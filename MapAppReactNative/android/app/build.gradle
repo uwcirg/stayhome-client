@@ -107,6 +107,9 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        manifestPlaceholders = [
+                appAuthRedirectScheme: 'edu.washington.cirg.mapapp'
+        ]
     }
     splits {
         abi {
@@ -138,6 +141,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-app-auth')
     implementation project(':react-native-gesture-handler')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
