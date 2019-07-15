@@ -1,102 +1,14 @@
 /**
- * Sample React Native App
  * https://github.com/facebook/react-native
  *
  * @format
  * @flow
  */
 
-// import React, {Fragment} from 'react';
-// import {
-//   SafeAreaView,
-//   StyleSheet,
-//   ScrollView,
-//   View,
-//   Text,
-//   StatusBar,
-// } from 'react-native';
-//
-// import {
-//   Header,
-//   LearnMoreLinks,
-//   Colors,
-//   DebugInstructions,
-//   ReloadInstructions,
-// } from 'react-native/Libraries/NewAppScreen';
-//
-// const App = () => {
-//   return (
-//     <Fragment>
-//       <StatusBar barStyle="light-content" />
-//       <SafeAreaView>
-//         <ScrollView
-//           contentInsetAdjustmentBehavior="automatic"
-//           style={styles.scrollView}>
-//           <Header />
-//           <View style={styles.body}>
-//             <View style={styles.sectionContainer}>
-//               <Text style={styles.sectionTitle}>Step One</Text>
-//               <Text style={styles.sectionDescription}>
-//                 Edit <Text style={styles.highlight}>App.js</Text> to change this
-//                 screen and then come back to see your edits.
-//               </Text>
-//             </View>
-//             <View style={styles.sectionContainer}>
-//               <Text style={styles.sectionTitle}>See Your Changes</Text>
-//               <Text style={styles.sectionDescription}>
-//                 <ReloadInstructions />
-//               </Text>
-//             </View>
-//             <View style={styles.sectionContainer}>
-//               <Text style={styles.sectionTitle}>Debug</Text>
-//               <Text style={styles.sectionDescription}>
-//                 <DebugInstructions />
-//               </Text>
-//             </View>
-//             <View style={styles.sectionContainer}>
-//               <Text style={styles.sectionTitle}>Learn More</Text>
-//               <Text style={styles.sectionDescription}>
-//                 Read the docs to discover what to do next:
-//               </Text>
-//             </View>
-//             <LearnMoreLinks />
-//           </View>
-//         </ScrollView>
-//       </SafeAreaView>
-//     </Fragment>
-//   );
-// };
-//
-// const styles = StyleSheet.create({
-//   scrollView: {
-//     backgroundColor: Colors.lighter,
-//   },
-//   body: {
-//     backgroundColor: Colors.white,
-//   },
-//   sectionContainer: {
-//     marginTop: 32,
-//     paddingHorizontal: 24,
-//   },
-//   sectionTitle: {
-//     fontSize: 24,
-//     fontWeight: '600',
-//     color: Colors.black,
-//   },
-//   sectionDescription: {
-//     marginTop: 8,
-//     fontSize: 18,
-//     fontWeight: '400',
-//     color: Colors.dark,
-//   },
-//   highlight: {
-//     fontWeight: '700',
-//   },
-// });
 import React from 'react';
 import { Button, Text, View } from 'react-native';
 import { createAppContainer, createStackNavigator } from 'react-navigation';
-import { authorize, revoke } from 'react-native-app-auth';
+import { authorize } from 'react-native-app-auth';
 
 const clientId = 'map-app-client';
 const redirectUrl = 'edu.washington.cirg.mapapp:/callback';
@@ -107,7 +19,12 @@ const clientSecret = 'b284cf4f-17e7-4464-987e-3c320b22cfac';
 class HomeScreen extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { isLoggedIn: false, refreshToken: null };
+    this.state = {
+      isLoggedIn: false,
+      accessToken: null,
+      accessTokenExpirationDate: null,
+      refreshToken: null,
+    };
   }
 
   static navigationOptions = {
@@ -142,6 +59,7 @@ class HomeScreen extends React.Component {
       clientSecret: clientSecret,
       redirectUrl: redirectUrl,
       scopes: ['openid', 'profile'],
+      additionalParameters: { prompt: 'login' },
     };
 
     // Log in to get an authentication token
@@ -156,6 +74,7 @@ class HomeScreen extends React.Component {
           isLoggedIn: true,
           refreshToken: authState.refreshToken,
           accessToken: authState.accessToken,
+          accessTokenExpirationDate: authState.accessTokenExpirationDate,
         }));
         console.warn('Log in successful');
       },
@@ -179,26 +98,6 @@ class HomeScreen extends React.Component {
       scopes: ['openid', 'profile'],
     };
 
-    // console.log(
-    //   'curl -X POST -d \'{ "client_id" : "map-app-client", "client_secret":' +
-    //     ' "b284cf4f-17e7-4464-987e-3c320b22cfac","refresh_token" :' +
-    //     this.state.refreshToken +
-    //     "}' -H" +
-    //     ' "Content-Type:application/x-www-form-urlencoded" -H "Authorization: bearer ' +
-    //     this.state.accessToken +
-    //     '" https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp/protocol/openid-connect/logout'
-    // );
-
-    // revoke(config, {
-    //   tokenToRevoke: this.state.refreshToken,
-    // }).then(
-    //   value => {
-    //     console.warn(value);
-    //   },
-    //   reason => {
-    //     console.error(reason);
-    //   }
-    // );
     fetch(
       'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp/protocol/openid-connect/logout?clientId=' +
         clientId +
@@ -209,7 +108,7 @@ class HomeScreen extends React.Component {
         '&redirect_uri=' +
         redirectUrlEncoded,
       {
-        method: 'POST',
+        method: 'GET',
         headers: {
           Authorization: 'Bearer ' + this.state.accessToken,
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -217,10 +116,16 @@ class HomeScreen extends React.Component {
       }
     ).then(
       value => {
-        if (!value.ok) {
+        if (value.status !== 302) {
           console.warn('Log out not complete: ' + value.status);
         } else {
-          this.setState(previousState => ({ isLoggedIn: false }));
+          console.warn('Logged out');
+          this.setState(previousState => ({
+            isLoggedIn: false,
+            refreshToken: null,
+            accessToken: null,
+            accessTokenExpirationDate: null,
+          }));
         }
       },
       reason => {
