@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -12,8 +13,6 @@
 		00C302E91ABCBA2D00DB3ED1 /* libRCTNetwork.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302DC1ABCB9D200DB3ED1 /* libRCTNetwork.a */; };
 		00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302E41ABCB9EE00DB3ED1 /* libRCTVibration.a */; };
 		00E356F31AD99517003FC87E /* MapAppReactNativeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* MapAppReactNativeTests.m */; };
-		0A51D60CE2005EDB9985E99C /* Pods_MapAppReactNativeTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8F2705EE1993F1CC6F72A31 /* Pods_MapAppReactNativeTests.framework */; };
-		0EB714AD3C19A358B4F565C7 /* Pods_MapAppReactNative.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4577B372DB084351038A17BF /* Pods_MapAppReactNative.framework */; };
 		11D1A2F320CAFA9E000508D9 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
 		133E29F31AD74F7200F7D852 /* libRCTLinking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 78C398B91ACF4ADC00677621 /* libRCTLinking.a */; };
 		139105C61AF99C1200B5F7CC /* libRCTSettings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 139105C11AF99BAD00B5F7CC /* libRCTSettings.a */; };
@@ -27,6 +26,8 @@
 		2E4ADCDBC2834CF1BC2D7342 /* libRNAppAuth.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9BB6A8DAE88A48AC91BF0973 /* libRNAppAuth.a */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */; };
+		AFCDDE3A4BD0178B09621E40 /* Pods_MapAppReactNative.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BD5326D9DC3596C0AE271356 /* Pods_MapAppReactNative.framework */; };
+		E5FD8501D8512E9B95AF30DA /* Pods_MapAppReactNativeTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02EA751391C7846177A37AD1 /* Pods_MapAppReactNativeTests.framework */; };
 		ED297163215061F000B7C4FE /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED297162215061F000B7C4FE /* JavaScriptCore.framework */; };
 		EE6DB33AFBFC498880ACCC38 /* libRNGestureHandler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BC5C8D9B120548ED88197AB9 /* libRNGestureHandler.a */; };
 /* End PBXBuildFile section */
@@ -331,7 +332,7 @@
 		00E356EE1AD99517003FC87E /* MapAppReactNativeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MapAppReactNativeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* MapAppReactNativeTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MapAppReactNativeTests.m; sourceTree = "<group>"; };
-		018B1BBFC758D8F96FC92EA2 /* Pods-MapAppReactNativeTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MapAppReactNativeTests.release.xcconfig"; path = "Target Support Files/Pods-MapAppReactNativeTests/Pods-MapAppReactNativeTests.release.xcconfig"; sourceTree = "<group>"; };
+		02EA751391C7846177A37AD1 /* Pods_MapAppReactNativeTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MapAppReactNativeTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		139105B61AF99BAD00B5F7CC /* RCTSettings.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTSettings.xcodeproj; path = "../node_modules/react-native/Libraries/Settings/RCTSettings.xcodeproj"; sourceTree = "<group>"; };
 		139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTWebSocket.xcodeproj; path = "../node_modules/react-native/Libraries/WebSocket/RCTWebSocket.xcodeproj"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* MapAppReactNative.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MapAppReactNative.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -343,19 +344,19 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = MapAppReactNative/main.m; sourceTree = "<group>"; };
 		146833FF1AC3E56700842450 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
 		2D16E6891FA4F8E400B85C8A /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		4577B372DB084351038A17BF /* Pods_MapAppReactNative.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MapAppReactNative.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		479E2CA85EB01567E89737FB /* Pods-MapAppReactNativeTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MapAppReactNativeTests.debug.xcconfig"; path = "Target Support Files/Pods-MapAppReactNativeTests/Pods-MapAppReactNativeTests.debug.xcconfig"; sourceTree = "<group>"; };
+		3DE863CB2A74F39FEE02CEF6 /* Pods-MapAppReactNative.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MapAppReactNative.release.xcconfig"; path = "Target Support Files/Pods-MapAppReactNative/Pods-MapAppReactNative.release.xcconfig"; sourceTree = "<group>"; };
 		4C1AA12FAB214337B6AA703A /* libRNGestureHandler-tvOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = "libRNGestureHandler-tvOS.a"; sourceTree = "<group>"; };
-		4EBC83F4D26FC0ADA9A919C0 /* Pods-MapAppReactNative.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MapAppReactNative.debug.xcconfig"; path = "Target Support Files/Pods-MapAppReactNative/Pods-MapAppReactNative.debug.xcconfig"; sourceTree = "<group>"; };
+		527264D2F135E1B41062E0AA /* Pods-MapAppReactNativeTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MapAppReactNativeTests.release.xcconfig"; path = "Target Support Files/Pods-MapAppReactNativeTests/Pods-MapAppReactNativeTests.release.xcconfig"; sourceTree = "<group>"; };
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
-		8A636EEDBDAE5B9F7C1FED69 /* Pods-MapAppReactNative.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MapAppReactNative.release.xcconfig"; path = "Target Support Files/Pods-MapAppReactNative/Pods-MapAppReactNative.release.xcconfig"; sourceTree = "<group>"; };
 		9BB6A8DAE88A48AC91BF0973 /* libRNAppAuth.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNAppAuth.a; sourceTree = "<group>"; };
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
 		B876CD161F504B078FA04470 /* RNAppAuth.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNAppAuth.xcodeproj; path = "../node_modules/react-native-app-auth/ios/RNAppAuth.xcodeproj"; sourceTree = "<group>"; };
 		BC5C8D9B120548ED88197AB9 /* libRNGestureHandler.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNGestureHandler.a; sourceTree = "<group>"; };
-		D8F2705EE1993F1CC6F72A31 /* Pods_MapAppReactNativeTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MapAppReactNativeTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BD5326D9DC3596C0AE271356 /* Pods_MapAppReactNative.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MapAppReactNative.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D0A740D2F03FD6EB14E3C227 /* Pods-MapAppReactNativeTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MapAppReactNativeTests.debug.xcconfig"; path = "Target Support Files/Pods-MapAppReactNativeTests/Pods-MapAppReactNativeTests.debug.xcconfig"; sourceTree = "<group>"; };
+		D6FD283B5D7351E872C979AC /* Pods-MapAppReactNative.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MapAppReactNative.debug.xcconfig"; path = "Target Support Files/Pods-MapAppReactNative/Pods-MapAppReactNative.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 		EF39AB3474474B0E8995D092 /* RNGestureHandler.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNGestureHandler.xcodeproj; path = "../node_modules/react-native-gesture-handler/ios/RNGestureHandler.xcodeproj"; sourceTree = "<group>"; };
@@ -367,7 +368,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				140ED2AC1D01E1AD002B40FF /* libReact.a in Frameworks */,
-				0A51D60CE2005EDB9985E99C /* Pods_MapAppReactNativeTests.framework in Frameworks */,
+				E5FD8501D8512E9B95AF30DA /* Pods_MapAppReactNativeTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -390,7 +391,7 @@
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
 				EE6DB33AFBFC498880ACCC38 /* libRNGestureHandler.a in Frameworks */,
 				2E4ADCDBC2834CF1BC2D7342 /* libRNAppAuth.a in Frameworks */,
-				0EB714AD3C19A358B4F565C7 /* Pods_MapAppReactNative.framework in Frameworks */,
+				AFCDDE3A4BD0178B09621E40 /* Pods_MapAppReactNative.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -456,6 +457,18 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		026FB1F96C5466745FC05602 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				D6FD283B5D7351E872C979AC /* Pods-MapAppReactNative.debug.xcconfig */,
+				3DE863CB2A74F39FEE02CEF6 /* Pods-MapAppReactNative.release.xcconfig */,
+				D0A740D2F03FD6EB14E3C227 /* Pods-MapAppReactNativeTests.debug.xcconfig */,
+				527264D2F135E1B41062E0AA /* Pods-MapAppReactNativeTests.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		139105B71AF99BAD00B5F7CC /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -519,8 +532,8 @@
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
-				4577B372DB084351038A17BF /* Pods_MapAppReactNative.framework */,
-				D8F2705EE1993F1CC6F72A31 /* Pods_MapAppReactNativeTests.framework */,
+				BD5326D9DC3596C0AE271356 /* Pods_MapAppReactNative.framework */,
+				02EA751391C7846177A37AD1 /* Pods_MapAppReactNativeTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -582,7 +595,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BB7964F822DCFE160029BFBC /* Recovered References */,
-				974F7A44D0507312535E3543 /* Pods */,
+				026FB1F96C5466745FC05602 /* Pods */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -596,18 +609,6 @@
 				00E356EE1AD99517003FC87E /* MapAppReactNativeTests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		974F7A44D0507312535E3543 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				4EBC83F4D26FC0ADA9A919C0 /* Pods-MapAppReactNative.debug.xcconfig */,
-				8A636EEDBDAE5B9F7C1FED69 /* Pods-MapAppReactNative.release.xcconfig */,
-				479E2CA85EB01567E89737FB /* Pods-MapAppReactNativeTests.debug.xcconfig */,
-				018B1BBFC758D8F96FC92EA2 /* Pods-MapAppReactNativeTests.release.xcconfig */,
-			);
-			name = Pods;
-			path = Pods;
 			sourceTree = "<group>";
 		};
 		ADBDB9201DFEBF0600ED6528 /* Products */ = {
@@ -653,7 +654,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "MapAppReactNativeTests" */;
 			buildPhases = (
-				FFC02CAFF3FAD9ED20067492 /* [CP] Check Pods Manifest.lock */,
+				9827F5A6C2F497C68EA37F9C /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
@@ -672,12 +673,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "MapAppReactNative" */;
 			buildPhases = (
-				4C9E4B20E79E18981A43028A /* [CP] Check Pods Manifest.lock */,
+				B38BFA878195061F7AE8CDFF /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				1035DA7A4B23E4A32EE7ACD1 /* [CP] Embed Pods Frameworks */,
+				70928601CA1335A144D49FF1 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1098,7 +1099,7 @@
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
 		};
-		1035DA7A4B23E4A32EE7ACD1 /* [CP] Embed Pods Frameworks */ = {
+		70928601CA1335A144D49FF1 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1116,29 +1117,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-MapAppReactNative/Pods-MapAppReactNative-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		4C9E4B20E79E18981A43028A /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-MapAppReactNative-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		FFC02CAFF3FAD9ED20067492 /* [CP] Check Pods Manifest.lock */ = {
+		9827F5A6C2F497C68EA37F9C /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1154,6 +1133,28 @@
 			);
 			outputPaths = (
 				"$(DERIVED_FILE_DIR)/Pods-MapAppReactNativeTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B38BFA878195061F7AE8CDFF /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-MapAppReactNative-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1205,7 +1206,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 479E2CA85EB01567E89737FB /* Pods-MapAppReactNativeTests.debug.xcconfig */;
+			baseConfigurationReference = D0A740D2F03FD6EB14E3C227 /* Pods-MapAppReactNativeTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1239,7 +1240,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 018B1BBFC758D8F96FC92EA2 /* Pods-MapAppReactNativeTests.release.xcconfig */;
+			baseConfigurationReference = 527264D2F135E1B41062E0AA /* Pods-MapAppReactNativeTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -1270,7 +1271,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4EBC83F4D26FC0ADA9A919C0 /* Pods-MapAppReactNative.debug.xcconfig */;
+			baseConfigurationReference = D6FD283B5D7351E872C979AC /* Pods-MapAppReactNative.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1295,7 +1296,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8A636EEDBDAE5B9F7C1FED69 /* Pods-MapAppReactNative.release.xcconfig */;
+			baseConfigurationReference = 3DE863CB2A74F39FEE02CEF6 /* Pods-MapAppReactNative.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
