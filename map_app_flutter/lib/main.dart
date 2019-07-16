@@ -1,11 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:simple_auth/simple_auth.dart';
-import 'package:simple_auth_flutter/simple_auth_flutter.dart';
+import 'package:flutter_appauth/flutter_appauth.dart';
+import 'package:http/http.dart' show get;
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   // This widget is the root of your application.
+  @override
+  State<StatefulWidget> createState() {
+    return new _MyAppState();
+  }
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -47,8 +59,17 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  bool _isLoggedIn = false;
+  String _accessToken;
+  DateTime _accessTokenExpirationDateTime;
+  String _refreshToken;
 
   double padding = 24.0;
+
+  final String _clientId = 'map-app-client';
+  final String _issuer = 'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp';
+  final String _redirectUrl = 'edu.washington.cirg.mapapp:/callback';
+  final String _clientSecret = 'b284cf4f-17e7-4464-987e-3c320b22cfac';
 
   void _incrementCounter() {
     setState(() {
@@ -58,7 +79,6 @@ class _MyHomePageState extends State<MyHomePage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _counter++;
-      throw new Exception();
     });
   }
 
@@ -105,15 +125,18 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Text(
               '$_counter',
-              style: Theme.of(context).textTheme.display1,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .display1,
             ),
             RaisedButton(
               onPressed: _goToProfile,
               child: Text("Go to profile"),
             ),
             RaisedButton(
-              onPressed: _mapAppLogin,
-              child: Text("Login"),
+              onPressed: _isLoggedIn ? _mapAppLogout : _mapAppLogin,
+              child: _isLoggedIn ? Text("Logout") : Text("Login"),
             )
           ],
         ),
@@ -141,7 +164,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: <Widget>[
                       Text(
                         "This is the profile",
-                        style: Theme.of(context).textTheme.display1,
+                        style: Theme
+                            .of(context)
+                            .textTheme
+                            .display1,
                       ),
                       RaisedButton(
                         child: Text("Back to Home"),
@@ -157,6 +183,59 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _mapAppLogin() {
+    FlutterAppAuth appAuth = FlutterAppAuth();
+    var authorizationTokenRequest = AuthorizationTokenRequest(
+        _clientId, _redirectUrl,
+        issuer: _issuer,
+        scopes: ['openid', 'profile'],
+        clientSecret: _clientSecret,
+        promptValues: ['login']
+    );
 
+    appAuth.authorizeAndExchangeCode(
+      authorizationTokenRequest,
+    ).then((AuthorizationTokenResponse value) {
+      snack("Logged in");
+      setState(() {
+        _isLoggedIn = true;
+        _accessToken = value.accessToken;
+        _accessTokenExpirationDateTime = value.accessTokenExpirationDateTime;
+        _refreshToken = value.refreshToken;
+      });
+    }).catchError((Object error) {
+      snack("Login failed");
+    });
+  }
+
+  void _mapAppLogout() {
+    var url = 'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp/protocol/openid-connect/logout?clientId=' +
+        _clientId + '&refresh_token=' + _refreshToken + '&client_secret=' +
+        _clientSecret;
+
+    get(url, headers: {
+      'Authorization': 'Bearer ' + _accessToken,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    }).then((value) {
+      print(value.statusCode);
+      if (value.statusCode == 200) {
+        snack("Logged out");
+        setState(() {
+          _isLoggedIn = false;
+          _accessToken = null;
+          _accessTokenExpirationDateTime = null;
+          _refreshToken = null;
+        });
+      } else {
+        snack("Log out not completed: " + value.statusCode.toString());
+      }
+    }).catchError((error) {
+      print(error);
+      snack("Log out error: " + error.toString());
+    });
+  }
+
+  void snack(String text) {
+    //Scaffold.of(context).showSnackBar(new SnackBar(content: new Text(text)));
+    print(text);
   }
 }
