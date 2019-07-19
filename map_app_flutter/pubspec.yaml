@@ -25,6 +25,8 @@ dependencies:
   cupertino_icons: ^0.1.2
   simple_auth_flutter: 2.0.4
   flutter_appauth: 0.3.0
+  english_words: ^3.1.0
+  toast: 0.1.5
 
 dev_dependencies:
   flutter_test:
