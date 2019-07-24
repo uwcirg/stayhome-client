@@ -104,9 +104,7 @@ class HomeScreen extends React.Component {
         '&refresh_token=' +
         this.state.refreshToken +
         '&client_secret=' +
-        clientSecret +
-        '&redirect_uri=' +
-        redirectUrlEncoded,
+        clientSecret,
       {
         method: 'GET',
         headers: {
@@ -116,7 +114,7 @@ class HomeScreen extends React.Component {
       }
     ).then(
       value => {
-        if (value.status !== 302) {
+        if (!value.ok) {
           console.warn('Log out not complete: ' + value.status);
         } else {
           console.warn('Logged out');
