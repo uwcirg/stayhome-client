@@ -48,11 +48,6 @@ build:bundle:
     paths:
       - build/app/outputs/bundle
 
-test:android:
-  stage: test
-  script:
-    - cd android
-    - ./gradlew -Pci --console=plain :app:testDebug
 test:flutter:
   stage: test
   script:
