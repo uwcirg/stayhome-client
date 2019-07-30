@@ -1,0 +1,15 @@
+{
+  "demoVersionBannerText": "Demo version - not for clinical use.",
+  "hello": "Hello!",
+  "versionString": "Version $version",
+  "developedByCIRG": "Developed by the Clinical Informatics Research Group (CIRG) at University of Washington, 2019.",
+  "about": "About",
+  "logout": "Logout",
+  "login": "Login",
+  "profile": "Profile",
+  "email": "Email: $email",
+  "buttonPushText": "You have pushed the button this many times:",
+  "languageName": "English (EN)",
+  "language": "Language",
+
+}
