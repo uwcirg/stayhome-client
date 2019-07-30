@@ -1,0 +1,69 @@
+stages:
+  - unit_tests_ios
+  - unit_tests_android
+  - build_ios
+  - build_android
+
+variables:
+  LC_ALL: "en_US.UTF-8"
+  LANG: "en_US.UTF-8"
+
+before_script:
+  - gem install bundler
+  - bundle install
+
+unit_tests_ios:
+  dependencies: []
+  stage: unit_tests_ios
+  artifacts:
+    paths:
+      - fastlane/screenshots
+      - fastlane/logs
+  script:
+    - fastlane tests
+  tags:
+    - ios
+
+unit_tests_android:
+  dependencies: []
+  stage: unit_tests_android
+  artifacts:
+    paths:
+      - fastlane/screenshots
+      - fastlane/logs
+  script:
+    - fastlane tests
+  tags:
+    - android
+
+ios_build:
+  dependencies: []
+  stage: build_ios
+  artifacts:
+    paths:
+      - fastlane/screenshots
+      - fastlane/logs
+  script:
+    - flutter build ios --release --no-codesign
+    - flutter build ios --no-codesign
+  tags:
+    - ios
+  only:
+     - /^release-.*$/
+     - master
+
+android_build:
+  dependencies: []
+  stage: build_android
+  artifacts:
+    paths:
+      - android/build/app/outputs/apk/release/app-release.apk
+      - android/build/app/outputs/apk/debug/app-debug.apk
+  script:
+    - flutter build apk --release
+    - flutter build apk
+  tags:
+    - android
+  only:
+    - /^release-.*$/
+    - master

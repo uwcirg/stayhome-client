@@ -1,4 +1,4 @@
-package com.example.map_app_flutter;
+package edu.washington.cirg.map_app_flutter;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;
