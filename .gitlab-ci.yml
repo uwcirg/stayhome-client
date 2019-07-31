@@ -36,6 +36,7 @@ stages:
 build:apk:
   only:
     - schedules
+    - web
   stage: build
   script:
     - flutter build apk
@@ -47,6 +48,7 @@ build:apk:
 build:bundle:
   only:
     - schedules
+    - web
   stage: build
   script:
     - flutter build appbundle

@@ -12,7 +12,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
-  - Flutter (from `.symlinks/flutter/ios-release`)
+  - Flutter (from `.symlinks/flutter/ios`)
   - flutter_appauth (from `.symlinks/plugins/flutter_appauth/ios`)
   - simple_auth_flutter (from `.symlinks/plugins/simple_auth_flutter/ios`)
 
@@ -22,7 +22,7 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   Flutter:
-    :path: ".symlinks/flutter/ios-release"
+    :path: ".symlinks/flutter/ios"
   flutter_appauth:
     :path: ".symlinks/plugins/flutter_appauth/ios"
   simple_auth_flutter:
