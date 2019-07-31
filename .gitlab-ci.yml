@@ -34,19 +34,26 @@ stages:
   - build
 
 build:apk:
+  only:
+    - schedules
   stage: build
   script:
     - flutter build apk
   artifacts:
     paths:
       - build/app/outputs/apk
+    expire_in: 1 day
+
 build:bundle:
+  only:
+    - schedules
   stage: build
   script:
     - flutter build appbundle
   artifacts:
     paths:
       - build/app/outputs/bundle
+    expire_in: 1 day
 
 test:flutter:
   stage: test
