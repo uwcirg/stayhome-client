@@ -45,17 +45,17 @@ build:apk:
       - build/app/outputs/apk/app.apk
     expire_in: 1 day
 
-build:ios:
-  only:
-    - schedules
-    - web
-  stage: build
-  script:
-    - flutter build ios --no-codesign
-  artifacts:
-    paths:
-      - build/ios/iphoneos/Runner.app
-    expire_in: 1 day
+# build:ios:
+#   only:
+#     - schedules
+#     - web
+#   stage: build
+#   script:
+#     - flutter build ios --no-codesign
+#   artifacts:
+#     paths:
+#       - build/ios/iphoneos/Runner.app
+#     expire_in: 1 day
 
 test:flutter:
   stage: test
