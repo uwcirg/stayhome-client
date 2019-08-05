@@ -11,5 +11,6 @@
   "buttonPushText": "You have pushed the button this many times:",
   "languageName": "English (EN)",
   "language": "Language",
-
+  "help": "Help",
+  "time_left_until_token_expiration": "Time left until token expiration: $_timeLeftInSeconds seconds"
 }

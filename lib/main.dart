@@ -2,36 +2,51 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:english_words/english_words.dart';
+import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/material.dart';
-import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart' show Response, get, post;
 import 'package:toast/toast.dart';
 
+import 'KeycloakAuth.dart';
 import 'generated/i18n.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  Widget home = new LoginPage();
+  runApp(MyApp(home));
+}
 
 class MyApp extends StatefulWidget {
-  static _MyAppState of(BuildContext context) => context.ancestorStateOfType(const TypeMatcher<_MyAppState>());
+  Widget _home;
+
+  MyApp(this._home);
+
+  static _MyAppState of(BuildContext context) =>
+      context.ancestorStateOfType(const TypeMatcher<_MyAppState>());
 
   @override
   State<StatefulWidget> createState() {
-    return new _MyAppState();
+    return new _MyAppState(_home);
   }
 }
 
 class _MyAppState extends State<MyApp> {
-  String _accessToken;
-  DateTime _accessTokenExpirationDateTime;
-  bool _isLoggedIn = false;
-  String _refreshToken;
-  final String _issuer = 'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp';
-  final String _redirectUrl = 'edu.washington.cirg.mapapp:/callback';
-  final String _clientSecret = 'b284cf4f-17e7-4464-987e-3c320b22cfac';
-  final String _clientId = 'map-app-client';
-
+  Widget _defaultHome;
+  Widget _homePage;
   String _locale = 'en';
+  KeycloakAuth auth;
+
+  _MyAppState(Widget home) {
+    _homePage = MyHomePage(this.onChangeLanguage, title: 'CIRG Map App');
+    auth = KeycloakAuth();
+
+    if (home != null) {
+      _defaultHome = home;
+    } else {
+      _defaultHome = _homePage;
+    }
+  }
 
   @override
   void initState() {
@@ -51,11 +66,13 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
       ),
-      home: MyHomePage(this.onChangeLanguage, title: 'CIRG Map App'),
+      home: _defaultHome,
       routes: <String, WidgetBuilder>{
+        "/home": (BuildContext context) => _homePage,
         "/profile": (BuildContext context) => ProfilePage(),
         "/help": (BuildContext context) => HelpPage(),
-        "/about": (BuildContext context) => AboutPage()
+        "/about": (BuildContext context) => AboutPage(),
+        "/login": (BuildContext context) => LoginPage()
       },
       locale: Locale(_locale, ""),
       localizationsDelegates: [
@@ -64,72 +81,9 @@ class _MyAppState extends State<MyApp> {
         GlobalWidgetsLocalizations.delegate,
       ],
       supportedLocales: S.delegate.supportedLocales,
-      localeResolutionCallback: S.delegate.resolution(fallback: new Locale("en", "")),
+      localeResolutionCallback:
+          S.delegate.resolution(fallback: new Locale("en", "")),
     );
-  }
-
-  void _mapAppLogin() {
-    FlutterAppAuth appAuth = FlutterAppAuth();
-
-    appAuth
-        .authorizeAndExchangeCode(
-      AuthorizationTokenRequest(_clientId, _redirectUrl,
-          issuer: _issuer, scopes: ['openid', 'profile'], clientSecret: _clientSecret, promptValues: ['login']),
-    )
-        .then((AuthorizationTokenResponse value) {
-      snack("Logged in", context);
-      setState(() {
-        _isLoggedIn = true;
-        _accessToken = value.accessToken;
-        _accessTokenExpirationDateTime = value.accessTokenExpirationDateTime;
-        _refreshToken = value.refreshToken;
-      });
-    }).catchError((Object error) {
-      snack("Login failed", context);
-    });
-  }
-
-  void _mapAppLogout() {
-    var url =
-        'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp/protocol/openid-connect/logout?clientId=$_clientId&refresh_token=$_refreshToken&client_secret=$_clientSecret';
-
-    get(url, headers: {
-      'Authorization': 'Bearer $_accessToken',
-      'Content-Type': 'application/x-www-form-urlencoded',
-    }).then((value) {
-      if (value.statusCode == 200) {
-        snack("Logged out", context);
-        setState(() {
-          _isLoggedIn = false;
-          _accessToken = null;
-          _accessTokenExpirationDateTime = null;
-          _refreshToken = null;
-        });
-      } else {
-        snack("Log out not completed: ${value.statusCode}", context);
-      }
-    }).catchError((error) {
-      snack("Log out error: $error", context);
-    });
-  }
-
-  Future _mapAppRefreshTokens() async {
-    FlutterAppAuth appAuth = FlutterAppAuth();
-    return appAuth
-        .token(TokenRequest(_clientId, _redirectUrl,
-            issuer: _issuer, refreshToken: _refreshToken, scopes: ['openid', 'profile'], clientSecret: _clientSecret))
-        .then((TokenResponse value) {
-      setState(() {
-        _isLoggedIn = true;
-        _accessToken = value.accessToken;
-        _accessTokenExpirationDateTime = value.accessTokenExpirationDateTime;
-        _refreshToken = value.refreshToken;
-      });
-      return Future.value("Tokens updated successfully.");
-    }).catchError((Object error) {
-      snack("Token refresh failed", context);
-      return Future.error(error);
-    });
   }
 }
 
@@ -149,17 +103,9 @@ class AboutPage extends StatelessWidget {
         ),
         body: Column(
           children: <Widget>[
-            Column(
-              children: <Widget>[
-                Text(S.of(context).demoVersionBannerText,
-                    style: TextStyle(
-                      backgroundColor: Colors.yellow,
-                    )),
-              ],
-              mainAxisSize: MainAxisSize.max,
-            ),
+            DemoVersionWarningBanner(),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(padding),
               child: Column(
                 children: [
                   Text(S.of(context).developedByCIRG),
@@ -170,6 +116,18 @@ class AboutPage extends StatelessWidget {
             ),
           ],
         ));
+  }
+}
+
+class DemoVersionWarningBanner extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Visibility(
+        visible: !Foundation.kReleaseMode,
+        child: Container(
+            color: Colors.amber.shade100,
+            alignment: FractionalOffset.center,
+            child: Text(S.of(context).demoVersionBannerText)));
   }
 }
 
@@ -184,10 +142,12 @@ class _HelpPageState extends State<HelpPage> {
   }
 
   void _updateTimeLeft() {
-    DateTime tokenExpDate = MyApp.of(context)._accessTokenExpirationDateTime;
+    DateTime tokenExpDate =
+        MyApp.of(context).auth.accessTokenExpirationDateTime;
     if (tokenExpDate != null) {
       setState(() {
-        _timeLeftInSeconds = tokenExpDate.difference(new DateTime.now()).inSeconds;
+        _timeLeftInSeconds =
+            tokenExpDate.difference(new DateTime.now()).inSeconds;
       });
     }
   }
@@ -197,7 +157,7 @@ class _HelpPageState extends State<HelpPage> {
     final wordPair = WordPair.random();
     return Scaffold(
         appBar: AppBar(
-          title: Text('Help'),
+          title: Text(S.of(context).help),
         ),
         body: Padding(
             padding: EdgeInsets.all(padding),
@@ -208,7 +168,52 @@ class _HelpPageState extends State<HelpPage> {
                   wordPair.asPascalCase,
                   style: Theme.of(context).textTheme.display1,
                 ),
-                Text("Time left until token expiration: $_timeLeftInSeconds seconds"),
+                Text(S
+                    .of(context)
+                    .time_left_until_token_expiration('$_timeLeftInSeconds')),
+              ],
+            )));
+  }
+}
+
+class LoginPage extends StatefulWidget {
+  @override
+  LoginPageState createState() => LoginPageState();
+}
+
+class LoginPageState extends State<LoginPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+              icon: Icon(Icons.close),
+              onPressed: () => Navigator.of(context).pushReplacementNamed('/home')),
+          backgroundColor: Colors.deepPurple.shade300,
+          elevation: 0,
+        ),
+        body: Container(
+            color: Colors.deepPurple.shade300,
+            alignment: FractionalOffset.center,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                SvgPicture.asset(
+                  "assets/female.svg",
+                  color: Colors.white,
+                  height: 200,
+                ),
+                FlatButton(
+                    onPressed: () => MyApp.of(context)
+                        .auth
+                        .mapAppLogin()
+                        .then((value) =>
+                            Navigator.of(context).pushReplacementNamed('/home'))
+                        .catchError((error) => snack("$error", context)),
+                    child: Text(
+                      S.of(context).login,
+                      style: Theme.of(context).primaryTextTheme.title,
+                    ))
               ],
             )));
   }
@@ -228,14 +233,17 @@ class MyHomePage extends StatefulWidget {
 void snack(String text, context) {
   //Scaffold.of(context).showSnackBar(new SnackBar(content: new Text(text)));
   print(text);
-  Toast.show(text, context, duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
+  Toast.show(text, context,
+      duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
 }
 
-double padding = 24.0;
+const double padding = 24.0;
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   final void Function(String) onChangeLanguage;
+
+  bool _updateState = false;
 
   _MyHomePageState(this.onChangeLanguage);
 
@@ -259,7 +267,9 @@ class _MyHomePageState extends State<MyHomePage> {
               }),
           IconButton(
               icon: Icon(Icons.account_circle),
-              onPressed: MyApp.of(context)._isLoggedIn ? () => Navigator.pushNamed(context, "/profile") : null)
+              onPressed: MyApp.of(context).auth.isLoggedIn
+                  ? () => Navigator.pushNamed(context, "/profile")
+                  : null)
         ],
       ),
       drawer: Drawer(
@@ -271,7 +281,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             decoration: BoxDecoration(color: Theme.of(context).primaryColor)),
         ListTile(
-          title: Text("About"),
+          title: Text(S.of(context).about),
           onTap: () {
             Navigator.pop(context);
             Navigator.pushNamed(context, '/about');
@@ -281,7 +291,10 @@ class _MyHomePageState extends State<MyHomePage> {
           title: Text(S.of(context).languageName),
           trailing: DropdownButton(
               items: S.delegate.supportedLocales.map((locale) {
-                return new DropdownMenuItem(child: Text(locale.languageCode), value: locale.languageCode,);
+                return new DropdownMenuItem(
+                  child: Text(locale.languageCode),
+                  value: locale.languageCode,
+                );
               }).toList(),
               onChanged: (item) {
                 onChangeLanguage(item);
@@ -294,17 +307,25 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(
-              S.of(context).buttonPushText,
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
+            Text(S.of(context).buttonPushText),
+            Text('$_counter',style: Theme.of(context).textTheme.display1),
             RaisedButton(
-              onPressed:
-                  MyApp.of(context)._isLoggedIn ? MyApp.of(context)._mapAppLogout : MyApp.of(context)._mapAppLogin,
-              child: MyApp.of(context)._isLoggedIn ? Text(S.of(context).logout) : Text(S.of(context).login),
+              onPressed: () {
+                if (MyApp.of(context).auth.isLoggedIn) {
+                  MyApp.of(context).auth.mapAppLogout()
+                      .then((value) => setState(() {
+                            _updateState = !_updateState;
+                          }));
+                } else {
+                  MyApp.of(context).auth.mapAppLogin()
+                      .then((value) => setState(() {
+                            _updateState = !_updateState;
+                          }));
+                }
+              },
+              child: MyApp.of(context).auth.isLoggedIn
+                  ? Text(S.of(context).logout)
+                  : Text(S.of(context).login),
             )
           ],
         ),
@@ -333,14 +354,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void initState() {
-    _getUserInfo().then((Response value) {
+    MyApp.of(context).auth.getUserInfo().then((Response value) {
       if (value.statusCode == 200) {
         setState(() {
           _userInfo = jsonDecode(value.body);
         });
       } else if (value.statusCode == 401) {
-        MyApp.of(context)._mapAppRefreshTokens().then((value) {
-          _getUserInfo().then((Response value) {
+        MyApp.of(context).auth.mapAppRefreshTokens().then((value) {
+          MyApp.of(context).auth.getUserInfo().then((Response value) {
             if (value.statusCode == 200) {
               setState(() {
                 _userInfo = jsonDecode(value.body);
@@ -352,7 +373,8 @@ class _ProfilePageState extends State<ProfilePage> {
             }
           }).catchError((error) {
             setState(() {
-              _error = "Error getting user info after successfully refreshing tokens: $error";
+              _error =
+                  "Error getting user info after successfully refreshing tokens: $error";
             });
           });
         }).catchError((error) {
@@ -408,12 +430,5 @@ class _ProfilePageState extends State<ProfilePage> {
           title: Text(S.of(context).profile),
         ),
         body: Center(child: new CircularProgressIndicator()));
-  }
-
-  Future<Response> _getUserInfo() {
-    var url = 'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp/protocol/openid-connect/userinfo';
-    return post(url, headers: {
-      'Authorization': 'Bearer ${MyApp.of(context)._accessToken}',
-    });
   }
 }

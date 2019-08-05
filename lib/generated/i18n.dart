@@ -24,12 +24,14 @@ class S implements WidgetsLocalizations {
   String get demoVersionBannerText => "Demo version - not for clinical use.";
   String get developedByCIRG => "Developed by the Clinical Informatics Research Group (CIRG) at University of Washington, 2019.";
   String get hello => "Hello!";
+  String get help => "Help";
   String get language => "Language";
   String get languageName => "English (EN)";
   String get login => "Login";
   String get logout => "Logout";
   String get profile => "Profile";
   String email(String email) => "Email: $email";
+  String time_left_until_token_expiration(String _timeLeftInSeconds) => "Time left until token expiration: $_timeLeftInSeconds seconds";
   String versionString(String version) => "Version $version";
 }
 
@@ -40,19 +42,13 @@ class $de extends S {
   TextDirection get textDirection => TextDirection.ltr;
 
   @override
-  String get logout => "Ausloggen";
-  @override
   String get profile => "Profil";
   @override
   String get buttonPushText => "Der Knopf wurde so oft gedrückt:";
   @override
-  String get demoVersionBannerText => "Demo version - nicht für klinischen Gebrauch.";
-  @override
   String get about => "Über";
   @override
   String get language => "Sprache";
-  @override
-  String get hello => "Hallo!";
   @override
   String get login => "Einloggen";
   @override
@@ -60,7 +56,17 @@ class $de extends S {
   @override
   String get languageName => "Deutsch (DE)";
   @override
+  String get help => "Hilfe";
+  @override
+  String get logout => "Ausloggen";
+  @override
+  String get demoVersionBannerText => "Demo version - nicht für klinischen Gebrauch.";
+  @override
+  String get hello => "Hallo!";
+  @override
   String versionString(String version) => "Version $version";
+  @override
+  String time_left_until_token_expiration(String _timeLeftInSeconds) => "Time left until token expiration: $_timeLeftInSeconds seconds";
   @override
   String email(String email) => "E-Mail: $email";
 }

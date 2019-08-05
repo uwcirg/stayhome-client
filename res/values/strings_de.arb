@@ -11,4 +11,6 @@
   "buttonPushText": "Der Knopf wurde so oft gedrückt:",
   "languageName": "Deutsch (DE)",
   "language": "Sprache",
+  "help": "Hilfe",
+  "time_left_until_token_expiration": "Time left until token expiration: $_timeLeftInSeconds seconds"
 }
