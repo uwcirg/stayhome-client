@@ -2,6 +2,8 @@
  * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
  */
 
+import 'dart:convert';
+
 import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:http/http.dart' show Response, get, post;
 
@@ -18,29 +20,27 @@ class KeycloakAuth {
 
   FlutterAppAuth _appAuth;
 
+  bool refreshTokenExpired = false;
+
   KeycloakAuth() {
     _appAuth = FlutterAppAuth();
   }
 
   Future mapAppLogin() async {
-    try {
-      AuthorizationTokenResponse value =
-          await _appAuth.authorizeAndExchangeCode(
-        AuthorizationTokenRequest(_clientId, _redirectUrl,
-            issuer: _issuer,
-            scopes: ['openid', 'profile'],
-            clientSecret: _clientSecret,
-            promptValues: ['login']),
-      );
+    AuthorizationTokenResponse value =
+        await _appAuth.authorizeAndExchangeCode(
+      AuthorizationTokenRequest(_clientId, _redirectUrl,
+          issuer: _issuer,
+          scopes: ['openid', 'profile'],
+          clientSecret: _clientSecret,
+          promptValues: ['login']),
+    );
 
-      isLoggedIn = true;
-      _accessToken = value.accessToken;
-      accessTokenExpirationDateTime = value.accessTokenExpirationDateTime;
-      _refreshToken = value.refreshToken;
-      return Future.value("Logged in");
-    } catch (error) {
-      return Future.error(error);
-    }
+    isLoggedIn = true;
+    _accessToken = value.accessToken;
+    accessTokenExpirationDateTime = value.accessTokenExpirationDateTime;
+    _refreshToken = value.refreshToken;
+    refreshTokenExpired = false;
   }
 
   Future mapAppLogout() async {
@@ -69,29 +69,65 @@ class KeycloakAuth {
 
   Future mapAppRefreshTokens() async {
     FlutterAppAuth appAuth = FlutterAppAuth();
-    return appAuth
+    TokenResponse value = await appAuth
         .token(TokenRequest(_clientId, _redirectUrl,
             issuer: _issuer,
             refreshToken: _refreshToken,
             scopes: ['openid', 'profile'],
-            clientSecret: _clientSecret))
-        .then((TokenResponse value) {
-      isLoggedIn = true;
-      _accessToken = value.accessToken;
-      accessTokenExpirationDateTime = value.accessTokenExpirationDateTime;
-      _refreshToken = value.refreshToken;
+            clientSecret: _clientSecret));
 
-      return Future.value("Tokens updated successfully.");
-    }).catchError((Object error) {
-      return Future.error("Token refresh failed: $error");
-    });
+    isLoggedIn = true;
+    _accessToken = value.accessToken;
+    accessTokenExpirationDateTime = value.accessTokenExpirationDateTime;
+    _refreshToken = value.refreshToken;
   }
 
-  Future<Response> getUserInfo() {
+  Future<Response> _getUserInfo() {
     var url =
         'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp/protocol/openid-connect/userinfo';
     return post(url, headers: {
       'Authorization': 'Bearer $_accessToken',
     });
+  }
+
+  Future getUserInfo() async {
+    var userInfo;
+    var returnError;
+
+    try {
+      Response value = await _getUserInfo();
+      if (value.statusCode == 200) {
+        userInfo = jsonDecode(value.body);
+      } else if (value.statusCode == 401) {
+        try {
+          var value = await mapAppRefreshTokens();
+          try {
+            var value = await _getUserInfo();
+
+            if (value.statusCode == 200) {
+              userInfo = jsonDecode(value.body);
+            } else {
+              returnError = "Error: ${value.statusCode} ${value.reasonPhrase}";
+            }
+          } catch (error) {
+            returnError =
+                "Error getting user info after successfully refreshing tokens: $error";
+          }
+        } catch (error) {
+          if (error.code == "token_failed") {
+            refreshTokenExpired = true;
+            isLoggedIn = false;
+          }
+          returnError = "Error refreshing tokens: $error";
+        }
+      } else {
+        returnError = "Error: ${value.statusCode} ${value.reasonPhrase}";
+      }
+    } catch (error) {
+      returnError = "Error getting user info: $error";
+    }
+
+    if (returnError != null) return Future.error(returnError);
+    return Future.value(userInfo);
   }
 }

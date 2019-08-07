@@ -7,9 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart' show Response, get, post;
+import 'package:scoped_model/scoped_model.dart';
 import 'package:toast/toast.dart';
 
 import 'KeycloakAuth.dart';
+import 'Model.dart';
 import 'generated/i18n.dart';
 
 void main() {
@@ -69,7 +71,8 @@ class _MyAppState extends State<MyApp> {
       home: _defaultHome,
       routes: <String, WidgetBuilder>{
         "/home": (BuildContext context) => _homePage,
-        "/profile": (BuildContext context) => ProfilePage(),
+        "/profile": (BuildContext context) => new ScopedModel<AppModel>(
+          model: new AppModel(), child: ProfilePage()),
         "/help": (BuildContext context) => HelpPage(),
         "/about": (BuildContext context) => AboutPage(),
         "/login": (BuildContext context) => LoginPage()
@@ -188,7 +191,8 @@ class LoginPageState extends State<LoginPage> {
         appBar: AppBar(
           leading: IconButton(
               icon: Icon(Icons.close),
-              onPressed: () => Navigator.of(context).pushReplacementNamed('/home')),
+              onPressed: () =>
+                  Navigator.of(context).pushReplacementNamed('/home')),
           backgroundColor: Colors.deepPurple.shade300,
           elevation: 0,
         ),
@@ -198,6 +202,7 @@ class LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
+                Visibility(visible: MyApp.of(context).auth.refreshTokenExpired, child: Text("Session expired, please log in again."),),
                 SvgPicture.asset(
                   "assets/female.svg",
                   color: Colors.white,
@@ -308,16 +313,23 @@ class _MyHomePageState extends State<MyHomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(S.of(context).buttonPushText),
-            Text('$_counter',style: Theme.of(context).textTheme.display1),
+            Text('$_counter', style: Theme.of(context).textTheme.display1),
             RaisedButton(
               onPressed: () {
                 if (MyApp.of(context).auth.isLoggedIn) {
-                  MyApp.of(context).auth.mapAppLogout()
-                      .then((value) => setState(() {
-                            _updateState = !_updateState;
-                          }));
+                  MyApp.of(context)
+                      .auth
+                      .mapAppLogout()
+                      .then((value) {
+                        setState(() {
+                          _updateState = !_updateState;
+                        });
+                        Navigator.of(context).pushNamed("/login");
+                      });
                 } else {
-                  MyApp.of(context).auth.mapAppLogin()
+                  MyApp.of(context)
+                      .auth
+                      .mapAppLogin()
                       .then((value) => setState(() {
                             _updateState = !_updateState;
                           }));
@@ -354,43 +366,18 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void initState() {
-    MyApp.of(context).auth.getUserInfo().then((Response value) {
-      if (value.statusCode == 200) {
+    MyApp.of(context).auth.getUserInfo().then((value) {
         setState(() {
-          _userInfo = jsonDecode(value.body);
+          _userInfo = value;
         });
-      } else if (value.statusCode == 401) {
-        MyApp.of(context).auth.mapAppRefreshTokens().then((value) {
-          MyApp.of(context).auth.getUserInfo().then((Response value) {
-            if (value.statusCode == 200) {
-              setState(() {
-                _userInfo = jsonDecode(value.body);
-              });
-            } else {
-              setState(() {
-                _error = "Error: ${value.statusCode} ${value.reasonPhrase}";
-              });
-            }
-          }).catchError((error) {
-            setState(() {
-              _error =
-                  "Error getting user info after successfully refreshing tokens: $error";
-            });
-          });
-        }).catchError((error) {
-          setState(() {
-            _error = "Error refreshing tokens: $error";
-          });
-        });
-      } else {
-        setState(() {
-          _error = "Error: ${value.statusCode} ${value.reasonPhrase}";
-        });
-      }
     }).catchError((error) {
       setState(() {
         _error = "Error getting user info: $error";
       });
+      if (MyApp.of(context).auth.refreshTokenExpired) {
+        Navigator.of(context).popUntil(ModalRoute.withName("/home"));
+        Navigator.of(context).pushNamed("/login");
+      }
     });
     super.initState();
   }
@@ -412,6 +399,14 @@ class _ProfilePageState extends State<ProfilePage> {
                     style: Theme.of(context).textTheme.display1,
                   ),
                   Text(S.of(context).email(_userInfo['email'])),
+                  Text(
+                    "Couchbase",
+                    style: Theme.of(context).textTheme.display1,
+                  ),
+                  ScopedModelDescendant<AppModel>(
+                    builder: (context, child, model) =>
+                        Text("Couchbase object content: ${model.docExample.getString("click")}"),
+                  rebuildOnChange: true,)
                 ],
               )));
     }

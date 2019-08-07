@@ -4,9 +4,13 @@ PODS:
     - AppAuth/ExternalUserAgent (= 1.0.0)
   - AppAuth/Core (1.0.0)
   - AppAuth/ExternalUserAgent (1.0.0)
+  - CouchbaseLite-Swift (2.1.6)
   - Flutter (1.0.0)
   - flutter_appauth (0.0.1):
     - AppAuth (= 1.0)
+    - Flutter
+  - fluttercouch (0.0.1):
+    - CouchbaseLite-Swift (~> 2.1.0)
     - Flutter
   - simple_auth_flutter (0.0.1):
     - Flutter
@@ -14,26 +18,32 @@ PODS:
 DEPENDENCIES:
   - Flutter (from `.symlinks/flutter/ios`)
   - flutter_appauth (from `.symlinks/plugins/flutter_appauth/ios`)
+  - fluttercouch (from `.symlinks/plugins/fluttercouch/ios`)
   - simple_auth_flutter (from `.symlinks/plugins/simple_auth_flutter/ios`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - AppAuth
+    - CouchbaseLite-Swift
 
 EXTERNAL SOURCES:
   Flutter:
     :path: ".symlinks/flutter/ios"
   flutter_appauth:
     :path: ".symlinks/plugins/flutter_appauth/ios"
+  fluttercouch:
+    :path: ".symlinks/plugins/fluttercouch/ios"
   simple_auth_flutter:
     :path: ".symlinks/plugins/simple_auth_flutter/ios"
 
 SPEC CHECKSUMS:
   AppAuth: c42547576838bf025b852736dd9b8a1c943fe68f
+  CouchbaseLite-Swift: 3384d01a9339669126164985b73e7514f19408ae
   Flutter: 58dd7d1b27887414a370fcccb9e645c08ffd7a6a
   flutter_appauth: 703177ded3b7dc65650478cd1ca9bce73c800cd6
+  fluttercouch: 00fa6ac958c8fb86b5d0140b4fb78cc10207c31e
   simple_auth_flutter: ec585a6e96b415247120df0a33af43dc1d2a5839
 
-PODFILE CHECKSUM: 7fb83752f59ead6285236625b82473f90b1cb932
+PODFILE CHECKSUM: 777e7f6cb26481ecbb0854a71b3cf93d037a6be6
 
-COCOAPODS: 1.7.4
+COCOAPODS: 1.7.3
