@@ -8,10 +8,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart' show Response, get, post;
 import 'package:scoped_model/scoped_model.dart';
+import 'package:table_calendar/table_calendar.dart';
 import 'package:toast/toast.dart';
 
 import 'KeycloakAuth.dart';
 import 'Model.dart';
+import 'color_palette.dart';
 import 'generated/i18n.dart';
 
 void main() {
@@ -24,8 +26,7 @@ class MyApp extends StatefulWidget {
 
   MyApp(this._home);
 
-  static _MyAppState of(BuildContext context) =>
-      context.ancestorStateOfType(const TypeMatcher<_MyAppState>());
+  static _MyAppState of(BuildContext context) => context.ancestorStateOfType(const TypeMatcher<_MyAppState>());
 
   @override
   State<StatefulWidget> createState() {
@@ -40,7 +41,7 @@ class _MyAppState extends State<MyApp> {
   KeycloakAuth auth;
 
   _MyAppState(Widget home) {
-    _homePage = MyHomePage(this.onChangeLanguage, title: 'CIRG Map App');
+    _homePage = PlanPage(this.onChangeLanguage, title: 'CIRG Map App');
     auth = KeycloakAuth();
 
     if (home != null) {
@@ -65,16 +66,13 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'MapAppFlutter',
-      theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
-      ),
+      theme: ThemeData(primarySwatch: Colors.grey, accentColor: Colors.redAccent),
       home: _defaultHome,
       routes: <String, WidgetBuilder>{
         "/home": (BuildContext context) => _homePage,
-        "/profile": (BuildContext context) => new ScopedModel<AppModel>(
-          model: new AppModel(), child: ProfilePage()),
+        "/profile": (BuildContext context) => new ScopedModel<AppModel>(model: new AppModel(), child: ProfilePage()),
         "/help": (BuildContext context) => HelpPage(),
-        "/about": (BuildContext context) => AboutPage(),
+        "/about": (BuildContext context) => HelpPage(),
         "/login": (BuildContext context) => LoginPage()
       },
       locale: Locale(_locale, ""),
@@ -84,8 +82,7 @@ class _MyAppState extends State<MyApp> {
         GlobalWidgetsLocalizations.delegate,
       ],
       supportedLocales: S.delegate.supportedLocales,
-      localeResolutionCallback:
-          S.delegate.resolution(fallback: new Locale("en", "")),
+      localeResolutionCallback: S.delegate.resolution(fallback: new Locale("en", "")),
     );
   }
 }
@@ -94,31 +91,6 @@ class HelpPage extends StatefulWidget {
   @override
   State createState() {
     return new _HelpPageState();
-  }
-}
-
-class AboutPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text(S.of(context).about),
-        ),
-        body: Column(
-          children: <Widget>[
-            DemoVersionWarningBanner(),
-            Padding(
-              padding: const EdgeInsets.all(padding),
-              child: Column(
-                children: [
-                  Text(S.of(context).developedByCIRG),
-                  Text(S.of(context).versionString("0.0")),
-                ],
-                crossAxisAlignment: CrossAxisAlignment.start,
-              ),
-            ),
-          ],
-        ));
   }
 }
 
@@ -145,12 +117,10 @@ class _HelpPageState extends State<HelpPage> {
   }
 
   void _updateTimeLeft() {
-    DateTime tokenExpDate =
-        MyApp.of(context).auth.accessTokenExpirationDateTime;
+    DateTime tokenExpDate = MyApp.of(context).auth.accessTokenExpirationDateTime;
     if (tokenExpDate != null) {
       setState(() {
-        _timeLeftInSeconds =
-            tokenExpDate.difference(new DateTime.now()).inSeconds;
+        _timeLeftInSeconds = tokenExpDate.difference(new DateTime.now()).inSeconds;
       });
     }
   }
@@ -162,20 +132,28 @@ class _HelpPageState extends State<HelpPage> {
         appBar: AppBar(
           title: Text(S.of(context).help),
         ),
-        body: Padding(
-            padding: EdgeInsets.all(padding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  wordPair.asPascalCase,
-                  style: Theme.of(context).textTheme.display1,
-                ),
-                Text(S
-                    .of(context)
-                    .time_left_until_token_expiration('$_timeLeftInSeconds')),
-              ],
-            )));
+        body: Column(
+          children: <Widget>[
+            DemoVersionWarningBanner(),
+            Padding(
+              padding: const EdgeInsets.all(padding),
+              child: Column(
+                children: [
+                  Text(
+                    wordPair.asPascalCase,
+                    style: Theme.of(context).textTheme.display1,
+                  ),
+                  Text(S.of(context).time_left_until_token_expiration('$_timeLeftInSeconds')),
+                  Text(""),
+                  Text(S.of(context).developedByCIRG),
+                  Text(""),
+                  Text(S.of(context).versionString("0.0")),
+                ],
+                crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+            ),
+          ],
+        ));
   }
 }
 
@@ -189,68 +167,85 @@ class LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          leading: IconButton(
-              icon: Icon(Icons.close),
-              onPressed: () =>
-                  Navigator.of(context).pushReplacementNamed('/home')),
-          backgroundColor: Colors.deepPurple.shade300,
+          leading:
+              IconButton(icon: Icon(Icons.close), onPressed: () => Navigator.of(context).pushReplacementNamed('/home')),
+          backgroundColor: Colors.white,
           elevation: 0,
         ),
         body: Container(
-            color: Colors.deepPurple.shade300,
+            color: Colors.white,
             alignment: FractionalOffset.center,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                Visibility(visible: MyApp.of(context).auth.refreshTokenExpired, child: Text("Session expired, please log in again."),),
-                SvgPicture.asset(
-                  "assets/female.svg",
-                  color: Colors.white,
-                  height: 200,
+                Visibility(
+                  visible: MyApp.of(context).auth.refreshTokenExpired,
+                  child: Text("Session expired, please log in again."),
                 ),
+                Image.asset('assets/vfit.png'),
                 FlatButton(
                     onPressed: () => MyApp.of(context)
                         .auth
                         .mapAppLogin()
-                        .then((value) =>
-                            Navigator.of(context).pushReplacementNamed('/home'))
+                        .then((value) => Navigator.of(context).pushReplacementNamed('/home'))
                         .catchError((error) => snack("$error", context)),
-                    child: Text(
-                      S.of(context).login,
-                      style: Theme.of(context).primaryTextTheme.title,
-                    ))
+                    child: Padding(
+                        padding: EdgeInsets.all(padding),
+                        child: Text(
+                          S.of(context).login,
+                          style: Theme.of(context).primaryTextTheme.title,
+                        ))),
+                Row(
+                  children: [
+                    Padding(padding: EdgeInsets.all(padding),
+                        child: Image.asset('assets/JOYLUX-Black.jpg', height: 48))
+                  ],
+                  mainAxisAlignment: MainAxisAlignment.end,
+                )
               ],
             )));
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class PlanPage extends StatefulWidget {
   final void Function(String) onChangeLanguage;
 
-  MyHomePage(this.onChangeLanguage, {Key key, this.title}) : super(key: key);
+  PlanPage(this.onChangeLanguage, {Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState(onChangeLanguage);
+  _PlanPageState createState() => _PlanPageState(onChangeLanguage);
 }
 
 void snack(String text, context) {
   //Scaffold.of(context).showSnackBar(new SnackBar(content: new Text(text)));
   print(text);
-  Toast.show(text, context,
-      duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
+  Toast.show(text, context, duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
 }
 
 const double padding = 24.0;
 
-class _MyHomePageState extends State<MyHomePage> {
+class _PlanPageState extends State<PlanPage> {
   int _counter = 0;
   final void Function(String) onChangeLanguage;
+  CalendarController _calendarController;
 
   bool _updateState = false;
 
-  _MyHomePageState(this.onChangeLanguage);
+  _PlanPageState(this.onChangeLanguage);
+
+  @override
+  void initState() {
+    super.initState();
+    _calendarController = CalendarController();
+  }
+
+  @override
+  void dispose() {
+    _calendarController.dispose();
+    super.dispose();
+  }
 
   void _incrementCounter() {
     setState(() {
@@ -260,51 +255,102 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    var textStyle = Theme.of(context).textTheme.caption;
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
         actions: <Widget>[
           IconButton(
-              icon: Icon(Icons.help),
-              onPressed: () {
-                snack("Going to help page.", context);
-                Navigator.pushNamed(context, "/help");
-              }),
-          IconButton(
               icon: Icon(Icons.account_circle),
-              onPressed: MyApp.of(context).auth.isLoggedIn
-                  ? () => Navigator.pushNamed(context, "/profile")
-                  : null)
+              onPressed: MyApp.of(context).auth.isLoggedIn ? () => Navigator.pushNamed(context, "/profile") : null)
         ],
       ),
       drawer: Drawer(
-          child: ListView(children: [
+          child: ListView(padding: const EdgeInsets.all(0.0), children: [
         DrawerHeader(
-            child: Text(
-              "Map App",
-              style: Theme.of(context).primaryTextTheme.title,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.account_circle,
+                    color: Theme.of(context).primaryIconTheme.color,
+                    size: 64,
+                  ),
+                  onPressed: () {
+                    if (MyApp.of(context).auth.isLoggedIn) {
+                      Navigator.of(context).pushNamed("/profile");
+                    } else {
+                      Navigator.of(context).pushNamed("/login");
+                    }
+                  },
+                ),
+                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <Widget>[
+                  Text(
+                    "Map App",
+                    style: Theme.of(context).primaryTextTheme.title,
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.settings, color: Theme.of(context).primaryIconTheme.color),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, '/profile');
+                    },
+                  )
+                ])
+              ],
             ),
             decoration: BoxDecoration(color: Theme.of(context).primaryColor)),
+        ListTile(
+          title: Text("Plan"),
+          leading: Icon(Icons.calendar_today),
+        ),
+        ListTile(
+          title: Text("Progress & Insights"),
+          leading: Icon(Icons.healing),
+        ),
+        ListTile(
+          title: Text("Devices"),
+          leading: Icon(Icons.bluetooth),
+        ),
+        ListTile(
+          title: Text("Learning Center"),
+          leading: Icon(Icons.lightbulb_outline),
+        ),
+        ListTile(
+          title: Text("Contact & Community"),
+          leading: Icon(Icons.chat),
+        ),
+        Divider(),
         ListTile(
           title: Text(S.of(context).about),
           onTap: () {
             Navigator.pop(context);
             Navigator.pushNamed(context, '/about');
           },
+          trailing: Icon(Icons.info),
         ),
         ListTile(
-          title: Text(S.of(context).languageName),
-          trailing: DropdownButton(
-              items: S.delegate.supportedLocales.map((locale) {
-                return new DropdownMenuItem(
-                  child: Text(locale.languageCode),
-                  value: locale.languageCode,
-                );
-              }).toList(),
-              onChanged: (item) {
-                onChangeLanguage(item);
-              }),
-          leading: Icon(Icons.language),
+          title: DropdownButton(
+            underline: Container(
+              height: 0,
+            ),
+            items: S.delegate.supportedLocales.map((locale) {
+              return new DropdownMenuItem<String>(
+                child: Text(locale.languageCode),
+                value: locale.languageCode,
+              );
+            }).toList(),
+            onChanged: (item) {
+              onChangeLanguage(item);
+            },
+            hint: Text(S.of(context).languageName,
+                style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.subtitle.fontSize,
+                    color: Theme.of(context).textTheme.subtitle.color)),
+          ),
+          trailing: Icon(Icons.language),
         )
       ])),
       body: Padding(
@@ -312,40 +358,30 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(S.of(context).buttonPushText),
-            Text('$_counter', style: Theme.of(context).textTheme.display1),
+            TableCalendar(calendarStyle: CalendarStyle(weekendStyle: textStyle, weekdayStyle: textStyle, todayStyle: TextStyle(color: Colors.black), selectedColor: Theme.of(context).accentColor, todayColor: Theme.of(context).primaryColor, outsideDaysVisible: false),
+              calendarController: _calendarController,
+              events: { DateTime(2019, 8, 9): ['Event A'] },
+            ),
+
             RaisedButton(
               onPressed: () {
                 if (MyApp.of(context).auth.isLoggedIn) {
-                  MyApp.of(context)
-                      .auth
-                      .mapAppLogout()
-                      .then((value) {
-                        setState(() {
-                          _updateState = !_updateState;
-                        });
-                        Navigator.of(context).pushNamed("/login");
-                      });
+                  MyApp.of(context).auth.mapAppLogout().then((value) {
+                    setState(() {
+                      _updateState = !_updateState;
+                    });
+                    Navigator.of(context).pushNamed("/login");
+                  });
                 } else {
-                  MyApp.of(context)
-                      .auth
-                      .mapAppLogin()
-                      .then((value) => setState(() {
-                            _updateState = !_updateState;
-                          }));
+                  MyApp.of(context).auth.mapAppLogin().then((value) => setState(() {
+                        _updateState = !_updateState;
+                      }));
                 }
               },
-              child: MyApp.of(context).auth.isLoggedIn
-                  ? Text(S.of(context).logout)
-                  : Text(S.of(context).login),
+              child: MyApp.of(context).auth.isLoggedIn ? Text(S.of(context).logout) : Text(S.of(context).login),
             )
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
       ),
     );
   }
@@ -367,9 +403,9 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     MyApp.of(context).auth.getUserInfo().then((value) {
-        setState(() {
-          _userInfo = value;
-        });
+      setState(() {
+        _userInfo = value;
+      });
     }).catchError((error) {
       setState(() {
         _error = "Error getting user info: $error";
@@ -406,7 +442,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   ScopedModelDescendant<AppModel>(
                     builder: (context, child, model) =>
                         Text("Couchbase object content: ${model.docExample.getString("click")}"),
-                  rebuildOnChange: true,)
+                    rebuildOnChange: true,
+                  )
                 ],
               )));
     }
