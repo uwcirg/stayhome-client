@@ -39,8 +39,6 @@ build:apk:
     - web
   stage: build
   script:
-    - flutter pub get
-    - FLUTTER_DIR=$(dirname $(which flutter)); sed -i 's/com.couchbase.lite:couchbase-lite-android-ee:2.1.0/com.couchbase.lite:couchbase-lite-android-ee:2.5.0/g' $FLUTTER_DIR/../.pub-cache/hosted/pub.dartlang.org/fluttercouch-0.5.0/android/build.gradle
     - flutter build apk
   artifacts:
     paths:

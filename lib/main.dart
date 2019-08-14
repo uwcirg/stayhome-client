@@ -183,22 +183,29 @@ class LoginPageState extends State<LoginPage> {
                   child: Text("Session expired, please log in again."),
                 ),
                 Image.asset('assets/vfit.png'),
-                FlatButton(
+                OutlineButton(
+                    shape: RoundedRectangleBorder(borderRadius: new BorderRadius.circular(50.0)),
                     onPressed: () => MyApp.of(context)
                         .auth
                         .mapAppLogin()
-                        .then((value) => Navigator.of(context).pushReplacementNamed('/home'))
+                        .then((value) => (BuildContext context) {
+                              Navigator.of(context).pushReplacementNamed('/home');
+                            }(context))
                         .catchError((error) => snack("$error", context)),
                     child: Padding(
-                        padding: EdgeInsets.all(padding),
+                        padding: EdgeInsets.all(12),
                         child: Text(
                           S.of(context).login,
                           style: Theme.of(context).primaryTextTheme.title,
                         ))),
+                FlatButton(
+                    onPressed: () => Navigator.of(context).pushReplacementNamed('/home'),
+                    child: Padding(
+                        padding: EdgeInsets.all(padding),
+                        child: Text("Not now", style: Theme.of(context).primaryTextTheme.subtitle))),
                 Row(
                   children: [
-                    Padding(padding: EdgeInsets.all(padding),
-                        child: Image.asset('assets/JOYLUX-Black.jpg', height: 48))
+                    Padding(padding: EdgeInsets.all(padding), child: Image.asset('assets/JOYLUX-Black.jpg', height: 48))
                   ],
                   mainAxisAlignment: MainAxisAlignment.end,
                 )
@@ -358,11 +365,22 @@ class _PlanPageState extends State<PlanPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            TableCalendar(calendarStyle: CalendarStyle(weekendStyle: textStyle, weekdayStyle: textStyle, todayStyle: TextStyle(color: Colors.black), selectedColor: Theme.of(context).accentColor, todayColor: Theme.of(context).primaryColor, outsideDaysVisible: false),
-              calendarController: _calendarController,
-              events: { DateTime(2019, 8, 9): ['Event A'] },
-            ),
+            TableCalendar(
+              availableCalendarFormats: {CalendarFormat.month: ""},
+              calendarStyle: CalendarStyle(
+                  weekendStyle: textStyle,
+                  weekdayStyle: textStyle,
+                  todayStyle: TextStyle(color: Colors.black),
+                  selectedColor: Theme.of(context).accentColor,
+                  todayColor: Theme.of(context).primaryColor,
+                  outsideDaysVisible: false,
+              markersColor: Colors.red.shade900),
 
+              calendarController: _calendarController,
+              events: {
+                DateTime(2019, 8, 9): ['Event A']
+              },
+            ),
             RaisedButton(
               onPressed: () {
                 if (MyApp.of(context).auth.isLoggedIn) {
