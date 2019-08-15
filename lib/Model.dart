@@ -40,8 +40,10 @@ class AppModel extends Model with Fluttercouch {
       initReplicator();
       startReplicator();
       docExample = await getDocumentWithId("hannahtest");
-      //notifyListeners();
-    } on PlatformException {}
+      notifyListeners();
+    } on PlatformException catch(e) {
+      print("Exception: $e");
+    }
 
   }
 

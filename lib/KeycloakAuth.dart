@@ -20,6 +20,8 @@ class KeycloakAuth {
 
   FlutterAppAuth _appAuth;
 
+  UserInfo userInfo;
+
   bool refreshTokenExpired = false;
 
   KeycloakAuth() {
@@ -27,14 +29,14 @@ class KeycloakAuth {
   }
 
   Future mapAppLogin() async {
-    AuthorizationTokenResponse value =
-        await _appAuth.authorizeAndExchangeCode(
+    AuthorizationTokenResponse value = await _appAuth.authorizeAndExchangeCode(
       AuthorizationTokenRequest(_clientId, _redirectUrl,
           issuer: _issuer,
           scopes: ['openid', 'profile'],
           clientSecret: _clientSecret,
           promptValues: ['login']),
     );
+
 
     isLoggedIn = true;
     _accessToken = value.accessToken;
@@ -58,6 +60,7 @@ class KeycloakAuth {
         _accessToken = null;
         accessTokenExpirationDateTime = null;
         _refreshToken = null;
+        userInfo = null;
         return Future.value("Logged out");
       } else {
         return Future.error("Log out not completed: ${value.statusCode}");
@@ -69,12 +72,12 @@ class KeycloakAuth {
 
   Future mapAppRefreshTokens() async {
     FlutterAppAuth appAuth = FlutterAppAuth();
-    TokenResponse value = await appAuth
-        .token(TokenRequest(_clientId, _redirectUrl,
-            issuer: _issuer,
-            refreshToken: _refreshToken,
-            scopes: ['openid', 'profile'],
-            clientSecret: _clientSecret));
+    TokenResponse value = await appAuth.token(TokenRequest(
+        _clientId, _redirectUrl,
+        issuer: _issuer,
+        refreshToken: _refreshToken,
+        scopes: ['openid', 'profile'],
+        clientSecret: _clientSecret));
 
     isLoggedIn = true;
     _accessToken = value.accessToken;
@@ -91,13 +94,13 @@ class KeycloakAuth {
   }
 
   Future getUserInfo() async {
-    var userInfo;
+    var userInfoJson;
     var returnError;
 
     try {
       Response value = await _getUserInfo();
       if (value.statusCode == 200) {
-        userInfo = jsonDecode(value.body);
+        userInfoJson = value.body;
       } else if (value.statusCode == 401) {
         try {
           var value = await mapAppRefreshTokens();
@@ -105,7 +108,7 @@ class KeycloakAuth {
             var value = await _getUserInfo();
 
             if (value.statusCode == 200) {
-              userInfo = jsonDecode(value.body);
+              userInfoJson = value.body;
             } else {
               returnError = "Error: ${value.statusCode} ${value.reasonPhrase}";
             }
@@ -117,6 +120,7 @@ class KeycloakAuth {
           if (error.code == "token_failed") {
             refreshTokenExpired = true;
             isLoggedIn = false;
+            userInfo = null;
           }
           returnError = "Error refreshing tokens: $error";
         }
@@ -128,6 +132,31 @@ class KeycloakAuth {
     }
 
     if (returnError != null) return Future.error(returnError);
-    return Future.value(userInfo);
+    this.userInfo = UserInfo.from(jsonDecode(userInfoJson));
+    return Future.value(this.userInfo);
+  }
+}
+
+class UserInfo {
+  final String sub;
+  final bool emailVerified;
+  final String name;
+  final String preferredUsername;
+  final String givenName;
+  final String familyName;
+  final String email;
+
+  UserInfo(this.sub, this.emailVerified, this.name, this.preferredUsername,
+      this.givenName, this.familyName, this.email);
+
+  static UserInfo from(Map userInfoMap) {
+    return UserInfo(
+        userInfoMap["sub"],
+        userInfoMap["email_verified"],
+        userInfoMap["name"],
+        userInfoMap["preferred_username"],
+        userInfoMap["given_name"],
+        userInfoMap["family_name"],
+        userInfoMap["email"]);
   }
 }

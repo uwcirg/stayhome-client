@@ -1,16 +1,24 @@
 {
-  "demoVersionBannerText": "Demo version - nicht für klinischen Gebrauch.",
+  "demoVersionBannerText": "Demo version - nicht für den klinischen Gebrauch vorgesehen.",
   "hello": "Hallo!",
   "versionString": "Version $version",
   "developedByCIRG": "Entwickelt von der Clinical Informatics Research Group (CIRG) an der University of Washington, 2019.",
   "about": "Über",
-  "logout": "Ausloggen",
-  "login": "Einloggen",
+  "logout": "Abmelden",
+  "login": "Anmelden",
   "profile": "Profil",
   "email": "E-Mail: $email",
   "buttonPushText": "Der Knopf wurde so oft gedrückt:",
   "languageName": "Deutsch (DE)",
   "language": "Sprache",
   "help": "Hilfe",
-  "time_left_until_token_expiration": "Time left until token expiration: $_timeLeftInSeconds seconds"
+  "time_left_until_token_expiration": "Zeit bis Token abläuft: $_timeLeftInSeconds Sekunden",
+  "plan": "Plan",
+  "progress__insights": "Fortschritt & Einsichten",
+  "devices": "Geräte",
+  "learning_center": "Lernzentrum",
+  "contact__community": "Kontakt & Gemeinschaft",
+  "session_expired_please_log_in_again": "Session abgelaufen, bitte erneut einloggen.",
+  "sign_up_or_log_in_to_access_all_functions": "Bitte melden Sie sich an, um auf alle Funktionen zuzugreifen.",
+  "not_now": "Jetzt nicht"
 }
