@@ -12,9 +12,13 @@ class DemoVersionWarningBanner extends StatelessWidget {
     return Visibility(
         visible: !Foundation.kReleaseMode,
         child: Container(
-          padding: const EdgeInsets.all(Dimensions.quarterMargin),
+            padding: const EdgeInsets.all(Dimensions.quarterMargin),
             color: Colors.amber.shade100,
-            alignment: FractionalOffset.center,
-            child: Text(S.of(context).demoVersionBannerText)));
+            child: Text(
+              S.of(context).demoVersionBannerText,
+              textAlign: Theme.of(context).platform == TargetPlatform.iOS
+                  ? TextAlign.center
+                  : TextAlign.start,
+            )));
   }
 }

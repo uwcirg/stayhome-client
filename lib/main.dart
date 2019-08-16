@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:map_app_flutter/ContactCommunityPage.dart';
 import 'package:map_app_flutter/DevicesPage.dart';
 import 'package:map_app_flutter/HelpPage.dart';
@@ -8,6 +9,7 @@ import 'package:map_app_flutter/LoginPage.dart';
 import 'package:map_app_flutter/PlanPage.dart';
 import 'package:map_app_flutter/ProfilePage.dart';
 import 'package:map_app_flutter/ProgressInsightsPage.dart';
+import 'package:map_app_flutter/color_palette.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:toast/toast.dart';
 
@@ -60,6 +62,7 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       _locale = languageCode;
     });
+    initializeDateFormatting(languageCode);
   }
 
   @override
@@ -67,7 +70,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: title,
       theme:
-          ThemeData(primarySwatch: Colors.grey, accentColor: Colors.redAccent),
+          ThemeData(primarySwatch: Colors.grey, accentColor: MapAppColors.vFitAccent),
       home: _defaultHome,
       routes: <String, WidgetBuilder>{
         "/home": (BuildContext context) => _homePage,

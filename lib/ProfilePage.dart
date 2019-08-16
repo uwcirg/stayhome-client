@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/Model.dart';
+import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/i18n.dart';
 import 'package:scoped_model/scoped_model.dart';
 
@@ -36,7 +37,7 @@ class _ProfilePageState extends State<ProfilePage> {
 //          Navigator.of(context).pushNamed("/login");
 //        }
 //      });
-      super.initState();
+    super.initState();
 //    }
   }
 
@@ -47,24 +48,31 @@ class _ProfilePageState extends State<ProfilePage> {
     if (MyApp.of(context).auth.userInfo != null) {
       return MapAppPageScaffold(
           title: title,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                "${MyApp.of(context).auth.userInfo.name}",
-                style: Theme.of(context).textTheme.display1,
-              ),
-              Text(S.of(context).email(MyApp.of(context).auth.userInfo.email)),
-              Text(
-                "Couchbase",
-                style: Theme.of(context).textTheme.display1,
-              ),
-              ScopedModelDescendant<AppModel>(
-                builder: (context, child, model) => Text(
-                    "Couchbase object content: ${model.docExample.getString("click")}"),
-                rebuildOnChange: true,
-              )
-            ],
+          actions: <Widget>[
+            FlatButton(child: Text(S.of(context).logout), onPressed: () => logout(context),)
+          ],
+          child: Padding(
+            padding: const EdgeInsets.all(Dimensions.halfMargin),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  "${MyApp.of(context).auth.userInfo.name}",
+                  style: Theme.of(context).textTheme.display1,
+                ),
+                Text(
+                    S.of(context).email(MyApp.of(context).auth.userInfo.email)),
+                Text(
+                  "Couchbase",
+                  style: Theme.of(context).textTheme.display1,
+                ),
+                ScopedModelDescendant<AppModel>(
+                  builder: (context, child, model) => Text(
+                      "Couchbase object content: ${model.docExample.getString("click")}"),
+                  rebuildOnChange: true,
+                ),
+              ],
+            ),
           ));
     }
     if (_error != null) {
@@ -75,5 +83,23 @@ class _ProfilePageState extends State<ProfilePage> {
     }
     return MapAppPageScaffold(
         title: title, child: new CircularProgressIndicator());
+  }
+
+  void logout(BuildContext context) {
+     MyApp.of(context).auth.mapAppLogout().then((value) {
+      setState(() {
+        _updateState = !_updateState;
+      });
+      Navigator.of(context).pushNamed("/login");
+    });
+  }
+
+  void login(BuildContext context) {
+     MyApp.of(context)
+        .auth
+        .mapAppLogin()
+        .then((value) => setState(() {
+              _updateState = !_updateState;
+            }));
   }
 }

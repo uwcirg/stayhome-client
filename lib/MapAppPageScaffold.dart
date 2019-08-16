@@ -4,27 +4,38 @@
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/DemoVersionWarningBanner.dart';
 import 'package:map_app_flutter/MapAppDrawer.dart';
-import 'package:map_app_flutter/const.dart';
 
 class MapAppPageScaffold extends StatelessWidget {
   final Widget child;
   final String title;
+  final bool showDrawer;
 
-  MapAppPageScaffold({this.child, this.title});
+  final Color backgroundColor;
+
+  final List<Widget> actions;
+
+  MapAppPageScaffold(
+      {Key key,
+      this.child,
+      this.title,
+      this.showDrawer = true,
+      this.backgroundColor,
+      this.actions})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: backgroundColor,
         appBar: AppBar(
           title: Text(title),
+          actions: this.actions,
         ),
-        drawer: MapAppDrawer(),
+        drawer: showDrawer ? MapAppDrawer() : null,
         body: Column(
           children: <Widget>[
             DemoVersionWarningBanner(),
-            Padding(
-                padding: const EdgeInsets.all(Dimensions.fullMargin),
-                child: child),
+            child,
           ],
         ));
   }

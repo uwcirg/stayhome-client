@@ -3,6 +3,7 @@
  */
 
 class Dimensions {
+  static const double largeMargin = 24;
   static const double fullMargin = 16;
   static const double halfMargin = fullMargin / 2;
   static const double quarterMargin = fullMargin / 4;

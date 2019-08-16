@@ -25,6 +25,7 @@ class S implements WidgetsLocalizations {
   String get demoVersionBannerText => "Demo version - not for clinical use.";
   String get developedByCIRG => "Developed by the Clinical Informatics Research Group (CIRG) at University of Washington, 2019.";
   String get devices => "Devices";
+  String get forget => "Forget";
   String get hello => "Hello!";
   String get help => "Help";
   String get language => "Language";
@@ -32,13 +33,21 @@ class S implements WidgetsLocalizations {
   String get learning_center => "Learning Center";
   String get login => "Login";
   String get logout => "Logout";
+  String get more_info => "More info";
   String get not_now => "Not now";
   String get plan => "Plan";
   String get profile => "Profile";
   String get progress__insights => "Progress & Insights";
+  String get rename => "Rename";
   String get session_expired_please_log_in_again => "Session expired, please log in again.";
   String get sign_up_or_log_in_to_access_all_functions => "Sign up or Log in to access all functions";
+  String get testimonials => "Testimonials";
+  String get timeFormat => "h:mm:ss aaa";
+  String get vfit_faq => "vFit FAQ";
+  String get womens_health_resources => "Women's Health Resources";
+  String battery_level(String _device) => "$_device% charged";
   String email(String email) => "Email: $email";
+  String last_synced_date(String _date, String _time) => "Last synced: $_date at $_time";
   String time_left_until_token_expiration(String _timeLeftInSeconds) => "Time left until token expiration: $_timeLeftInSeconds seconds";
   String versionString(String version) => "Version $version";
 }
@@ -50,19 +59,13 @@ class $de extends S {
   TextDirection get textDirection => TextDirection.ltr;
 
   @override
-  String get devices => "Geräte";
-  @override
-  String get profile => "Profil";
-  @override
-  String get buttonPushText => "Der Knopf wurde so oft gedrückt:";
-  @override
   String get about => "Über";
+  @override
+  String get more_info => "Weitere details";
   @override
   String get language => "Sprache";
   @override
   String get progress__insights => "Fortschritt & Einsichten";
-  @override
-  String get contact__community => "Kontakt & Gemeinschaft";
   @override
   String get sign_up_or_log_in_to_access_all_functions => "Bitte melden Sie sich an, um auf alle Funktionen zuzugreifen.";
   @override
@@ -72,27 +75,51 @@ class $de extends S {
   @override
   String get not_now => "Jetzt nicht";
   @override
-  String get developedByCIRG => "Entwickelt von der Clinical Informatics Research Group (CIRG) an der University of Washington, 2019.";
-  @override
   String get languageName => "Deutsch (DE)";
   @override
-  String get help => "Hilfe";
-  @override
   String get logout => "Abmelden";
-  @override
-  String get demoVersionBannerText => "Demo version - nicht für den klinischen Gebrauch vorgesehen.";
-  @override
-  String get hello => "Hallo!";
   @override
   String get plan => "Plan";
   @override
   String get session_expired_please_log_in_again => "Session abgelaufen, bitte erneut einloggen.";
   @override
+  String get devices => "Geräte";
+  @override
+  String get profile => "Profil";
+  @override
+  String get buttonPushText => "Der Knopf wurde so oft gedrückt:";
+  @override
+  String get womens_health_resources => "Bildungsressourcen zu frauenspezifischen Gesundheitsthemen";
+  @override
+  String get contact__community => "Kontakt & Gemeinschaft";
+  @override
+  String get developedByCIRG => "Entwickelt von der Clinical Informatics Research Group (CIRG) an der University of Washington, 2019.";
+  @override
+  String get vfit_faq => "vFit Häufig Gestellte Fragen";
+  @override
+  String get help => "Hilfe";
+  @override
+  String get testimonials => "Kundenreferenzen";
+  @override
+  String get forget => "Vergessen";
+  @override
+  String get rename => "Umbenennen";
+  @override
+  String get timeFormat => "H:mm:ss";
+  @override
+  String get demoVersionBannerText => "Demo version - nicht für den klinischen Gebrauch vorgesehen.";
+  @override
+  String get hello => "Hallo!";
+  @override
+  String last_synced_date(String _date, String _time) => "Zuletzt synchronisiert: $_date at $_time";
+  @override
+  String email(String email) => "E-Mail: $email";
+  @override
+  String battery_level(String _device) => "$_device% geladen";
+  @override
   String versionString(String version) => "Version $version";
   @override
   String time_left_until_token_expiration(String _timeLeftInSeconds) => "Zeit bis Token abläuft: $_timeLeftInSeconds Sekunden";
-  @override
-  String email(String email) => "E-Mail: $email";
 }
 
 class $mn extends S {
@@ -102,19 +129,13 @@ class $mn extends S {
   TextDirection get textDirection => TextDirection.ltr;
 
   @override
-  String get devices => "Hale Ticking Devices";
-  @override
-  String get profile => "Profile. The ancestor exists?";
-  @override
-  String get buttonPushText => "You have pushed the button this many times:";
-  @override
   String get about => "About. The honorary stem taxes my unread beast.";
+  @override
+  String get more_info => "More info";
   @override
   String get language => "Language";
   @override
   String get progress__insights => "Intricate Concurrence Progress & Capillary Rainforest Insights";
-  @override
-  String get contact__community => "Contact & Community";
   @override
   String get sign_up_or_log_in_to_access_all_functions => "Sign up or Log in to access all functions. Why does the advantage attempt a lighted representative?";
   @override
@@ -124,27 +145,51 @@ class $mn extends S {
   @override
   String get not_now => "Not now, utilitarian chaplain!";
   @override
-  String get developedByCIRG => "Developed by the Clinical Informatics Research Group (CIRG) at University of Washington, 2019. The gut gowns a worm. A lifestyle stares! The mercury rails! The bite suffixes the bench across a big moron. When can the symmetry dictate the typical cry?";
-  @override
   String get languageName => "Long (MN) How will the bitter cry glow within a garage?";
   @override
-  String get help => "Help! When will the performance interfere?";
-  @override
   String get logout => "Logout. The jail exchanges a bass outset near a parody.";
-  @override
-  String get demoVersionBannerText => "Demo version - not for clinical use. Into the normal lunchtime glows the fast union.";
-  @override
-  String get hello => "Hello! Should the expected muck caution?";
   @override
   String get plan => "Plan zigzag email";
   @override
   String get session_expired_please_log_in_again => "Session expired, please log in again. The legendary highlight staggers outside the silicon.";
   @override
+  String get devices => "Hale Ticking Devices";
+  @override
+  String get profile => "Profile. The ancestor exists?";
+  @override
+  String get buttonPushText => "You have pushed the button this many times:";
+  @override
+  String get womens_health_resources => "Women's Health Resources \nWhy does the indent dictate?\n";
+  @override
+  String get contact__community => "Contact & Community";
+  @override
+  String get developedByCIRG => "Developed by the Clinical Informatics Research Group (CIRG) at University of Washington, 2019. The gut gowns a worm. A lifestyle stares! The mercury rails! The bite suffixes the bench across a big moron. When can the symmetry dictate the typical cry?";
+  @override
+  String get vfit_faq => "vFit FAQ This crying average frustrates the genetics.";
+  @override
+  String get help => "Help! When will the performance interfere?";
+  @override
+  String get testimonials => "Testimonials Each layer starts the market over each historic eyesight.";
+  @override
+  String get forget => "Forget";
+  @override
+  String get rename => "Rename";
+  @override
+  String get timeFormat => "h:mm:ss aaa";
+  @override
+  String get demoVersionBannerText => "Demo version - not for clinical use. Into the normal lunchtime glows the fast union.";
+  @override
+  String get hello => "Hello! Should the expected muck caution?";
+  @override
+  String last_synced_date(String _date, String _time) => "Last synced: $_date at $_time";
+  @override
+  String email(String email) => "Email expansive somersaulting: $email";
+  @override
+  String battery_level(String _device) => "$_device% charged";
+  @override
   String versionString(String version) => "Why won't the clearance hook the isolate artist? Version $version The still galaxy flies within a racial conscience.";
   @override
   String time_left_until_token_expiration(String _timeLeftInSeconds) => "Time left until token expiration: $_timeLeftInSeconds seconds, The misleading dinner explains the taxi. A postal regime graduates before a substance. How will the applicable bog try? A pointed abstract scans the bored heaven.";
-  @override
-  String email(String email) => "Email expansive somersaulting: $email";
 }
 
 class $en extends S {

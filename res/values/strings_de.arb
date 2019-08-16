@@ -20,5 +20,16 @@
   "contact__community": "Kontakt & Gemeinschaft",
   "session_expired_please_log_in_again": "Session abgelaufen, bitte erneut einloggen.",
   "sign_up_or_log_in_to_access_all_functions": "Bitte melden Sie sich an, um auf alle Funktionen zuzugreifen.",
-  "not_now": "Jetzt nicht"
+  "not_now": "Jetzt nicht",
+  "vfit_faq": "vFit Häufig Gestellte Fragen",
+  "womens_health_resources": "Bildungsressourcen zu frauenspezifischen Gesundheitsthemen",
+  "testimonials": "Kundenreferenzen",
+  "timeFormat": "H:mm:ss",
+  "battery_level": "$_device% geladen",
+  "last_synced_date": "Zuletzt synchronisiert: $_date at $_time",
+  "rename": "Umbenennen",
+  "forget": "Vergessen",
+  "more_info": "Weitere details",
+
+
 }

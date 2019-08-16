@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
+import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/i18n.dart';
 import 'package:map_app_flutter/main.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -51,40 +52,22 @@ class _PlanPageState extends State<PlanPage> {
             TableCalendar(
               availableCalendarFormats: {CalendarFormat.month: ""},
               calendarStyle: CalendarStyle(
-                  weekendStyle: textStyle,
-                  weekdayStyle: textStyle,
-                  todayStyle: TextStyle(color: Colors.black),
-                  selectedColor: Theme.of(context).accentColor,
-                  todayColor: Theme.of(context).primaryColor,
-                  outsideDaysVisible: false,
-                  markersColor: Colors.red.shade900),
+                weekendStyle: textStyle,
+                weekdayStyle: textStyle,
+                todayStyle: TextStyle(color: Colors.black),
+                selectedColor: Theme.of(context).accentColor,
+                todayColor: Theme.of(context).primaryColor,
+                outsideDaysVisible: false,
+                markersColor: Colors.red.shade900,
+              ),
+              daysOfWeekStyle: DaysOfWeekStyle(
+                  weekendStyle:
+                      TextStyle(color: Theme.of(context).accentColor)),
               calendarController: _calendarController,
               events: {
                 DateTime(2019, 8, 9): ['Event A']
               },
             ),
-            RaisedButton(
-              onPressed: () {
-                if (MyApp.of(context).auth.isLoggedIn) {
-                  MyApp.of(context).auth.mapAppLogout().then((value) {
-                    setState(() {
-                      _updateState = !_updateState;
-                    });
-                    Navigator.of(context).pushNamed("/login");
-                  });
-                } else {
-                  MyApp.of(context)
-                      .auth
-                      .mapAppLogin()
-                      .then((value) => setState(() {
-                            _updateState = !_updateState;
-                          }));
-                }
-              },
-              child: MyApp.of(context).auth.isLoggedIn
-                  ? Text(S.of(context).logout)
-                  : Text(S.of(context).login),
-            )
           ],
         ));
   }
