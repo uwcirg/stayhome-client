@@ -14,12 +14,15 @@ PODS:
     - Flutter
   - simple_auth_flutter (0.0.1):
     - Flutter
+  - url_launcher (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - Flutter (from `.symlinks/flutter/ios`)
   - flutter_appauth (from `.symlinks/plugins/flutter_appauth/ios`)
   - fluttercouch (from `.symlinks/plugins/fluttercouch/ios`)
   - simple_auth_flutter (from `.symlinks/plugins/simple_auth_flutter/ios`)
+  - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -35,6 +38,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/fluttercouch/ios"
   simple_auth_flutter:
     :path: ".symlinks/plugins/simple_auth_flutter/ios"
+  url_launcher:
+    :path: ".symlinks/plugins/url_launcher/ios"
 
 SPEC CHECKSUMS:
   AppAuth: c42547576838bf025b852736dd9b8a1c943fe68f
@@ -43,6 +48,7 @@ SPEC CHECKSUMS:
   flutter_appauth: 703177ded3b7dc65650478cd1ca9bce73c800cd6
   fluttercouch: 77ece6ec478dbcfd800a3380a5601f5ccb573ce5
   simple_auth_flutter: ec585a6e96b415247120df0a33af43dc1d2a5839
+  url_launcher: 0067ddb8f10d36786672aa0722a21717dba3a298
 
 PODFILE CHECKSUM: 777e7f6cb26481ecbb0854a71b3cf93d037a6be6
 

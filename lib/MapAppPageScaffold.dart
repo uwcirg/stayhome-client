@@ -33,6 +33,7 @@ class MapAppPageScaffold extends StatelessWidget {
         ),
         drawer: showDrawer ? MapAppDrawer() : null,
         body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             DemoVersionWarningBanner(),
             child,

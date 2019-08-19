@@ -79,7 +79,7 @@ class _MyAppState extends State<MyApp> {
             model: new AppModel(), child: ProfilePage()),
         "/help": (BuildContext context) => HelpPage(),
         "/devices": (BuildContext context) => DevicesPage(),
-        "/contact_community": (BuildContext context) => ContactCommunityPage(),
+        "/contact_community": (BuildContext context) => ContactCommunityPage(ContactPageContents.contents()),
         "/progress_insights": (BuildContext context) => ProgressInsightsPage(),
         "/learning_center": (BuildContext context) => LearningCenterPage(),
         "/about": (BuildContext context) => HelpPage(),

@@ -17,6 +17,8 @@ class DevicesPage extends StatefulWidget {
 }
 
 class _DevicesPageState extends State<DevicesPage> {
+  List<Device> _devices = Device.devices();
+
   @override
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
@@ -25,9 +27,9 @@ class _DevicesPageState extends State<DevicesPage> {
             child: ListView.builder(
           padding: const EdgeInsets.all(Dimensions.halfMargin),
           itemBuilder: (context, i) {
-            return DeviceWidget(Device.devices()[i]);
+            return DeviceWidget(_devices[i]);
           },
-          itemCount: Device.devices().length,
+          itemCount: _devices.length,
           shrinkWrap: true,
         )));
   }

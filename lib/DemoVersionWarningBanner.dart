@@ -14,11 +14,14 @@ class DemoVersionWarningBanner extends StatelessWidget {
         child: Container(
             padding: const EdgeInsets.all(Dimensions.quarterMargin),
             color: Colors.amber.shade100,
-            child: Text(
-              S.of(context).demoVersionBannerText,
-              textAlign: Theme.of(context).platform == TargetPlatform.iOS
-                  ? TextAlign.center
-                  : TextAlign.start,
+            child: Row(
+              mainAxisAlignment:
+                  Theme.of(context).platform == TargetPlatform.iOS
+                      ? MainAxisAlignment.center
+                      : MainAxisAlignment.start,
+              children: <Widget>[
+                Text(S.of(context).demoVersionBannerText),
+              ],
             )));
   }
 }

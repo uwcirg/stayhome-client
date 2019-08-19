@@ -17,7 +17,7 @@ class LearningCenterPage extends StatelessWidget {
         children: [
           LearningCenterCard(S.of(context).vfit_faq,
               onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => FAQPage()))),
+                  builder: (BuildContext context) => FAQPage(FAQ.faqs())))),
           LearningCenterCard(
             S.of(context).womens_health_resources,
           ),
@@ -25,7 +25,8 @@ class LearningCenterPage extends StatelessWidget {
             S.of(context).testimonials,
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(
-                  builder: (BuildContext context) => TestimonialsPage()),
+                  builder: (BuildContext context) =>
+                      TestimonialsPage(Testimonial.testimonials())),
             ),
           )
         ],
@@ -124,6 +125,10 @@ class TestimonialWidget extends StatelessWidget {
 }
 
 class TestimonialsPage extends StatelessWidget {
+  final List<Testimonial> _testimonials;
+
+  TestimonialsPage(this._testimonials);
+
   @override
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
@@ -134,9 +139,9 @@ class TestimonialsPage extends StatelessWidget {
             child: ListView.builder(
           padding: const EdgeInsets.all(Dimensions.halfMargin),
           itemBuilder: (context, i) {
-            return TestimonialWidget(Testimonial.testimonials()[i]);
+            return TestimonialWidget(_testimonials[i]);
           },
-          itemCount: Testimonial.testimonials().length,
+          itemCount: _testimonials.length,
           shrinkWrap: true,
         )));
   }
@@ -196,6 +201,10 @@ class FAQWidget extends StatelessWidget {
 }
 
 class FAQPage extends StatelessWidget {
+  final List<FAQ> _faqs;
+
+  FAQPage(this._faqs);
+
   @override
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
@@ -204,9 +213,9 @@ class FAQPage extends StatelessWidget {
         child: Expanded(
             child: ListView.builder(
           itemBuilder: (context, i) {
-            return FAQWidget(FAQ.faqs()[i]);
+            return FAQWidget(_faqs[i]);
           },
-          itemCount: FAQ.faqs().length,
+          itemCount: _faqs.length,
           shrinkWrap: true,
         )));
   }
