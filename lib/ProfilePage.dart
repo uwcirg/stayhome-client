@@ -49,7 +49,11 @@ class _ProfilePageState extends State<ProfilePage> {
       return MapAppPageScaffold(
           title: title,
           actions: <Widget>[
-            FlatButton(child: Text(S.of(context).logout), onPressed: () => logout(context),)
+            FlatButton(
+              textTheme: ButtonTextTheme.normal,
+              child: Text(S.of(context).logout),
+              onPressed: () => logout(context),
+            )
           ],
           child: Padding(
             padding: const EdgeInsets.all(Dimensions.halfMargin),
@@ -86,7 +90,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void logout(BuildContext context) {
-     MyApp.of(context).auth.mapAppLogout().then((value) {
+    MyApp.of(context).auth.mapAppLogout().then((value) {
       setState(() {
         _updateState = !_updateState;
       });
@@ -95,11 +99,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void login(BuildContext context) {
-     MyApp.of(context)
-        .auth
-        .mapAppLogin()
-        .then((value) => setState(() {
-              _updateState = !_updateState;
-            }));
+    MyApp.of(context).auth.mapAppLogin().then((value) => setState(() {
+          _updateState = !_updateState;
+        }));
   }
 }

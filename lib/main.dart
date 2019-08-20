@@ -43,7 +43,8 @@ class _MyAppState extends State<MyApp> {
   String title = 'CIRG Map App';
 
   _MyAppState(Widget home) {
-    _homePage = PlanPage();
+    _homePage = PlanPage(
+        TreatmentSchedule.treatmentSchedule(), TreatmentPlan.treatmentPlan());
     auth = KeycloakAuth();
 
     if (home != null) {
@@ -69,8 +70,14 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: title,
-      theme:
-          ThemeData(primarySwatch: Colors.grey, accentColor: MapAppColors.vFitAccent),
+      theme: ThemeData(
+          primarySwatch: Colors.grey,
+          accentColor: MapAppColors.vFitAccent,
+          buttonTheme: ButtonThemeData(
+              buttonColor: MapAppColors.vFitAccent,
+              textTheme: ButtonTextTheme.primary
+          )
+      ),
       home: _defaultHome,
       routes: <String, WidgetBuilder>{
         "/home": (BuildContext context) => _homePage,
@@ -79,7 +86,8 @@ class _MyAppState extends State<MyApp> {
             model: new AppModel(), child: ProfilePage()),
         "/help": (BuildContext context) => HelpPage(),
         "/devices": (BuildContext context) => DevicesPage(),
-        "/contact_community": (BuildContext context) => ContactCommunityPage(ContactPageContents.contents()),
+        "/contact_community": (BuildContext context) =>
+            ContactCommunityPage(ContactPageContents.contents()),
         "/progress_insights": (BuildContext context) => ProgressInsightsPage(),
         "/learning_center": (BuildContext context) => LearningCenterPage(),
         "/about": (BuildContext context) => HelpPage(),
@@ -97,8 +105,6 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-
-
 
 void snack(String text, context) {
   //Scaffold.of(context).showSnackBar(new SnackBar(content: new Text(text)));

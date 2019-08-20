@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/i18n.dart';
+import 'package:map_app_flutter/main.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -29,10 +30,10 @@ class ContactCommunityPage extends StatelessWidget {
               children: _buildButtons(context),
             ),
             Padding(
-              padding: const EdgeInsets.only(top:Dimensions.largeMargin),
+              padding: const EdgeInsets.only(top: Dimensions.largeMargin),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: _buildLinks(),
+                children: _buildLinks(context),
               ),
             )
           ],
@@ -41,50 +42,46 @@ class ContactCommunityPage extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildLinks() {
-    return _contactPageContents.links
-        .map((ContactPageItem item) => FlatButton(
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Padding(
-                  padding: const EdgeInsets.only(right: Dimensions.halfMargin),
-                  child: Icon(item.iconData),
-                ),
-                Text(item.text),
-              ]),
-              onPressed: () => _launchURL(item.url),
-            ))
-        .toList();
+  List<Widget> _buildLinks(BuildContext context) {
+    return _contactPageContents.links.map((ContactPageItem item) {
+      return FlatButton(
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Padding(
+            padding: MapAppPadding.buttonIconEdgeInsets,
+            child: Icon(item.iconData),
+          ),
+          Text(item.text),
+        ]),
+        onPressed: () => _launchURL(item.url, context),
+      );
+    }).toList();
   }
 
   List<Widget> _buildButtons(BuildContext context) {
     return _contactPageContents.buttons
         .map((ContactPageItem item) => RaisedButton(
-              color: Theme.of(context).accentColor,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Padding(
-                    padding:
-                        const EdgeInsets.only(right: Dimensions.halfMargin),
-                    child: Icon(item.iconData,
-                        color: Theme.of(context).accentIconTheme.color),
+                    padding: MapAppPadding.buttonIconEdgeInsets,
+                    child: Icon(item.iconData),
                   ),
-                  Text(
-                    item.text,
-                    style: Theme.of(context).accentTextTheme.body1,
-                  ),
+                  Text(item.text),
                 ],
               ),
-              onPressed: () => _launchURL(item.url),
+              onPressed: () => _launchURL(item.url, context),
             ))
         .toList();
   }
 
-  _launchURL(url) async {
+  _launchURL(url, context) async {
     if (await canLaunch(url)) {
       await launch(url);
     } else {
-      throw 'Could not launch $url';
+      snack(
+          'Could not launch $url: Make sure you have an app to handle this kind of link.',
+          context);
     }
   }
 }

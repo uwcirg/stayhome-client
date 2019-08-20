@@ -12,24 +12,27 @@ class LearningCenterPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
       title: S.of(context).learning_center,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          LearningCenterCard(S.of(context).vfit_faq,
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => FAQPage(FAQ.faqs())))),
-          LearningCenterCard(
-            S.of(context).womens_health_resources,
-          ),
-          LearningCenterCard(
-            S.of(context).testimonials,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      TestimonialsPage(Testimonial.testimonials())),
+      child: Padding(
+        padding: const EdgeInsets.all(Dimensions.halfMargin),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            LearningCenterCard(S.of(context).vfit_faq,
+                onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (BuildContext context) => FAQPage(FAQ.faqs())))),
+            LearningCenterCard(
+              S.of(context).womens_health_resources,
             ),
-          )
-        ],
+            LearningCenterCard(
+              S.of(context).testimonials,
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                        TestimonialsPage(Testimonial.testimonials())),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
