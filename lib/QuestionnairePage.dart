@@ -4,13 +4,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
-import 'package:map_app_flutter/fhir/QuestionnaireResponse.dart';
+import 'package:map_app_flutter/fhir/FhirResources.dart';
 
 import 'const.dart';
-import 'fhir/Questionnaire.dart';
+import 'main.dart';
 
 class QuestionnairePage extends StatefulWidget {
-  Questionnaire _questionnaire;
+  final Questionnaire _questionnaire;
 
   QuestionnairePage(this._questionnaire);
 
@@ -21,14 +21,14 @@ class QuestionnairePage extends StatefulWidget {
 }
 
 class QuestionnairePageState extends State<QuestionnairePage> {
-  Questionnaire _questionnaire;
+  final Questionnaire _questionnaire;
   QuestionnaireResponse _response;
 
   QuestionnairePageState(this._questionnaire,
       {QuestionnaireResponse response}) {
     this._response = response;
     if (this._response == null) {
-      this._response = new QuestionnaireResponse();
+      this._response = new QuestionnaireResponse(_questionnaire.reference, subject);
     }
   }
 
@@ -36,66 +36,117 @@ class QuestionnairePageState extends State<QuestionnairePage> {
   Widget build(BuildContext context) {
     return new MapAppPageScaffold(
       title: _questionnaire.title,
-      child: Padding(
-        padding: const EdgeInsets.all(Dimensions.halfMargin),
-        child: Column(children: _buildQuestions(context)),
-      ),
+      child: _buildQuestions(context),
       showDrawer: false,
     );
   }
 
-  List<Widget> _buildQuestions(BuildContext context) {
-    List<Widget> widgets = [];
-    for (QuestionnaireItem item in _questionnaire.item) {
-      widgets.add(_buildItem(context, item));
-    }
-    return widgets;
+  Widget _buildQuestions(BuildContext context) {
+    return Expanded(
+        child: ListView.builder(
+            itemCount: _questionnaire.item.length,
+            shrinkWrap: true,
+            padding: MapAppPadding.cardPageMargins,
+            itemBuilder: (context, i) {
+              QuestionnaireItem item = _questionnaire.item[i];
+              if (item.isSupported()) {
+                return _buildItem(context, item);
+              } else {
+                return Card(child:Padding(
+                  padding: MapAppPadding.cardPageMargins,
+                  child: Text(
+                    "Unsupported question: ${item.text}",
+                    style: Theme.of(context).textTheme.title.apply(color: Colors.red),
+                  ),
+                ));
+              }
+            }));
   }
 
   Widget _buildItem(BuildContext context, QuestionnaireItem questionnaireItem) {
-    var currentResponse =
-        _response.getResponseItem(questionnaireItem.linkId) != null
-            ? _response
-                .getResponseItem(questionnaireItem.linkId)
-                .answer[0]
-                .valueInteger
-            : null;
-
     return Card(
       child: Padding(
         padding: MapAppPadding.cardPageMargins,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Text(
               questionnaireItem.text,
               style: Theme.of(context).textTheme.title,
             ),
-            Row(
-              children:
-                  questionnaireItem.answerOption.map((AnswerOption option) {
-                bool isSelected = currentResponse == option.valueInteger;
-                return ChoiceChip(
-                  label: Text(
-                    '${option.valueInteger}',
-                    style: isSelected
-                        ? Theme.of(context).accentTextTheme.body1
-                        : Theme.of(context).textTheme.body1,
-                  ),
-                  selected: isSelected,
-                  onSelected: (bool) {
-                    setState(() {
-                      _response.setAnswer(questionnaireItem.linkId,
-                          new Answer(valueInteger: option.valueInteger));
-                    });
-                  },
-                  selectedColor: Theme.of(context).accentColor,
-                );
-              }).toList(),
-            )
+            Wrap(
+              runSpacing: -8,
+              spacing: Dimensions.halfMargin,
+              children: _buildChoices(questionnaireItem, context),
+            ),
           ],
         ),
       ),
+    );
+  }
+
+  List<Widget> _buildChoices(
+      QuestionnaireItem questionnaireItem, BuildContext context) {
+    if (questionnaireItem.answerOption != null) {
+      return _buildChoicesFromAnswerOptions(questionnaireItem, context);
+    }
+    if (questionnaireItem.answerValueSet != null) {
+      return _buildChoicesFromAnswerValueSet(questionnaireItem, context);
+    }
+    throw UnimplementedError(
+        "Only answerOption and answerValueSet are supported");
+  }
+
+  List<Widget> _buildChoicesFromAnswerOptions(
+      QuestionnaireItem questionnaireItem, BuildContext context) {
+    Answer currentResponse =
+        _response.getResponseItem(questionnaireItem.linkId) != null
+            ? _response
+                .getResponseItem(questionnaireItem.linkId)
+                .answer[0]
+            : null;
+
+    return questionnaireItem.answerOption.map((AnswerOption option) {
+      return _buildChip(
+          '$option',
+          currentResponse==option,
+          context,
+          questionnaireItem,
+          new Answer.fromAnswerOption(option));
+    }).toList();
+  }
+
+  List<Widget> _buildChoicesFromAnswerValueSet(
+      QuestionnaireItem questionnaireItem, BuildContext context) {
+    Answer currentResponse =
+        _response.getResponseItem(questionnaireItem.linkId) != null
+            ? _response
+                .getResponseItem(questionnaireItem.linkId)
+                .answer[0]
+            : null;
+
+    return questionnaireItem.answerValueSet.map((CodeableConcept option) {
+      return _buildChip('$option', currentResponse==option, context,
+          questionnaireItem, new Answer(valueCoding: option));
+    }).toList();
+  }
+
+  Widget _buildChip(String chipLabel, bool isSelected, BuildContext context,
+      QuestionnaireItem questionnaireItem, Answer ifChosen) {
+    return ChoiceChip(
+      label: Text(
+        chipLabel,
+        style: isSelected
+            ? Theme.of(context).accentTextTheme.body1
+            : Theme.of(context).textTheme.body1,
+      ),
+      selected: isSelected,
+      onSelected: (bool) {
+        setState(() {
+          _response.setAnswer(questionnaireItem.linkId, ifChosen);
+        });
+      },
+      selectedColor: Theme.of(context).accentColor,
     );
   }
 }

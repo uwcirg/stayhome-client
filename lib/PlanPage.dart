@@ -6,10 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/QuestionnairePage.dart';
 import 'package:map_app_flutter/const.dart';
-import 'package:map_app_flutter/fhir/Questionnaire.dart';
 import 'package:map_app_flutter/generated/i18n.dart';
 import 'package:map_app_flutter/services/Repository.dart';
 import 'package:table_calendar/table_calendar.dart';
+
+import 'fhir/FhirResources.dart';
 
 class PlanPage extends StatefulWidget {
   final TreatmentSchedule _schedule;
@@ -29,19 +30,12 @@ class _PlanPageState extends State<PlanPage> {
 
   bool _updateState = false;
 
-  Questionnaire _questionnaire;
-
   _PlanPageState(this._schedule, this._plan);
 
   @override
   void initState() {
     super.initState();
     _calendarController = CalendarController();
-    Repository.getQuestionnaire().then((Questionnaire value) {
-      _questionnaire = value;
-    }).catchError((error) {
-      throw error;
-    });
   }
 
   @override
@@ -96,13 +90,51 @@ class _PlanPageState extends State<PlanPage> {
                       padding: MapAppPadding.buttonIconEdgeInsets,
                       child: Icon(Icons.add),
                     ),
-                    Text("New Assessment"),
+                    Text("PHQ9 questionnaire"),
                   ],
                   mainAxisSize: MainAxisSize.min,
                 ),
                 onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => QuestionnairePage(_questionnaire)));
+                  Repository.getPHQ9Questionnaire().then((Questionnaire q) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => QuestionnairePage(q)));
+                  });
+                },
+              ),
+              RaisedButton(
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: MapAppPadding.buttonIconEdgeInsets,
+                      child: Icon(Icons.add),
+                    ),
+                    Text("Simple assessment"),
+                  ],
+                  mainAxisSize: MainAxisSize.min,
+                ),
+                onPressed: () {
+                  Repository.getSimpleQuestionnaire().then((Questionnaire q) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => QuestionnairePage(q)));
+                  });
+                },
+              ),
+              RaisedButton(
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: MapAppPadding.buttonIconEdgeInsets,
+                      child: Icon(Icons.add),
+                    ),
+                    Text("Women's assessment"),
+                  ],
+                  mainAxisSize: MainAxisSize.min,
+                ),
+                onPressed: () {
+                  Repository.getMapAppQuestionnaire().then((Questionnaire q) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => QuestionnairePage(q)));
+                  });
                 },
               ),
               Padding(

@@ -4,6 +4,8 @@
 
 import 'package:flutter/material.dart';
 
+import 'fhir/FhirResources.dart';
+
 class Dimensions {
   static const double largeMargin = 24;
   static const double fullMargin = 16;
@@ -23,6 +25,8 @@ class MapAppPadding {
 
   MapAppPadding._();
 }
+
+get subject => Subject(reference: "Patient/23");
 
 class IconSize {
   static const double small = 18;
