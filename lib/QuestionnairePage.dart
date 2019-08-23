@@ -7,7 +7,6 @@ import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
 
 import 'const.dart';
-import 'main.dart';
 
 class QuestionnairePage extends StatefulWidget {
   final Questionnaire _questionnaire;
@@ -28,7 +27,8 @@ class QuestionnairePageState extends State<QuestionnairePage> {
       {QuestionnaireResponse response}) {
     this._response = response;
     if (this._response == null) {
-      this._response = new QuestionnaireResponse(_questionnaire.reference, subject);
+      this._response =
+          new QuestionnaireResponse(_questionnaire.reference, subject);
     }
   }
 
@@ -36,27 +36,97 @@ class QuestionnairePageState extends State<QuestionnairePage> {
   Widget build(BuildContext context) {
     return new MapAppPageScaffold(
       title: _questionnaire.title,
-      child: _buildQuestions(context),
+      child: QuestionListWidget(_questionnaire.item, _response),
       showDrawer: false,
     );
   }
+}
 
-  Widget _buildQuestions(BuildContext context) {
+class QuestionnaireItemPage extends StatefulWidget {
+  final QuestionnaireItem _questionnaireItem;
+  final QuestionnaireResponse _response;
+
+  QuestionnaireItemPage(this._questionnaireItem, this._response);
+
+  @override
+  State createState() =>
+      QuestionnaireItemPageState(this._questionnaireItem, this._response);
+}
+
+class QuestionnaireItemPageState extends State<QuestionnaireItemPage> {
+  final QuestionnaireItem _questionnaireItem;
+  final QuestionnaireResponse _response;
+
+  QuestionnaireItemPageState(this._questionnaireItem, this._response);
+
+  @override
+  Widget build(BuildContext context) {
+    return new MapAppPageScaffold(
+      title: _questionnaireItem.text,
+      child: QuestionListWidget(_questionnaireItem.item, _response),
+      showDrawer: false,
+    );
+  }
+}
+
+class QuestionListWidget extends StatefulWidget {
+  final List<QuestionnaireItem> _questions;
+  final QuestionnaireResponse _response;
+
+  QuestionListWidget(this._questions, this._response);
+
+  @override
+  State createState() =>
+      QuestionListWidgetState(this._questions, this._response);
+}
+
+class QuestionListWidgetState extends State<QuestionListWidget> {
+  final List<QuestionnaireItem> _questions;
+  final QuestionnaireResponse _response;
+
+  QuestionListWidgetState(this._questions, this._response);
+
+  @override
+  Widget build(BuildContext context) {
     return Expanded(
         child: ListView.builder(
-            itemCount: _questionnaire.item.length,
+            itemCount: _questions.length,
             shrinkWrap: true,
             padding: MapAppPadding.cardPageMargins,
             itemBuilder: (context, i) {
-              QuestionnaireItem item = _questionnaire.item[i];
+              QuestionnaireItem item = _questions[i];
               if (item.isSupported()) {
                 return _buildItem(context, item);
+              } else if (item.isGroup()) {
+                return GestureDetector(
+                    onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            QuestionnaireItemPage(item, _response))),
+                    child: Card(
+                        child: Padding(
+                            padding: MapAppPadding.cardPageMargins,
+                            child: Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    item.text,
+                                    style: Theme.of(context).textTheme.title,
+                                  ),
+                                ),
+                                Icon(Icons.chevron_right),
+                              ],
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            ))));
               } else {
-                return Card(child:Padding(
+                return Card(
+                    child: Padding(
                   padding: MapAppPadding.cardPageMargins,
                   child: Text(
-                    "Unsupported question: ${item.text}",
-                    style: Theme.of(context).textTheme.title.apply(color: Colors.red),
+                    "Unsupported question. Name: ${item.text}. Type: ${item.type}",
+                    style: Theme.of(context)
+                        .textTheme
+                        .title
+                        .apply(color: Colors.red),
                   ),
                 ));
               }
@@ -101,18 +171,12 @@ class QuestionnairePageState extends State<QuestionnairePage> {
       QuestionnaireItem questionnaireItem, BuildContext context) {
     Answer currentResponse =
         _response.getResponseItem(questionnaireItem.linkId) != null
-            ? _response
-                .getResponseItem(questionnaireItem.linkId)
-                .answer[0]
+            ? _response.getResponseItem(questionnaireItem.linkId).answer[0]
             : null;
 
     return questionnaireItem.answerOption.map((AnswerOption option) {
-      return _buildChip(
-          '$option',
-          currentResponse==option,
-          context,
-          questionnaireItem,
-          new Answer.fromAnswerOption(option));
+      return _buildChip('$option', currentResponse == option, context,
+          questionnaireItem, new Answer.fromAnswerOption(option));
     }).toList();
   }
 
@@ -120,13 +184,11 @@ class QuestionnairePageState extends State<QuestionnairePage> {
       QuestionnaireItem questionnaireItem, BuildContext context) {
     Answer currentResponse =
         _response.getResponseItem(questionnaireItem.linkId) != null
-            ? _response
-                .getResponseItem(questionnaireItem.linkId)
-                .answer[0]
+            ? _response.getResponseItem(questionnaireItem.linkId).answer[0]
             : null;
 
     return questionnaireItem.answerValueSet.map((CodeableConcept option) {
-      return _buildChip('$option', currentResponse==option, context,
+      return _buildChip('$option', currentResponse == option, context,
           questionnaireItem, new Answer(valueCoding: option));
     }).toList();
   }

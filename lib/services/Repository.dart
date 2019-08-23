@@ -10,7 +10,7 @@ import 'package:map_app_flutter/fhir/FhirResources.dart';
 class Repository {
   static Future<Patient> getPatient() async {
     var system = "http://hospital.smarthealthit.org";
-    var identifier = "fb538307-c13a-4605-9b7f-f9689654392a";
+    var identifier = "fb538307-c13a-4605-9b7f-f9689654392a"; // MRN
     var patientSearchUrl =
         "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/Patient?identifier=$system|$identifier";
     var response = await get(patientSearchUrl, headers: {});
@@ -21,6 +21,37 @@ class Repository {
         "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/Patient/$patientResourceId";
     response = await get(patientLoadUrl, headers: {});
     return Patient.fromJson(jsonDecode(response.body));
+  }
+
+  /// Get the first returned CarePlan for the given patient.
+  static Future<CarePlan> getCarePlan(Patient patient) async {
+    var url =
+        "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/CarePlan?subject=${patient.reference}";
+    var response = await get(url, headers: {});
+    var searchResultBundle = jsonDecode(response.body);
+    String id = searchResultBundle['entry'][0]['resource']['id'];
+    url =
+        "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/CarePlan/$id";
+    response = await get(url, headers: {});
+    return CarePlan.fromJson(jsonDecode(response.body));
+  }
+
+  static Future<List<Procedure>> getProcedures(CarePlan carePlan) async {
+    var url =
+        "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/Procedure?based-on=${carePlan.reference}";
+    var response = await get(url, headers: {});
+    var searchResultBundle = jsonDecode(response.body);
+    List<Procedure> procedures = [];
+    if (searchResultBundle['total'] > 0) {
+      await Future.forEach(searchResultBundle['entry'], (var entry) async {
+        String id = entry['resource']['id'];
+        url =
+            "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/Procedure/$id";
+        response = await get(url, headers: {});
+        procedures.add(Procedure.fromJson(jsonDecode(response.body)));
+      });
+    }
+    return procedures;
   }
 
   static Future<Questionnaire> getSimpleQuestionnaire() async {

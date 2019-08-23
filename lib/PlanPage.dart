@@ -30,12 +30,32 @@ class _PlanPageState extends State<PlanPage> {
 
   bool _updateState = false;
 
+  Patient _patient;
+
+  CarePlan _carePlan;
+
+  List<Procedure> _procedures;
+
+  bool _loading = true;
+
   _PlanPageState(this._schedule, this._plan);
 
   @override
   void initState() {
     super.initState();
     _calendarController = CalendarController();
+    Repository.getPatient().then((Patient patient) {
+      _patient = patient;
+      Repository.getCarePlan(patient).then((CarePlan carePlan) {
+        _carePlan = carePlan;
+        Repository.getProcedures(carePlan).then((List<Procedure> procedures) {
+          _procedures = procedures;
+          setState(() {
+            _loading = false;
+          });
+        });
+      });
+    });
   }
 
   @override
@@ -53,116 +73,128 @@ class _PlanPageState extends State<PlanPage> {
   @override
   Widget build(BuildContext context) {
     String title = S.of(context).plan;
-    var textStyle = Theme.of(context).textTheme.caption;
     return MapAppPageScaffold(
         title: title,
-        child: Padding(
-          padding: const EdgeInsets.all(Dimensions.halfMargin),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Text(
-                "Treatment Schedule",
-                style: Theme.of(context).textTheme.title,
+        child: _loading ? CircularProgressIndicator() : buildScreen(context));
+  }
+
+  Padding buildScreen(BuildContext context) {
+    var textStyle = Theme.of(context).textTheme.caption;
+    return Padding(
+        padding: const EdgeInsets.all(Dimensions.halfMargin),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Text(
+              "Treatment Schedule",
+              style: Theme.of(context).textTheme.title,
+            ),
+            TableCalendar(
+              availableCalendarFormats: {CalendarFormat.month: ""},
+              calendarStyle: CalendarStyle(
+                weekendStyle: textStyle,
+                weekdayStyle: textStyle,
+                todayStyle: TextStyle(color: Colors.black),
+                selectedColor: Theme.of(context).accentColor,
+                todayColor: Theme.of(context).primaryColor,
+                outsideDaysVisible: false,
+                markersColor: Colors.red.shade900,
               ),
-              TableCalendar(
-                availableCalendarFormats: {CalendarFormat.month: ""},
-                calendarStyle: CalendarStyle(
-                  weekendStyle: textStyle,
-                  weekdayStyle: textStyle,
-                  todayStyle: TextStyle(color: Colors.black),
-                  selectedColor: Theme.of(context).accentColor,
-                  todayColor: Theme.of(context).primaryColor,
-                  outsideDaysVisible: false,
-                  markersColor: Colors.red.shade900,
-                ),
-                daysOfWeekStyle: DaysOfWeekStyle(
-                    weekendStyle:
-                        TextStyle(color: Theme.of(context).accentColor)),
-                calendarController: _calendarController,
-                events: _schedule.events,
-                builders: CalendarBuilders(markersBuilder: _buildMarkers),
-              ),
-              RaisedButton(
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: MapAppPadding.buttonIconEdgeInsets,
-                      child: Icon(Icons.add),
-                    ),
-                    Text("PHQ9 questionnaire"),
-                  ],
-                  mainAxisSize: MainAxisSize.min,
-                ),
-                onPressed: () {
-                  Repository.getPHQ9Questionnaire().then((Questionnaire q) {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => QuestionnairePage(q)));
-                  });
-                },
-              ),
-              RaisedButton(
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: MapAppPadding.buttonIconEdgeInsets,
-                      child: Icon(Icons.add),
-                    ),
-                    Text("Simple assessment"),
-                  ],
-                  mainAxisSize: MainAxisSize.min,
-                ),
-                onPressed: () {
-                  Repository.getSimpleQuestionnaire().then((Questionnaire q) {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => QuestionnairePage(q)));
-                  });
-                },
-              ),
-              RaisedButton(
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: MapAppPadding.buttonIconEdgeInsets,
-                      child: Icon(Icons.add),
-                    ),
-                    Text("Women's assessment"),
-                  ],
-                  mainAxisSize: MainAxisSize.min,
-                ),
-                onPressed: () {
-                  Repository.getMapAppQuestionnaire().then((Questionnaire q) {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => QuestionnairePage(q)));
-                  });
-                },
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: Dimensions.largeMargin),
-                child: Text("My Treatment Plan",
-                    style: Theme.of(context).textTheme.title),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text("Frequency: ${_plan.frequency}"),
-                      Text("Duration: ${_plan.duration}"),
-                    ],
+              daysOfWeekStyle: DaysOfWeekStyle(
+                  weekendStyle:
+                      TextStyle(color: Theme.of(context).accentColor)),
+              calendarController: _calendarController,
+              events: _schedule.events,
+              builders: CalendarBuilders(markersBuilder: _buildMarkers),
+            ),
+            RaisedButton(
+              child: Row(
+                children: [
+                  Padding(
+                    padding: MapAppPadding.buttonIconEdgeInsets,
+                    child: Icon(Icons.add),
                   ),
-                  FlatButton(
-                    child: Text(
-                      "Change",
-                    ),
-                    onPressed: () {},
-                  )
+                  Text("PHQ9 questionnaire"),
                 ],
-              )
-            ],
-          ),
-        ));
+                mainAxisSize: MainAxisSize.min,
+              ),
+              onPressed: () {
+                Repository.getPHQ9Questionnaire().then((Questionnaire q) {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => QuestionnairePage(q)));
+                });
+              },
+            ),
+            RaisedButton(
+              child: Row(
+                children: [
+                  Padding(
+                    padding: MapAppPadding.buttonIconEdgeInsets,
+                    child: Icon(Icons.add),
+                  ),
+                  Text("Simple assessment"),
+                ],
+                mainAxisSize: MainAxisSize.min,
+              ),
+              onPressed: () {
+                Repository.getSimpleQuestionnaire().then((Questionnaire q) {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => QuestionnairePage(q)));
+                });
+              },
+            ),
+            RaisedButton(
+              child: Row(
+                children: [
+                  Padding(
+                    padding: MapAppPadding.buttonIconEdgeInsets,
+                    child: Icon(Icons.add),
+                  ),
+                  Text("Women's assessment"),
+                ],
+                mainAxisSize: MainAxisSize.min,
+              ),
+              onPressed: () {
+                Repository.getMapAppQuestionnaire().then((Questionnaire q) {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => QuestionnairePage(q)));
+                });
+              },
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: Dimensions.largeMargin),
+              child: Text("My Treatment Plan",
+                  style: Theme.of(context).textTheme.title),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: _carePlan.activity
+                      .map((Activity activity) {
+                        return [
+                          Text(activity.detail.description ?? "Activity", style: Theme.of(context).textTheme.subtitle,),
+                          Text(
+                              "Frequency: ${activity.detail.scheduledTiming.repeat.frequency} time(s) every ${activity.detail.scheduledTiming.repeat.period} ${activity.detail.scheduledTiming.repeat.periodUnit}"),
+                          Text("Duration: ${activity.detail.scheduledTiming.repeat.duration} ${activity.detail.scheduledTiming.repeat.durationUnit}")
+                        ];
+                      })
+                      .toList()
+                      .expand((i) => i)
+                      .toList(),
+                ),
+                FlatButton(
+                  child: Text(
+                    "Change",
+                  ),
+                  onPressed: () {},
+                )
+              ],
+            )
+          ],
+        ),
+      );
   }
 
   List<Widget> _buildMarkers(
