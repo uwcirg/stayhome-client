@@ -43,8 +43,7 @@ class _MyAppState extends State<MyApp> {
   String title = 'CIRG Map App';
 
   _MyAppState(Widget home) {
-    _homePage = PlanPage(
-        TreatmentSchedule.treatmentSchedule(), TreatmentPlan.treatmentPlan());
+    _homePage = PlanPage();
     auth = KeycloakAuth();
 
     if (home != null) {

@@ -3,19 +3,26 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' show Response;
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
+import 'package:map_app_flutter/main.dart';
 
 import 'const.dart';
+import 'services/Repository.dart';
 
 class QuestionnairePage extends StatefulWidget {
   final Questionnaire _questionnaire;
 
-  QuestionnairePage(this._questionnaire);
+  CarePlan _carePlan;
+
+  Reference _subject;
+
+  QuestionnairePage(this._questionnaire, this._subject, this._carePlan);
 
   @override
   State<StatefulWidget> createState() {
-    return QuestionnairePageState(_questionnaire);
+    return QuestionnairePageState(_questionnaire, _subject, _carePlan);
   }
 }
 
@@ -23,12 +30,13 @@ class QuestionnairePageState extends State<QuestionnairePage> {
   final Questionnaire _questionnaire;
   QuestionnaireResponse _response;
 
-  QuestionnairePageState(this._questionnaire,
+  QuestionnairePageState(
+      this._questionnaire, Reference subject, CarePlan carePlan,
       {QuestionnaireResponse response}) {
     this._response = response;
     if (this._response == null) {
       this._response =
-          new QuestionnaireResponse(_questionnaire.reference, subject);
+          new QuestionnaireResponse(_questionnaire, subject, carePlan);
     }
   }
 
@@ -36,7 +44,21 @@ class QuestionnairePageState extends State<QuestionnairePage> {
   Widget build(BuildContext context) {
     return new MapAppPageScaffold(
       title: _questionnaire.title,
-      child: QuestionListWidget(_questionnaire.item, _response),
+      child: QuestionListWidget(_questionnaire.item, _response, () {
+        _response.status = QuestionnaireResponseStatus.completed;
+        Repository.postQuestionnaireResponse(_response).then((Response value) {
+          if (value.statusCode != 201) {
+            snack(
+                "An error occurred when trying to save your responses. Please try again. Error: ${value.body}",
+                context);
+          } else {
+            snack("Successful", context);
+            Navigator.of(context).pop();
+          }
+        }).catchError((var error) => snack(
+            "An error occurred when trying to save your responses. Please try again. Error: $error",
+            context));
+      }),
       showDrawer: false,
     );
   }
@@ -63,7 +85,8 @@ class QuestionnaireItemPageState extends State<QuestionnaireItemPage> {
   Widget build(BuildContext context) {
     return new MapAppPageScaffold(
       title: _questionnaireItem.text,
-      child: QuestionListWidget(_questionnaireItem.item, _response),
+      child: QuestionListWidget(_questionnaireItem.item, _response,
+          () => Navigator.of(context).pop()),
       showDrawer: false,
     );
   }
@@ -72,65 +95,80 @@ class QuestionnaireItemPageState extends State<QuestionnaireItemPage> {
 class QuestionListWidget extends StatefulWidget {
   final List<QuestionnaireItem> _questions;
   final QuestionnaireResponse _response;
+  final Function _onPressed;
 
-  QuestionListWidget(this._questions, this._response);
+  QuestionListWidget(this._questions, this._response, this._onPressed);
 
   @override
   State createState() =>
-      QuestionListWidgetState(this._questions, this._response);
+      QuestionListWidgetState(this._questions, this._response, this._onPressed);
 }
 
 class QuestionListWidgetState extends State<QuestionListWidget> {
   final List<QuestionnaireItem> _questions;
   final QuestionnaireResponse _response;
+  final Function _onPressed;
 
-  QuestionListWidgetState(this._questions, this._response);
+  QuestionListWidgetState(this._questions, this._response, this._onPressed);
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
         child: ListView.builder(
-            itemCount: _questions.length,
+            itemCount: _questions.length + 1,
             shrinkWrap: true,
             padding: MapAppPadding.cardPageMargins,
             itemBuilder: (context, i) {
+              if (i == _questions.length) {
+                return RaisedButton(
+                  child: Text("Done"),
+                  onPressed: _onPressed,
+                );
+              }
+
               QuestionnaireItem item = _questions[i];
               if (item.isSupported()) {
                 return _buildItem(context, item);
               } else if (item.isGroup()) {
-                return GestureDetector(
-                    onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            QuestionnaireItemPage(item, _response))),
-                    child: Card(
-                        child: Padding(
-                            padding: MapAppPadding.cardPageMargins,
-                            child: Row(
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    item.text,
-                                    style: Theme.of(context).textTheme.title,
-                                  ),
-                                ),
-                                Icon(Icons.chevron_right),
-                              ],
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            ))));
+                return _buildGroupCard(context, item);
               } else {
-                return Card(
-                    child: Padding(
-                  padding: MapAppPadding.cardPageMargins,
-                  child: Text(
-                    "Unsupported question. Name: ${item.text}. Type: ${item.type}",
-                    style: Theme.of(context)
-                        .textTheme
-                        .title
-                        .apply(color: Colors.red),
-                  ),
-                ));
+                return _buildUnsupportedItemCard(context, item);
               }
             }));
+  }
+
+  GestureDetector _buildGroupCard(
+      BuildContext context, QuestionnaireItem item) {
+    return GestureDetector(
+        onTap: () => Navigator.of(context).push(MaterialPageRoute(
+            builder: (BuildContext context) =>
+                QuestionnaireItemPage(item, _response))),
+        child: Card(
+            child: Padding(
+                padding: MapAppPadding.cardPageMargins,
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        item.text,
+                        style: Theme.of(context).textTheme.title,
+                      ),
+                    ),
+                    Icon(Icons.chevron_right),
+                  ],
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                ))));
+  }
+
+  Card _buildUnsupportedItemCard(BuildContext context, QuestionnaireItem item) {
+    return Card(
+        child: Padding(
+      padding: MapAppPadding.cardPageMargins,
+      child: Text(
+        "Unsupported question. Name: ${item.text}. Type: ${item.type}",
+        style: Theme.of(context).textTheme.title.apply(color: Colors.red),
+      ),
+    ));
   }
 
   Widget _buildItem(BuildContext context, QuestionnaireItem questionnaireItem) {
@@ -187,7 +225,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
             ? _response.getResponseItem(questionnaireItem.linkId).answer[0]
             : null;
 
-    return questionnaireItem.answerValueSet.map((CodeableConcept option) {
+    return questionnaireItem.answerValueSet.map((Coding option) {
       return _buildChip('$option', currentResponse == option, context,
           questionnaireItem, new Answer(valueCoding: option));
     }).toList();

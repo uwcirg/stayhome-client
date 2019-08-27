@@ -238,7 +238,6 @@ class Address {
     }
     if (json['line'] != null) {
       line = json['line'].cast<String>();
-      ;
     }
     city = json['city'];
     state = json['state'];
@@ -318,15 +317,49 @@ class ProcedureStatus {
   }
 }
 
+
+class QuestionnaireResponseStatus {
+  final _value;
+
+  const QuestionnaireResponseStatus._(this._value);
+
+  toString() => _value;
+  toJson() => toString();
+
+  static const in_progress = const QuestionnaireResponseStatus._('in-progress');
+  static const stopped = const QuestionnaireResponseStatus._('stopped');
+  static const completed = const QuestionnaireResponseStatus._('completed');
+  static const amended = const QuestionnaireResponseStatus._('amended');
+  static const entered_in_error = const QuestionnaireResponseStatus._('entered-in-error');
+
+  static QuestionnaireResponseStatus fromJson(String key) {
+    switch (key) {
+      case 'in-progress':
+        return in_progress;
+      case 'stopped':
+        return stopped;
+      case 'amended':
+        return amended;
+      case 'completed':
+        return completed;
+      case 'entered-in-error':
+        return entered_in_error;
+    }
+    return completed;
+  }
+}
+
+
 class Procedure extends Resource {
   Narrative text;
   List<Identifier> identifier;
-  List<CarePlan> basedOn;
+  List<String> basedOnCarePlan;
+  List<String> instantiatesQuestionnaire;
   ProcedureStatus status;
   CodeableConcept statusReason;
   CodeableConcept category;
   CodeableConcept code;
-  Subject subject;
+  Reference subject;
   DateTime performedDateTime;
   Period performedPeriod;
   List<CodeableConcept> reasonCode;
@@ -336,7 +369,7 @@ class Procedure extends Resource {
       id,
       this.text,
       this.identifier,
-      this.basedOn,
+      this.basedOnCarePlan,
       this.status,
       this.statusReason,
       this.category,
@@ -344,7 +377,8 @@ class Procedure extends Resource {
       this.subject,
       this.performedDateTime,
       this.reasonCode,
-      this.performedPeriod})
+      this.performedPeriod,
+      this.instantiatesQuestionnaire})
       : super(resourceType: "Procedure", id: id);
 
   Procedure.fromJson(Map<String, dynamic> json) {
@@ -357,12 +391,11 @@ class Procedure extends Resource {
         identifier.add(new Identifier.fromJson(v));
       });
     }
-    if (json['basedOn'] != null) {
-      basedOn = new List<CarePlan>();
-      json['basedOn'].forEach((v) {
-        basedOn.add(new CarePlan.fromJson(v));
-      });
-    }
+    if (json['basedOn'] != null)
+      basedOnCarePlan = json['basedOn'].cast<String>();
+    if (json['instantiatesQuestionnaire'] != null)
+      instantiatesQuestionnaire =
+          json['instantiatesQuestionnaire'].cast<String>();
     if (json['status'] != null) {
       status = ProcedureStatus.fromJson(json['status']);
     }
@@ -378,8 +411,9 @@ class Procedure extends Resource {
     performedPeriod = json['performedPeriod'] != null
         ? new Period.fromJson(json['performedPeriod'])
         : null;
-    subject =
-        json['subject'] != null ? new Subject.fromJson(json['subject']) : null;
+    subject = json['subject'] != null
+        ? new Reference.fromJson(json['subject'])
+        : null;
     if (json['performedDateTime'] != null) {
       performedDateTime = DateTime.parse(json['performedDateTime']);
     }
@@ -401,8 +435,11 @@ class Procedure extends Resource {
     if (this.identifier != null) {
       data['identifier'] = this.identifier.map((v) => v.toJson()).toList();
     }
-    if (this.basedOn != null) {
-      data['basedOn'] = this.basedOn.map((v) => v.toJson()).toList();
+    if (this.basedOnCarePlan != null) {
+      data['basedOn'] = this.basedOnCarePlan.map((v) => v).toList();
+    }
+    if (this.instantiatesQuestionnaire != null) {
+      data['instantiatesQuestionnaire'] = instantiatesQuestionnaire;
     }
     data['status'] = this.status.toString();
     if (this.statusReason != null) {
@@ -427,12 +464,12 @@ class Procedure extends Resource {
 
 class CarePlan extends Resource {
   List<Identifier> identifier;
-  List<CodeableConcept> basedOn;
+  List<String> basedOn;
   CarePlanStatus status;
   String intent;
   List<CodeableConcept> category;
   String description;
-  Subject subject;
+  Reference subject;
   Period period;
   DateTime created;
   List<Activity> activity;
@@ -462,11 +499,12 @@ class CarePlan extends Resource {
       });
     }
     if (json['basedOn'] != null) {
-      basedOn = new List<CodeableConcept>();
+      basedOn = new List<String>();
       json['basedOn'].forEach((v) {
-        basedOn.add(new CodeableConcept.fromJson(v));
+        basedOn.add(v);
       });
     }
+
     if (json['status'] != null) {
       status = CarePlanStatus.fromJson(json['status']);
     }
@@ -478,8 +516,9 @@ class CarePlan extends Resource {
       });
     }
     description = json['description'];
-    subject =
-        json['subject'] != null ? new Subject.fromJson(json['subject']) : null;
+    subject = json['subject'] != null
+        ? new Reference.fromJson(json['subject'])
+        : null;
     period =
         json['period'] != null ? new Period.fromJson(json['period']) : null;
     if (json['created'] != null) created = DateTime.parse(json["created"]);
@@ -498,8 +537,9 @@ class CarePlan extends Resource {
       data['identifier'] = this.identifier.map((v) => v.toJson()).toList();
     }
     if (this.basedOn != null) {
-      data['basedOn'] = this.basedOn.map((v) => v.toJson()).toList();
+      data['basedOn'] = this.basedOn.map((v) => v).toList();
     }
+
     data['status'] = this.status.toString();
     data['intent'] = this.intent;
     if (this.category != null) {
@@ -518,6 +558,12 @@ class CarePlan extends Resource {
     }
     return data;
   }
+
+  Activity getActivityWithCode(String code) {
+    return activity.firstWhere((Activity activity) => activity
+        .detail.code.coding
+        .any((Coding coding) => coding.code == code));
+  }
 }
 
 class Identifier {
@@ -532,25 +578,6 @@ class Identifier {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['value'] = this.value;
-    return data;
-  }
-}
-
-class Subject {
-  String reference;
-  String display;
-
-  Subject({this.reference, this.display});
-
-  Subject.fromJson(Map<String, dynamic> json) {
-    reference = json['reference'];
-    display = json['display'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['reference'] = this.reference;
-    data['display'] = this.display;
     return data;
   }
 }
@@ -601,13 +628,17 @@ class Detail {
   Timing scheduledTiming;
   Period scheduledPeriod;
   String description;
+  List<String> instantiatesCanonical;
 
   Detail(
       {this.code,
       this.status,
       this.statusReason,
       this.doNotPerform,
-      this.scheduledTiming, this.scheduledPeriod, this.description});
+      this.scheduledTiming,
+      this.scheduledPeriod,
+      this.description,
+      this.instantiatesCanonical});
 
   Detail.fromJson(Map<String, dynamic> json) {
     code = json['code'] != null
@@ -627,6 +658,12 @@ class Detail {
         ? new Period.fromJson(json['scheduledPeriod'])
         : null;
     description = json['description'];
+    if (json['instantiatesCanonical'] != null) {
+      instantiatesCanonical = new List<String>();
+      json['instantiatesCanonical'].forEach((v) {
+        instantiatesCanonical.add(v);
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -646,6 +683,10 @@ class Detail {
       data['scheduledPeriod'] = this.scheduledPeriod.toJson();
     }
     data['description'] = description;
+    if (this.instantiatesCanonical != null) {
+      data['instantiatesCanonical'] =
+          this.instantiatesCanonical.map((v) => v).toList();
+    }
     return data;
   }
 }
@@ -681,7 +722,12 @@ class Repeat {
   int period;
   String periodUnit;
 
-  Repeat({this.frequency, this.period, this.periodUnit, this.durationUnit, this.duration});
+  Repeat(
+      {this.frequency,
+      this.period,
+      this.periodUnit,
+      this.durationUnit,
+      this.duration});
 
   Repeat.fromJson(Map<String, dynamic> json) {
     frequency = json['frequency'];
@@ -970,18 +1016,60 @@ class Questionnaire extends Resource {
 }
 
 class CodeableConcept {
+  List<Coding> coding;
+  String text;
+
+  CodeableConcept({this.coding, this.text});
+
+  @override
+  String toString() {
+    return coding.toString();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (this.coding != null) {
+      data['coding'] = this.coding.map((v) => v.toJson()).toList();
+    }
+    data['text'] = this.text;
+    return data;
+  }
+
+  CodeableConcept.fromJson(Map<String, dynamic> json) {
+    if (json['coding'] != null) {
+      coding = new List<Coding>();
+      json['coding'].forEach((v) {
+        coding.add(new Coding.fromJson(v));
+      });
+    }
+    text = json['text'];
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CodeableConcept &&
+          this.coding.any((Coding code1) {
+            return other.coding.any((Coding code2) => code1 == code2);
+          });
+
+  @override
+  int get hashCode => coding.hashCode;
+}
+
+class Coding {
   String system;
   String code;
   String display;
 
-  CodeableConcept({this.system, this.code, this.display});
+  Coding({this.system, this.code, this.display});
 
   @override
   String toString() {
     return display;
   }
 
-  CodeableConcept.fromJson(Map<String, dynamic> json) {
+  Coding.fromJson(Map<String, dynamic> json) {
     system = json['system'];
     code = json['code'];
     display = json['display'];
@@ -994,6 +1082,16 @@ class CodeableConcept {
     data['display'] = this.display;
     return data;
   }
+
+  @override
+  bool operator ==(other) {
+    if (other is! Coding) return false;
+    Coding o = other;
+    return o.system == this.system && o.code == this.code;
+  }
+
+  @override
+  int get hashCode => system.hashCode ^ code.hashCode;
 }
 
 class Extension {
@@ -1002,8 +1100,8 @@ class Extension {
   String url;
   String valueCanonical;
   ValueExpression valueExpression;
-  ValueCodeableConcept valueCodeableConcept;
-  CodeableConcept valueCoding;
+  CodeableConcept valueCodeableConcept;
+  Coding valueCoding;
   String valueString;
   int valueDecimal;
 
@@ -1027,10 +1125,10 @@ class Extension {
         ? new ValueExpression.fromJson(json['valueExpression'])
         : null;
     valueCodeableConcept = json['valueCodeableConcept'] != null
-        ? new ValueCodeableConcept.fromJson(json['valueCodeableConcept'])
+        ? new CodeableConcept.fromJson(json['valueCodeableConcept'])
         : null;
     valueCoding = json['valueCoding'] != null
-        ? new CodeableConcept.fromJson(json['valueCoding'])
+        ? new Coding.fromJson(json['valueCoding'])
         : null;
     valueString = json['valueString'];
     valueDecimal = json['valueDecimal'];
@@ -1054,32 +1152,6 @@ class Extension {
     }
     data['valueString'] = this.valueString;
     data['valueDecimal'] = this.valueDecimal;
-    return data;
-  }
-}
-
-class ValueCodeableConcept {
-  List<CodeableConcept> coding;
-  String text;
-
-  ValueCodeableConcept({this.coding, this.text});
-
-  ValueCodeableConcept.fromJson(Map<String, dynamic> json) {
-    if (json['coding'] != null) {
-      coding = new List<CodeableConcept>();
-      json['coding'].forEach((v) {
-        coding.add(new CodeableConcept.fromJson(v));
-      });
-    }
-    text = json['text'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.coding != null) {
-      data['coding'] = this.coding.map((v) => v.toJson()).toList();
-    }
-    data['text'] = this.text;
     return data;
   }
 }
@@ -1108,10 +1180,10 @@ class QuestionnaireItem {
   String text;
   bool required;
   String type;
-  List<CodeableConcept> code;
+  List<Coding> code;
   List<AnswerOption> answerOption;
   String answerValueSetAddress;
-  List<CodeableConcept> answerValueSet;
+  List<Coding> answerValueSet;
   List<Extension> extension;
   List<QuestionnaireItem> item;
 
@@ -1151,9 +1223,9 @@ class QuestionnaireItem {
       });
     }
     if (json['code'] != null) {
-      code = new List<CodeableConcept>();
+      code = new List<Coding>();
       json['code'].forEach((v) {
-        code.add(new CodeableConcept.fromJson(v));
+        code.add(new Coding.fromJson(v));
       });
     }
     if (json['extension'] != null) {
@@ -1167,9 +1239,9 @@ class QuestionnaireItem {
     // answerValueSet actual values are loaded separately
 
     if (json['code'] != null) {
-      code = new List<CodeableConcept>();
+      code = new List<Coding>();
       json['code'].forEach((v) {
-        code.add(new CodeableConcept.fromJson(v));
+        code.add(new Coding.fromJson(v));
       });
     }
     if (json['item'] != null) {
@@ -1210,7 +1282,7 @@ class QuestionnaireItem {
 class AnswerOption {
   int valueInteger;
   List<Extension> extension;
-  CodeableConcept valueCoding;
+  Coding valueCoding;
 
   AnswerOption({this.valueInteger, this.extension, this.valueCoding});
 
@@ -1223,7 +1295,7 @@ class AnswerOption {
       });
     }
     valueCoding = json['valueCoding'] != null
-        ? new CodeableConcept.fromJson(json['valueCoding'])
+        ? new Coding.fromJson(json['valueCoding'])
         : null;
   }
 
@@ -1251,16 +1323,23 @@ class AnswerOption {
 class QuestionnaireResponse extends Resource {
   Meta meta;
   String questionnaireReference;
-  String status;
-  Subject subject;
+  List<Reference> basedOnCarePlan;
+  Reference subject;
+  DateTime authored;
   List<QuestionnaireResponseItem> item;
+  QuestionnaireResponseStatus status;
 
-  QuestionnaireResponse(this.questionnaireReference, this.subject,
+  QuestionnaireResponse(
+      Questionnaire questionnaire, this.subject, CarePlan carePlan,
       {resourceType, id, this.meta, this.status, this.item})
       : super(resourceType: "QuestionnaireResponse", id: id) {
     if (this.item == null) {
       this.item = [];
     }
+    this.questionnaireReference = questionnaire.reference;
+    this.basedOnCarePlan = [Reference(reference: carePlan.reference)];
+    var today = new DateTime.now();
+    this.authored = new DateTime(today.year, today.month, today.day);
   }
 
   QuestionnaireResponse.fromJson(Map<String, dynamic> json) {
@@ -1268,9 +1347,19 @@ class QuestionnaireResponse extends Resource {
     id = json['id'];
     meta = json['meta'] != null ? new Meta.fromJson(json['meta']) : null;
     questionnaireReference = json['questionnaire'];
-    status = json['status'];
-    subject =
-        json['subject'] != null ? new Subject.fromJson(json['subject']) : null;
+
+    if (json['basedOn'] != null) {
+      basedOnCarePlan = new List<Reference>();
+      json['basedOn'].forEach((v) {
+        basedOnCarePlan.add(new Reference.fromJson(v));
+      });
+    }
+
+    if (json['status'] != null) status = QuestionnaireResponseStatus.fromJson(json['status']);
+    if (json['authored'] != null) authored = DateTime.parse(json['authored']);
+    subject = json['subject'] != null
+        ? new Reference.fromJson(json['subject'])
+        : null;
     if (json['item'] != null) {
       item = new List<QuestionnaireResponseItem>();
       json['item'].forEach((v) {
@@ -1286,11 +1375,13 @@ class QuestionnaireResponse extends Resource {
     if (this.meta != null) {
       data['meta'] = this.meta.toJson();
     }
+    data['basedOn'] = this.basedOnCarePlan;
     data['questionnaire'] = this.questionnaireReference;
-    data['status'] = this.status;
+    data['status'] = this.status.toJson();
     if (this.subject != null) {
       data['subject'] = this.subject.toJson();
     }
+    data['authored'] = this.authored.toIso8601String();
     if (this.item != null) {
       data['item'] = this.item.map((v) => v.toJson()).toList();
     }
@@ -1315,6 +1406,22 @@ class QuestionnaireResponse extends Resource {
       }
     }
     return null;
+  }
+}
+
+class Reference {
+  String reference;
+
+  Reference({this.reference});
+
+  Reference.fromJson(Map<String, dynamic> json) {
+    reference = json['linkId'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['reference'] = this.reference;
+    return data;
   }
 }
 
@@ -1346,7 +1453,7 @@ class QuestionnaireResponseItem {
 
 class Answer {
   int valueInteger;
-  CodeableConcept valueCoding;
+  Coding valueCoding;
 
   Answer({this.valueInteger, this.valueCoding});
 
@@ -1359,8 +1466,8 @@ class Answer {
       AnswerOption other = o;
       return valueInteger == other.valueInteger &&
           valueCoding == other.valueCoding;
-    } else if (o is CodeableConcept) {
-      CodeableConcept other = o;
+    } else if (o is Coding) {
+      Coding other = o;
       return valueInteger == null && other == valueCoding;
     }
 
@@ -1391,7 +1498,7 @@ class Answer {
 
   Answer.fromJson(Map<String, dynamic> json) {
     valueInteger = json['valueInteger'];
-    valueCoding = CodeableConcept.fromJson(json['valueCoding']);
+    valueCoding = Coding.fromJson(json['valueCoding']);
   }
 
   Map<String, dynamic> toJson() {
@@ -1447,7 +1554,7 @@ class Expansion {
   String timestamp;
   int total;
   List<Parameter> parameter;
-  List<CodeableConcept> contains;
+  List<Coding> contains;
 
   Expansion(
       {this.identifier,
@@ -1467,9 +1574,9 @@ class Expansion {
       });
     }
     if (json['contains'] != null) {
-      contains = new List<CodeableConcept>();
+      contains = new List<Coding>();
       json['contains'].forEach((v) {
-        contains.add(new CodeableConcept.fromJson(v));
+        contains.add(new Coding.fromJson(v));
       });
     }
   }

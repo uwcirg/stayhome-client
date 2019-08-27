@@ -26,7 +26,11 @@ class MapAppPadding {
   MapAppPadding._();
 }
 
-get subject => Subject(reference: "Patient/23");
+class FhirConstants {
+  static const SNOMED_PELVIC_FLOOR_EXERCISES = "183306002";
+
+  static const String ASSESSMENT_SCALES = "273249006";
+}
 
 class IconSize {
   static const double small = 18;
