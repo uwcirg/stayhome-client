@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/QuestionnairePage.dart';
 import 'package:map_app_flutter/const.dart';
+import 'package:map_app_flutter/fhir/Exception.dart';
 import 'package:map_app_flutter/generated/i18n.dart';
 import 'package:map_app_flutter/services/Repository.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import 'fhir/FhirResources.dart';
-import 'fhir/exception.dart';
 
 class PlanPage extends StatefulWidget {
   PlanPage();
