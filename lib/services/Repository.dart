@@ -4,7 +4,7 @@
 
 import 'dart:convert';
 
-import 'package:http/http.dart' show Response, get, post;
+import 'package:http/http.dart' show Response, get, post, put;
 import 'package:map_app_flutter/fhir/FhirResources.dart';
 
 class Repository {
@@ -21,14 +21,18 @@ class Repository {
     var patientLoadUrl =
         "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/Patient/$patientResourceId";
     var response = await get(patientLoadUrl, headers: {});
-    if (response.statusCode == 200) {
-      return Patient.fromJson(jsonDecode(response.body));
+    return resultFromResponse(response, "Error loading Patient/$patientResourceId").then((value) => Patient.fromJson(jsonDecode(response.body)));
+  }
+
+  static Future resultFromResponse(Response response, String defaultMessage) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return Future.value(response.body);
     } else {
       var message;
       try {
         message = jsonDecode(response.body)['issue'][0]['diagnostics'];
       } catch (e) {
-        message = "Error loading Patient/$patientResourceId";
+        message = defaultMessage;
       }
       return Future.error(message);
     }
@@ -124,7 +128,7 @@ class Repository {
     return ValueSet.fromJson(jsonDecode(value.body));
   }
 
-  static Future<Response> postQuestionnaireResponse(
+  static Future<void> postQuestionnaireResponse(
       QuestionnaireResponse questionnaireResponse) async {
     var url =
         "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/QuestionnaireResponse?_format=json";
@@ -137,8 +141,10 @@ class Repository {
       "Content-Type": "application/fhir+json; charset=UTF-8",
     };
 
-    return await post(url,
+    Response value = await post(url,
         headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
+
+    return resultFromResponse(value, "An error occurred when trying to save your responses.");
   }
 
   static Future<Questionnaire> getQuestionnaire(
@@ -184,6 +190,22 @@ class Repository {
     };
 
     return await post(url,
+        headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
+  }
+
+  static Future<Response> updateCarePlan(CarePlan plan) async {
+    var url =
+        "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/CarePlan/${plan.id}?_format=json";
+    String body = jsonEncode(plan.toJson());
+    var headers = {
+      "Accept-Charset": "utf-8",
+      "Accept": "application/fhir+json;q=1.0, application/json+fhir;q=0.9",
+      "User-Agent": "HAPI-FHIR/3.8.0 (FHIR Client; FHIR 4.0.0/R4; apache)",
+      "Accept-Encoding": "gzip",
+      "Content-Type": "application/fhir+json; charset=UTF-8",
+    };
+
+    return await put(url,
         headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
   }
 }

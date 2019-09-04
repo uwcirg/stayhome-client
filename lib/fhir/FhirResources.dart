@@ -606,8 +606,10 @@ class CarePlan extends Resource {
     newPlan.id = null;
     newPlan.basedOn = [Reference(reference: plan.reference)];
     newPlan.status = CarePlanStatus.active;
+    var now = DateTime.now();
+    var today = DateTime(now.year, now.month, now.day);
     newPlan.period = Period(
-        start: DateTime.now(), end: DateTime.now().add(Duration(days: 120)));
+        start: today, end: today.add(Duration(days: 120)));
     return newPlan;
   }
 }
@@ -1472,6 +1474,8 @@ class Reference {
     data['reference'] = this.reference;
     return data;
   }
+
+  Reference.from(Patient patient) : this(reference: patient.reference);
 }
 
 class QuestionnaireResponseItem {

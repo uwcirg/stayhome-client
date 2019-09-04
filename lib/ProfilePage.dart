@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
-import 'package:map_app_flutter/Model.dart';
+import 'package:map_app_flutter/model/AppModel.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/i18n.dart';
 import 'package:map_app_flutter/services/Repository.dart';
@@ -69,7 +69,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 Text(
                     S.of(context).email(MyApp.of(context).auth.userInfo.email)),
                 Text(
-                  "Couchbase",
+                  
+                  S.of(context).couchbase,
                   style: Theme.of(context).textTheme.display1,
                 ),
                 ScopedModelDescendant<AppModel>(

@@ -2,15 +2,13 @@
  * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
  */
 
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/QuestionnairePage.dart';
 import 'package:map_app_flutter/const.dart';
-import 'package:map_app_flutter/fhir/Exception.dart';
 import 'package:map_app_flutter/generated/i18n.dart';
-import 'package:map_app_flutter/services/Repository.dart';
+import 'package:map_app_flutter/model/CarePlanModel.dart';
+import 'package:scoped_model/scoped_model.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import 'fhir/FhirResources.dart';
@@ -19,27 +17,17 @@ import 'main.dart';
 class PlanPage extends StatefulWidget {
   PlanPage();
 
+  static _PlanPageState of(BuildContext context) =>
+      context.ancestorStateOfType(const TypeMatcher<_PlanPageState>());
+
   @override
   _PlanPageState createState() => _PlanPageState();
 }
 
 class _PlanPageState extends State<PlanPage> {
-  TreatmentCalendar _treatmentCalendar;
-  int _counter = 0;
   CalendarController _calendarController;
 
-  bool _updateState = false;
-
-  Patient _patient;
-
-  CarePlan _carePlan;
-  bool _hasNoCarePlan = false;
-
-  List<Procedure> _procedures;
-
-  List<Questionnaire> _questionnaires;
-
-  List<QuestionnaireResponse> _questionnaireResponses;
+  CarePlanModel _carePlanModel;
 
   _PlanPageState();
 
@@ -48,44 +36,8 @@ class _PlanPageState extends State<PlanPage> {
     super.initState();
     _calendarController = CalendarController();
     var patientID = MyApp.of(context).auth.userInfo.patientResourceID;
-    Repository.getPatient(patientID).then((Patient patient) {
-      _patient = patient;
-      Repository.getCarePlan(patient).then((CarePlan carePlan) {
-        if (carePlan == null) {
-          setState(() {
-            _hasNoCarePlan = true;
-          });
-        } else {
-          _carePlan = carePlan;
-          _loadQuestionnaires();
-        }
-      });
-    });
-  }
-
-  void _loadQuestionnaires() {
-    Repository.getQuestionnaires(_carePlan).then((var questionnaires) {
-      setState(() {
-        _questionnaires = questionnaires;
-      });
-    });
-    List<Future> futures = [
-      Repository.getProcedures(_carePlan).then((List<Procedure> procedures) {
-        _procedures = procedures;
-      }),
-      Repository.getQuestionnaireResponses(_carePlan)
-          .then((List<QuestionnaireResponse> responses) {
-        _questionnaireResponses = responses;
-      })
-    ];
-
-    Future.wait(futures).then((var value) {
-      var treatmentCalendar = TreatmentCalendar.make(
-          _carePlan, _procedures, _questionnaireResponses);
-      setState(() {
-        _treatmentCalendar = treatmentCalendar;
-      });
-    });
+    _carePlanModel = CarePlanModel(patientID);
+    super.initState();
   }
 
   @override
@@ -94,108 +46,103 @@ class _PlanPageState extends State<PlanPage> {
     super.dispose();
   }
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     String title = S.of(context).plan;
-    return MapAppPageScaffold(title: title, child: buildScreen(context));
+    return ScopedModel(
+        model: _carePlanModel,
+        child: MapAppPageScaffold(title: title, child: buildScreen(context)));
   }
 
   Padding buildScreen(BuildContext context) {
     var textStyle = Theme.of(context).textTheme.caption;
     return Padding(
       padding: const EdgeInsets.all(Dimensions.halfMargin),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          _buildCalendar(textStyle, context),
-          _buildQuestionnaireButtonSection(context),
-          Padding(
-            padding: const EdgeInsets.only(top: Dimensions.largeMargin),
-            child: Text("My Treatment Plan",
-                style: Theme.of(context).textTheme.title),
-          ),
-          _buildCareplanInfoSection(context)
-        ],
+      child: SafeArea(
+        child: ScopedModelDescendant<CarePlanModel>(
+            builder: (context, child, model) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              _buildCalendar(textStyle, context, model),
+              _buildQuestionnaireButtonSection(context, model),
+              Padding(
+                padding: const EdgeInsets.only(top: Dimensions.largeMargin),
+                child: Text(S.of(context).my_treatment_plan,
+                    style: Theme.of(context).textTheme.title),
+              ),
+              _buildCareplanInfoSection(context, model)
+            ],
+          );
+        }),
       ),
     );
   }
 
-  Widget _buildCareplanInfoSection(BuildContext context) {
-    if (_hasNoCarePlan) {
+  Widget _buildCareplanInfoSection(BuildContext context, CarePlanModel model) {
+    if (model.hasNoCarePlan) {
       return Wrap(
         children: <Widget>[
-          Text("You have no active Pelvic Floor Management Careplan."),
+          Text(S
+              .of(context)
+              .you_have_no_active_pelvic_floor_management_careplan),
           FlatButton(
             child: Text(
-              "Add the default CarePlan for me",
+              S.of(context).add_the_default_careplan_for_me,
             ),
-            onPressed: () {
-              Repository.loadCarePlan("54").then((CarePlan plan) {
-                CarePlan newPlan = CarePlan.fromTemplate(plan, _patient);
-                Repository.postCarePlan(newPlan).then((value) {
-                  setState(() {
-                    _carePlan = CarePlan.fromJson(jsonDecode(value.body));
-                    _hasNoCarePlan = false;
-                  });
-                  _loadQuestionnaires();
-                });
-              });
-            },
+            onPressed: () => _carePlanModel.addDefaultCareplan(),
           )
         ],
       );
     }
-    if (_treatmentCalendar == null) {
+    if (model.isLoading) {
       return Center(child: CircularProgressIndicator());
     }
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: _carePlan.activity
-              .map((Activity activity) {
-                return [
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: model.carePlan.activity.map((Activity activity) {
+        var durationUnit = activity.detail.scheduledTiming.repeat.durationUnit;
+        var duration = activity.detail.scheduledTiming.repeat.duration;
+        return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                children: [
                   Text(
-                    activity.detail.description ?? "Activity",
+                    activity.detail.description ?? S.of(context).activity,
                     style: Theme.of(context).textTheme.subtitle,
                   ),
-                  Text(
-                      "Frequency: ${activity.detail.scheduledTiming.repeat.frequency} time(s) every ${activity.detail.scheduledTiming.repeat.period} ${activity.detail.scheduledTiming.repeat.periodUnit}"),
+                  Text(S.of(context).frequency_with_contents(
+                      '${activity.detail.scheduledTiming.repeat.period}',
+                      activity.detail.scheduledTiming.repeat.periodUnit)),
                   Visibility(
-                    visible: activity.detail.scheduledTiming.repeat.duration !=
-                            null ||
-                        activity.detail.scheduledTiming.repeat.durationUnit !=
-                            null,
-                    child: Text(
-                        "Duration: ${activity.detail.scheduledTiming.repeat.duration} ${activity.detail.scheduledTiming.repeat.durationUnit}"),
+                    visible: duration != null || durationUnit != null,
+                    child: Text(S.of(context).duration_duration_durationunit(
+                        '$duration', durationUnit)),
                   )
-                ];
-              })
-              .toList()
-              .expand((i) => i)
-              .toList(),
-        ),
-        FlatButton(
-          child: Text(
-            "Change",
-          ),
-          onPressed: () {},
-        )
-      ],
+                ],
+                crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+              FlatButton(
+                child: Text(
+                  S.of(context).change,
+                ),
+                onPressed: () => _showChangeDialogForActivity(
+                    context, model, model.carePlan.activity.indexOf(activity)),
+              )
+            ]);
+      }).toList(),
     );
   }
 
-  Widget _buildQuestionnaireButtonSection(BuildContext context) {
-    if (_hasNoCarePlan) return Container(height: 0,);
+  Widget _buildQuestionnaireButtonSection(
+      BuildContext context, CarePlanModel model) {
+    if (model.hasNoCarePlan)
+      return Container(
+        height: 0,
+      );
 
-    if (_questionnaires == null)
+    if (model.isLoading)
       return Padding(
         child: Center(child: CircularProgressIndicator()),
         padding: MapAppPadding.pageMargins,
@@ -203,56 +150,41 @@ class _PlanPageState extends State<PlanPage> {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: _buildQuestionnaireButtons(context),
+      children: _buildQuestionnaireButtons(context, model),
     );
   }
 
-  Widget _buildCalendar(TextStyle textStyle, BuildContext context) {
-    if (_hasNoCarePlan)
+  Widget _buildCalendar(
+      TextStyle textStyle, BuildContext context, CarePlanModel model) {
+    if (model.hasNoCarePlan)
       return Container(
         height: 0,
       );
 
-    if (_treatmentCalendar == null)
-      return Center(child: CircularProgressIndicator());
+    if (model.isLoading) return Center(child: CircularProgressIndicator());
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Text(
-          "Treatment Calendar",
+          S.of(context).treatment_calendar,
           style: Theme.of(context).textTheme.title,
         ),
-        TableCalendar(
-          availableCalendarFormats: {CalendarFormat.month: ""},
-          calendarStyle: CalendarStyle(
-            weekendStyle: textStyle,
-            weekdayStyle: textStyle,
-            todayStyle: TextStyle(color: Colors.black),
-            selectedColor: Theme.of(context).accentColor,
-            todayColor: Theme.of(context).primaryColor,
-            outsideDaysVisible: false,
-            markersColor: Colors.red.shade900,
-          ),
-          daysOfWeekStyle: DaysOfWeekStyle(
-              weekendStyle: TextStyle(color: Theme.of(context).accentColor)),
-          calendarController: _calendarController,
-          events: _treatmentCalendar.events,
-          builders: CalendarBuilders(markersBuilder: _buildMarkers),
-        ),
+        TreatmentCalendarWidget(_calendarController, model),
       ],
     );
   }
 
-  List<Widget> _buildQuestionnaireButtons(BuildContext context) {
-    return _questionnaires
+  List<Widget> _buildQuestionnaireButtons(
+      BuildContext context, CarePlanModel model) {
+    return model.questionnaires
         .map((Questionnaire questionnaire) => _buildQuestionnaireButton(
-            context, questionnaire.title, questionnaire))
+            context, questionnaire.title, questionnaire, model))
         .toList();
   }
 
-  RaisedButton _buildQuestionnaireButton(
-      BuildContext context, String title, Questionnaire questionnaire) {
+  RaisedButton _buildQuestionnaireButton(BuildContext context, String title,
+      Questionnaire questionnaire, CarePlanModel model) {
     return RaisedButton(
         child: Row(
           children: [
@@ -266,25 +198,147 @@ class _PlanPageState extends State<PlanPage> {
         ),
         onPressed: () {
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => QuestionnairePage(questionnaire,
-                  Reference(reference: _patient.reference), _carePlan)));
+              builder: (context) => QuestionnairePage(questionnaire, model)));
         });
+  }
+
+  Future<String> _showChangeDialogForActivity(
+      BuildContext context, CarePlanModel model, int activityIndex) async {
+    Activity activity = model.carePlan.activity[activityIndex];
+    var period2 = activity.detail.scheduledTiming.repeat.period;
+    String every = period2 != null ? '$period2' : null;
+
+    var duration2 = activity.detail.scheduledTiming.repeat.duration;
+    String duration = duration2 != null ? '$duration2' : null;
+    return showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      // dialog is dismissible with a tap on the barrier
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Change Treatment Plan Activity'),
+          content: new Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                controller: new TextEditingController(text: every),
+                autofocus: true,
+                decoration: new InputDecoration(
+                    labelText: 'Every', hintText: 'e.g. 2 for every 2 days'),
+                onChanged: (value) {
+                  every = value;
+                },
+              ),
+              Visibility(
+                  visible: duration != null && duration.trim().length > 0,
+                  child: TextField(
+                    controller: new TextEditingController(text: duration),
+                    autofocus: true,
+                    decoration: new InputDecoration(
+                        labelText: 'Duration',
+                        hintText: 'e.g. 12 for 12 minutes per session'),
+                    onChanged: (value) {
+                      duration = value;
+                    },
+                  ))
+            ],
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text('OK'),
+              onPressed: () {
+                bool valid = true;
+                if (every != null && int.tryParse(every) == null) {
+                  snack("Not a valid frequency", context);
+                  valid = false;
+                }
+                if (duration != null && double.tryParse(duration) == null) {
+                  snack("Not a valid duration", context);
+                  valid = false;
+                }
+                if (valid) {
+                  if (every != null)
+                    model.updateActivityFrequency(
+                        activityIndex, int.parse(every));
+                  if (duration != null)
+                    model.updateActivityDuration(
+                        activityIndex, double.parse(duration));
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class TreatmentCalendarWidget extends StatelessWidget {
+  final CalendarController _calendarController;
+  final CarePlanModel _model;
+
+  TreatmentCalendarWidget(this._calendarController, this._model);
+
+  @override
+  Widget build(BuildContext context) {
+    var textStyle = Theme.of(context).textTheme.caption;
+
+    return TableCalendar(
+      availableCalendarFormats: {CalendarFormat.month: ""},
+      calendarStyle: CalendarStyle(
+          weekendStyle: textStyle,
+          weekdayStyle: textStyle,
+          todayStyle: TextStyle(color: Colors.black),
+          selectedColor: Theme.of(context).accentColor,
+          todayColor: Theme.of(context).primaryColor,
+          outsideDaysVisible: false,
+          markersColor: Colors.red.shade900,
+          markersMaxAmount: 100),
+      daysOfWeekStyle: DaysOfWeekStyle(
+          weekendStyle: TextStyle(color: Theme.of(context).accentColor)),
+      calendarController: _calendarController,
+      events: _model.treatmentCalendar.events,
+      builders: CalendarBuilders(markersBuilder: _buildMarkers),
+    );
   }
 
   List<Widget> _buildMarkers(
       BuildContext context, DateTime date, List events, List holidays) {
     List<Widget> eventWidgets = [];
     double offset = 6;
-    for (TreatmentEvent e in events) {
+    var eventTypes = {};
+    events.forEach((var e) {
+      if (eventTypes.containsKey(e.eventType)) {
+        eventTypes[e.eventType]['count'] = eventTypes[e.eventType]['count'] + 1;
+        eventTypes[e.eventType]['status'] =
+            eventTypes[e.eventType]['status'] == Status.Completed ||
+                    e.status == Status.Completed
+                ? Status.Completed
+                : e.status;
+      } else {
+        eventTypes[e.eventType] = {};
+        eventTypes[e.eventType]['count'] = 1;
+        eventTypes[e.eventType]['status'] = e.status;
+      }
+    });
+
+    for (EventType type in eventTypes.keys) {
       IconData icon;
-      if (e.eventType == EventType.Treatment) {
+      if (type == EventType.Treatment) {
         icon = Icons.healing;
       } else {
         icon = Icons.check_circle;
         offset += IconSize.small;
       }
       var color;
-      switch (e.status) {
+      switch (eventTypes[type]['status']) {
         case Status.Completed:
           color = Theme.of(context).accentColor;
           break;
@@ -295,209 +349,36 @@ class _PlanPageState extends State<PlanPage> {
           color = Colors.grey;
           break;
       }
+      var number;
+      if (eventTypes[type]['count'] > 9) {
+        number = "..";
+      } else if (eventTypes[type]['count'] > 1) {
+        number = eventTypes[type]['count'];
+      }
       eventWidgets.add(Positioned(
-        child: Icon(
-          icon,
-          color: color,
-          size: IconSize.small,
-        ),
+        child: Stack(children: [
+          Icon(
+            icon,
+            color: color,
+            size: IconSize.small_medium,
+          ),
+          Visibility(
+            visible: number != null,
+            child: Positioned(
+                right: 0,
+                bottom: -5,
+                child: Container(
+                  padding: EdgeInsets.all(2),
+                  decoration: ShapeDecoration(
+                      color: Colors.white, shape: CircleBorder()),
+                  child: Text('$number',
+                      style: Theme.of(context).textTheme.caption),
+                )),
+          )
+        ]),
         right: offset,
       ));
     }
     return eventWidgets;
   }
 }
-
-class TreatmentCalendar {
-  Map<DateTime, List<TreatmentEvent>> events;
-
-  TreatmentCalendar(this.events);
-
-  TreatmentCalendar.make(CarePlan plan, List<Procedure> procedures,
-      List<QuestionnaireResponse> questionnaireResponses) {
-    events = new Map();
-
-    addScheduledActivities(plan);
-    addProcedureInstances(procedures);
-    addAssessmentInstances(plan, questionnaireResponses);
-  }
-
-  /// If there is a matching scheduled event, update the status; otherwise,
-  /// add a new event for this activity instance.
-  void addProcedureInstances(List<Procedure> procedures) {
-    for (Procedure procedure in procedures) {
-      List<TreatmentEvent> eventList =
-          events.putIfAbsent(procedure.performedDateTime, () => []);
-
-      // find matching scheduled event
-      TreatmentEvent event = eventList.firstWhere(
-          (TreatmentEvent e) => e.code == procedure.code,
-          orElse: () => null);
-
-      if (event != null) {
-        event.updateStatus(procedure.status);
-      } else {
-        eventList.add(TreatmentEvent.fromProcedure(procedure));
-      }
-    }
-  }
-
-  /// If there is a matching scheduled event, update the status; otherwise,
-  /// add a new event for this activity instance.
-  void addAssessmentInstances(
-      CarePlan plan, List<QuestionnaireResponse> responses) {
-    if (responses == null || responses.length == 0) return;
-    List<String> applicableQuestionnaires =
-        plan.getAllQuestionnaireReferences();
-
-    for (QuestionnaireResponse response in responses) {
-      if (!applicableQuestionnaires.contains(response.questionnaireReference)) {
-        continue;
-      }
-
-      List<TreatmentEvent> eventList =
-          events.putIfAbsent(response.authored, () => []);
-
-      // find matching scheduled event
-      TreatmentEvent event = eventList.firstWhere(
-          (TreatmentEvent e) =>
-              e.questionnaireReference == response.questionnaireReference,
-          orElse: () {
-        return null;
-      });
-
-      if (event != null) {
-        event.updateStatus(response.status);
-      } else {
-        eventList.add(TreatmentEvent.fromQuestionnaireResponse(response));
-      }
-    }
-  }
-
-  void addScheduledActivities(CarePlan plan) {
-    for (Activity activity in plan.activity) {
-      if (activity.detail.scheduledTiming.repeat.periodUnit != "d") {
-        throw UnimplementedError("Can only handle periodUnit of 'd' for now.");
-      }
-
-      Period scheduledPeriod = getScheduledPeriod(plan, activity);
-
-      if (activity.detail.scheduledTiming.repeat.period == null) {
-        throw MalformedFhirResourceException(plan,
-            "Resource must have a period length specified in every activity.detail.scheduledTiming");
-      }
-      int every = activity.detail.scheduledTiming.repeat.period;
-      TreatmentEvent event = TreatmentEvent.scheduledEventForActivity(activity);
-      addEvents(scheduledPeriod, every, event);
-    }
-  }
-
-  Period getScheduledPeriod(CarePlan plan, Activity activity) {
-    Period scheduledPeriod;
-    if (activity.detail.scheduledPeriod != null &&
-        activity.detail.scheduledPeriod.start != null &&
-        activity.detail.scheduledPeriod.end != null) {
-      scheduledPeriod = activity.detail.scheduledPeriod;
-    } else if (plan.period != null &&
-        plan.period.start != null &&
-        plan.period.end != null) {
-      scheduledPeriod = plan.period;
-    } else {
-      throw MalformedFhirResourceException(plan,
-          "Either ${plan.reference} or the containing activity with code ${FhirConstants.SNOMED_PELVIC_FLOOR_EXERCISES} must have period start and end");
-    }
-    return scheduledPeriod;
-  }
-
-  void addEvents(Period period, int every, TreatmentEvent event) {
-    var date = period.start;
-    while (date.isBefore(period.end)) {
-      if (date.difference(period.start).inDays % every == 0) {
-        List<TreatmentEvent> dateEvents = events.putIfAbsent(date, () => []);
-        dateEvents.add(TreatmentEvent.from(event));
-      }
-      date = date.add(Duration(days: every));
-    }
-  }
-}
-
-class TreatmentEvent {
-  final EventType eventType;
-  Status status;
-  CodeableConcept code;
-  String questionnaireReference;
-
-  TreatmentEvent(
-      this.eventType, this.status, this.code, this.questionnaireReference);
-
-  factory TreatmentEvent.fromProcedure(Procedure procedure) {
-    TreatmentEvent e =
-        TreatmentEvent(EventType.Treatment, null, procedure.code, null);
-    e.updateStatus(procedure.status);
-    return e;
-  }
-
-  factory TreatmentEvent.fromQuestionnaireResponse(
-      QuestionnaireResponse questionnaireResponse) {
-    TreatmentEvent e = TreatmentEvent(
-        EventType.Assessment, null, null, questionnaireResponse.reference);
-    e.updateStatus(questionnaireResponse.status);
-    return e;
-  }
-
-  TreatmentEvent.from(TreatmentEvent event)
-      : this(event.eventType, event.status, event.code,
-            event.questionnaireReference);
-
-  void updateStatus(var status) {
-    if (status == null) {
-      this.status = Status.Scheduled;
-    } else {
-      if (status is ProcedureStatus) {
-        if (status == ProcedureStatus.completed) {
-          this.status = Status.Completed;
-        } else if (status == ProcedureStatus.not_done) {
-          this.status = Status.Missed;
-        } else {
-          this.status = Status.Scheduled;
-        }
-      } else if (status is QuestionnaireResponseStatus) {
-        if (status == QuestionnaireResponseStatus.completed) {
-          this.status = Status.Completed;
-        } else if (status == QuestionnaireResponseStatus.stopped) {
-          this.status = Status.Missed;
-        } else {
-          this.status = Status.Scheduled;
-        }
-      } else {
-        throw ArgumentError(
-            "Status class has to be either ProcedureStatus or QuestionnaireResponseStatus");
-      }
-    }
-  }
-
-  static TreatmentEvent scheduledEventForActivity(Activity activity) {
-    if (activity.detail.code != null) {
-      // if there is a code, assume it's a treatment
-      return TreatmentEvent(
-          EventType.Treatment, Status.Scheduled, activity.detail.code, null);
-    } else {
-      // assume a questionnaire
-      if (activity.detail.instantiatesCanonical == null ||
-          activity.detail.instantiatesCanonical.length > 1 ||
-          !activity.detail.instantiatesCanonical[0]
-              .startsWith(Questionnaire.resourceTypeName)) {
-        throw MalformedFhirResourceException(
-            activity,
-            "Activity should have exactly one "
-            "Questionnaire listed in its Detail's instantiatesCanonical list "
-            "if it refers to a questionnaire.");
-      }
-      return TreatmentEvent(EventType.Assessment, Status.Scheduled, null,
-          activity.detail.instantiatesCanonical[0]);
-    }
-  }
-}
-
-enum EventType { Assessment, Treatment }
-enum Status { Scheduled, Completed, Missed }

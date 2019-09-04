@@ -14,7 +14,7 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:toast/toast.dart';
 
 import 'KeycloakAuth.dart';
-import 'Model.dart';
+import 'package:map_app_flutter/model/AppModel.dart';
 import 'generated/i18n.dart';
 
 void main() {

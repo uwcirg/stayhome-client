@@ -34,6 +34,7 @@ class FhirConstants {
 
 class IconSize {
   static const double small = 18;
+  static const double small_medium = 21;
   static const double medium = 24;
   static const double large = 36;
   static const double xlarge = 48;

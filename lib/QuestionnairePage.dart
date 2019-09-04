@@ -3,40 +3,37 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' show Response;
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
 import 'package:map_app_flutter/main.dart';
+import 'package:map_app_flutter/model/CarePlanModel.dart';
 
 import 'const.dart';
-import 'services/Repository.dart';
 
 class QuestionnairePage extends StatefulWidget {
   final Questionnaire _questionnaire;
 
-  CarePlan _carePlan;
+  CarePlanModel _carePlanModel;
 
-  Reference _subject;
-
-  QuestionnairePage(this._questionnaire, this._subject, this._carePlan);
+  QuestionnairePage(this._questionnaire, this._carePlanModel);
 
   @override
   State<StatefulWidget> createState() {
-    return QuestionnairePageState(_questionnaire, _subject, _carePlan);
+    return QuestionnairePageState(_questionnaire, _carePlanModel);
   }
 }
 
 class QuestionnairePageState extends State<QuestionnairePage> {
   final Questionnaire _questionnaire;
   QuestionnaireResponse _response;
+  CarePlanModel _model;
 
-  QuestionnairePageState(
-      this._questionnaire, Reference subject, CarePlan carePlan,
+  QuestionnairePageState(this._questionnaire, this._model,
       {QuestionnaireResponse response}) {
     this._response = response;
     if (this._response == null) {
-      this._response =
-          new QuestionnaireResponse(_questionnaire, subject, carePlan);
+      this._response = new QuestionnaireResponse(
+          _questionnaire, Reference.from(_model.patient), _model.carePlan);
     }
   }
 
@@ -46,18 +43,9 @@ class QuestionnairePageState extends State<QuestionnairePage> {
       title: _questionnaire.title,
       child: QuestionListWidget(_questionnaire.item, _response, () {
         _response.status = QuestionnaireResponseStatus.completed;
-        Repository.postQuestionnaireResponse(_response).then((Response value) {
-          if (value.statusCode != 201) {
-            snack(
-                "An error occurred when trying to save your responses. Please try again. Error: ${value.body}",
-                context);
-          } else {
-            snack("Successful", context);
-            Navigator.of(context).pop();
-          }
-        }).catchError((var error) => snack(
-            "An error occurred when trying to save your responses. Please try again. Error: $error",
-            context));
+        _model.postQuestionnaireResponse(_response).then((value) {
+          Navigator.of(context).pop();
+        }).catchError((error) => snack(error, context));
       }),
       showDrawer: false,
     );
