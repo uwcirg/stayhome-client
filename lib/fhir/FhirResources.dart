@@ -317,20 +317,21 @@ class ProcedureStatus {
   }
 }
 
-
 class QuestionnaireResponseStatus {
   final _value;
 
   const QuestionnaireResponseStatus._(this._value);
 
   toString() => _value;
+
   toJson() => toString();
 
   static const in_progress = const QuestionnaireResponseStatus._('in-progress');
   static const stopped = const QuestionnaireResponseStatus._('stopped');
   static const completed = const QuestionnaireResponseStatus._('completed');
   static const amended = const QuestionnaireResponseStatus._('amended');
-  static const entered_in_error = const QuestionnaireResponseStatus._('entered-in-error');
+  static const entered_in_error =
+      const QuestionnaireResponseStatus._('entered-in-error');
 
   static QuestionnaireResponseStatus fromJson(String key) {
     switch (key) {
@@ -348,7 +349,6 @@ class QuestionnaireResponseStatus {
     return completed;
   }
 }
-
 
 class Procedure extends Resource {
   Narrative text;
@@ -464,7 +464,7 @@ class Procedure extends Resource {
 
 class CarePlan extends Resource {
   List<Identifier> identifier;
-  List<String> basedOn;
+  List<Reference> basedOn;
   CarePlanStatus status;
   String intent;
   List<CodeableConcept> category;
@@ -499,9 +499,9 @@ class CarePlan extends Resource {
       });
     }
     if (json['basedOn'] != null) {
-      basedOn = new List<String>();
+      basedOn = new List<Reference>();
       json['basedOn'].forEach((v) {
-        basedOn.add(v);
+        basedOn.add(Reference.fromJson(v));
       });
     }
 
@@ -533,14 +533,16 @@ class CarePlan extends Resource {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
+    data['resourceType'] = this.resourceType;
     if (this.identifier != null) {
       data['identifier'] = this.identifier.map((v) => v.toJson()).toList();
     }
     if (this.basedOn != null) {
-      data['basedOn'] = this.basedOn.map((v) => v).toList();
+      data['basedOn'] = this.basedOn.map((v) => v.toJson()).toList();
     }
-
-    data['status'] = this.status.toString();
+    if (this.status != null) {
+      data['status'] = this.status.toString();
+    }
     data['intent'] = this.intent;
     if (this.category != null) {
       data['category'] = this.category.map((v) => v.toJson()).toList();
@@ -552,7 +554,9 @@ class CarePlan extends Resource {
     if (this.period != null) {
       data['period'] = this.period.toJson();
     }
-    data['created'] = this.created.toIso8601String();
+    if (this.created != null) {
+      data['created'] = this.created.toIso8601String();
+    }
     if (this.activity != null) {
       data['activity'] = this.activity.map((v) => v.toJson()).toList();
     }
@@ -560,9 +564,51 @@ class CarePlan extends Resource {
   }
 
   Activity getActivityWithCode(String code) {
-    return activity.firstWhere((Activity activity) => activity
-        .detail.code.coding
-        .any((Coding coding) => coding.code == code));
+    return activity.firstWhere((Activity activity) {
+      if (activity == null ||
+          activity.detail == null ||
+          activity.detail.code == null ||
+          activity.detail.code.coding == null) return null;
+      return activity.detail.code.coding
+          .any((Coding coding) => coding.code == code);
+    });
+  }
+
+  Activity getQuestionnaireActivities() {
+    return activity.firstWhere((Activity activity) {
+      if (activity == null ||
+          activity.detail == null ||
+          activity.detail.instantiatesCanonical == null) return null;
+      return activity.detail.instantiatesCanonical.any((String instantiated) =>
+          instantiated.startsWith(Questionnaire.resourceTypeName));
+    });
+  }
+
+  List<String> getAllQuestionnaireReferences() {
+    return activity
+        .where((Activity activity) {
+          if (activity == null ||
+              activity.detail == null ||
+              activity.detail.instantiatesCanonical == null ||
+              activity.detail.instantiatesCanonical.length > 1 ||
+              activity.detail.instantiatesCanonical.length == 0) return false;
+          return activity.detail.instantiatesCanonical[0]
+              .startsWith(Questionnaire.resourceTypeName);
+        })
+        .map((Activity questionnaireActivity) =>
+            questionnaireActivity.detail.instantiatesCanonical[0])
+        .toList();
+  }
+
+  static CarePlan fromTemplate(CarePlan plan, Patient patient) {
+    CarePlan newPlan = CarePlan.fromJson(plan.toJson());
+    newPlan.subject = Reference(reference: patient.reference);
+    newPlan.id = null;
+    newPlan.basedOn = [Reference(reference: plan.reference)];
+    newPlan.status = CarePlanStatus.active;
+    newPlan.period = Period(
+        start: DateTime.now(), end: DateTime.now().add(Duration(days: 120)));
+    return newPlan;
   }
 }
 
@@ -671,7 +717,7 @@ class Detail {
     if (this.code != null) {
       data['code'] = this.code.toJson();
     }
-    data['status'] = this.status;
+    if (this.status != null) data['status'] = this.status.toString();
     if (this.statusReason != null) {
       data['statusReason'] = this.statusReason.toJson();
     }
@@ -959,6 +1005,8 @@ class Questionnaire extends Resource {
   String description;
   List<QuestionnaireItem> item;
 
+  static const resourceTypeName = "Questionnaire";
+
   Questionnaire(
       {this.name,
       String resourceType,
@@ -969,7 +1017,7 @@ class Questionnaire extends Resource {
       this.status,
       this.description,
       this.item})
-      : super(resourceType: "Questionnaire", id: id);
+      : super(resourceType: resourceTypeName, id: id);
 
   Future<void> loadValueSets() async {
     return Future.wait(item.map((QuestionnaireItem questionnaireItem) async {
@@ -1355,7 +1403,8 @@ class QuestionnaireResponse extends Resource {
       });
     }
 
-    if (json['status'] != null) status = QuestionnaireResponseStatus.fromJson(json['status']);
+    if (json['status'] != null)
+      status = QuestionnaireResponseStatus.fromJson(json['status']);
     if (json['authored'] != null) authored = DateTime.parse(json['authored']);
     subject = json['subject'] != null
         ? new Reference.fromJson(json['subject'])
@@ -1415,7 +1464,7 @@ class Reference {
   Reference({this.reference});
 
   Reference.fromJson(Map<String, dynamic> json) {
-    reference = json['linkId'];
+    reference = json['reference'];
   }
 
   Map<String, dynamic> toJson() {

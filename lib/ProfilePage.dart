@@ -4,6 +4,8 @@ import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/Model.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/i18n.dart';
+import 'package:map_app_flutter/services/Repository.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import 'main.dart';
@@ -71,9 +73,32 @@ class _ProfilePageState extends State<ProfilePage> {
                   style: Theme.of(context).textTheme.display1,
                 ),
                 ScopedModelDescendant<AppModel>(
-                  builder: (context, child, model) => Text(
-                      "Couchbase object content: ${model.docExample.getString("click")}"),
+                  builder: (context, child, model) {
+                    if (model.docExample != null) {
+                      return Text(
+                          "Couchbase object content: ${model.docExample
+                              .getString("click")}");
+                    } else {
+                      return CircularProgressIndicator();
+                    }
+                  },
                   rebuildOnChange: true,
+                ),
+                TextFormField(
+                  decoration: const InputDecoration(
+                      icon: Icon(MdiIcons.barcode),
+                      hintText: "What is your Patient Resource ID?",
+                      labelText: "Patient Resource ID"),
+                  initialValue:
+                      MyApp.of(context).auth.userInfo.patientResourceID,
+                  onFieldSubmitted: (String text) {
+                    Repository.getPatient(text).then((value) {
+                      setState(() {
+                        MyApp.of(context).auth.userInfo.patientResourceID =
+                            text;
+                      });
+                    }).catchError((error) => snack(error, context));
+                  },
                 ),
               ],
             ),
@@ -103,4 +128,5 @@ class _ProfilePageState extends State<ProfilePage> {
           _updateState = !_updateState;
         }));
   }
+
 }

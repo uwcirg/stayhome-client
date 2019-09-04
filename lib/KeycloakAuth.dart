@@ -146,6 +146,8 @@ class UserInfo {
   final String familyName;
   final String email;
 
+  String patientResourceID = "23";
+
   UserInfo(this.sub, this.emailVerified, this.name, this.preferredUsername,
       this.givenName, this.familyName, this.email);
 

@@ -42,7 +42,7 @@ class AppModel extends Model with Fluttercouch {
       docExample = await getDocumentWithId("hannahtest");
       notifyListeners();
     } on PlatformException catch(e) {
-      print("Exception: $e");
+      print("Exception when initializing AppModel scoped model Platform State: $e");
     }
 
   }
