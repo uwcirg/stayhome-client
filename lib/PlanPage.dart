@@ -3,6 +3,7 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/QuestionnairePage.dart';
 import 'package:map_app_flutter/const.dart';
@@ -26,17 +27,12 @@ class PlanPage extends StatefulWidget {
 
 class _PlanPageState extends State<PlanPage> {
   CalendarController _calendarController;
-
-  CarePlanModel _carePlanModel;
-
   _PlanPageState();
 
   @override
   void initState() {
     super.initState();
     _calendarController = CalendarController();
-    var patientID = MyApp.of(context).auth.userInfo.patientResourceID;
-    _carePlanModel = CarePlanModel(patientID);
     super.initState();
   }
 
@@ -49,28 +45,21 @@ class _PlanPageState extends State<PlanPage> {
   @override
   Widget build(BuildContext context) {
     String title = S.of(context).plan;
-    return ScopedModel(
-        model: _carePlanModel,
-        child: MapAppPageScaffold(title: title, child: buildScreen(context)));
+    return MapAppPageScaffold(title: title, child: buildScreen(context));
   }
 
-  Padding buildScreen(BuildContext context) {
+  Widget buildScreen(BuildContext context) {
     var textStyle = Theme.of(context).textTheme.caption;
     return Padding(
       padding: const EdgeInsets.all(Dimensions.halfMargin),
       child: SafeArea(
         child: ScopedModelDescendant<CarePlanModel>(
             builder: (context, child, model) {
-          return Column(
+              return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               _buildCalendar(textStyle, context, model),
               _buildQuestionnaireButtonSection(context, model),
-              Padding(
-                padding: const EdgeInsets.only(top: Dimensions.largeMargin),
-                child: Text(S.of(context).my_treatment_plan,
-                    style: Theme.of(context).textTheme.title),
-              ),
               _buildCareplanInfoSection(context, model)
             ],
           );
@@ -90,54 +79,69 @@ class _PlanPageState extends State<PlanPage> {
             child: Text(
               S.of(context).add_the_default_careplan_for_me,
             ),
-            onPressed: () => _carePlanModel.addDefaultCareplan(),
+            onPressed: () => model.addDefaultCareplan(),
           )
+        ],
+      );
+    }
+    if (model.error != null) {
+      return Wrap(
+        children: <Widget>[
+          Text(model.error),
+
         ],
       );
     }
     if (model.isLoading) {
       return Center(child: CircularProgressIndicator());
     }
+    List<Widget> children = [Padding(
+      padding: const EdgeInsets.only(top: Dimensions.largeMargin),
+      child: Text(S.of(context).my_treatment_plan,
+          style: Theme.of(context).textTheme.title),
+    )];
+    children.addAll(model.carePlan.activity.map((Activity activity) {
+      var durationUnit = activity.detail.scheduledTiming.repeat.durationUnit;
+      var duration = activity.detail.scheduledTiming.repeat.duration;
+      return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              children: [
+                Text(
+                  activity.detail.description ?? S.of(context).activity,
+                  style: Theme.of(context).textTheme.subtitle,
+                ),
+                Text(S.of(context).frequency_with_contents(
+                    '${activity.detail.scheduledTiming.repeat.period}',
+                    activity.detail.scheduledTiming.repeat.periodUnit)),
+                Visibility(
+                  visible: duration != null || durationUnit != null,
+                  child: Text(S.of(context).duration_duration_durationunit(
+                      '$duration', durationUnit)),
+                )
+              ],
+              crossAxisAlignment: CrossAxisAlignment.start,
+            ),
+            FlatButton(
+              child: Text(
+                S.of(context).change,
+              ),
+              onPressed: () => _showChangeDialogForActivity(
+                  context, model, model.carePlan.activity.indexOf(activity)),
+            )
+          ]);
+    }));
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: model.carePlan.activity.map((Activity activity) {
-        var durationUnit = activity.detail.scheduledTiming.repeat.durationUnit;
-        var duration = activity.detail.scheduledTiming.repeat.duration;
-        return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                children: [
-                  Text(
-                    activity.detail.description ?? S.of(context).activity,
-                    style: Theme.of(context).textTheme.subtitle,
-                  ),
-                  Text(S.of(context).frequency_with_contents(
-                      '${activity.detail.scheduledTiming.repeat.period}',
-                      activity.detail.scheduledTiming.repeat.periodUnit)),
-                  Visibility(
-                    visible: duration != null || durationUnit != null,
-                    child: Text(S.of(context).duration_duration_durationunit(
-                        '$duration', durationUnit)),
-                  )
-                ],
-                crossAxisAlignment: CrossAxisAlignment.start,
-              ),
-              FlatButton(
-                child: Text(
-                  S.of(context).change,
-                ),
-                onPressed: () => _showChangeDialogForActivity(
-                    context, model, model.carePlan.activity.indexOf(activity)),
-              )
-            ]);
-      }).toList(),
+      children: children,
     );
   }
 
   Widget _buildQuestionnaireButtonSection(
       BuildContext context, CarePlanModel model) {
-    if (model.hasNoCarePlan)
+    if (model.hasNoCarePlan || model.error != null)
       return Container(
         height: 0,
       );
@@ -156,7 +160,7 @@ class _PlanPageState extends State<PlanPage> {
 
   Widget _buildCalendar(
       TextStyle textStyle, BuildContext context, CarePlanModel model) {
-    if (model.hasNoCarePlan)
+    if (model.hasNoCarePlan || model.error != null)
       return Container(
         height: 0,
       );
@@ -290,7 +294,7 @@ class TreatmentCalendarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var textStyle = Theme.of(context).textTheme.caption;
 
-    return TableCalendar(
+    return TableCalendar(locale: Localizations.localeOf(context).languageCode,
       availableCalendarFormats: {CalendarFormat.month: ""},
       calendarStyle: CalendarStyle(
           weekendStyle: textStyle,

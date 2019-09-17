@@ -7,7 +7,7 @@
   "logout": "Logout",
   "login": "Login",
   "profile": "Profile",
-  "email": "Email: $email",
+  "email": "Email",
   "buttonPushText": "You have pushed the button this many times:",
   "languageName": "English (EN)",
   "language": "Language",
@@ -38,5 +38,11 @@
   "my_treatment_plan": "My Treatment Plan",
   "you_have_no_active_pelvic_floor_management_careplan": "You have no active Pelvic Floor Management Careplan.",
   "add_the_default_careplan_for_me": "Add the default CarePlan for me",
-  "couchbase": "Couchbase"
+  "visit_our_facebook_page": "Visit our Facebook Page",
+  "read_our_blog": "Read our Blog",
+  "patient_resource_id": "Patient Resource ID",
+  "name": "Name",
+  "what_is_your_name": "What is your name?",
+  "what_is_your_email_address": "What is your email address?",
+  "what_is_your_patient_resource_id": "What is your Patient Resource ID?"
 }

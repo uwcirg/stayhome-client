@@ -8,20 +8,22 @@ import 'package:http/http.dart' show Response, get, post, put;
 import 'package:map_app_flutter/fhir/FhirResources.dart';
 
 class Repository {
-  static Future<Patient> getPatient(String patientResourceId) async {
-    if (patientResourceId == null) {
-      var system = "http://hospital.smarthealthit.org";
-      var identifier = "fb538307-c13a-4605-9b7f-f9689654392a"; // MRN
+  static Future<Patient> getPatient(String keycloakSub) async {
+
+      var system = "keycloak";
+      var identifier = keycloakSub;
       var patientSearchUrl =
           "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/Patient?identifier=$system|$identifier";
       var response = await get(patientSearchUrl, headers: {});
-      var searchResultBundle = jsonDecode(response.body);
-      patientResourceId = searchResultBundle['entry'][0]['resource']['id'];
-    }
-    var patientLoadUrl =
-        "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/Patient/$patientResourceId";
-    var response = await get(patientLoadUrl, headers: {});
-    return resultFromResponse(response, "Error loading Patient/$patientResourceId").then((value) => Patient.fromJson(jsonDecode(response.body)));
+
+
+    return resultFromResponse(response, "Error loading Patient/$keycloakSub").then((value) {
+      var searchResultBundle = jsonDecode(value);
+      if (searchResultBundle['total'] != 1) {
+        return Future.error("The user ID does not uniquely match a patient resource.");
+      }
+      return Patient.fromJson(searchResultBundle['entry'][0]['resource']);
+    });
   }
 
   static Future resultFromResponse(Response response, String defaultMessage) {

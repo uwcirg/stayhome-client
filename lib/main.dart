@@ -10,11 +10,12 @@ import 'package:map_app_flutter/PlanPage.dart';
 import 'package:map_app_flutter/ProfilePage.dart';
 import 'package:map_app_flutter/ProgressInsightsPage.dart';
 import 'package:map_app_flutter/color_palette.dart';
+import 'package:map_app_flutter/model/AppModel.dart';
+import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:toast/toast.dart';
 
 import 'KeycloakAuth.dart';
-import 'package:map_app_flutter/model/AppModel.dart';
 import 'generated/i18n.dart';
 
 void main() {
@@ -41,6 +42,7 @@ class _MyAppState extends State<MyApp> {
   String _locale = 'en';
   KeycloakAuth auth;
   String title = 'CIRG Map App';
+  CarePlanModel _carePlanModel;
 
   _MyAppState(Widget home) {
     _homePage = PlanPage();
@@ -67,41 +69,43 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: title,
-      theme: ThemeData(
-          primarySwatch: Colors.grey,
-          accentColor: MapAppColors.vFitAccent,
-          buttonTheme: ButtonThemeData(
-              buttonColor: MapAppColors.vFitAccent,
-              textTheme: ButtonTextTheme.primary
-          )
-      ),
-      home: _defaultHome,
-      routes: <String, WidgetBuilder>{
-        "/home": (BuildContext context) => _homePage,
-        "/guestHome": (BuildContext context) => LearningCenterPage(),
-        "/profile": (BuildContext context) => new ScopedModel<AppModel>(
-            model: new AppModel(), child: ProfilePage()),
-        "/help": (BuildContext context) => HelpPage(),
-        "/devices": (BuildContext context) => DevicesPage(),
-        "/contact_community": (BuildContext context) =>
-            ContactCommunityPage(ContactPageContents.contents()),
-        "/progress_insights": (BuildContext context) => ProgressInsightsPage(),
-        "/learning_center": (BuildContext context) => LearningCenterPage(),
-        "/about": (BuildContext context) => HelpPage(),
-        "/login": (BuildContext context) => LoginPage()
-      },
-      locale: Locale(_locale, ""),
-      localizationsDelegates: [
-        S.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
-      supportedLocales: S.delegate.supportedLocales,
-      localeResolutionCallback:
-          S.delegate.resolution(fallback: new Locale("en", "")),
-    );
+    if (_carePlanModel == null) _carePlanModel = new CarePlanModel();
+    return ScopedModel<CarePlanModel>(
+        model: _carePlanModel,
+        child: MaterialApp(
+          title: title,
+          theme: ThemeData(
+              primarySwatch: Colors.grey,
+              accentColor: MapAppColors.vFitAccent,
+              buttonTheme: ButtonThemeData(
+                  buttonColor: MapAppColors.vFitAccent,
+                  textTheme: ButtonTextTheme.primary)),
+          home: _defaultHome,
+          routes: <String, WidgetBuilder>{
+            "/home": (BuildContext context) => _homePage,
+            "/guestHome": (BuildContext context) => LearningCenterPage(),
+            "/profile": (BuildContext context) => new ScopedModel<AppModel>(
+                model: new AppModel(), child: ProfilePage()),
+            "/help": (BuildContext context) => HelpPage(),
+            "/devices": (BuildContext context) => DevicesPage(),
+            "/contact_community": (BuildContext context) =>
+                ContactCommunityPage(ContactPageContents.contents(context)),
+            "/progress_insights": (BuildContext context) =>
+                ProgressInsightsPage(),
+            "/learning_center": (BuildContext context) => LearningCenterPage(),
+            "/about": (BuildContext context) => HelpPage(),
+            "/login": (BuildContext context) => LoginPage()
+          },
+          locale: Locale(_locale, ""),
+          localizationsDelegates: [
+            S.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          supportedLocales: S.delegate.supportedLocales,
+          localeResolutionCallback:
+              S.delegate.resolution(fallback: new Locale("en", "")),
+        ));
   }
 }
 

@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
  */
+import 'package:intl/intl.dart';
 import 'package:map_app_flutter/services/Repository.dart';
 
 class Resource {
@@ -1432,7 +1433,7 @@ class QuestionnaireResponse extends Resource {
     if (this.subject != null) {
       data['subject'] = this.subject.toJson();
     }
-    data['authored'] = this.authored.toIso8601String();
+    data['authored'] = new DateFormat("yyyy-MM-dd").format(this.authored);
     if (this.item != null) {
       data['item'] = this.item.map((v) => v.toJson()).toList();
     }

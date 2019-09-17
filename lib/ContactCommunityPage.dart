@@ -92,11 +92,11 @@ class ContactPageContents {
 
   ContactPageContents(this.buttons, this.links);
 
-  static ContactPageContents contents() {
+  static ContactPageContents contents(BuildContext context) {
     return ContactPageContents([
-      ContactPageItem(MdiIcons.facebook, "Visit our Facebook Page",
+      ContactPageItem(MdiIcons.facebook, S.of(context).visit_our_facebook_page,
           url: "https://www.facebook.com/getvfit"),
-      ContactPageItem(MdiIcons.web, "Read our Blog",
+      ContactPageItem(MdiIcons.web, S.of(context).read_our_blog,
           url: "https://www.getvfit.com/blogs/news"),
     ], [
       ContactPageItem(MdiIcons.phone, "+1 844-872-8578",

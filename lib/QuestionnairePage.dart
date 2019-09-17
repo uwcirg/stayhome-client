@@ -183,23 +183,27 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
 
   List<Widget> _buildChoices(
       QuestionnaireItem questionnaireItem, BuildContext context) {
+    Answer currentResponse =
+        _response.getResponseItem(questionnaireItem.linkId) != null
+            ? _response.getResponseItem(questionnaireItem.linkId).answer[0]
+            : null;
+
     if (questionnaireItem.answerOption != null) {
-      return _buildChoicesFromAnswerOptions(questionnaireItem, context);
+      return _buildChoicesFromAnswerOptions(
+          questionnaireItem, currentResponse, context);
     }
     if (questionnaireItem.answerValueSet != null) {
-      return _buildChoicesFromAnswerValueSet(questionnaireItem, context);
+      return _buildChoicesFromAnswerValueSet(
+          questionnaireItem, currentResponse, context);
     }
     throw UnimplementedError(
         "Only answerOption and answerValueSet are supported");
   }
 
   List<Widget> _buildChoicesFromAnswerOptions(
-      QuestionnaireItem questionnaireItem, BuildContext context) {
-    Answer currentResponse =
-        _response.getResponseItem(questionnaireItem.linkId) != null
-            ? _response.getResponseItem(questionnaireItem.linkId).answer[0]
-            : null;
-
+      QuestionnaireItem questionnaireItem,
+      Answer currentResponse,
+      BuildContext context) {
     return questionnaireItem.answerOption.map((AnswerOption option) {
       return _buildChip('$option', currentResponse == option, context,
           questionnaireItem, new Answer.fromAnswerOption(option));
@@ -207,12 +211,9 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
   }
 
   List<Widget> _buildChoicesFromAnswerValueSet(
-      QuestionnaireItem questionnaireItem, BuildContext context) {
-    Answer currentResponse =
-        _response.getResponseItem(questionnaireItem.linkId) != null
-            ? _response.getResponseItem(questionnaireItem.linkId).answer[0]
-            : null;
-
+      QuestionnaireItem questionnaireItem,
+      Answer currentResponse,
+      BuildContext context) {
     return questionnaireItem.answerValueSet.map((Coding option) {
       return _buildChip('$option', currentResponse == option, context,
           questionnaireItem, new Answer(valueCoding: option));

@@ -20,13 +20,16 @@ class CarePlanModel extends Model {
   CarePlan carePlan;
   var error;
   bool isLoading = false;
-
-  String _patientId;
   Patient patient;
-
   TreatmentCalendar treatmentCalendar;
+  
+  String _keycloakUserId;
+  Map<String, QuestionnaireItem> _questionsByLinkId = new Map();
 
-  CarePlanModel(this._patientId) {
+  CarePlanModel();
+
+  void setUser(String keycloakUserId) {
+    this._keycloakUserId = keycloakUserId;
     load();
   }
 
@@ -40,7 +43,7 @@ class CarePlanModel extends Model {
     notifyOrError(_doLoad());
   }
 
-  notifyOrError(Future f) {
+  void notifyOrError(Future f) {
     f.then((value) {
       isLoading = false;
       notifyListeners();
@@ -54,7 +57,7 @@ class CarePlanModel extends Model {
   Future<void> _doLoad() async {
     // don't need to reload patient if we already have it
     if (patient == null) {
-      patient = await Repository.getPatient(_patientId);
+      patient = await Repository.getPatient(_keycloakUserId);
     }
     return _loadCarePlan();
   }
@@ -74,6 +77,7 @@ class CarePlanModel extends Model {
     List<Future> futures = [
       Repository.getQuestionnaires(this.carePlan).then((var questionnaires) {
         this.questionnaires = questionnaires;
+        _createQuestionMap();
       }),
       Repository.getProcedures(this.carePlan)
           .then((List<Procedure> procedures) {
@@ -99,8 +103,9 @@ class CarePlanModel extends Model {
       Repository.postCarePlan(newPlan).then((value) {
         carePlan = CarePlan.fromJson(jsonDecode(value.body));
         hasNoCarePlan = false;
+
+        _loadQuestionnaires();
       });
-      _loadQuestionnaires();
     }));
   }
 
@@ -118,6 +123,30 @@ class CarePlanModel extends Model {
     carePlan.activity[activityIndex].detail.scheduledTiming.repeat.duration =
         newDuration;
     Repository.updateCarePlan(carePlan).then((value) => load());
+  }
+
+  QuestionnaireItem questionForLinkId(String linkId) {
+    return _questionsByLinkId[linkId];
+  }
+  
+  void _createQuestionMap() {
+    _questionsByLinkId = new Map();
+    for (Questionnaire questionnaire in this.questionnaires) {
+      if (questionnaire.item != null) {
+        for (QuestionnaireItem question in questionnaire.item) {
+          addSelfAndChildren(question);
+        }
+      }
+    }
+  }
+  
+  addSelfAndChildren(QuestionnaireItem question) {
+    _questionsByLinkId[question.linkId] = question;
+    if (question.item != null) {
+      for (QuestionnaireItem nestedQuestion in question.item) {
+        addSelfAndChildren(nestedQuestion);
+      }
+    }
   }
 }
 

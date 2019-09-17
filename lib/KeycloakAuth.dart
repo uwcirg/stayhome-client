@@ -33,10 +33,8 @@ class KeycloakAuth {
       AuthorizationTokenRequest(_clientId, _redirectUrl,
           issuer: _issuer,
           scopes: ['openid', 'profile'],
-          clientSecret: _clientSecret,
-          promptValues: ['login']),
+          clientSecret: _clientSecret),
     );
-
 
     isLoggedIn = true;
     _accessToken = value.accessToken;
@@ -46,16 +44,27 @@ class KeycloakAuth {
   }
 
   Future mapAppLogout() async {
+//    var url =
+//        'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp/protocol/openid-connect/logout?clientId=$_clientId&refresh_token=$_refreshToken&client_secret=$_clientSecret';
+//    try {
+//      var value = await get(url, headers: {
+//        'Authorization': 'Bearer $_accessToken',
+//        'Content-Type': 'application/x-www-form-urlencoded',
+//      });
+
     var url =
-        'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp/protocol/openid-connect/logout?clientId=$_clientId&refresh_token=$_refreshToken&client_secret=$_clientSecret';
+        'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp/protocol/openid-connect/logout';
 
     try {
-      var value = await get(url, headers: {
-        'Authorization': 'Bearer $_accessToken',
-        'Content-Type': 'application/x-www-form-urlencoded',
+      var value = await post(url, headers: {
+        "authorization": 'Bearer $_accessToken'
+      }, body: {
+        "refresh_token": _refreshToken,
+        "client_id": _clientId,
+        "client_secret": _clientSecret
       });
 
-      if (value.statusCode == 200) {
+      if (value.statusCode == 204) {
         isLoggedIn = false;
         _accessToken = null;
         accessTokenExpirationDateTime = null;
@@ -138,18 +147,20 @@ class KeycloakAuth {
 }
 
 class UserInfo {
-  final String sub;
+  final String keycloakUserId;
   final bool emailVerified;
   final String name;
   final String preferredUsername;
-  final String givenName;
+  final String _givenName;
   final String familyName;
   final String email;
 
-  String patientResourceID = "23";
+  UserInfo(this.keycloakUserId, this.emailVerified, this.name,
+      this.preferredUsername, this._givenName, this.familyName, this.email);
 
-  UserInfo(this.sub, this.emailVerified, this.name, this.preferredUsername,
-      this.givenName, this.familyName, this.email);
+  String get givenName {
+    return this._givenName != null ? this._givenName : "";
+  }
 
   static UserInfo from(Map userInfoMap) {
     return UserInfo(

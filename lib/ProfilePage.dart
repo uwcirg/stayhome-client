@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
-import 'package:map_app_flutter/model/AppModel.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/i18n.dart';
+import 'package:map_app_flutter/model/AppModel.dart';
 import 'package:map_app_flutter/services/Repository.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -62,44 +62,37 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(
-                  "${MyApp.of(context).auth.userInfo.name}",
-                  style: Theme.of(context).textTheme.display1,
+                TextFormField(
+                  decoration: InputDecoration(
+                      icon: Icon(Icons.person),
+                      hintText: S.of(context).what_is_your_name,
+                      labelText: S.of(context).name),
+                  initialValue: MyApp.of(context).auth.userInfo.name,
+                  onFieldSubmitted: (String text) {},
                 ),
+                TextFormField(
+                  decoration: InputDecoration(
+                      icon: Icon(Icons.email),
+                      hintText: S.of(context).what_is_your_email_address,
+                      labelText: S.of(context).email),
+                  initialValue: MyApp.of(context).auth.userInfo.email,
+                  onFieldSubmitted: (String text) {},
+                ),
+                Divider(),
                 Text(
-                    S.of(context).email(MyApp.of(context).auth.userInfo.email)),
-                Text(
-                  
-                  S.of(context).couchbase,
-                  style: Theme.of(context).textTheme.display1,
+                  "Couchbase debug area",
+                  style: Theme.of(context).textTheme.subtitle,
                 ),
                 ScopedModelDescendant<AppModel>(
                   builder: (context, child, model) {
                     if (model.docExample != null) {
                       return Text(
-                          "Couchbase object content: ${model.docExample
-                              .getString("click")}");
+                          "Couchbase object content: ${model.docExample.getString("click")}");
                     } else {
                       return CircularProgressIndicator();
                     }
                   },
                   rebuildOnChange: true,
-                ),
-                TextFormField(
-                  decoration: const InputDecoration(
-                      icon: Icon(MdiIcons.barcode),
-                      hintText: "What is your Patient Resource ID?",
-                      labelText: "Patient Resource ID"),
-                  initialValue:
-                      MyApp.of(context).auth.userInfo.patientResourceID,
-                  onFieldSubmitted: (String text) {
-                    Repository.getPatient(text).then((value) {
-                      setState(() {
-                        MyApp.of(context).auth.userInfo.patientResourceID =
-                            text;
-                      });
-                    }).catchError((error) => snack(error, context));
-                  },
                 ),
               ],
             ),
@@ -129,5 +122,4 @@ class _ProfilePageState extends State<ProfilePage> {
           _updateState = !_updateState;
         }));
   }
-
 }

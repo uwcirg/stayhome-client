@@ -25,10 +25,10 @@ class S implements WidgetsLocalizations {
   String get buttonPushText => "You have pushed the button this many times:";
   String get change => "Change";
   String get contact__community => "Contact & Community";
-  String get couchbase => "Couchbase";
   String get demoVersionBannerText => "Demo version - not for clinical use.";
   String get developedByCIRG => "Developed by the Clinical Informatics Research Group (CIRG) at University of Washington, 2019.";
   String get devices => "Devices";
+  String get email => "Email";
   String get forget => "Forget";
   String get hello => "Hello!";
   String get help => "Help";
@@ -39,10 +39,13 @@ class S implements WidgetsLocalizations {
   String get logout => "Logout";
   String get more_info => "More info";
   String get my_treatment_plan => "My Treatment Plan";
+  String get name => "Name";
   String get not_now => "Not now";
+  String get patient_resource_id => "Patient Resource ID";
   String get plan => "Plan";
   String get profile => "Profile";
   String get progress__insights => "Progress & Insights";
+  String get read_our_blog => "Read our Blog";
   String get rename => "Rename";
   String get session_expired_please_log_in_again => "Session expired, please log in again.";
   String get sign_up_or_log_in_to_access_all_functions => "Sign up or Log in to access all functions";
@@ -50,11 +53,14 @@ class S implements WidgetsLocalizations {
   String get timeFormat => "h:mm:ss aaa";
   String get treatment_calendar => "Treatment Calendar";
   String get vfit_faq => "vFit FAQ";
+  String get visit_our_facebook_page => "Visit our Facebook Page";
+  String get what_is_your_email_address => "What is your email address?";
+  String get what_is_your_name => "What is your name?";
+  String get what_is_your_patient_resource_id => "What is your Patient Resource ID?";
   String get womens_health_resources => "Women's Health Resources";
   String get you_have_no_active_pelvic_floor_management_careplan => "You have no active Pelvic Floor Management Careplan.";
   String battery_level(String _device) => "$_device% charged";
   String duration_duration_durationunit(String duration, String durationUnit) => "Duration: $duration $durationUnit";
-  String email(String email) => "Email: $email";
   String frequency_with_contents(String number, String unit) => "Frequency: Once every $number $unit";
   String last_synced_date(String _date, String _time) => "Last synced: $_date at $_time";
   String time_left_until_token_expiration(String _timeLeftInSeconds) => "Time left until token expiration: $_timeLeftInSeconds seconds";
@@ -68,7 +74,11 @@ class $de extends S {
   TextDirection get textDirection => TextDirection.ltr;
 
   @override
-  String get activity => "Activity";
+  String get what_is_your_patient_resource_id => "Wie lautet ihre Patientenressourcen-ID?";
+  @override
+  String get activity => "Aktivität";
+  @override
+  String get read_our_blog => "Lesen Sie unseren Blog";
   @override
   String get about => "Über";
   @override
@@ -80,7 +90,7 @@ class $de extends S {
   @override
   String get sign_up_or_log_in_to_access_all_functions => "Bitte melden Sie sich an, um auf alle Funktionen zuzugreifen.";
   @override
-  String get you_have_no_active_pelvic_floor_management_careplan => "You have no active Pelvic Floor Management Careplan.";
+  String get you_have_no_active_pelvic_floor_management_careplan => "Sie haben keinen aktiven Beckenbodenpflegeplan.";
   @override
   String get login => "Anmelden";
   @override
@@ -92,15 +102,21 @@ class $de extends S {
   @override
   String get logout => "Abmelden";
   @override
-  String get add_the_default_careplan_for_me => "Add the default CarePlan for me";
+  String get add_the_default_careplan_for_me => "Den Standardpflegeplan hinzufügen";
   @override
-  String get couchbase => "Couchbase";
+  String get what_is_your_email_address => "Was ist Ihre E-Mail Adresse?";
   @override
-  String get my_treatment_plan => "My Treatment Plan";
+  String get visit_our_facebook_page => "Besuchen Sie uns auf Facebook";
+  @override
+  String get my_treatment_plan => "Mein Behandlungsplan";
   @override
   String get plan => "Plan";
   @override
+  String get email => "E-Mail";
+  @override
   String get session_expired_please_log_in_again => "Session abgelaufen, bitte erneut einloggen.";
+  @override
+  String get what_is_your_name => "Wie heißen Sie?";
   @override
   String get devices => "Geräte";
   @override
@@ -108,13 +124,15 @@ class $de extends S {
   @override
   String get buttonPushText => "Der Knopf wurde so oft gedrückt:";
   @override
-  String get change => "Change";
+  String get change => "Ändern";
   @override
   String get womens_health_resources => "Bildungsressourcen zu frauenspezifischen Gesundheitsthemen";
   @override
   String get contact__community => "Kontakt & Gemeinschaft";
   @override
   String get developedByCIRG => "Entwickelt von der Clinical Informatics Research Group (CIRG) an der University of Washington, 2019.";
+  @override
+  String get patient_resource_id => "Patient Resource ID";
   @override
   String get vfit_faq => "vFit Häufig Gestellte Fragen";
   @override
@@ -130,21 +148,21 @@ class $de extends S {
   @override
   String get demoVersionBannerText => "Demo version - nicht für den klinischen Gebrauch vorgesehen.";
   @override
+  String get name => "Name";
+  @override
   String get hello => "Hallo!";
   @override
-  String get treatment_calendar => "Treatment Calendar";
+  String get treatment_calendar => "Behandlungskalender";
   @override
   String last_synced_date(String _date, String _time) => "Zuletzt synchronisiert: $_date at $_time";
-  @override
-  String email(String email) => "E-Mail: $email";
   @override
   String battery_level(String _device) => "$_device% geladen";
   @override
   String versionString(String version) => "Version $version";
   @override
-  String duration_duration_durationunit(String duration, String durationUnit) => "Duration: $duration $durationUnit";
+  String duration_duration_durationunit(String duration, String durationUnit) => "Dauer: $duration $durationUnit";
   @override
-  String frequency_with_contents(String number, String unit) => "Frequency: Once every $number $unit";
+  String frequency_with_contents(String number, String unit) => "Häufigkeit: $number Mal pro $unit";
   @override
   String time_left_until_token_expiration(String _timeLeftInSeconds) => "Zeit bis Token abläuft: $_timeLeftInSeconds Sekunden";
 }
@@ -156,7 +174,11 @@ class $mn extends S {
   TextDirection get textDirection => TextDirection.ltr;
 
   @override
+  String get what_is_your_patient_resource_id => "What is your Patient Resource ID?";
+  @override
   String get activity => "Activity";
+  @override
+  String get read_our_blog => "Read our Blog";
   @override
   String get about => "About. The honorary stem taxes my unread beast.";
   @override
@@ -182,13 +204,19 @@ class $mn extends S {
   @override
   String get add_the_default_careplan_for_me => "Add the default CarePlan for me";
   @override
-  String get couchbase => "Couchbase";
+  String get what_is_your_email_address => "What is your email address?";
+  @override
+  String get visit_our_facebook_page => "Visit our Facebook Page";
   @override
   String get my_treatment_plan => "My Treatment Plan";
   @override
   String get plan => "Plan zigzag email";
   @override
+  String get email => "Email expansive somersaulting";
+  @override
   String get session_expired_please_log_in_again => "Session expired, please log in again. The legendary highlight staggers outside the silicon.";
+  @override
+  String get what_is_your_name => "What is your name?";
   @override
   String get devices => "Hale Ticking Devices";
   @override
@@ -204,6 +232,8 @@ class $mn extends S {
   @override
   String get developedByCIRG => "Developed by the Clinical Informatics Research Group (CIRG) at University of Washington, 2019. The gut gowns a worm. A lifestyle stares! The mercury rails! The bite suffixes the bench across a big moron. When can the symmetry dictate the typical cry?";
   @override
+  String get patient_resource_id => "Patient Resource ID";
+  @override
   String get vfit_faq => "vFit FAQ This crying average frustrates the genetics.";
   @override
   String get help => "Help! When will the performance interfere?";
@@ -218,13 +248,13 @@ class $mn extends S {
   @override
   String get demoVersionBannerText => "Demo version - not for clinical use. Into the normal lunchtime glows the fast union.";
   @override
+  String get name => "Name";
+  @override
   String get hello => "Hello! Should the expected muck caution?";
   @override
   String get treatment_calendar => "Treatment Calendar";
   @override
   String last_synced_date(String _date, String _time) => "Last synced: $_date at $_time";
-  @override
-  String email(String email) => "Email expansive somersaulting: $email";
   @override
   String battery_level(String _device) => "$_device% charged";
   @override

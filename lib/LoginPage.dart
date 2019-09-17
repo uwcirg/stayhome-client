@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/i18n.dart';
 import 'package:map_app_flutter/main.dart';
+import 'package:map_app_flutter/model/CarePlanModel.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -76,6 +78,8 @@ class LoginPageState extends State<LoginPage> {
   void dismissLoginScreen(BuildContext context) {
     if (MyApp.of(context).auth.isLoggedIn) {
       MyApp.of(context).auth.getUserInfo().then((value) {
+        var keycloakUserId = MyApp.of(context).auth.userInfo.keycloakUserId;
+        ScopedModel.of<CarePlanModel>(context).setUser(keycloakUserId);
         Navigator.of(context).pushReplacementNamed('/home');
       }).catchError((error) {
         Navigator.of(context).pushReplacementNamed('/guestHome');

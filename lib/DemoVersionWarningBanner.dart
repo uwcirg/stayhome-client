@@ -20,7 +20,15 @@ class DemoVersionWarningBanner extends StatelessWidget {
                       ? MainAxisAlignment.center
                       : MainAxisAlignment.start,
               children: <Widget>[
-                Text(S.of(context).demoVersionBannerText),
+                Flexible(
+                    child: Text(
+                  S.of(context).demoVersionBannerText,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: Theme.of(context).platform == TargetPlatform.iOS
+                      ? TextAlign.center
+                      : TextAlign.start,
+                )),
               ],
             )));
   }
