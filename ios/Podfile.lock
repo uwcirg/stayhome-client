@@ -1,16 +1,16 @@
 PODS:
-  - AppAuth (1.0.0):
-    - AppAuth/Core (= 1.0.0)
-    - AppAuth/ExternalUserAgent (= 1.0.0)
-  - AppAuth/Core (1.0.0)
-  - AppAuth/ExternalUserAgent (1.0.0)
-  - CouchbaseLite-Swift (2.5.3)
+  - AppAuth (1.2.0):
+    - AppAuth/Core (= 1.2.0)
+    - AppAuth/ExternalUserAgent (= 1.2.0)
+  - AppAuth/Core (1.2.0)
+  - AppAuth/ExternalUserAgent (1.2.0)
+  - CouchbaseLite-Swift (2.6.3)
   - Flutter (1.0.0)
   - flutter_appauth (0.0.1):
-    - AppAuth (= 1.0)
+    - AppAuth (= 1.2.0)
     - Flutter
   - fluttercouch (0.0.1):
-    - CouchbaseLite-Swift (~> 2.5.1)
+    - CouchbaseLite-Swift (~> 2.6.3)
     - Flutter
   - simple_auth_flutter (0.0.1):
     - Flutter
@@ -25,7 +25,7 @@ DEPENDENCIES:
   - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  trunk:
     - AppAuth
     - CouchbaseLite-Swift
 
@@ -42,14 +42,14 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher/ios"
 
 SPEC CHECKSUMS:
-  AppAuth: c42547576838bf025b852736dd9b8a1c943fe68f
-  CouchbaseLite-Swift: 39a36c5191768c97c3ddcf4feb3ef9ef07bd027a
-  Flutter: 58dd7d1b27887414a370fcccb9e645c08ffd7a6a
-  flutter_appauth: 703177ded3b7dc65650478cd1ca9bce73c800cd6
-  fluttercouch: 77ece6ec478dbcfd800a3380a5601f5ccb573ce5
+  AppAuth: bce82c76043657c99d91e7882e8a9e1a93650cd4
+  CouchbaseLite-Swift: af73817c4db5222f01de6e59196dcf6389bd51a2
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  flutter_appauth: df12d7d65012a380f1ab11311866cfcbfd55370f
+  fluttercouch: a09d4937668b54a2fa54e6c271df15f59d2104ba
   simple_auth_flutter: ec585a6e96b415247120df0a33af43dc1d2a5839
-  url_launcher: 0067ddb8f10d36786672aa0722a21717dba3a298
+  url_launcher: a1c0cc845906122c4784c542523d8cacbded5626
 
 PODFILE CHECKSUM: 777e7f6cb26481ecbb0854a71b3cf93d037a6be6
 
-COCOAPODS: 1.7.3
+COCOAPODS: 1.8.4
