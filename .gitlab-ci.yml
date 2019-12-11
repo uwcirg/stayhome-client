@@ -29,7 +29,8 @@ before_script:
   - echo flutter.sdk=$PWD/flutter > android/local.properties
   - chmod +x ./android/gradlew
   # fluttercouch setup
-  - git clone git://github.com/fluttercouch/fluttercouch.git ..
+  - pwd
+  - git clone git://github.com/fluttercouch/fluttercouch.git ../fluttercouch
   - sed -i 's/~> 2.5.1/~> 2.6.3/g' ../fluttercouch/ios/fluttercouch.podspec
 
 stages:
