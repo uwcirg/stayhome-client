@@ -14,7 +14,7 @@
   "help": "Help",
   "time_left_until_token_expiration": "Time left until token expiration: $_timeLeftInSeconds seconds",
   "plan": "My calendar",
-  "progress__insights": "My goals",
+  "progress__insights": "Check progress",
   "devices": "Devices",
   "learning_center": "Learning center & Help",
   "contact__community": "Contact",
@@ -45,5 +45,6 @@
   "what_is_your_name": "What is your name?",
   "what_is_your_email_address": "What is your email address?",
   "what_is_your_patient_resource_id": "What is your Patient Resource ID?",
-  "start_a_session": "Start a session"
+  "start_a_session": "Start a session",
+  "my_goals": "My goals"
 }

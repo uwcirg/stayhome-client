@@ -9,6 +9,7 @@ import 'package:map_app_flutter/LoginPage.dart';
 import 'package:map_app_flutter/PlanPage.dart';
 import 'package:map_app_flutter/ProfilePage.dart';
 import 'package:map_app_flutter/ProgressInsightsPage.dart';
+import 'package:map_app_flutter/SessionPage.dart';
 import 'package:map_app_flutter/color_palette.dart';
 import 'package:map_app_flutter/model/AppModel.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
@@ -75,12 +76,14 @@ class _MyAppState extends State<MyApp> {
         child: MaterialApp(
           title: title,
           theme: ThemeData(
+              scaffoldBackgroundColor: Colors.white,
               primarySwatch: MapAppColors.vFitPrimary,
               accentColor: MapAppColors.vFitAccent,
               highlightColor: MapAppColors.vFitHighlight,
               textTheme: Theme.of(context).textTheme.apply(
-                  bodyColor: MapAppColors.vFitPrimary.shade600,
-                  displayColor: MapAppColors.vFitPrimary.shade600,),
+                    bodyColor: MapAppColors.vFitPrimary.shade600,
+                    displayColor: MapAppColors.vFitPrimary.shade600,
+                  ),
               buttonTheme: ButtonThemeData(
                   buttonColor: MapAppColors.vFitAccent,
                   textTheme: ButtonTextTheme.primary)),
@@ -91,6 +94,7 @@ class _MyAppState extends State<MyApp> {
             "/profile": (BuildContext context) => new ScopedModel<AppModel>(
                 model: new AppModel(), child: ProfilePage()),
             "/help": (BuildContext context) => HelpPage(),
+            "/start_session": (BuildContext context) => SessionPage(),
             "/devices": (BuildContext context) => DevicesPage(),
             "/contact_community": (BuildContext context) =>
                 ContactCommunityPage(ContactPageContents.contents(context)),

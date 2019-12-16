@@ -38,13 +38,14 @@ class S implements WidgetsLocalizations {
   String get login => "Login";
   String get logout => "Logout";
   String get more_info => "More info";
+  String get my_goals => "My goals";
   String get my_treatment_plan => "My Treatment Plan";
   String get name => "Name";
   String get not_now => "Not now";
   String get patient_resource_id => "Patient Resource ID";
   String get plan => "My calendar";
   String get profile => "Profile";
-  String get progress__insights => "My goals";
+  String get progress__insights => "Check progress";
   String get read_our_blog => "Read our Blog";
   String get rename => "Rename";
   String get session_expired_please_log_in_again => "Session expired, please log in again.";
@@ -75,6 +76,8 @@ class $de extends S {
   TextDirection get textDirection => TextDirection.ltr;
 
   @override
+  String get my_goals => "Meine Ziele";
+  @override
   String get what_is_your_patient_resource_id => "Wie lautet ihre Patientenressourcen-ID?";
   @override
   String get activity => "Aktivität";
@@ -87,7 +90,7 @@ class $de extends S {
   @override
   String get language => "Sprache";
   @override
-  String get progress__insights => "Meine Ziele";
+  String get progress__insights => "Fortschritt";
   @override
   String get sign_up_or_log_in_to_access_all_functions => "Bitte melden Sie sich an, um auf alle Funktionen zuzugreifen.";
   @override
@@ -109,7 +112,7 @@ class $de extends S {
   @override
   String get visit_our_facebook_page => "Besuchen Sie uns auf Facebook";
   @override
-  String get start_a_session => "Start a session";
+  String get start_a_session => "Session starten";
   @override
   String get my_treatment_plan => "Mein Behandlungsplan";
   @override
@@ -176,6 +179,8 @@ class $mn extends S {
   @override
   TextDirection get textDirection => TextDirection.ltr;
 
+  @override
+  String get my_goals => "My goals";
   @override
   String get what_is_your_patient_resource_id => "What is your Patient Resource ID?";
   @override

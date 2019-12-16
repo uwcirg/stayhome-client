@@ -76,7 +76,7 @@ class MapAppDrawer extends Drawer {
         ),
         ListTile(
           enabled: MyApp.of(context).auth.isLoggedIn,
-          title: Text(S.of(context).progress__insights),
+          title: Text(S.of(context).my_goals),
           leading: Icon(MdiIcons.bullseyeArrow),
           onTap: () => navigate(context, '/progress_insights'),
         ),
@@ -94,6 +94,12 @@ class MapAppDrawer extends Drawer {
         ),
         ListTile(
           enabled: MyApp.of(context).auth.isLoggedIn,
+          title: Text(S.of(context).progress__insights),
+          leading: Icon(MdiIcons.bullseyeArrow),
+          onTap: () => navigate(context, '/progress_insights'),
+        ),
+        ListTile(
+          enabled: MyApp.of(context).auth.isLoggedIn,
           title: Text(S.of(context).devices),
           leading: Icon(Icons.bluetooth),
           onTap: () => navigate(context, '/devices'),
@@ -108,14 +114,13 @@ class MapAppDrawer extends Drawer {
           leading: Icon(Icons.chat),
           onTap: () => navigate(context, '/contact_community'),
         ),
-
         ListTile(
           title: Text(S.of(context).about),
           onTap: () => navigate(context, '/about'),
           leading: Icon(Icons.people),
         ),
-            Divider(),
-            ListTile(
+        Divider(),
+        ListTile(
           title: DropdownButton(
             underline: Container(
               height: 0,
