@@ -27,14 +27,11 @@ class ContactCommunityPage extends StatelessWidget {
           children: <Widget>[
             Column(
               crossAxisAlignment: CrossAxisAlignment.center,
-              children: _buildButtons(context),
+              children: _buildWeblinks(context),
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: Dimensions.largeMargin),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: _buildLinks(context),
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: _buildContactItems(context),
             )
           ],
         ),
@@ -42,37 +39,35 @@ class ContactCommunityPage extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildLinks(BuildContext context) {
-    return _contactPageContents.links.map((ContactPageItem item) {
-      return FlatButton(
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Padding(
-            padding: MapAppPadding.buttonIconEdgeInsets,
-            child: Icon(item.iconData),
-          ),
-          Text(item.text),
-        ]),
-        onPressed: () => _launchURL(item.url, context),
-      );
-    }).toList();
+  List<Widget> _buildContactItems(BuildContext context) {
+    return _contactPageButtons(context,_contactPageContents.links, Theme.of(context).primaryColor);
   }
 
-  List<Widget> _buildButtons(BuildContext context) {
-    return _contactPageContents.buttons
-        .map((ContactPageItem item) => RaisedButton(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: MapAppPadding.buttonIconEdgeInsets,
-                    child: Icon(item.iconData),
-                  ),
-                  Text(item.text),
-                ],
+  List<Widget> _buildWeblinks(BuildContext context) {
+    return _contactPageButtons(context,_contactPageContents.buttons, Theme.of(context).accentColor);
+  }
+
+  List<Widget> _contactPageButtons(BuildContext context, List<ContactPageItem> items, Color buttonColor) {
+    return items.map((ContactPageItem item) {
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: FlatButton(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          child: Padding(
+            padding: const EdgeInsets.all(Dimensions.fullMargin),
+            child: Row(mainAxisSize: MainAxisSize.max, children: [
+              Padding(
+                padding: MapAppPadding.buttonIconEdgeInsets,
+                child: Icon(item.iconData, size: IconSize.large),
               ),
-              onPressed: () => _launchURL(item.url, context),
-            ))
-        .toList();
+              Flexible(child: Text(item.text, style: Theme.of(context).accentTextTheme.title)),
+            ]),
+          ),
+          onPressed: () => _launchURL(item.url, context),
+          color: buttonColor,
+        ),
+      );
+    }).toList();
   }
 
   _launchURL(url, context) async {
@@ -94,9 +89,9 @@ class ContactPageContents {
 
   static ContactPageContents contents(BuildContext context) {
     return ContactPageContents([
-      ContactPageItem(MdiIcons.facebook, S.of(context).visit_our_facebook_page,
+      ContactPageItem(MdiIcons.facebookBox, S.of(context).visit_our_facebook_page,
           url: "https://www.facebook.com/getvfit"),
-      ContactPageItem(MdiIcons.web, S.of(context).read_our_blog,
+      ContactPageItem(MdiIcons.bookOpenVariant, S.of(context).read_our_blog,
           url: "https://www.getvfit.com/blogs/news"),
     ], [
       ContactPageItem(MdiIcons.phone, "+1 844-872-8578",

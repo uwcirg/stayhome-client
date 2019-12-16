@@ -4,8 +4,6 @@ import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/i18n.dart';
 import 'package:map_app_flutter/model/AppModel.dart';
-import 'package:map_app_flutter/services/Repository.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import 'main.dart';
@@ -50,15 +48,8 @@ class _ProfilePageState extends State<ProfilePage> {
     if (MyApp.of(context).auth.userInfo != null) {
       return MapAppPageScaffold(
           title: title,
-          actions: <Widget>[
-            FlatButton(
-              textTheme: ButtonTextTheme.normal,
-              child: Text(S.of(context).logout),
-              onPressed: () => logout(context),
-            )
-          ],
           child: Padding(
-            padding: const EdgeInsets.all(Dimensions.halfMargin),
+            padding: const EdgeInsets.all(Dimensions.fullMargin),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -77,6 +68,15 @@ class _ProfilePageState extends State<ProfilePage> {
                       labelText: S.of(context).email),
                   initialValue: MyApp.of(context).auth.userInfo.email,
                   onFieldSubmitted: (String text) {},
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: Dimensions.largeMargin),
+                  child: Center(
+                    child: OutlineButton(
+                      child: Text(S.of(context).logout),
+                      onPressed: () => logout(context),
+                    ),
+                  ),
                 ),
                 Divider(),
                 Text(

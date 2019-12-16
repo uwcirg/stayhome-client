@@ -24,7 +24,7 @@ class S implements WidgetsLocalizations {
   String get add_the_default_careplan_for_me => "Add the default CarePlan for me";
   String get buttonPushText => "You have pushed the button this many times:";
   String get change => "Change";
-  String get contact__community => "Contact & Community";
+  String get contact__community => "Contact";
   String get demoVersionBannerText => "Demo version - not for clinical use.";
   String get developedByCIRG => "Developed by the Clinical Informatics Research Group (CIRG) at University of Washington, 2019.";
   String get devices => "Devices";
@@ -34,7 +34,7 @@ class S implements WidgetsLocalizations {
   String get help => "Help";
   String get language => "Language";
   String get languageName => "English (EN)";
-  String get learning_center => "Learning Center";
+  String get learning_center => "Learning center & Help";
   String get login => "Login";
   String get logout => "Logout";
   String get more_info => "More info";
@@ -42,13 +42,14 @@ class S implements WidgetsLocalizations {
   String get name => "Name";
   String get not_now => "Not now";
   String get patient_resource_id => "Patient Resource ID";
-  String get plan => "Plan";
+  String get plan => "My calendar";
   String get profile => "Profile";
-  String get progress__insights => "Progress & Insights";
+  String get progress__insights => "My goals";
   String get read_our_blog => "Read our Blog";
   String get rename => "Rename";
   String get session_expired_please_log_in_again => "Session expired, please log in again.";
   String get sign_up_or_log_in_to_access_all_functions => "Sign up or Log in to access all functions";
+  String get start_a_session => "Start a session";
   String get testimonials => "Testimonials";
   String get timeFormat => "h:mm:ss aaa";
   String get treatment_calendar => "Treatment Calendar";
@@ -86,7 +87,7 @@ class $de extends S {
   @override
   String get language => "Sprache";
   @override
-  String get progress__insights => "Fortschritt & Einsichten";
+  String get progress__insights => "Meine Ziele";
   @override
   String get sign_up_or_log_in_to_access_all_functions => "Bitte melden Sie sich an, um auf alle Funktionen zuzugreifen.";
   @override
@@ -107,6 +108,8 @@ class $de extends S {
   String get what_is_your_email_address => "Was ist Ihre E-Mail Adresse?";
   @override
   String get visit_our_facebook_page => "Besuchen Sie uns auf Facebook";
+  @override
+  String get start_a_session => "Start a session";
   @override
   String get my_treatment_plan => "Mein Behandlungsplan";
   @override
@@ -207,6 +210,8 @@ class $mn extends S {
   String get what_is_your_email_address => "What is your email address?";
   @override
   String get visit_our_facebook_page => "Visit our Facebook Page";
+  @override
+  String get start_a_session => "Start a session";
   @override
   String get my_treatment_plan => "My Treatment Plan";
   @override

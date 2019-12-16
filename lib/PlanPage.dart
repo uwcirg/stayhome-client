@@ -3,7 +3,6 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/QuestionnairePage.dart';
 import 'package:map_app_flutter/const.dart';
@@ -27,6 +26,8 @@ class PlanPage extends StatefulWidget {
 
 class _PlanPageState extends State<PlanPage> {
   CalendarController _calendarController;
+  String _selectedChip;
+
   _PlanPageState();
 
   @override
@@ -45,7 +46,7 @@ class _PlanPageState extends State<PlanPage> {
   @override
   Widget build(BuildContext context) {
     String title = S.of(context).plan;
-    return MapAppPageScaffold(title: title, child: buildScreen(context));
+    return MapAppPageScaffold(child: buildScreen(context));
   }
 
   Widget buildScreen(BuildContext context) {
@@ -55,11 +56,10 @@ class _PlanPageState extends State<PlanPage> {
       child: SafeArea(
         child: ScopedModelDescendant<CarePlanModel>(
             builder: (context, child, model) {
-              return Column(
+          return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               _buildCalendar(textStyle, context, model),
-              _buildQuestionnaireButtonSection(context, model),
               _buildCareplanInfoSection(context, model)
             ],
           );
@@ -88,54 +88,125 @@ class _PlanPageState extends State<PlanPage> {
       return Wrap(
         children: <Widget>[
           Text(model.error),
-
         ],
       );
     }
     if (model.isLoading) {
       return Center(child: CircularProgressIndicator());
     }
-    List<Widget> children = [Padding(
-      padding: const EdgeInsets.only(top: Dimensions.largeMargin),
-      child: Text(S.of(context).my_treatment_plan,
-          style: Theme.of(context).textTheme.title),
-    )];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: Dimensions.fullMargin),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              _choiceChip("Introduction"),
+              _choiceChip("Wellness"),
+              _choiceChip("Maintenance")
+            ],
+          ),
+          Visibility(
+              visible: _selectedChip != null,
+              child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                        color: Theme.of(context).primaryColor,
+                        width: Dimensions.borderWidth),
+                    borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(0), bottom: Radius.circular(5)),
+                    color: Theme.of(context).accentColor,
+                  ),
+                  child: _infoContentForSelectedChip(context, model)))
+        ],
+      ),
+    );
+  }
+
+  _choiceChip(String chipLabel) {
+    bool isSelected = chipLabel == _selectedChip;
+    return ChoiceChip(
+      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
+      shape: RoundedRectangleBorder(
+          borderRadius: _selectedChip == null
+              ? BorderRadius.circular(5)
+              : BorderRadius.vertical(
+                  top: Radius.circular(5), bottom: Radius.circular(0))),
+      label: Row(
+        children: <Widget>[
+          Text(
+            chipLabel,
+            style: Theme.of(context)
+                .accentTextTheme
+                .caption
+                .apply(color: Theme.of(context).accentTextTheme.body1.color),
+            overflow: TextOverflow.ellipsis,
+          ),
+          Icon(
+            isSelected ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+            color: Theme.of(context).accentTextTheme.body1.color,
+            size: IconSize.small,
+          )
+        ],
+      ),
+      selected: isSelected,
+      onSelected: (bool) {
+        setState(() {
+          if (isSelected) {
+            _selectedChip = null;
+          } else {
+            _selectedChip = chipLabel;
+          }
+        });
+      },
+      selectedColor: Theme.of(context).accentColor,
+      backgroundColor: Theme.of(context).primaryColor,
+    );
+  }
+
+  Widget _infoContentForSelectedChip(
+      BuildContext context, CarePlanModel model) {
+    List<Widget> children = [];
     children.addAll(model.carePlan.activity.map((Activity activity) {
       var durationUnit = activity.detail.scheduledTiming.repeat.durationUnit;
       var duration = activity.detail.scheduledTiming.repeat.duration;
-      return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        Column(
           children: [
-            Column(
-              children: [
-                Text(
-                  activity.detail.description ?? S.of(context).activity,
-                  style: Theme.of(context).textTheme.subtitle,
-                ),
-                Text(S.of(context).frequency_with_contents(
-                    '${activity.detail.scheduledTiming.repeat.period}',
-                    activity.detail.scheduledTiming.repeat.periodUnit)),
-                Visibility(
-                  visible: duration != null || durationUnit != null,
-                  child: Text(S.of(context).duration_duration_durationunit(
-                      '$duration', durationUnit)),
-                )
-              ],
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Text(
+              activity.detail.description ?? S.of(context).activity,
+              style: Theme.of(context).textTheme.subtitle,
             ),
-            FlatButton(
-              child: Text(
-                S.of(context).change,
-              ),
-              onPressed: () => _showChangeDialogForActivity(
-                  context, model, model.carePlan.activity.indexOf(activity)),
+            Text(S.of(context).frequency_with_contents(
+                '${activity.detail.scheduledTiming.repeat.period}',
+                activity.detail.scheduledTiming.repeat.periodUnit)),
+            Visibility(
+              visible: duration != null || durationUnit != null,
+              child: Text(S
+                  .of(context)
+                  .duration_duration_durationunit('$duration', durationUnit)),
             )
-          ]);
+          ],
+          crossAxisAlignment: CrossAxisAlignment.start,
+        ),
+        FlatButton(
+          child: Text(
+            S.of(context).change,
+          ),
+          onPressed: () => _showChangeDialogForActivity(
+              context, model, model.carePlan.activity.indexOf(activity)),
+        )
+      ]);
     }));
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: children,
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: children,
+      ),
     );
   }
 
@@ -170,10 +241,28 @@ class _PlanPageState extends State<PlanPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Text(
-          S.of(context).treatment_calendar,
-          style: Theme.of(context).textTheme.title,
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Text(
+              S.of(context).treatment_calendar,
+              style: Theme.of(context).textTheme.title,
+            ),
+          ),
         ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+              "Lorem ipsum dolor sit amet, eu sit explicari expetendis, nullam putent ceteros an pri. Quaeque insolens cu ius, eu nulla delicatissimi has."),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Text(S.of(context).my_treatment_plan,
+                style: Theme.of(context).textTheme.title),
+          ),
+        ),
+        _buildQuestionnaireButtonSection(context, model),
         TreatmentCalendarWidget(_calendarController, model),
       ],
     );
@@ -183,7 +272,7 @@ class _PlanPageState extends State<PlanPage> {
       BuildContext context, CarePlanModel model) {
     return model.questionnaires
         .map((Questionnaire questionnaire) => _buildQuestionnaireButton(
-            context, questionnaire.title, questionnaire, model))
+            context, "Complete Questionnaire", questionnaire, model))
         .toList();
   }
 
@@ -293,23 +382,46 @@ class TreatmentCalendarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var textStyle = Theme.of(context).textTheme.caption;
-
-    return TableCalendar(locale: Localizations.localeOf(context).languageCode,
+    var noInsets = const EdgeInsets.all(0);
+    return TableCalendar(
+      locale: Localizations.localeOf(context).languageCode,
       availableCalendarFormats: {CalendarFormat.month: ""},
+      headerStyle: HeaderStyle(
+          centerHeaderTitle: true,
+          titleTextStyle:
+              Theme.of(context).textTheme.subtitle.apply(fontWeightDelta: 2),
+          leftChevronPadding: noInsets,
+          rightChevronPadding: noInsets,
+          leftChevronIcon: Icon(
+            Icons.chevron_left,
+            color: Theme.of(context).textTheme.subtitle.color,
+          ),
+          rightChevronIcon: Icon(
+            Icons.chevron_right,
+            color: Theme.of(context).textTheme.subtitle.color,
+          )),
       calendarStyle: CalendarStyle(
           weekendStyle: textStyle,
           weekdayStyle: textStyle,
           todayStyle: TextStyle(color: Colors.black),
           selectedColor: Theme.of(context).accentColor,
           todayColor: Theme.of(context).primaryColor,
-          outsideDaysVisible: false,
+          outsideDaysVisible: true,
           markersColor: Colors.red.shade900,
-          markersMaxAmount: 100),
+          markersMaxAmount: 100,
+          markersAlignment: Alignment.center),
       daysOfWeekStyle: DaysOfWeekStyle(
-          weekendStyle: TextStyle(color: Theme.of(context).accentColor)),
+          weekdayStyle:
+              Theme.of(context).textTheme.caption.apply(fontWeightDelta: 2),
+          weekendStyle:
+              Theme.of(context).textTheme.caption.apply(fontWeightDelta: 2)),
       calendarController: _calendarController,
       events: _model.treatmentCalendar.events,
-      builders: CalendarBuilders(markersBuilder: _buildMarkers),
+      builders: CalendarBuilders(
+          markersBuilder: _buildMarkers,
+          dayBuilder: _buildDay,
+          outsideDayBuilder: _buildOutsideDay,
+          outsideWeekendDayBuilder: _buildOutsideDay),
     );
   }
 
@@ -334,39 +446,43 @@ class TreatmentCalendarWidget extends StatelessWidget {
     });
 
     for (EventType type in eventTypes.keys) {
-      IconData icon;
-      if (type == EventType.Treatment) {
-        icon = Icons.healing;
-      } else {
-        icon = Icons.check_circle;
-        offset += IconSize.small;
-      }
       var color;
       switch (eventTypes[type]['status']) {
         case Status.Completed:
           color = Theme.of(context).accentColor;
           break;
         case Status.Scheduled:
-          color = Colors.grey;
+          color = Colors.grey[600];
           break;
         case Status.Missed:
-          color = Colors.grey;
+          color = Colors.grey[600];
           break;
       }
+
+      Widget icon;
+      if (type == EventType.Treatment) {
+        icon = ImageIcon(
+          AssetImage('assets/logos/v-logo-smaller.png'),
+          color: color,
+          size: IconSize.small,
+        );
+      } else {
+        icon = Icon(Icons.help, color: color, size: IconSize.small);
+        offset += IconSize.small;
+      }
+
       var number;
       if (eventTypes[type]['count'] > 9) {
         number = "..";
       } else if (eventTypes[type]['count'] > 1) {
         number = eventTypes[type]['count'];
       }
+
       eventWidgets.add(Positioned(
         child: Stack(children: [
-          Icon(
-            icon,
-            color: color,
-            size: IconSize.small_medium,
-          ),
+          icon,
           Visibility(
+            //count badge
             visible: number != null,
             child: Positioned(
                 right: 0,
@@ -384,5 +500,31 @@ class TreatmentCalendarWidget extends StatelessWidget {
       ));
     }
     return eventWidgets;
+  }
+
+  Widget _buildDay(BuildContext context, DateTime date, List events) {
+    return Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Theme.of(context).primaryColor, width: 0.2),
+          color: Theme.of(context).highlightColor,
+        ),
+        alignment: AlignmentDirectional.topCenter,
+        child: Text(
+          "${date.day}",
+          style: Theme.of(context).textTheme.caption,
+        ));
+  }
+
+  Widget _buildOutsideDay(BuildContext context, DateTime date, List events) {
+    return Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Theme.of(context).primaryColor, width: 0.2),
+          color: Theme.of(context).highlightColor,
+        ),
+        alignment: AlignmentDirectional.topCenter,
+        child: Text(
+          "",
+          style: Theme.of(context).textTheme.caption,
+        ));
   }
 }

@@ -14,7 +14,7 @@
   "help": "Hilfe",
   "time_left_until_token_expiration": "Zeit bis Token abläuft: $_timeLeftInSeconds Sekunden",
   "plan": "Plan",
-  "progress__insights": "Fortschritt & Einsichten",
+  "progress__insights": "Meine Ziele",
   "devices": "Geräte",
   "learning_center": "Lernzentrum",
   "contact__community": "Kontakt & Gemeinschaft",
@@ -44,5 +44,6 @@
   "name": "Name",
   "what_is_your_name": "Wie heißen Sie?",
   "what_is_your_email_address": "Was ist Ihre E-Mail Adresse?",
-  "what_is_your_patient_resource_id": "Wie lautet ihre Patientenressourcen-ID?"
+  "what_is_your_patient_resource_id": "Wie lautet ihre Patientenressourcen-ID?",
+  "start_a_session": "Start a session"
 }

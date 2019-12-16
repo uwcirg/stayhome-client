@@ -2,6 +2,8 @@
  * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
  */
 
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
@@ -13,7 +15,7 @@ class LearningCenterPage extends StatelessWidget {
     return MapAppPageScaffold(
       title: S.of(context).learning_center,
       child: Padding(
-        padding: const EdgeInsets.all(Dimensions.halfMargin),
+        padding: const EdgeInsets.symmetric(horizontal: Dimensions.halfMargin, vertical: Dimensions.fullMargin),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -71,14 +73,17 @@ class Testimonial {
   static List<Testimonial> testimonials() {
     return [
       Testimonial(
-          "This is a great product. Has given me a new lease of life and is so quick and easy to use. Would recommend it.",
-          "Tanhya"),
-      Testimonial(
-          "After menopause, I could no longer have pleasurable intercourse. This product changed all that and gave me so much confidence and desire to be intimate again.",
+          "I am a 59 year old woman... this product gave me so much confidence and desire to be intimate again. I have recommended it to close friends and now to you. Trust me, it works, is painless and in fact, pleasurable.",
           "Barbara"),
       Testimonial(
           "Before using vFit, I lacked sexual confidence after having a baby. Thanks to vFit, my sex drive is back and sex is pleasurable again.",
+          "Tanhya"),
+      Testimonial(
+          "I appreciate that a company has finally created something to help with many womanly issues. It was easy to use and comfortable.",
           "Kristina"),
+      Testimonial(
+          "This has made me feel more confident in spontaneous intimacy with my husband. We both notice the change and have found intercourse to be much more enjoyable. I am way more sensitive and he definitely feels a difference. Orgasms are heightened!",
+          "Maryanne"),
     ];
   }
 }
@@ -90,40 +95,51 @@ class TestimonialWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var textStyle = Theme.of(context).accentTextTheme.body1;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.white),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(Dimensions.halfMargin),
-              child: Text.rich(TextSpan(
-                style: TextStyle(height: 1.4),
+    var textStyle = Theme.of(context).textTheme.subhead;
+    return Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Theme.of(context).primaryColor, width: Dimensions.borderWidth),
+          borderRadius: BorderRadius.circular(10),
+          color: Theme.of(context).highlightColor,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(Dimensions.fullMargin),
+          child: Column(
+            children: <Widget>[
+              Text.rich(TextSpan(
                 children: <InlineSpan>[
                   WidgetSpan(
+                    child: Transform.rotate(
+                      angle: 3.1492,
                       child: Icon(
-                    Icons.format_quote,
-                    color: Colors.white,
-                  )),
+                        Icons.format_quote,
+                        color: Theme.of(context).textTheme.body1.color,
+                        size: 20,
+                      ),
+                    ),
+                  ),
                   TextSpan(text: _testimonial.quote, style: textStyle),
                   WidgetSpan(
-                      child: Icon(Icons.format_quote, color: Colors.white)),
+                      child: Icon(
+                        Icons.format_quote,
+                        color: Theme.of(context).textTheme.body1.color,
+                        size: 20,
+                      ),
+                      alignment: ui.PlaceholderAlignment.top),
                 ],
               )),
-            )),
-        Padding(
-          padding: const EdgeInsets.all(Dimensions.halfMargin),
-          child: Text(
-            "- ${_testimonial.name}",
-            style: textStyle,
-            textAlign: TextAlign.end,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Text(
+                    "- ${_testimonial.name}",
+                    style: textStyle,
+                  ),
+                ],
+              ),
+            ],
           ),
-        )
-      ],
-    );
+        ));
   }
 }
 
@@ -135,14 +151,17 @@ class TestimonialsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
-        backgroundColor: Theme.of(context).accentColor,
         title: S.of(context).testimonials,
         showDrawer: false,
         child: Expanded(
             child: ListView.builder(
-          padding: const EdgeInsets.all(Dimensions.halfMargin),
+          padding: const EdgeInsets.all(Dimensions.fullMargin),
           itemBuilder: (context, i) {
-            return TestimonialWidget(_testimonials[i]);
+            return Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
+              child: TestimonialWidget(_testimonials[i]),
+            );
           },
           itemCount: _testimonials.length,
           shrinkWrap: true,

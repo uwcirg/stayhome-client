@@ -75,8 +75,12 @@ class _MyAppState extends State<MyApp> {
         child: MaterialApp(
           title: title,
           theme: ThemeData(
-              primarySwatch: Colors.grey,
+              primarySwatch: MapAppColors.vFitPrimary,
               accentColor: MapAppColors.vFitAccent,
+              highlightColor: MapAppColors.vFitHighlight,
+              textTheme: Theme.of(context).textTheme.apply(
+                  bodyColor: MapAppColors.vFitPrimary.shade600,
+                  displayColor: MapAppColors.vFitPrimary.shade600,),
               buttonTheme: ButtonThemeData(
                   buttonColor: MapAppColors.vFitAccent,
                   textTheme: ButtonTextTheme.primary)),

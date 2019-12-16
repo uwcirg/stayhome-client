@@ -12,7 +12,9 @@ class Dimensions {
   static const double halfMargin = fullMargin / 2;
   static const double quarterMargin = fullMargin / 4;
 
-  static const double profileImageSize = 64;
+  static const double profileImageSize = 60;
+
+  static const double borderWidth = 0.5;
 
   Dimensions._();
 }

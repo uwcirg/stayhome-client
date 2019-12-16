@@ -1,31 +1,35 @@
 import 'package:flutter/material.dart';
 
 class MapAppColors {
-  static const MaterialColor vFitRed = MaterialColor(
-    _amberPrimaryValue,
+  static const MaterialColor vFitPrimary = MaterialColor(
+    _vFitPrimaryValue,
     <int, Color>{
-      50: Color(0xFFFFF8E1),
-      100: Color(0xFFFFECB3),
-      200: Color(0xFFFFE082),
-      300: Color(0xFFFFD54F),
-      400: Color(0xFFf04d57),
-      500: Color(_amberPrimaryValue),
-      600: Color(0xFFFFB300),
-      700: Color(0xFFFFA000),
-      800: Color(0xFFFF8F00),
-      900: Color(0xFF7f0006),
+      50: Color(0xFFFAFAFA),
+      100: Color(0xFFF5F5F5),
+      200: Color(0xFFEEEEEE),
+      300: Color(0xFFE0E0E0),
+      350: Color(0xFFD6D6D6), // only for raised button while pressed in light theme
+      400: Color(0xFFBDBDBD),
+      500: Color(_vFitPrimaryValue),
+      600: Color(0xFF717d7d),
+      700: Color(0xFF616161),
+      800: Color(0xFF424242),
+      850: Color(0xFF273238), // only for background color in dark theme
+      900: Color(0xFF212121),
     },
   );
-  static const int _amberPrimaryValue = 0xFFb7082e;
+  static const int _vFitPrimaryValue = 0xFF727c7e;
 
   static const MaterialAccentColor vFitAccent = MaterialAccentColor(
-    _redAccentValue,
+    _vFitAccentValue,
     <int, Color>{
-      100: Color(0xFFFF8A80),
-      200: Color(_redAccentValue),
-      400: Color(0xFFFF1744),
-      700: Color(0xFFD50000),
+      100: Color(_vFitHighlightValue),
+      200: Color(_vFitAccentValue),
     },
   );
-  static const int _redAccentValue = 0xFF983D3D;
+  static const int _vFitAccentValue = 0xFFa3343a;
+  
+  static const int _vFitHighlightValue = 0xFFe4d4d4;
+  
+  static const Color vFitHighlight = Color(_vFitHighlightValue);
 }

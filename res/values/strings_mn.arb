@@ -44,5 +44,6 @@
   "name": "Name",
   "what_is_your_name": "What is your name?",
   "what_is_your_email_address": "What is your email address?",
-  "what_is_your_patient_resource_id": "What is your Patient Resource ID?"
+  "what_is_your_patient_resource_id": "What is your Patient Resource ID?",
+  "start_a_session": "Start a session"
 }
