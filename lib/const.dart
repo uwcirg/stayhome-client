@@ -24,6 +24,7 @@ class MapAppPadding {
       const EdgeInsets.only(right: Dimensions.halfMargin);
   static const cardPageMargins = const EdgeInsets.all(Dimensions.halfMargin);
   static const pageMargins = const EdgeInsets.all(Dimensions.fullMargin);
+  static const largeButtonPadding = const EdgeInsets.all(Dimensions.fullMargin);
 
   MapAppPadding._();
 }

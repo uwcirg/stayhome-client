@@ -54,7 +54,7 @@ class ContactCommunityPage extends StatelessWidget {
         child: FlatButton(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           child: Padding(
-            padding: const EdgeInsets.all(Dimensions.fullMargin),
+            padding: MapAppPadding.largeButtonPadding,
             child: Row(mainAxisSize: MainAxisSize.max, children: [
               Padding(
                 padding: MapAppPadding.buttonIconEdgeInsets,

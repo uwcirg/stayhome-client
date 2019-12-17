@@ -17,12 +17,7 @@ class MapAppPageScaffold extends StatelessWidget {
   final List<Widget> actions;
 
   MapAppPageScaffold(
-      {Key key,
-      this.child,
-      this.title,
-      this.showDrawer = true,
-      this.backgroundColor,
-      this.actions})
+      {Key key, this.child, this.title, this.showDrawer = true, this.backgroundColor, this.actions})
       : super(key: key);
 
   @override
@@ -54,7 +49,8 @@ class MapAppPageScaffold extends StatelessWidget {
       );
     }
     return Padding(
-      padding: const EdgeInsets.only(top: Dimensions.largeMargin),
+      padding: const EdgeInsets.only(
+          top: Dimensions.largeMargin, left: Dimensions.largeMargin, right: Dimensions.largeMargin),
       child: Text(
         title,
         style: Theme.of(context).textTheme.title.apply(fontWeightDelta: 1),
@@ -73,10 +69,9 @@ class DemoVersionWarningBanner extends StatelessWidget {
             padding: const EdgeInsets.all(Dimensions.quarterMargin),
             color: Colors.amber.shade100,
             child: Row(
-              mainAxisAlignment:
-                  Theme.of(context).platform == TargetPlatform.iOS
-                      ? MainAxisAlignment.center
-                      : MainAxisAlignment.start,
+              mainAxisAlignment: Theme.of(context).platform == TargetPlatform.iOS
+                  ? MainAxisAlignment.center
+                  : MainAxisAlignment.start,
               children: <Widget>[
                 Flexible(
                     child: Text(

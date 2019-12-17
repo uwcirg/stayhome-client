@@ -81,9 +81,8 @@ class Patient extends Resource {
         address.add(new Address.fromJson(v));
       });
     }
-    maritalStatus = json['maritalStatus'] != null
-        ? new CodeableConcept.fromJson(json['maritalStatus'])
-        : null;
+    maritalStatus =
+        json['maritalStatus'] != null ? new CodeableConcept.fromJson(json['maritalStatus']) : null;
     multipleBirthBoolean = json['multipleBirthBoolean'];
     if (json['communication'] != null) {
       communication = new List<Communication>();
@@ -125,8 +124,7 @@ class Patient extends Resource {
     }
     data['multipleBirthBoolean'] = this.multipleBirthBoolean;
     if (this.communication != null) {
-      data['communication'] =
-          this.communication.map((v) => v.toJson()).toList();
+      data['communication'] = this.communication.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -222,13 +220,7 @@ class Address {
   String postalCode;
   String country;
 
-  Address(
-      {this.extension,
-      this.line,
-      this.city,
-      this.state,
-      this.postalCode,
-      this.country});
+  Address({this.extension, this.line, this.city, this.state, this.postalCode, this.country});
 
   Address.fromJson(Map<String, dynamic> json) {
     if (json['extension'] != null) {
@@ -266,9 +258,7 @@ class Communication {
   Communication({this.language});
 
   Communication.fromJson(Map<String, dynamic> json) {
-    language = json['language'] != null
-        ? new CodeableConcept.fromJson(json['language'])
-        : null;
+    language = json['language'] != null ? new CodeableConcept.fromJson(json['language']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -331,8 +321,7 @@ class QuestionnaireResponseStatus {
   static const stopped = const QuestionnaireResponseStatus._('stopped');
   static const completed = const QuestionnaireResponseStatus._('completed');
   static const amended = const QuestionnaireResponseStatus._('amended');
-  static const entered_in_error =
-      const QuestionnaireResponseStatus._('entered-in-error');
+  static const entered_in_error = const QuestionnaireResponseStatus._('entered-in-error');
 
   static QuestionnaireResponseStatus fromJson(String key) {
     switch (key) {
@@ -392,29 +381,19 @@ class Procedure extends Resource {
         identifier.add(new Identifier.fromJson(v));
       });
     }
-    if (json['basedOn'] != null)
-      basedOnCarePlan = json['basedOn'].cast<String>();
+    if (json['basedOn'] != null) basedOnCarePlan = json['basedOn'].cast<String>();
     if (json['instantiatesQuestionnaire'] != null)
-      instantiatesQuestionnaire =
-          json['instantiatesQuestionnaire'].cast<String>();
+      instantiatesQuestionnaire = json['instantiatesQuestionnaire'].cast<String>();
     if (json['status'] != null) {
       status = ProcedureStatus.fromJson(json['status']);
     }
-    statusReason = json['statusReason'] != null
-        ? new CodeableConcept.fromJson(json['statusReason'])
-        : null;
-    category = json['category'] != null
-        ? new CodeableConcept.fromJson(json['category'])
-        : null;
-    code = json['code'] != null
-        ? new CodeableConcept.fromJson(json['code'])
-        : null;
-    performedPeriod = json['performedPeriod'] != null
-        ? new Period.fromJson(json['performedPeriod'])
-        : null;
-    subject = json['subject'] != null
-        ? new Reference.fromJson(json['subject'])
-        : null;
+    statusReason =
+        json['statusReason'] != null ? new CodeableConcept.fromJson(json['statusReason']) : null;
+    category = json['category'] != null ? new CodeableConcept.fromJson(json['category']) : null;
+    code = json['code'] != null ? new CodeableConcept.fromJson(json['code']) : null;
+    performedPeriod =
+        json['performedPeriod'] != null ? new Period.fromJson(json['performedPeriod']) : null;
+    subject = json['subject'] != null ? new Reference.fromJson(json['subject']) : null;
     if (json['performedDateTime'] != null) {
       performedDateTime = DateTime.parse(json['performedDateTime']);
     }
@@ -517,11 +496,8 @@ class CarePlan extends Resource {
       });
     }
     description = json['description'];
-    subject = json['subject'] != null
-        ? new Reference.fromJson(json['subject'])
-        : null;
-    period =
-        json['period'] != null ? new Period.fromJson(json['period']) : null;
+    subject = json['subject'] != null ? new Reference.fromJson(json['subject']) : null;
+    period = json['period'] != null ? new Period.fromJson(json['period']) : null;
     if (json['created'] != null) created = DateTime.parse(json["created"]);
     if (json['activity'] != null) {
       activity = new List<Activity>();
@@ -570,8 +546,7 @@ class CarePlan extends Resource {
           activity.detail == null ||
           activity.detail.code == null ||
           activity.detail.code.coding == null) return null;
-      return activity.detail.code.coding
-          .any((Coding coding) => coding.code == code);
+      return activity.detail.code.coding.any((Coding coding) => coding.code == code);
     });
   }
 
@@ -580,8 +555,8 @@ class CarePlan extends Resource {
       if (activity == null ||
           activity.detail == null ||
           activity.detail.instantiatesCanonical == null) return null;
-      return activity.detail.instantiatesCanonical.any((String instantiated) =>
-          instantiated.startsWith(Questionnaire.resourceTypeName));
+      return activity.detail.instantiatesCanonical
+          .any((String instantiated) => instantiated.startsWith(Questionnaire.resourceTypeName));
     });
   }
 
@@ -609,8 +584,7 @@ class CarePlan extends Resource {
     newPlan.status = CarePlanStatus.active;
     var now = DateTime.now();
     var today = DateTime(now.year, now.month, now.day);
-    newPlan.period = Period(
-        start: today, end: today.add(Duration(days: 120)));
+    newPlan.period = Period(start: today, end: today.add(Duration(days: 120)));
     return newPlan;
   }
 }
@@ -656,8 +630,7 @@ class Activity {
   Activity({this.detail});
 
   Activity.fromJson(Map<String, dynamic> json) {
-    detail =
-        json['detail'] != null ? new Detail.fromJson(json['detail']) : null;
+    detail = json['detail'] != null ? new Detail.fromJson(json['detail']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -690,22 +663,17 @@ class Detail {
       this.instantiatesCanonical});
 
   Detail.fromJson(Map<String, dynamic> json) {
-    code = json['code'] != null
-        ? new CodeableConcept.fromJson(json['code'])
-        : null;
+    code = json['code'] != null ? new CodeableConcept.fromJson(json['code']) : null;
     if (json['status'] != null) {
       status = DetailStatus.fromJson(json['status']);
     }
-    statusReason = json['statusReason'] != null
-        ? new CodeableConcept.fromJson(json['statusReason'])
-        : null;
+    statusReason =
+        json['statusReason'] != null ? new CodeableConcept.fromJson(json['statusReason']) : null;
     doNotPerform = json['doNotPerform'];
-    scheduledTiming = json['scheduledTiming'] != null
-        ? new Timing.fromJson(json['scheduledTiming'])
-        : null;
-    scheduledPeriod = json['scheduledPeriod'] != null
-        ? new Period.fromJson(json['scheduledPeriod'])
-        : null;
+    scheduledTiming =
+        json['scheduledTiming'] != null ? new Timing.fromJson(json['scheduledTiming']) : null;
+    scheduledPeriod =
+        json['scheduledPeriod'] != null ? new Period.fromJson(json['scheduledPeriod']) : null;
     description = json['description'];
     if (json['instantiatesCanonical'] != null) {
       instantiatesCanonical = new List<String>();
@@ -733,8 +701,7 @@ class Detail {
     }
     data['description'] = description;
     if (this.instantiatesCanonical != null) {
-      data['instantiatesCanonical'] =
-          this.instantiatesCanonical.map((v) => v).toList();
+      data['instantiatesCanonical'] = this.instantiatesCanonical.map((v) => v).toList();
     }
     return data;
   }
@@ -747,8 +714,7 @@ class Timing {
   Timing({this.repeat});
 
   Timing.fromJson(Map<String, dynamic> json) {
-    repeat =
-        json['repeat'] != null ? new Repeat.fromJson(json['repeat']) : null;
+    repeat = json['repeat'] != null ? new Repeat.fromJson(json['repeat']) : null;
     code = json['code'] != null ? CodeableConcept.fromJson(json['code']) : null;
   }
 
@@ -771,12 +737,7 @@ class Repeat {
   int period;
   String periodUnit;
 
-  Repeat(
-      {this.frequency,
-      this.period,
-      this.periodUnit,
-      this.durationUnit,
-      this.duration});
+  Repeat({this.frequency, this.period, this.periodUnit, this.durationUnit, this.duration});
 
   Repeat.fromJson(Map<String, dynamic> json) {
     frequency = json['frequency'];
@@ -851,39 +812,38 @@ class TimingAbbreviation {
 
   const TimingAbbreviation._(this.display, this.definition);
 
-  static const TimingAbbreviation BID =
-      const TimingAbbreviation._("BID", "Two times a day");
+  static const TimingAbbreviation BID = const TimingAbbreviation._("BID", "Two times a day");
 
-  static const TimingAbbreviation TID = const TimingAbbreviation._(
-      "TID", "Three times a day at institution specified time");
-  static const TimingAbbreviation QID = const TimingAbbreviation._(
-      "QID", "Four times a day at institution specified time");
-  static const TimingAbbreviation AM = const TimingAbbreviation._(
-      "AM", "Every morning at institution specified times");
-  static const TimingAbbreviation PM = const TimingAbbreviation._(
-      "PM", "Every afternoon at institution specified times");
-  static const TimingAbbreviation QD = const TimingAbbreviation._(
-      "QD", "Every Day at institution specified times");
-  static const TimingAbbreviation QOD = const TimingAbbreviation._(
-      "QOD", "Every Other Day at institution specified times");
-  static const TimingAbbreviation Q1H = const TimingAbbreviation._(
-      "every hour", "Every hour at institution specified times");
-  static const TimingAbbreviation Q2H = const TimingAbbreviation._(
-      "every 2 hours", "Every 2 hours at institution specified times");
-  static const TimingAbbreviation Q3H = const TimingAbbreviation._(
-      "every 3 hours", "Every 3 hours at institution specified times");
-  static const TimingAbbreviation Q4H = const TimingAbbreviation._(
-      "Q4H", "Every 4 hours at institution specified times");
-  static const TimingAbbreviation Q6H = const TimingAbbreviation._(
-      "Q6H", "Every 6 Hours at institution specified times");
-  static const TimingAbbreviation Q8H = const TimingAbbreviation._(
-      "every 8 hours", "Every 8 hours at institution specified times");
-  static const TimingAbbreviation BED = const TimingAbbreviation._(
-      "at bedtime", "At bedtime (institution specified time)");
-  static const TimingAbbreviation WK = const TimingAbbreviation._(
-      "weekly", "Weekly at institution specified time");
-  static const TimingAbbreviation MO = const TimingAbbreviation._(
-      "monthly", "Monthly at institution specified time");
+  static const TimingAbbreviation TID =
+      const TimingAbbreviation._("TID", "Three times a day at institution specified time");
+  static const TimingAbbreviation QID =
+      const TimingAbbreviation._("QID", "Four times a day at institution specified time");
+  static const TimingAbbreviation AM =
+      const TimingAbbreviation._("AM", "Every morning at institution specified times");
+  static const TimingAbbreviation PM =
+      const TimingAbbreviation._("PM", "Every afternoon at institution specified times");
+  static const TimingAbbreviation QD =
+      const TimingAbbreviation._("QD", "Every Day at institution specified times");
+  static const TimingAbbreviation QOD =
+      const TimingAbbreviation._("QOD", "Every Other Day at institution specified times");
+  static const TimingAbbreviation Q1H =
+      const TimingAbbreviation._("every hour", "Every hour at institution specified times");
+  static const TimingAbbreviation Q2H =
+      const TimingAbbreviation._("every 2 hours", "Every 2 hours at institution specified times");
+  static const TimingAbbreviation Q3H =
+      const TimingAbbreviation._("every 3 hours", "Every 3 hours at institution specified times");
+  static const TimingAbbreviation Q4H =
+      const TimingAbbreviation._("Q4H", "Every 4 hours at institution specified times");
+  static const TimingAbbreviation Q6H =
+      const TimingAbbreviation._("Q6H", "Every 6 Hours at institution specified times");
+  static const TimingAbbreviation Q8H =
+      const TimingAbbreviation._("every 8 hours", "Every 8 hours at institution specified times");
+  static const TimingAbbreviation BED =
+      const TimingAbbreviation._("at bedtime", "At bedtime (institution specified time)");
+  static const TimingAbbreviation WK =
+      const TimingAbbreviation._("weekly", "Weekly at institution specified time");
+  static const TimingAbbreviation MO =
+      const TimingAbbreviation._("monthly", "Monthly at institution specified time");
 
   TimingAbbreviation fromJson(String key) {
     switch (key) {
@@ -937,8 +897,7 @@ class DetailStatus {
   static const DetailStatus cancelled = DetailStatus._('cancelled');
   static const DetailStatus stopped = DetailStatus._('stopped');
   static const DetailStatus unknown = DetailStatus._('unknown');
-  static const DetailStatus entered_in_error =
-      DetailStatus._('entered-in-error');
+  static const DetailStatus entered_in_error = DetailStatus._('entered-in-error');
 
   static DetailStatus fromJson(String key) {
     switch (key) {
@@ -1168,9 +1127,7 @@ class Extension {
 
   Extension.fromJson(Map<String, dynamic> json) {
     url = json['url'];
-    valueAddress = json['valueAddress'] != null
-        ? new Address.fromJson(json['valueAddress'])
-        : null;
+    valueAddress = json['valueAddress'] != null ? new Address.fromJson(json['valueAddress']) : null;
     valueCanonical = json['valueCanonical'];
     valueExpression = json['valueExpression'] != null
         ? new ValueExpression.fromJson(json['valueExpression'])
@@ -1178,9 +1135,7 @@ class Extension {
     valueCodeableConcept = json['valueCodeableConcept'] != null
         ? new CodeableConcept.fromJson(json['valueCodeableConcept'])
         : null;
-    valueCoding = json['valueCoding'] != null
-        ? new Coding.fromJson(json['valueCoding'])
-        : null;
+    valueCoding = json['valueCoding'] != null ? new Coding.fromJson(json['valueCoding']) : null;
     valueString = json['valueString'];
     valueDecimal = json['valueDecimal'];
   }
@@ -1345,9 +1300,7 @@ class AnswerOption {
         extension.add(new Extension.fromJson(v));
       });
     }
-    valueCoding = json['valueCoding'] != null
-        ? new Coding.fromJson(json['valueCoding'])
-        : null;
+    valueCoding = json['valueCoding'] != null ? new Coding.fromJson(json['valueCoding']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -1368,6 +1321,16 @@ class AnswerOption {
     if (valueCoding != null) return valueCoding.toString();
     return super.toString();
   }
+
+  /// returns -1 if there is no ordinal value.
+  int ordinalValue() {
+    Extension ordinalValueExtension = extension.firstWhere(
+        (Extension e) => e.url == 'http://hl7.org/fhir/StructureDefinition/ordinalValue');
+    if (ordinalValueExtension != null) {
+      return ordinalValueExtension.valueDecimal;
+    }
+    return -1;
+  }
 }
 
 /// https://www.hl7.org/fhir/questionnaireresponse.html
@@ -1380,8 +1343,7 @@ class QuestionnaireResponse extends Resource {
   List<QuestionnaireResponseItem> item;
   QuestionnaireResponseStatus status;
 
-  QuestionnaireResponse(
-      Questionnaire questionnaire, this.subject, CarePlan carePlan,
+  QuestionnaireResponse(Questionnaire questionnaire, this.subject, CarePlan carePlan,
       {resourceType, id, this.meta, this.status, this.item})
       : super(resourceType: "QuestionnaireResponse", id: id) {
     if (this.item == null) {
@@ -1406,12 +1368,9 @@ class QuestionnaireResponse extends Resource {
       });
     }
 
-    if (json['status'] != null)
-      status = QuestionnaireResponseStatus.fromJson(json['status']);
+    if (json['status'] != null) status = QuestionnaireResponseStatus.fromJson(json['status']);
     if (json['authored'] != null) authored = DateTime.parse(json['authored']);
-    subject = json['subject'] != null
-        ? new Reference.fromJson(json['subject'])
-        : null;
+    subject = json['subject'] != null ? new Reference.fromJson(json['subject']) : null;
     if (json['item'] != null) {
       item = new List<QuestionnaireResponseItem>();
       json['item'].forEach((v) {
@@ -1445,9 +1404,7 @@ class QuestionnaireResponse extends Resource {
     if (responseItem != null) {
       responseItem.answer = [answer]; // single response
     } else {
-      this
-          .item
-          .add(new QuestionnaireResponseItem(linkId: linkId, answer: [answer]));
+      this.item.add(new QuestionnaireResponseItem(linkId: linkId, answer: [answer]));
     }
   }
 
@@ -1514,12 +1471,10 @@ class Answer {
   bool operator ==(dynamic o) {
     if (o is Answer) {
       Answer other = o;
-      return valueInteger == other.valueInteger &&
-          valueCoding == other.valueCoding;
+      return valueInteger == other.valueInteger && valueCoding == other.valueCoding;
     } else if (o is AnswerOption) {
       AnswerOption other = o;
-      return valueInteger == other.valueInteger &&
-          valueCoding == other.valueCoding;
+      return valueInteger == other.valueInteger && valueCoding == other.valueCoding;
     } else if (o is Coding) {
       Coding other = o;
       return valueInteger == null && other == valueCoding;
@@ -1569,13 +1524,7 @@ class ValueSet extends Resource {
   String status;
   Expansion expansion;
 
-  ValueSet(
-      {String resourceType,
-      String id,
-      this.language,
-      this.url,
-      this.status,
-      this.expansion})
+  ValueSet({String resourceType, String id, this.language, this.url, this.status, this.expansion})
       : super(resourceType: "ValueSet", id: id);
 
   ValueSet.fromJson(Map<String, dynamic> json) {
@@ -1584,9 +1533,7 @@ class ValueSet extends Resource {
     language = json['language'];
     url = json['url'];
     status = json['status'];
-    expansion = json['expansion'] != null
-        ? new Expansion.fromJson(json['expansion'])
-        : null;
+    expansion = json['expansion'] != null ? new Expansion.fromJson(json['expansion']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -1610,12 +1557,7 @@ class Expansion {
   List<Parameter> parameter;
   List<Coding> contains;
 
-  Expansion(
-      {this.identifier,
-      this.timestamp,
-      this.total,
-      this.parameter,
-      this.contains});
+  Expansion({this.identifier, this.timestamp, this.total, this.parameter, this.contains});
 
   Expansion.fromJson(Map<String, dynamic> json) {
     identifier = json['identifier'];

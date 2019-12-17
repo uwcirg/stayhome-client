@@ -28,8 +28,7 @@ class QuestionnairePageState extends State<QuestionnairePage> {
   QuestionnaireResponse _response;
   CarePlanModel _model;
 
-  QuestionnairePageState(this._questionnaire, this._model,
-      {QuestionnaireResponse response}) {
+  QuestionnairePageState(this._questionnaire, this._model, {QuestionnaireResponse response}) {
     this._response = response;
     if (this._response == null) {
       this._response = new QuestionnaireResponse(
@@ -59,8 +58,7 @@ class QuestionnaireItemPage extends StatefulWidget {
   QuestionnaireItemPage(this._questionnaireItem, this._response);
 
   @override
-  State createState() =>
-      QuestionnaireItemPageState(this._questionnaireItem, this._response);
+  State createState() => QuestionnaireItemPageState(this._questionnaireItem, this._response);
 }
 
 class QuestionnaireItemPageState extends State<QuestionnaireItemPage> {
@@ -73,8 +71,8 @@ class QuestionnaireItemPageState extends State<QuestionnaireItemPage> {
   Widget build(BuildContext context) {
     return new MapAppPageScaffold(
       title: _questionnaireItem.text,
-      child: QuestionListWidget(_questionnaireItem.item, _response,
-          () => Navigator.of(context).pop()),
+      child:
+          QuestionListWidget(_questionnaireItem.item, _response, () => Navigator.of(context).pop()),
       showDrawer: false,
     );
   }
@@ -88,8 +86,7 @@ class QuestionListWidget extends StatefulWidget {
   QuestionListWidget(this._questions, this._response, this._onPressed);
 
   @override
-  State createState() =>
-      QuestionListWidgetState(this._questions, this._response, this._onPressed);
+  State createState() => QuestionListWidgetState(this._questions, this._response, this._onPressed);
 }
 
 class QuestionListWidgetState extends State<QuestionListWidget> {
@@ -108,9 +105,13 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
             padding: MapAppPadding.cardPageMargins,
             itemBuilder: (context, i) {
               if (i == _questions.length) {
-                return RaisedButton(
-                  child: Text("Done"),
-                  onPressed: _onPressed,
+                return Padding(
+                  padding: const EdgeInsets.all(Dimensions.halfMargin),
+                  child: RaisedButton(
+                    padding: MapAppPadding.largeButtonPadding,
+                    child: Text("Done"),
+                    onPressed: _onPressed,
+                  ),
                 );
               }
 
@@ -125,13 +126,12 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
             }));
   }
 
-  GestureDetector _buildGroupCard(
-      BuildContext context, QuestionnaireItem item) {
+  GestureDetector _buildGroupCard(BuildContext context, QuestionnaireItem item) {
     return GestureDetector(
         onTap: () => Navigator.of(context).push(MaterialPageRoute(
-            builder: (BuildContext context) =>
-                QuestionnaireItemPage(item, _response))),
+            builder: (BuildContext context) => QuestionnaireItemPage(item, _response))),
         child: Card(
+            color: Theme.of(context).highlightColor,
             child: Padding(
                 padding: MapAppPadding.cardPageMargins,
                 child: Row(
@@ -139,10 +139,13 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
                     Flexible(
                       child: Text(
                         item.text,
-                        style: Theme.of(context).textTheme.title,
+                        style: Theme.of(context).textTheme.subhead,
                       ),
                     ),
-                    Icon(Icons.chevron_right),
+                    Icon(
+                      Icons.chevron_right,
+                      color: Theme.of(context).textTheme.title.color,
+                    ),
                   ],
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 ))));
@@ -160,82 +163,95 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
   }
 
   Widget _buildItem(BuildContext context, QuestionnaireItem questionnaireItem) {
-    return Card(
-      child: Padding(
-        padding: MapAppPadding.cardPageMargins,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Text(
+    return Padding(
+      padding: MapAppPadding.cardPageMargins,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
+            child: Text(
               questionnaireItem.text,
               style: Theme.of(context).textTheme.title,
             ),
-            Wrap(
-              runSpacing: -8,
-              spacing: Dimensions.halfMargin,
-              children: _buildChoices(questionnaireItem, context),
-            ),
-          ],
-        ),
+          ),
+//          Wrap(
+//            runSpacing: -8,
+//            spacing: Dimensions.halfMargin,
+//            children: _buildChoices(questionnaireItem, context),
+//          ),
+          Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: _buildChoices(questionnaireItem, context))
+        ],
       ),
     );
   }
 
-  List<Widget> _buildChoices(
-      QuestionnaireItem questionnaireItem, BuildContext context) {
-    Answer currentResponse =
-        _response.getResponseItem(questionnaireItem.linkId) != null
-            ? _response.getResponseItem(questionnaireItem.linkId).answer[0]
-            : null;
+  List<Widget> _buildChoices(QuestionnaireItem questionnaireItem, BuildContext context) {
+    Answer currentResponse = _response.getResponseItem(questionnaireItem.linkId) != null
+        ? _response.getResponseItem(questionnaireItem.linkId).answer[0]
+        : null;
 
     if (questionnaireItem.answerOption != null) {
-      return _buildChoicesFromAnswerOptions(
-          questionnaireItem, currentResponse, context);
+      return _buildChoicesFromAnswerOptions(questionnaireItem, currentResponse, context);
     }
     if (questionnaireItem.answerValueSet != null) {
-      return _buildChoicesFromAnswerValueSet(
-          questionnaireItem, currentResponse, context);
+      return _buildChoicesFromAnswerValueSet(questionnaireItem, currentResponse, context);
     }
-    throw UnimplementedError(
-        "Only answerOption and answerValueSet are supported");
+    throw UnimplementedError("Only answerOption and answerValueSet are supported");
   }
 
   List<Widget> _buildChoicesFromAnswerOptions(
-      QuestionnaireItem questionnaireItem,
-      Answer currentResponse,
-      BuildContext context) {
+      QuestionnaireItem questionnaireItem, Answer currentResponse, BuildContext context) {
     return questionnaireItem.answerOption.map((AnswerOption option) {
-      return _buildChip('$option', currentResponse == option, context,
-          questionnaireItem, new Answer.fromAnswerOption(option));
+      return _buildChip(
+          '${option.ordinalValue() != -1 ? option.ordinalValue() : option}',
+          currentResponse == option,
+          context,
+          questionnaireItem,
+          new Answer.fromAnswerOption(option),
+          helpLabel: '$option');
     }).toList();
   }
 
   List<Widget> _buildChoicesFromAnswerValueSet(
-      QuestionnaireItem questionnaireItem,
-      Answer currentResponse,
-      BuildContext context) {
+      QuestionnaireItem questionnaireItem, Answer currentResponse, BuildContext context) {
     return questionnaireItem.answerValueSet.map((Coding option) {
-      return _buildChip('$option', currentResponse == option, context,
-          questionnaireItem, new Answer(valueCoding: option));
+      return _buildChip('$option', currentResponse == option, context, questionnaireItem,
+          new Answer(valueCoding: option));
     }).toList();
   }
 
   Widget _buildChip(String chipLabel, bool isSelected, BuildContext context,
-      QuestionnaireItem questionnaireItem, Answer ifChosen) {
-    return ChoiceChip(
-      label: Text(
-        chipLabel,
-        style: isSelected
-            ? Theme.of(context).accentTextTheme.body1
-            : Theme.of(context).textTheme.body1,
-      ),
-      selected: isSelected,
-      onSelected: (bool) {
-        setState(() {
-          _response.setAnswer(questionnaireItem.linkId, ifChosen);
-        });
-      },
-      selectedColor: Theme.of(context).accentColor,
+      QuestionnaireItem questionnaireItem, Answer ifChosen,
+      {String helpLabel}) {
+    if (chipLabel == "-1") {
+      chipLabel = helpLabel;
+      helpLabel = null;
+    }
+    return Column(
+      children: <Widget>[
+        ChoiceChip(
+          label: Text(
+            chipLabel,
+            style: isSelected
+                ? Theme.of(context).accentTextTheme.body1
+                : Theme.of(context).textTheme.body1,
+          ),
+          selected: isSelected,
+          onSelected: (bool) {
+            setState(() {
+              _response.setAnswer(questionnaireItem.linkId, ifChosen);
+            });
+          },
+          selectedColor: Theme.of(context).accentColor,
+        ),
+        Visibility(
+          visible: helpLabel != null,
+          child: Text(helpLabel),
+        )
+      ],
     );
   }
 }

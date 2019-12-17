@@ -54,13 +54,12 @@ class _PlanPageState extends State<PlanPage> {
     return Padding(
       padding: const EdgeInsets.all(Dimensions.halfMargin),
       child: SafeArea(
-        child: ScopedModelDescendant<CarePlanModel>(
-            builder: (context, child, model) {
+        child: ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.max,
             children: <Widget>[
               _buildCalendar(textStyle, context, model),
-              _buildCareplanInfoSection(context, model)
             ],
           );
         }),
@@ -72,9 +71,7 @@ class _PlanPageState extends State<PlanPage> {
     if (model.hasNoCarePlan) {
       return Wrap(
         children: <Widget>[
-          Text(S
-              .of(context)
-              .you_have_no_active_pelvic_floor_management_careplan),
+          Text(S.of(context).you_have_no_active_pelvic_floor_management_careplan),
           FlatButton(
             child: Text(
               S.of(context).add_the_default_careplan_for_me,
@@ -97,8 +94,8 @@ class _PlanPageState extends State<PlanPage> {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Dimensions.fullMargin),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      child: Stack(
+        overflow: Overflow.visible,
         children: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -109,17 +106,18 @@ class _PlanPageState extends State<PlanPage> {
             ],
           ),
           Visibility(
-              visible: _selectedChip != null,
-              child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                        color: Theme.of(context).primaryColor,
-                        width: Dimensions.borderWidth),
-                    borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(0), bottom: Radius.circular(5)),
-                    color: Theme.of(context).accentColor,
-                  ),
-                  child: _infoContentForSelectedChip(context, model)))
+            visible: _selectedChip != null,
+            child: Container(
+                margin: EdgeInsets.only(top: 35),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                      color: Theme.of(context).primaryColor, width: Dimensions.borderWidth),
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(0), bottom: Radius.circular(5)),
+                  color: Theme.of(context).accentColor,
+                ),
+                child: _infoContentForSelectedChip(context, model)),
+          )
         ],
       ),
     );
@@ -132,8 +130,7 @@ class _PlanPageState extends State<PlanPage> {
       shape: RoundedRectangleBorder(
           borderRadius: _selectedChip == null
               ? BorderRadius.circular(5)
-              : BorderRadius.vertical(
-                  top: Radius.circular(5), bottom: Radius.circular(0))),
+              : BorderRadius.vertical(top: Radius.circular(5), bottom: Radius.circular(0))),
       label: Row(
         children: <Widget>[
           Text(
@@ -166,8 +163,7 @@ class _PlanPageState extends State<PlanPage> {
     );
   }
 
-  Widget _infoContentForSelectedChip(
-      BuildContext context, CarePlanModel model) {
+  Widget _infoContentForSelectedChip(BuildContext context, CarePlanModel model) {
     List<Widget> children = [];
     children.addAll(model.carePlan.activity.map((Activity activity) {
       var durationUnit = activity.detail.scheduledTiming.repeat.durationUnit;
@@ -177,21 +173,26 @@ class _PlanPageState extends State<PlanPage> {
           children: [
             Text(
               activity.detail.description ?? S.of(context).activity,
-              style: Theme.of(context).textTheme.subtitle,
+              style: Theme.of(context).accentTextTheme.subtitle,
             ),
-            Text(S.of(context).frequency_with_contents(
-                '${activity.detail.scheduledTiming.repeat.period}',
-                activity.detail.scheduledTiming.repeat.periodUnit)),
+            Text(
+              S.of(context).frequency_with_contents(
+                  '${activity.detail.scheduledTiming.repeat.period}',
+                  activity.detail.scheduledTiming.repeat.periodUnit),
+              style: Theme.of(context).accentTextTheme.body1,
+            ),
             Visibility(
               visible: duration != null || durationUnit != null,
-              child: Text(S
-                  .of(context)
-                  .duration_duration_durationunit('$duration', durationUnit)),
+              child: Text(
+                S.of(context).duration_duration_durationunit('$duration', durationUnit),
+                style: Theme.of(context).accentTextTheme.body1,
+              ),
             )
           ],
           crossAxisAlignment: CrossAxisAlignment.start,
         ),
-        FlatButton(
+        RaisedButton(
+          elevation: 0,
           child: Text(
             S.of(context).change,
           ),
@@ -210,8 +211,7 @@ class _PlanPageState extends State<PlanPage> {
     );
   }
 
-  Widget _buildQuestionnaireButtonSection(
-      BuildContext context, CarePlanModel model) {
+  Widget _buildQuestionnaireButtonSection(BuildContext context, CarePlanModel model) {
     if (model.hasNoCarePlan || model.error != null)
       return Container(
         height: 0,
@@ -223,14 +223,16 @@ class _PlanPageState extends State<PlanPage> {
         padding: MapAppPadding.pageMargins,
       );
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: _buildQuestionnaireButtons(context, model),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: Dimensions.fullMargin),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: _buildQuestionnaireButtons(context, model),
+      ),
     );
   }
 
-  Widget _buildCalendar(
-      TextStyle textStyle, BuildContext context, CarePlanModel model) {
+  Widget _buildCalendar(TextStyle textStyle, BuildContext context, CarePlanModel model) {
     if (model.hasNoCarePlan || model.error != null)
       return Container(
         height: 0,
@@ -240,6 +242,7 @@ class _PlanPageState extends State<PlanPage> {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.max,
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -258,26 +261,25 @@ class _PlanPageState extends State<PlanPage> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Center(
-            child: Text(S.of(context).my_treatment_plan,
-                style: Theme.of(context).textTheme.title),
+            child: Text(S.of(context).my_treatment_plan, style: Theme.of(context).textTheme.title),
           ),
         ),
+        _buildCareplanInfoSection(context, model),
         _buildQuestionnaireButtonSection(context, model),
         TreatmentCalendarWidget(_calendarController, model),
       ],
     );
   }
 
-  List<Widget> _buildQuestionnaireButtons(
-      BuildContext context, CarePlanModel model) {
+  List<Widget> _buildQuestionnaireButtons(BuildContext context, CarePlanModel model) {
     return model.questionnaires
-        .map((Questionnaire questionnaire) => _buildQuestionnaireButton(
-            context, "Complete Questionnaire", questionnaire, model))
+        .map((Questionnaire questionnaire) =>
+            _buildQuestionnaireButton(context, "Complete Questionnaire", questionnaire, model))
         .toList();
   }
 
-  RaisedButton _buildQuestionnaireButton(BuildContext context, String title,
-      Questionnaire questionnaire, CarePlanModel model) {
+  RaisedButton _buildQuestionnaireButton(
+      BuildContext context, String title, Questionnaire questionnaire, CarePlanModel model) {
     return RaisedButton(
         child: Row(
           children: [
@@ -290,8 +292,8 @@ class _PlanPageState extends State<PlanPage> {
           mainAxisSize: MainAxisSize.min,
         ),
         onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => QuestionnairePage(questionnaire, model)));
+          Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => QuestionnairePage(questionnaire, model)));
         });
   }
 
@@ -316,8 +318,8 @@ class _PlanPageState extends State<PlanPage> {
               TextField(
                 controller: new TextEditingController(text: every),
                 autofocus: true,
-                decoration: new InputDecoration(
-                    labelText: 'Every', hintText: 'e.g. 2 for every 2 days'),
+                decoration:
+                    new InputDecoration(labelText: 'Every', hintText: 'e.g. 2 for every 2 days'),
                 onChanged: (value) {
                   every = value;
                 },
@@ -328,8 +330,7 @@ class _PlanPageState extends State<PlanPage> {
                     controller: new TextEditingController(text: duration),
                     autofocus: true,
                     decoration: new InputDecoration(
-                        labelText: 'Duration',
-                        hintText: 'e.g. 12 for 12 minutes per session'),
+                        labelText: 'Duration', hintText: 'e.g. 12 for 12 minutes per session'),
                     onChanged: (value) {
                       duration = value;
                     },
@@ -356,12 +357,9 @@ class _PlanPageState extends State<PlanPage> {
                   valid = false;
                 }
                 if (valid) {
-                  if (every != null)
-                    model.updateActivityFrequency(
-                        activityIndex, int.parse(every));
+                  if (every != null) model.updateActivityFrequency(activityIndex, int.parse(every));
                   if (duration != null)
-                    model.updateActivityDuration(
-                        activityIndex, double.parse(duration));
+                    model.updateActivityDuration(activityIndex, double.parse(duration));
                   Navigator.of(context).pop();
                 }
               },
@@ -388,8 +386,7 @@ class TreatmentCalendarWidget extends StatelessWidget {
       availableCalendarFormats: {CalendarFormat.month: ""},
       headerStyle: HeaderStyle(
           centerHeaderTitle: true,
-          titleTextStyle:
-              Theme.of(context).textTheme.subtitle.apply(fontWeightDelta: 2),
+          titleTextStyle: Theme.of(context).textTheme.subtitle.apply(fontWeightDelta: 2),
           leftChevronPadding: noInsets,
           rightChevronPadding: noInsets,
           leftChevronIcon: Icon(
@@ -411,10 +408,8 @@ class TreatmentCalendarWidget extends StatelessWidget {
           markersMaxAmount: 100,
           markersAlignment: Alignment.center),
       daysOfWeekStyle: DaysOfWeekStyle(
-          weekdayStyle:
-              Theme.of(context).textTheme.caption.apply(fontWeightDelta: 2),
-          weekendStyle:
-              Theme.of(context).textTheme.caption.apply(fontWeightDelta: 2)),
+          weekdayStyle: Theme.of(context).textTheme.caption.apply(fontWeightDelta: 2),
+          weekendStyle: Theme.of(context).textTheme.caption.apply(fontWeightDelta: 2)),
       calendarController: _calendarController,
       events: _model.treatmentCalendar.events,
       builders: CalendarBuilders(
@@ -425,8 +420,7 @@ class TreatmentCalendarWidget extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildMarkers(
-      BuildContext context, DateTime date, List events, List holidays) {
+  List<Widget> _buildMarkers(BuildContext context, DateTime date, List events, List holidays) {
     List<Widget> eventWidgets = [];
     double offset = 6;
     var eventTypes = {};
@@ -434,8 +428,7 @@ class TreatmentCalendarWidget extends StatelessWidget {
       if (eventTypes.containsKey(e.eventType)) {
         eventTypes[e.eventType]['count'] = eventTypes[e.eventType]['count'] + 1;
         eventTypes[e.eventType]['status'] =
-            eventTypes[e.eventType]['status'] == Status.Completed ||
-                    e.status == Status.Completed
+            eventTypes[e.eventType]['status'] == Status.Completed || e.status == Status.Completed
                 ? Status.Completed
                 : e.status;
       } else {
@@ -489,10 +482,8 @@ class TreatmentCalendarWidget extends StatelessWidget {
                 bottom: -5,
                 child: Container(
                   padding: EdgeInsets.all(2),
-                  decoration: ShapeDecoration(
-                      color: Colors.white, shape: CircleBorder()),
-                  child: Text('$number',
-                      style: Theme.of(context).textTheme.caption),
+                  decoration: ShapeDecoration(color: Colors.white, shape: CircleBorder()),
+                  child: Text('$number', style: Theme.of(context).textTheme.caption),
                 )),
           )
         ]),

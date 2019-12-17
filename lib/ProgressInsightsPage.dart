@@ -24,8 +24,7 @@ class _ProgressInsightsPageState extends State<ProgressInsightsPage> {
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
         title: S.of(context).progress__insights,
-        child: ScopedModelDescendant<CarePlanModel>(
-            builder: (context, child, model) {
+        child: ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
           return _buildScreen(context, model);
         }));
   }
@@ -56,8 +55,8 @@ class _ProgressInsightsPageState extends State<ProgressInsightsPage> {
               isExpanded: true,
               items: questions
                   .map(
-                    (QuestionnaireItem question) => DropdownMenuItem(
-                        value: question.linkId, child: Text(question.text)),
+                    (QuestionnaireItem question) =>
+                        DropdownMenuItem(value: question.linkId, child: Text(question.text)),
                   )
                   .toList(),
               onChanged: (String selectedLinkId) =>
@@ -71,7 +70,7 @@ class _ProgressInsightsPageState extends State<ProgressInsightsPage> {
               child: SizedBox(
                   height: 250.0,
                   child: SimpleTimeSeriesChart.fromQuestionnaireResponses(
-                      model, this._selectedLinkId)))
+                      model, this._selectedLinkId, context)))
         ],
       ),
     );
@@ -98,9 +97,9 @@ class SimpleTimeSeriesChart extends StatelessWidget {
 
   /// Creates a [TimeSeriesChart] with sample data and no transition.
   factory SimpleTimeSeriesChart.fromQuestionnaireResponses(
-      CarePlanModel model, String linkId) {
+      CarePlanModel model, String linkId, BuildContext context) {
     return new SimpleTimeSeriesChart(
-      _createTimeSeries(model, linkId),
+      _createTimeSeries(model, linkId, context),
       // Disable animations for image tests.
       animate: true,
     );
@@ -115,22 +114,27 @@ class SimpleTimeSeriesChart extends StatelessWidget {
       // should create the same type of [DateTime] as the data provided. If none
       // specified, the default creates local date time.
       dateTimeFactory: const charts.LocalDateTimeFactory(),
-      defaultRenderer: new charts.LineRendererConfig(includePoints: true),
-      primaryMeasureAxis: new charts.NumericAxisSpec(tickFormatterSpec: charts.BasicNumericTickFormatterSpec((num value) {
+      defaultRenderer: new charts.LineRendererConfig(includePoints: true, includeArea: true),
+      primaryMeasureAxis: new charts.NumericAxisSpec(
+          tickFormatterSpec: charts.BasicNumericTickFormatterSpec((num value) {
         switch (value) {
-          case 0: return "Not at all";
-          case 1: return "A little bit";
-          case 2: return "Somewhat";
-          case 3: return "Quite a bit";
-          default: return "Very much";
-
+          case 0:
+            return "Not at all";
+          case 1:
+            return "A little bit";
+          case 2:
+            return "Somewhat";
+          case 3:
+            return "Quite a bit";
+          default:
+            return "Very much";
         }
-      })) ,
+      })),
     );
   }
 
   static List<charts.Series<AnswerTimeSeries, DateTime>> _createTimeSeries(
-      CarePlanModel model, String linkId) {
+      CarePlanModel model, String linkId, BuildContext context) {
     if (linkId == null) return [];
     List<QuestionnaireResponse> responses = model.questionnaireResponses;
     QuestionnaireItem questionnaireItem = model.questionForLinkId(linkId);
@@ -138,18 +142,16 @@ class SimpleTimeSeriesChart extends StatelessWidget {
     List<AnswerTimeSeries> data = [];
     for (QuestionnaireResponse response in responses) {
       if (response.item != null) {
-        var answers = response.item
-            .where((QuestionnaireResponseItem r) => r.linkId == linkId)
-            .toList();
+        var answers =
+            response.item.where((QuestionnaireResponseItem r) => r.linkId == linkId).toList();
         if (answers.length > 0) {
           Answer answer = answers[0].answer[0];
           int answerValue = answer.valueInteger;
           if (questionnaireItem.answerOption[0].extension != null &&
               questionnaireItem.answerOption[0].extension
                   .any((Extension e) => e.url.contains("ordinalValue"))) {
-            AnswerOption option = questionnaireItem.answerOption.firstWhere(
-                (AnswerOption o) => answer == o,
-                orElse: () => null);
+            AnswerOption option = questionnaireItem.answerOption
+                .firstWhere((AnswerOption o) => answer == o, orElse: () => null);
             if (option != null) {
               answerValue = option.extension
                   .firstWhere((Extension e) => e.url.contains("ordinalValue"))
@@ -165,7 +167,8 @@ class SimpleTimeSeriesChart extends StatelessWidget {
     return [
       new charts.Series<AnswerTimeSeries, DateTime>(
         id: 'Answers',
-        colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
+        colorFn: (_, __) => charts.ColorUtil.fromDartColor(Theme.of(context).accentColor),
+        areaColorFn: (_, __) => charts.ColorUtil.fromDartColor(Theme.of(context).highlightColor),
         domainFn: (AnswerTimeSeries series, _) => series.time,
         measureFn: (AnswerTimeSeries series, _) => series.answer,
         data: data,

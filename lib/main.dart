@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:map_app_flutter/ContactCommunityPage.dart';
 import 'package:map_app_flutter/DevicesPage.dart';
+import 'package:map_app_flutter/GoalsPage.dart';
 import 'package:map_app_flutter/HelpPage.dart';
 import 'package:map_app_flutter/LearningCenterPage.dart';
 import 'package:map_app_flutter/LoginPage.dart';
@@ -102,6 +103,7 @@ class _MyAppState extends State<MyApp> {
                 ProgressInsightsPage(),
             "/learning_center": (BuildContext context) => LearningCenterPage(),
             "/about": (BuildContext context) => HelpPage(),
+            "/goals": (BuildContext context) => GoalsPage(),
             "/login": (BuildContext context) => LoginPage()
           },
           locale: Locale(_locale, ""),

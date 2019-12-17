@@ -78,7 +78,7 @@ class MapAppDrawer extends Drawer {
           enabled: MyApp.of(context).auth.isLoggedIn,
           title: Text(S.of(context).my_goals),
           leading: Icon(MdiIcons.bullseyeArrow),
-          onTap: () => navigate(context, '/progress_insights'),
+          onTap: () => navigate(context, '/goals'),
         ),
         ListTile(
           enabled: MyApp.of(context).auth.isLoggedIn,

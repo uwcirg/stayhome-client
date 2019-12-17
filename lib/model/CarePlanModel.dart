@@ -22,19 +22,21 @@ class CarePlanModel extends Model {
   bool isLoading = false;
   Patient patient;
   TreatmentCalendar treatmentCalendar;
-  
+  Goals goals;
+
   String _keycloakUserId;
   Map<String, QuestionnaireItem> _questionsByLinkId = new Map();
 
-  CarePlanModel();
+  CarePlanModel() {
+    goals = new Goals();
+  }
 
   void setUser(String keycloakUserId) {
     this._keycloakUserId = keycloakUserId;
     load();
   }
 
-  static CarePlanModel of(BuildContext context) =>
-      ScopedModel.of<CarePlanModel>(context);
+  static CarePlanModel of(BuildContext context) => ScopedModel.of<CarePlanModel>(context);
 
   void load() {
     isLoading = true;
@@ -79,8 +81,7 @@ class CarePlanModel extends Model {
         this.questionnaires = questionnaires;
         _createQuestionMap();
       }),
-      Repository.getProcedures(this.carePlan)
-          .then((List<Procedure> procedures) {
+      Repository.getProcedures(this.carePlan).then((List<Procedure> procedures) {
         this.procedures = procedures;
       }),
       Repository.getQuestionnaireResponses(this.carePlan)
@@ -93,8 +94,7 @@ class CarePlanModel extends Model {
   }
 
   void rebuildTreatmentPlan() {
-    treatmentCalendar =
-        TreatmentCalendar.make(carePlan, procedures, questionnaireResponses);
+    treatmentCalendar = TreatmentCalendar.make(carePlan, procedures, questionnaireResponses);
   }
 
   void addDefaultCareplan() {
@@ -114,21 +114,19 @@ class CarePlanModel extends Model {
   }
 
   void updateActivityFrequency(int activityIndex, int newFrequency) {
-    carePlan.activity[activityIndex].detail.scheduledTiming.repeat.period =
-        newFrequency;
+    carePlan.activity[activityIndex].detail.scheduledTiming.repeat.period = newFrequency;
     Repository.updateCarePlan(carePlan).then((value) => load());
   }
 
   void updateActivityDuration(int activityIndex, double newDuration) {
-    carePlan.activity[activityIndex].detail.scheduledTiming.repeat.duration =
-        newDuration;
+    carePlan.activity[activityIndex].detail.scheduledTiming.repeat.duration = newDuration;
     Repository.updateCarePlan(carePlan).then((value) => load());
   }
 
   QuestionnaireItem questionForLinkId(String linkId) {
     return _questionsByLinkId[linkId];
   }
-  
+
   void _createQuestionMap() {
     _questionsByLinkId = new Map();
     for (Questionnaire questionnaire in this.questionnaires) {
@@ -139,7 +137,7 @@ class CarePlanModel extends Model {
       }
     }
   }
-  
+
   addSelfAndChildren(QuestionnaireItem question) {
     _questionsByLinkId[question.linkId] = question;
     if (question.item != null) {
@@ -168,13 +166,11 @@ class TreatmentCalendar {
   /// add a new event for this activity instance.
   void addProcedureInstances(List<Procedure> procedures) {
     for (Procedure procedure in procedures) {
-      List<TreatmentEvent> eventList =
-          events.putIfAbsent(procedure.performedDateTime, () => []);
+      List<TreatmentEvent> eventList = events.putIfAbsent(procedure.performedDateTime, () => []);
 
       // find matching scheduled event
-      TreatmentEvent event = eventList.firstWhere(
-          (TreatmentEvent e) => e.code == procedure.code,
-          orElse: () => null);
+      TreatmentEvent event =
+          eventList.firstWhere((TreatmentEvent e) => e.code == procedure.code, orElse: () => null);
 
       if (event != null) {
         event.updateStatus(procedure.status);
@@ -186,19 +182,16 @@ class TreatmentCalendar {
 
   /// If there is a matching scheduled event, update the status; otherwise,
   /// add a new event for this activity instance.
-  void addAssessmentInstances(
-      CarePlan plan, List<QuestionnaireResponse> responses) {
+  void addAssessmentInstances(CarePlan plan, List<QuestionnaireResponse> responses) {
     if (responses == null || responses.length == 0) return;
-    List<String> applicableQuestionnaires =
-        plan.getAllQuestionnaireReferences();
+    List<String> applicableQuestionnaires = plan.getAllQuestionnaireReferences();
 
     for (QuestionnaireResponse response in responses) {
       if (!applicableQuestionnaires.contains(response.questionnaireReference)) {
         continue;
       }
 
-      List<TreatmentEvent> eventList =
-          events.putIfAbsent(response.authored, () => []);
+      List<TreatmentEvent> eventList = events.putIfAbsent(response.authored, () => []);
 
       // find matching scheduled event
       TreatmentEvent event = eventList.firstWhere(
@@ -240,9 +233,7 @@ class TreatmentCalendar {
         activity.detail.scheduledPeriod.start != null &&
         activity.detail.scheduledPeriod.end != null) {
       scheduledPeriod = activity.detail.scheduledPeriod;
-    } else if (plan.period != null &&
-        plan.period.start != null &&
-        plan.period.end != null) {
+    } else if (plan.period != null && plan.period.start != null && plan.period.end != null) {
       scheduledPeriod = plan.period;
     } else {
       throw MalformedFhirResourceException(plan,
@@ -269,27 +260,23 @@ class TreatmentEvent {
   CodeableConcept code;
   String questionnaireReference;
 
-  TreatmentEvent(
-      this.eventType, this.status, this.code, this.questionnaireReference);
+  TreatmentEvent(this.eventType, this.status, this.code, this.questionnaireReference);
 
   factory TreatmentEvent.fromProcedure(Procedure procedure) {
-    TreatmentEvent e =
-        TreatmentEvent(EventType.Treatment, null, procedure.code, null);
+    TreatmentEvent e = TreatmentEvent(EventType.Treatment, null, procedure.code, null);
     e.updateStatus(procedure.status);
     return e;
   }
 
-  factory TreatmentEvent.fromQuestionnaireResponse(
-      QuestionnaireResponse questionnaireResponse) {
-    TreatmentEvent e = TreatmentEvent(
-        EventType.Assessment, null, null, questionnaireResponse.reference);
+  factory TreatmentEvent.fromQuestionnaireResponse(QuestionnaireResponse questionnaireResponse) {
+    TreatmentEvent e =
+        TreatmentEvent(EventType.Assessment, null, null, questionnaireResponse.reference);
     e.updateStatus(questionnaireResponse.status);
     return e;
   }
 
   TreatmentEvent.from(TreatmentEvent event)
-      : this(event.eventType, event.status, event.code,
-            event.questionnaireReference);
+      : this(event.eventType, event.status, event.code, event.questionnaireReference);
 
   void updateStatus(var status) {
     if (status == null) {
@@ -321,24 +308,63 @@ class TreatmentEvent {
   static TreatmentEvent scheduledEventForActivity(Activity activity) {
     if (activity.detail.code != null) {
       // if there is a code, assume it's a treatment
-      return TreatmentEvent(
-          EventType.Treatment, Status.Scheduled, activity.detail.code, null);
+      return TreatmentEvent(EventType.Treatment, Status.Scheduled, activity.detail.code, null);
     } else {
       // assume a questionnaire
       if (activity.detail.instantiatesCanonical == null ||
           activity.detail.instantiatesCanonical.length > 1 ||
-          !activity.detail.instantiatesCanonical[0]
-              .startsWith(Questionnaire.resourceTypeName)) {
+          !activity.detail.instantiatesCanonical[0].startsWith(Questionnaire.resourceTypeName)) {
         throw MalformedFhirResourceException(
             activity,
             "Activity should have exactly one "
             "Questionnaire listed in its Detail's instantiatesCanonical list "
             "if it refers to a questionnaire.");
       }
-      return TreatmentEvent(EventType.Assessment, Status.Scheduled, null,
-          activity.detail.instantiatesCanonical[0]);
+      return TreatmentEvent(
+          EventType.Assessment, Status.Scheduled, null, activity.detail.instantiatesCanonical[0]);
     }
   }
+}
+
+class Goals {
+  Map<HealthIssue, int> concerns;
+  Map<HealthIssue, SessionGoal> goals;
+
+  Goals() {
+    concerns = new Map();
+    concerns.putIfAbsent(HealthIssue.Bladder, () => -1);
+    concerns.putIfAbsent(HealthIssue.Dryness, () => -1);
+    concerns.putIfAbsent(HealthIssue.Sexual, () => -1);
+    goals = new Map();
+    goals.putIfAbsent(HealthIssue.Bladder, () => null);
+    goals.putIfAbsent(HealthIssue.Dryness, () => null);
+    goals.putIfAbsent(HealthIssue.Sexual, () => null);
+  }
+}
+
+class SessionGoal {
+  final String _name;
+
+  const SessionGoal(this._name);
+
+  static const SessionGoal Wellness = SessionGoal("Wellness");
+  static const SessionGoal Maintenance = SessionGoal("Maintenance");
+
+  @override
+  String toString() {
+    return _name;
+  }
+}
+
+class HealthIssue {
+  final String name;
+  final String image;
+
+  const HealthIssue(this.name, this.image);
+
+  static const HealthIssue Bladder = const HealthIssue("Bladder", "assets/icons/bladder.png");
+  static const HealthIssue Dryness = const HealthIssue("Dryness", "assets/icons/uterus.png");
+  static const HealthIssue Sexual = const HealthIssue("Sexual", "assets/icons/heart.png");
 }
 
 enum EventType { Assessment, Treatment }
