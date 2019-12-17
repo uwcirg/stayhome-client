@@ -76,22 +76,33 @@ class _GoalsPageState extends State<GoalsPage> {
         .toList();
   }
 
-  Widget _row(MapEntry<HealthIssue, dynamic> e, f, model) {
+  Widget _row(MapEntry<HealthIssue, dynamic> mapEntry, chipsFunction, model) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.max,
         children: <Widget>[
-          Image.asset(
-            e.key.image,
-            height: 40,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Image.asset(
+              mapEntry.key.image,
+              height: 30,
+            ),
           ),
-          Text(
-            e.key.name,
-            style: Theme.of(context).textTheme.subhead,
+          Expanded(
+            flex: 1,
+            child: Text(
+              mapEntry.key.name,
+              style: Theme.of(context).textTheme.subhead,
+            ),
           ),
-          ...f(model, e.key)
+          Expanded(
+            flex:3,
+            child: Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: chipsFunction(model, mapEntry.key)),
+          )
         ],
       ),
     );
