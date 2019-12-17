@@ -80,14 +80,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 Divider(),
                 Text(
-                  "Couchbase debug area",
+                  "CouchDB debug area",
                   style: Theme.of(context).textTheme.subtitle,
                 ),
                 ScopedModelDescendant<AppModel>(
                   builder: (context, child, model) {
                     if (model.docExample != null) {
                       return Text(
-                          "Couchbase object content: ${model.docExample.getString("click")}");
+                          "CouchDB object content: ${model.docExample.getString("click")}");
                     } else {
                       return CircularProgressIndicator();
                     }

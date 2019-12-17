@@ -45,11 +45,18 @@ class _PlanPageState extends State<PlanPage> {
 
   @override
   Widget build(BuildContext context) {
-    String title = S.of(context).plan;
-    return MapAppPageScaffold(child: buildScreen(context));
+    return MapAppPageScaffold(
+        child: Expanded(
+            child: ListView.builder(
+      itemBuilder: (context, i) {
+        return _buildScreen(context);
+      },
+      itemCount: 1,
+      shrinkWrap: true,
+    )));
   }
 
-  Widget buildScreen(BuildContext context) {
+  Widget _buildScreen(BuildContext context) {
     var textStyle = Theme.of(context).textTheme.caption;
     return Padding(
       padding: const EdgeInsets.all(Dimensions.halfMargin),

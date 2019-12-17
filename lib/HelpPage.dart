@@ -45,10 +45,10 @@ class _HelpPageState extends State<HelpPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MapAppPageScaffold(child: buildChild(context));
+    return MapAppPageScaffold(child: _buildScreen(context));
   }
 
-  Widget buildChild(BuildContext context) {
+  Widget _buildScreen(BuildContext context) {
 //    return LayoutBuilder(
 //        builder: (BuildContext context, BoxConstraints viewportConstraints) {
 //      return SingleChildScrollView(

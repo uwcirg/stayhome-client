@@ -50,6 +50,7 @@ class LearningCenterCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
         child: Card(
+          color: Theme.of(context).highlightColor,
           child: Padding(
               padding: const EdgeInsets.symmetric(
                   vertical: Dimensions.largeMargin,
