@@ -130,6 +130,24 @@ class Repository {
     return ValueSet.fromJson(jsonDecode(value.body));
   }
 
+  static Future<void> postCompletedSession(Procedure treatmentSession) async {
+    var url =
+        "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/Procedure?_format=json";
+    String body = jsonEncode(treatmentSession.toJson());
+    var headers = {
+      "Accept-Charset": "utf-8",
+      "Accept": "application/fhir+json;q=1.0, application/json+fhir;q=0.9",
+      "User-Agent": "HAPI-FHIR/3.8.0 (FHIR Client; FHIR 4.0.0/R4; apache)",
+      "Accept-Encoding": "gzip",
+      "Content-Type": "application/fhir+json; charset=UTF-8",
+    };
+
+    Response value = await post(url,
+        headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
+
+    return resultFromResponse(value, "An error occurred when trying to save your responses.");
+  }
+
   static Future<void> postQuestionnaireResponse(
       QuestionnaireResponse questionnaireResponse) async {
     var url =

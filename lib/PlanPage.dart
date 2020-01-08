@@ -130,7 +130,7 @@ class _PlanPageState extends State<PlanPage> {
     );
   }
 
-  _choiceChip(String chipLabel) {
+  Widget _choiceChip(String chipLabel) {
     bool isSelected = chipLabel == _selectedChip;
     return ChoiceChip(
       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
@@ -156,16 +156,13 @@ class _PlanPageState extends State<PlanPage> {
         ],
       ),
       selected: isSelected,
-      onSelected: (bool) {
-        setState(() {
-          if (isSelected) {
-            _selectedChip = null;
-          } else {
-            _selectedChip = chipLabel;
-          }
-        });
-      },
-      selectedColor: Theme.of(context).accentColor,
+      onSelected: (bool) => setState(() {
+        if (isSelected) {
+          _selectedChip = null;
+        } else {
+          _selectedChip = chipLabel;
+        }
+      }),
       backgroundColor: Theme.of(context).primaryColor,
     );
   }

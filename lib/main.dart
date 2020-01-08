@@ -87,7 +87,14 @@ class _MyAppState extends State<MyApp> {
                   ),
               buttonTheme: ButtonThemeData(
                   buttonColor: MapAppColors.vFitAccent,
-                  textTheme: ButtonTextTheme.primary)),
+                  textTheme: ButtonTextTheme.primary),
+              chipTheme: ChipTheme.of(context).copyWith(
+                  selectedColor: MapAppColors.vFitAccent,
+                  secondarySelectedColor: MapAppColors.vFitAccent,
+                  labelStyle: Theme.of(context).textTheme.body1,
+                  secondaryLabelStyle:
+                      Theme.of(context).accentTextTheme.body1)
+          ),
           home: _defaultHome,
           routes: <String, WidgetBuilder>{
             "/home": (BuildContext context) => _homePage,

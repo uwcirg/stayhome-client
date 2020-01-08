@@ -109,6 +109,11 @@ class CarePlanModel extends Model {
     }));
   }
 
+  Future addCompletedSession(int minutes) async {
+    Procedure treatmentSession = Procedure.treatmentSession(minutes, carePlan);
+    Repository.postCompletedSession(treatmentSession).then((value) => load());
+  }
+
   Future postQuestionnaireResponse(QuestionnaireResponse response) async {
     Repository.postQuestionnaireResponse(response).then((value) => load());
   }
@@ -132,17 +137,17 @@ class CarePlanModel extends Model {
     for (Questionnaire questionnaire in this.questionnaires) {
       if (questionnaire.item != null) {
         for (QuestionnaireItem question in questionnaire.item) {
-          addSelfAndChildren(question);
+          _addQuestionnaireItemAndItsChildren(question);
         }
       }
     }
   }
 
-  addSelfAndChildren(QuestionnaireItem question) {
+  void _addQuestionnaireItemAndItsChildren(QuestionnaireItem question) {
     _questionsByLinkId[question.linkId] = question;
     if (question.item != null) {
       for (QuestionnaireItem nestedQuestion in question.item) {
-        addSelfAndChildren(nestedQuestion);
+        _addQuestionnaireItemAndItsChildren(nestedQuestion);
       }
     }
   }
@@ -166,7 +171,19 @@ class TreatmentCalendar {
   /// add a new event for this activity instance.
   void addProcedureInstances(List<Procedure> procedures) {
     for (Procedure procedure in procedures) {
-      List<TreatmentEvent> eventList = events.putIfAbsent(procedure.performedDateTime, () => []);
+      DateTime procedureDate = procedure.performedDateTime;
+      if (procedureDate == null && procedure.performedPeriod != null) {
+        procedureDate = procedure.performedPeriod.end;
+      }
+      if (procedureDate == null) {
+        print("No date for procedure ${procedure.reference}! Skipping.");
+        continue;
+      }
+      // Use round days for calendar purposes so all events for one day fall into one datetime key
+      procedureDate = new DateTime(procedureDate.year, procedureDate.month, procedureDate.day);
+
+      // get the list of events at this date. If the date doesn't exist, create a new list for the date and return it.
+      List<TreatmentEvent> eventList = events.putIfAbsent(procedureDate, () => []);
 
       // find matching scheduled event
       TreatmentEvent event =

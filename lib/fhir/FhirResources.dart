@@ -343,7 +343,7 @@ class QuestionnaireResponseStatus {
 class Procedure extends Resource {
   Narrative text;
   List<Identifier> identifier;
-  List<String> basedOnCarePlan;
+  List<Reference> basedOnCarePlan;
   List<String> instantiatesQuestionnaire;
   ProcedureStatus status;
   CodeableConcept statusReason;
@@ -381,7 +381,12 @@ class Procedure extends Resource {
         identifier.add(new Identifier.fromJson(v));
       });
     }
-    if (json['basedOn'] != null) basedOnCarePlan = json['basedOn'].cast<String>();
+    if (json['basedOn'] != null) {
+      basedOnCarePlan = new List<Reference>();
+      json['basedOn'].forEach((v) {
+        basedOnCarePlan.add(new Reference.fromJson(v));
+      });
+    }
     if (json['instantiatesQuestionnaire'] != null)
       instantiatesQuestionnaire = json['instantiatesQuestionnaire'].cast<String>();
     if (json['status'] != null) {
@@ -416,7 +421,7 @@ class Procedure extends Resource {
       data['identifier'] = this.identifier.map((v) => v.toJson()).toList();
     }
     if (this.basedOnCarePlan != null) {
-      data['basedOn'] = this.basedOnCarePlan.map((v) => v).toList();
+      data['basedOn'] = this.basedOnCarePlan.map((v) => v.toJson()).toList();
     }
     if (this.instantiatesQuestionnaire != null) {
       data['instantiatesQuestionnaire'] = instantiatesQuestionnaire;
@@ -434,11 +439,35 @@ class Procedure extends Resource {
     if (this.subject != null) {
       data['subject'] = this.subject.toJson();
     }
-    data['performedDateTime'] = this.performedDateTime;
+    data['performedDateTime'] = this.performedDateTime.toIso8601String();
     if (this.reasonCode != null) {
       data['reasonCode'] = this.reasonCode.map((v) => v.toJson()).toList();
     }
+    if (this.performedPeriod != null) {
+      data['performedPeriod'] = this.performedPeriod.toJson();
+    }
     return data;
+  }
+
+  Procedure.treatmentSession(int minutes, CarePlan carePlan,
+      {resourceType, id, this.status, this.code})
+      : super(resourceType: "Procedure", id: id) {
+    if (this.code == null) {
+      this.code = carePlan.getTreatmentActivity().detail.code;
+    }
+    if (this.status == null) {
+      this.status = ProcedureStatus.completed;
+    }
+    this.subject = carePlan.subject;
+    this.basedOnCarePlan = [Reference(reference: carePlan.reference)];
+
+    var today = new DateTime.now();
+    // remove milliseconds and seconds
+    DateTime performedDateTime =
+        new DateTime(today.year, today.month, today.day, today.hour, today.minute);
+    this.performedDateTime = performedDateTime;
+    this.performedPeriod = Period(
+        start: performedDateTime.subtract(Duration(minutes: minutes)), end: performedDateTime);
   }
 }
 
@@ -554,9 +583,26 @@ class CarePlan extends Resource {
     return activity.firstWhere((Activity activity) {
       if (activity == null ||
           activity.detail == null ||
-          activity.detail.instantiatesCanonical == null) return null;
+          activity.detail.instantiatesCanonical == null) return false;
+
       return activity.detail.instantiatesCanonical
           .any((String instantiated) => instantiated.startsWith(Questionnaire.resourceTypeName));
+    });
+  }
+
+  Activity getTreatmentActivity() {
+    // for now, assume that the treatment activity is the first activity that
+    // has a snomed code
+    return activity.firstWhere((Activity activity) {
+      if (activity == null ||
+          activity.detail == null ||
+          activity.detail.code == null ||
+          activity.detail.code.coding == null) return false;
+
+      return activity.detail.code.coding.any((Coding coding) {
+        if (coding == null || coding.system == null) return false;
+        return coding.system.contains("snomed");
+      });
     });
   }
 

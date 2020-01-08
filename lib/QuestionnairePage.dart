@@ -235,18 +235,13 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
         ChoiceChip(
           label: Text(
             chipLabel,
-            style: isSelected
-                ? Theme.of(context).accentTextTheme.body1
-                : Theme.of(context).textTheme.body1,
           ),
           selected: isSelected,
           onSelected: (bool) {
             setState(() {
               _response.setAnswer(questionnaireItem.linkId, ifChosen);
             });
-          },
-          selectedColor: Theme.of(context).accentColor,
-        ),
+          }),
         Visibility(
           visible: helpLabel != null,
           child: Text(helpLabel),
