@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
-import 'package:map_app_flutter/generated/i18n.dart';
+import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:scoped_model/scoped_model.dart';
 

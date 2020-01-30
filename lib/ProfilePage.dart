@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
-import 'package:map_app_flutter/generated/i18n.dart';
+import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/model/AppModel.dart';
 import 'package:scoped_model/scoped_model.dart';
 

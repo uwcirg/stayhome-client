@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
-import 'package:map_app_flutter/generated/i18n.dart';
+import 'package:map_app_flutter/generated/l10n.dart';
 
 class DevicesPage extends StatefulWidget {
   @override
@@ -24,8 +24,8 @@ class _DevicesPageState extends State<DevicesPage> {
     return MapAppPageScaffold(
         title: S.of(context).devices,
         child: Expanded(
-            child: ListView.builder(
-          padding: const EdgeInsets.all(Dimensions.halfMargin),
+            child: ListView.separated(
+          separatorBuilder: (context, i) => Divider(),
           itemBuilder: (context, i) {
             return DeviceWidget(_devices[i]);
           },
@@ -58,46 +58,44 @@ class DeviceWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(Dimensions.halfMargin),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Flexible(
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    _device.name,
-                    style: Theme.of(context).textTheme.title,
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            right: Dimensions.quarterMargin),
-                        child: Icon(batteryIcon(_device.batteryLevel)),
-                      ),
-                      Text(S.of(context).battery_level("${(_device.batteryLevel * 100).round()}"))
-                    ],
-                  ),
-                  Text(
-                      S.of(context).last_synced_date(DateFormat.yMMMd(Localizations.localeOf(context).languageCode).format(_device.lastSynced), DateFormat(S.of(context).timeFormat).format(_device.lastSynced)))
-                ],
-              ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: Dimensions.fullMargin, vertical: Dimensions.halfMargin),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Flexible(
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  _device.name,
+                  style: Theme.of(context).textTheme.title,
+                ),
+                Row(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(right: Dimensions.quarterMargin),
+                      child: Icon(batteryIcon(_device.batteryLevel)),
+                    ),
+                    Text(S.of(context).battery_level("${(_device.batteryLevel * 100).round()}"))
+                  ],
+                ),
+                Text(S.of(context).last_synced_date(
+                    DateFormat.yMMMd(Localizations.localeOf(context).languageCode)
+                        .format(_device.lastSynced),
+                    DateFormat(S.of(context).timeFormat).format(_device.lastSynced)))
+              ],
             ),
-            PopupMenuButton(
-              itemBuilder: (context) {
-                return [S.of(context).rename, S.of(context).forget, S.of(context).more_info]
-                    .map((String menuItemName) =>
-                        PopupMenuItem(child: Text(menuItemName)))
-                    .toList();
-              },
-            )
-          ],
-        ),
+          ),
+          PopupMenuButton(
+            itemBuilder: (context) {
+              return [S.of(context).rename, S.of(context).forget, S.of(context).more_info]
+                  .map((String menuItemName) => PopupMenuItem(child: Text(menuItemName)))
+                  .toList();
+            },
+          )
+        ],
       ),
     );
   }

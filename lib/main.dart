@@ -16,9 +16,8 @@ import 'package:map_app_flutter/model/AppModel.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:toast/toast.dart';
-
+import 'package:map_app_flutter/generated/l10n.dart';
 import 'KeycloakAuth.dart';
-import 'generated/i18n.dart';
 
 void main() {
   runApp(MyApp(new LoginPage()));
@@ -66,6 +65,7 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       _locale = languageCode;
     });
+    S.load(Locale(_locale, ""));
     initializeDateFormatting(languageCode);
   }
 
@@ -86,28 +86,24 @@ class _MyAppState extends State<MyApp> {
                     displayColor: MapAppColors.vFitPrimary.shade600,
                   ),
               buttonTheme: ButtonThemeData(
-                  buttonColor: MapAppColors.vFitAccent,
-                  textTheme: ButtonTextTheme.primary),
+                  buttonColor: MapAppColors.vFitAccent, textTheme: ButtonTextTheme.primary),
               chipTheme: ChipTheme.of(context).copyWith(
                   selectedColor: MapAppColors.vFitAccent,
                   secondarySelectedColor: MapAppColors.vFitAccent,
                   labelStyle: Theme.of(context).textTheme.body1,
-                  secondaryLabelStyle:
-                      Theme.of(context).accentTextTheme.body1)
-          ),
+                  secondaryLabelStyle: Theme.of(context).accentTextTheme.body1)),
           home: _defaultHome,
           routes: <String, WidgetBuilder>{
             "/home": (BuildContext context) => _homePage,
             "/guestHome": (BuildContext context) => LearningCenterPage(),
-            "/profile": (BuildContext context) => new ScopedModel<AppModel>(
-                model: new AppModel(), child: ProfilePage()),
+            "/profile": (BuildContext context) =>
+                new ScopedModel<AppModel>(model: new AppModel(), child: ProfilePage()),
             "/help": (BuildContext context) => HelpPage(),
             "/start_session": (BuildContext context) => SessionPage(),
             "/devices": (BuildContext context) => DevicesPage(),
             "/contact_community": (BuildContext context) =>
                 ContactCommunityPage(ContactPageContents.contents(context)),
-            "/progress_insights": (BuildContext context) =>
-                ProgressInsightsPage(),
+            "/progress_insights": (BuildContext context) => ProgressInsightsPage(),
             "/learning_center": (BuildContext context) => LearningCenterPage(),
             "/about": (BuildContext context) => HelpPage(),
             "/goals": (BuildContext context) => GoalsPage(),
@@ -120,8 +116,6 @@ class _MyAppState extends State<MyApp> {
             GlobalWidgetsLocalizations.delegate,
           ],
           supportedLocales: S.delegate.supportedLocales,
-          localeResolutionCallback:
-              S.delegate.resolution(fallback: new Locale("en", "")),
         ));
   }
 }
@@ -129,6 +123,5 @@ class _MyAppState extends State<MyApp> {
 void snack(String text, context) {
   //Scaffold.of(context).showSnackBar(new SnackBar(content: new Text(text)));
   print(text);
-  Toast.show(text, context,
-      duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
+  Toast.show(text, context, duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
 }

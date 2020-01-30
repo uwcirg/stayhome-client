@@ -5,7 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:map_app_flutter/const.dart';
-import 'package:map_app_flutter/generated/i18n.dart';
+import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
@@ -27,52 +27,47 @@ class MapAppDrawer extends Drawer {
                     'assets/logos/Joylux_wdmk_blk_rgb.png',
                     height: 20,
                   ),
-                  Stack(
-                      alignment: AlignmentDirectional.bottomCenter,
+                  Stack(alignment: AlignmentDirectional.bottomCenter, children: <Widget>[
+                    Column(
                       children: <Widget>[
-                        Column(
-                          children: <Widget>[
-                            IconButton(
-                                iconSize: Dimensions.profileImageSize,
-                                icon: Icon(
-                                  Icons.account_circle,
-                                  color: Theme.of(context).iconTheme.color,
-                                ),
-                                onPressed: () => profileOrLogin(context)),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: IconSize.large),
-                              child: Text(
-                                MyApp.of(context).auth.isLoggedIn
-                                    ? MyApp.of(context).auth.userInfo.givenName
-                                    : S
-                                        .of(context)
-                                        .sign_up_or_log_in_to_access_all_functions,
-                                softWrap: true,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context).textTheme.body1.apply(
-                                    color: Theme.of(context).iconTheme.color),
-                                textAlign: TextAlign.center,
-                              ),
+                        IconButton(
+                            iconSize: Dimensions.profileImageSize,
+                            icon: Icon(
+                              Icons.account_circle,
+                              color: Theme.of(context).iconTheme.color,
                             ),
-                          ],
+                            onPressed: () => profileOrLogin(context)),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: IconSize.large),
+                          child: Text(
+                            MyApp.of(context).auth.isLoggedIn
+                                ? MyApp.of(context).auth.userInfo.givenName
+                                : S.of(context).sign_up_or_log_in_to_access_all_functions,
+                            softWrap: true,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context)
+                                .textTheme
+                                .body1
+                                .apply(color: Theme.of(context).iconTheme.color),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: <Widget>[
-                            IconButton(
-                              icon: Icon(Icons.settings,
-                                  color: Theme.of(context).iconTheme.color),
-                              onPressed: () => profileOrLogin(context),
-                            ),
-                          ],
-                        )
-                      ])
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        IconButton(
+                          icon: Icon(Icons.settings, color: Theme.of(context).iconTheme.color),
+                          onPressed: () => profileOrLogin(context),
+                        ),
+                      ],
+                    )
+                  ])
                 ],
               ),
-              decoration:
-                  BoxDecoration(color: Theme.of(context).highlightColor)),
+              decoration: BoxDecoration(color: Theme.of(context).highlightColor)),
         ),
         ListTile(
           enabled: MyApp.of(context).auth.isLoggedIn,
@@ -121,7 +116,17 @@ class MapAppDrawer extends Drawer {
         ),
         Divider(),
         ListTile(
+          trailing: Icon(Icons.language),
           title: DropdownButton(
+            isExpanded: true,
+            hint: Text(
+              S.of(context).languageName,
+              style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.subtitle.fontSize,
+                  color: Theme.of(context).textTheme.subtitle.color),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
             underline: Container(
               height: 0,
             ),
@@ -134,12 +139,7 @@ class MapAppDrawer extends Drawer {
             onChanged: (item) {
               MyApp.of(context).onChangeLanguage(item);
             },
-            hint: Text(S.of(context).languageName,
-                style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.subtitle.fontSize,
-                    color: Theme.of(context).textTheme.subtitle.color)),
           ),
-          trailing: Icon(Icons.language),
         ),
       ])),
     );

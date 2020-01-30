@@ -18,7 +18,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
-  - Flutter (from `.symlinks/flutter/ios`)
+  - Flutter (from `Flutter`)
   - flutter_appauth (from `.symlinks/plugins/flutter_appauth/ios`)
   - fluttercouch (from `.symlinks/plugins/fluttercouch/ios`)
   - simple_auth_flutter (from `.symlinks/plugins/simple_auth_flutter/ios`)
@@ -31,7 +31,7 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   Flutter:
-    :path: ".symlinks/flutter/ios"
+    :path: Flutter
   flutter_appauth:
     :path: ".symlinks/plugins/flutter_appauth/ios"
   fluttercouch:
@@ -50,6 +50,6 @@ SPEC CHECKSUMS:
   simple_auth_flutter: ec585a6e96b415247120df0a33af43dc1d2a5839
   url_launcher: a1c0cc845906122c4784c542523d8cacbded5626
 
-PODFILE CHECKSUM: 777e7f6cb26481ecbb0854a71b3cf93d037a6be6
+PODFILE CHECKSUM: 1b66dae606f75376c5f2135a8290850eeb09ae83
 
 COCOAPODS: 1.8.4

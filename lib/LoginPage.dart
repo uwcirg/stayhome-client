@@ -5,7 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:map_app_flutter/const.dart';
-import 'package:map_app_flutter/generated/i18n.dart';
+import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -28,75 +28,72 @@ class LoginPageState extends State<LoginPage> {
                   image: AssetImage('assets/photos/woman-login.jpg'),
                   fit: BoxFit.fitHeight,
                   alignment: FractionalOffset(0.8, 0))),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Image.asset(
-                "assets/logos/Joylux_wdmk_color_rgb.png",
-                height: 40,
-              ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Container(
-                    height: 400,
-                  ), //TODO: don't hardcode this
-                  Visibility(
-                    visible: MyApp.of(context).auth.refreshTokenExpired,
-                    child:
-                        Text(S.of(context).session_expired_please_log_in_again),
+                  Image.asset(
+                    "assets/logos/Joylux_wdmk_color_rgb.png",
+                    height: 40,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: RaisedButton(
-                        color: Color.fromRGBO(255, 255, 255, 100),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(50.0),
-                        ),
-                        elevation: 0,
-                        onPressed: () => MyApp.of(context)
-                            .auth
-                            .mapAppLogin()
-                            .then((value) => dismissLoginScreen(context))
-                            .catchError((error) => snack("$error", context)),
-                        child: Padding(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 14, horizontal: 100),
-                            child: Text(
-                              S.of(context).login,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .subhead
-                                  .apply(color: Colors.black),
-                              textAlign: TextAlign.center,
-                            ))),
-                  ),
-                  Row(
-                    children: [
-                      Padding(
-                          padding: EdgeInsets.all(Dimensions.fullMargin),
-                          child: Image.asset(
-                              'assets/logos/Vfit_logo_icon_circle_color_rgb_bg.png',
-                              height: 48)),
-                      Padding(
-                          padding: EdgeInsets.all(Dimensions.fullMargin),
-                          child: Image.asset(
-                              'assets/logos/VSculpt_logo_circle_icon_color_rgb_bg.png',
-                              height: 48))
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+//                  Container(), //TODO: don't hardcode this
+                      Visibility(
+                        visible: MyApp.of(context).auth.refreshTokenExpired,
+                        child: Text(S.of(context).session_expired_please_log_in_again),
+                      ),
+                      RaisedButton(
+                          color: Color.fromRGBO(255, 255, 255, 100),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(50.0),
+                          ),
+                          elevation: 0,
+                          onPressed: () => MyApp.of(context)
+                              .auth
+                              .mapAppLogin()
+                              .then((value) => dismissLoginScreen(context))
+                              .catchError((error) => snack("$error", context)),
+                          child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 14),
+                              child: Text(
+                                S.of(context).login,
+                                style:
+                                    Theme.of(context).textTheme.subhead.apply(color: Colors.black),
+                                textAlign: TextAlign.center,
+                              ))),
+
+                      Row(
+                        children: [
+                          Padding(
+                              padding: EdgeInsets.all(Dimensions.fullMargin),
+                              child: Image.asset(
+                                  'assets/logos/Vfit_logo_icon_circle_color_rgb_bg.png',
+                                  height: 48)),
+                          Padding(
+                              padding: EdgeInsets.all(Dimensions.fullMargin),
+                              child: Image.asset(
+                                  'assets/logos/VSculpt_logo_circle_icon_color_rgb_bg.png',
+                                  height: 48))
+                        ],
+                        mainAxisAlignment: MainAxisAlignment.center,
+                      ),
+                      FlatButton(
+                          onPressed: () => dismissLoginScreen(context),
+                          child: Padding(
+                              padding: EdgeInsets.all(Dimensions.fullMargin),
+                              child: Text(S.of(context).not_now,
+                                  style: Theme.of(context).accentTextTheme.subtitle))),
                     ],
-                    mainAxisAlignment: MainAxisAlignment.center,
                   ),
-                  FlatButton(
-                      onPressed: () => dismissLoginScreen(context),
-                      child: Padding(
-                          padding: EdgeInsets.all(Dimensions.fullMargin),
-                          child: Text(S.of(context).not_now,
-                              style:
-                                  Theme.of(context).accentTextTheme.subtitle))),
                 ],
               ),
-            ],
+            ),
           )),
     ));
   }

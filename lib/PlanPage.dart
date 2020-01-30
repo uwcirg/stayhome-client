@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/QuestionnairePage.dart';
 import 'package:map_app_flutter/const.dart';
-import 'package:map_app_flutter/generated/i18n.dart';
+import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -132,38 +132,42 @@ class _PlanPageState extends State<PlanPage> {
 
   Widget _choiceChip(String chipLabel) {
     bool isSelected = chipLabel == _selectedChip;
-    return ChoiceChip(
-      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
-      shape: RoundedRectangleBorder(
-          borderRadius: _selectedChip == null
-              ? BorderRadius.circular(5)
-              : BorderRadius.vertical(top: Radius.circular(5), bottom: Radius.circular(0))),
-      label: Row(
-        children: <Widget>[
-          Text(
-            chipLabel,
-            style: Theme.of(context)
-                .accentTextTheme
-                .caption
-                .apply(color: Theme.of(context).accentTextTheme.body1.color),
-            overflow: TextOverflow.ellipsis,
-          ),
-          Icon(
-            isSelected ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-            color: Theme.of(context).accentTextTheme.body1.color,
-            size: IconSize.small,
-          )
-        ],
+    return Flexible(
+      child: ChoiceChip(
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
+        shape: RoundedRectangleBorder(
+            borderRadius: _selectedChip == null
+                ? BorderRadius.circular(5)
+                : BorderRadius.vertical(top: Radius.circular(5), bottom: Radius.circular(0))),
+        label: Row(
+          children: <Widget>[
+            Flexible(
+              child: Text(
+                chipLabel,
+                style: Theme.of(context)
+                    .accentTextTheme
+                    .caption
+                    .apply(color: Theme.of(context).accentTextTheme.body1.color),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Icon(
+              isSelected ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+              color: Theme.of(context).accentTextTheme.body1.color,
+              size: IconSize.small,
+            )
+          ],
+        ),
+        selected: isSelected,
+        onSelected: (bool) => setState(() {
+          if (isSelected) {
+            _selectedChip = null;
+          } else {
+            _selectedChip = chipLabel;
+          }
+        }),
+        backgroundColor: Theme.of(context).primaryColor,
       ),
-      selected: isSelected,
-      onSelected: (bool) => setState(() {
-        if (isSelected) {
-          _selectedChip = null;
-        } else {
-          _selectedChip = chipLabel;
-        }
-      }),
-      backgroundColor: Theme.of(context).primaryColor,
     );
   }
 
@@ -172,38 +176,67 @@ class _PlanPageState extends State<PlanPage> {
     children.addAll(model.carePlan.activity.map((Activity activity) {
       var durationUnit = activity.detail.scheduledTiming.repeat.durationUnit;
       var duration = activity.detail.scheduledTiming.repeat.duration;
-      return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Column(
-          children: [
-            Text(
-              activity.detail.description ?? S.of(context).activity,
-              style: Theme.of(context).accentTextTheme.subtitle,
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 4.0),
+        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Flexible(
+            child: Column(
+              children: [
+                Text(
+                  activity.detail.description ?? S.of(context).activity,
+                  style: Theme.of(context).accentTextTheme.subtitle,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: true,
+                ),
+                Text(
+                  S.of(context).frequency,
+                  style: Theme.of(context).accentTextTheme.body1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: true,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Text(
+                    S.of(context).frequency_with_contents(
+                        '${activity.detail.scheduledTiming.repeat.period}',
+                        activity.detail.scheduledTiming.repeat.periodUnit),
+                    style: Theme.of(context).accentTextTheme.body1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: true,
+                  ),
+                ),
+                Visibility(
+                  visible: duration != null || durationUnit != null,
+                  child: Column(
+                    children: <Widget>[
+                      Text(
+                        S.of(context).duration,
+                        style: Theme.of(context).accentTextTheme.body1,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          S.of(context).duration_duration_durationunit('$duration', durationUnit),
+                          style: Theme.of(context).accentTextTheme.body1,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+              crossAxisAlignment: CrossAxisAlignment.start,
             ),
-            Text(
-              S.of(context).frequency_with_contents(
-                  '${activity.detail.scheduledTiming.repeat.period}',
-                  activity.detail.scheduledTiming.repeat.periodUnit),
-              style: Theme.of(context).accentTextTheme.body1,
-            ),
-            Visibility(
-              visible: duration != null || durationUnit != null,
-              child: Text(
-                S.of(context).duration_duration_durationunit('$duration', durationUnit),
-                style: Theme.of(context).accentTextTheme.body1,
-              ),
-            )
-          ],
-          crossAxisAlignment: CrossAxisAlignment.start,
-        ),
-        RaisedButton(
-          elevation: 0,
-          child: Text(
-            S.of(context).change,
           ),
-          onPressed: () => _showChangeDialogForActivity(
-              context, model, model.carePlan.activity.indexOf(activity)),
-        )
-      ]);
+          RaisedButton(
+            elevation: 0,
+            child: Text(
+              S.of(context).change,
+            ),
+            onPressed: () => _showChangeDialogForActivity(
+                context, model, model.carePlan.activity.indexOf(activity)),
+          )
+        ]),
+      );
     }));
 
     return Padding(

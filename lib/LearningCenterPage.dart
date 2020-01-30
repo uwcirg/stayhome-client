@@ -7,60 +7,62 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
-import 'package:map_app_flutter/generated/i18n.dart';
+import 'package:map_app_flutter/generated/l10n.dart';
 
 class LearningCenterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
-      title: S.of(context).learning_center,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: Dimensions.halfMargin, vertical: Dimensions.fullMargin),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            LearningCenterCard(S.of(context).vfit_faq,
-                onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (BuildContext context) => FAQPage(FAQ.faqs())))),
-            LearningCenterCard(
-              S.of(context).womens_health_resources,
-            ),
-            LearningCenterCard(
-              S.of(context).testimonials,
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                    builder: (BuildContext context) =>
-                        TestimonialsPage(Testimonial.testimonials())),
-              ),
-            )
-          ],
-        ),
-      ),
-    );
+        title: S.of(context).learning_center,
+        child: Expanded(
+            child: ListView.separated(
+          primary: true,
+          separatorBuilder: (context, i) => Divider(),
+          itemBuilder: (context, i) {
+            switch (i) {
+              case 0:
+                return _buildLearningCenterListItem(context, S.of(context).vfit_faq,
+                    onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (BuildContext context) => FAQPage(FAQ.faqs()))));
+              case 1:
+                return _buildLearningCenterListItem(context, S.of(context).womens_health_resources);
+              default:
+                return _buildLearningCenterListItem(
+                  context,
+                  S.of(context).testimonials,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            TestimonialsPage(Testimonial.testimonials())),
+                  ),
+                );
+            }
+          },
+          itemCount: 3,
+          shrinkWrap: true,
+        )));
   }
-}
 
-class LearningCenterCard extends StatelessWidget {
-  final String text;
-  final Function onTap;
-
-  LearningCenterCard(this.text, {this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-        child: Card(
-          color: Theme.of(context).highlightColor,
-          child: Padding(
-              padding: const EdgeInsets.symmetric(
-                  vertical: Dimensions.largeMargin,
-                  horizontal: Dimensions.fullMargin),
-              child: Text(
-                text,
-                style: Theme.of(context).textTheme.title,
-                textAlign: TextAlign.center,
-              )),
-        ),
+  Widget _buildLearningCenterListItem(BuildContext context, String text, {Function onTap}) {
+    return InkWell(
+        child: Padding(
+            padding: const EdgeInsets.symmetric(
+                vertical: Dimensions.largeMargin, horizontal: Dimensions.fullMargin),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Flexible(
+                  child: Text(
+                    text,
+                    style: Theme.of(context).textTheme.title,
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right,
+                  color: Theme.of(context).textTheme.body1.color,
+                )
+              ],
+            )),
         onTap: onTap);
   }
 }
@@ -159,8 +161,7 @@ class TestimonialsPage extends StatelessWidget {
           padding: const EdgeInsets.all(Dimensions.fullMargin),
           itemBuilder: (context, i) {
             return Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
+              padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
               child: TestimonialWidget(_testimonials[i]),
             );
           },

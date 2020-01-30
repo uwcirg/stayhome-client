@@ -44,35 +44,30 @@ class _SessionPageState extends State<SessionPage> {
   }
 
   Widget _buildSplashPage() {
-    return Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 50),
-            child: RaisedButton(
-              shape: RoundedRectangleBorder(
-                borderRadius: new BorderRadius.circular(50.0),
-              ),
-              elevation: 0,
-              child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 14),
-                  child: Text(
-                    "Start a session",
-                    textAlign: TextAlign.center,
-                  )),
-              onPressed: () => setState(() {
-                _showSessionPage = true;
-              }),
-            ),
+    return Column(children: [
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 50),
+        child: RaisedButton(
+          shape: RoundedRectangleBorder(
+            borderRadius: new BorderRadius.circular(50.0),
           ),
-          FittedBox(
-              fit: BoxFit.contain,
-              child: Image.asset(
-                'assets/photos/device-diagram.jpg',
-                height: 570, //TODO figure out how to set the size to fit
+          elevation: 0,
+          child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 14),
+              child: Text(
+                "Start a session",
+                textAlign: TextAlign.center,
               )),
-        ]);
+          onPressed: () => setState(() {
+            _showSessionPage = true;
+          }),
+        ),
+      ),
+      Container(
+          // workaround for BoxFit.fitHeight rendering to the height of the screen, not the available height
+          height: MediaQuery.of(context).size.height * (0.65),
+          child: Image.asset('assets/photos/device-diagram.jpg'))
+    ]);
   }
 
   Widget _buildSessionPage() {

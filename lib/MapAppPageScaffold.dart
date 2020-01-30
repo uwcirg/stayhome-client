@@ -5,8 +5,7 @@ import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppDrawer.dart';
 import 'package:map_app_flutter/const.dart';
-import 'package:map_app_flutter/generated/i18n.dart';
-
+import 'package:map_app_flutter/generated/l10n.dart';
 class MapAppPageScaffold extends StatelessWidget {
   final Widget child;
   final String title;
@@ -69,9 +68,7 @@ class DemoVersionWarningBanner extends StatelessWidget {
             padding: const EdgeInsets.all(Dimensions.quarterMargin),
             color: Colors.amber.shade100,
             child: Row(
-              mainAxisAlignment: Theme.of(context).platform == TargetPlatform.iOS
-                  ? MainAxisAlignment.center
-                  : MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Flexible(
                     child: Text(

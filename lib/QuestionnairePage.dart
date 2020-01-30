@@ -126,8 +126,8 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
             }));
   }
 
-  GestureDetector _buildGroupCard(BuildContext context, QuestionnaireItem item) {
-    return GestureDetector(
+  Widget _buildGroupCard(BuildContext context, QuestionnaireItem item) {
+    return InkWell(
         onTap: () => Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) => QuestionnaireItemPage(item, _response))),
         child: Card(
@@ -230,23 +230,26 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
       chipLabel = helpLabel;
       helpLabel = null;
     }
-    return Column(
-      children: <Widget>[
-        ChoiceChip(
-          label: Text(
-            chipLabel,
-          ),
-          selected: isSelected,
-          onSelected: (bool) {
-            setState(() {
-              _response.setAnswer(questionnaireItem.linkId, ifChosen);
-            });
-          }),
-        Visibility(
-          visible: helpLabel != null,
-          child: Text(helpLabel),
-        )
-      ],
+    return Flexible(
+      child: Column(
+        children: <Widget>[
+          ChoiceChip(
+              label: Text("  "),
+              selected: isSelected,
+              onSelected: (bool) {
+                setState(() {
+                  _response.setAnswer(questionnaireItem.linkId, ifChosen);
+                });
+              }),
+          Visibility(
+            visible: helpLabel != null,
+            child: Text(
+              helpLabel == "Somewhat" ? "Some\u00ADwhat" : helpLabel,
+              textAlign: TextAlign.center,
+            ),
+          )
+        ],
+      ),
     );
   }
 }
