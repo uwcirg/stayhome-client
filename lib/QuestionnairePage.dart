@@ -181,7 +181,8 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
 //            children: _buildChoices(questionnaireItem, context),
 //          ),
           Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: _buildChoices(questionnaireItem, context))
         ],
       ),
