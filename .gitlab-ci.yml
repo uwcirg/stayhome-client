@@ -26,6 +26,8 @@ before_script:
   - wget --output-document=flutter-sdk.tar.xz $FLUTTER_VERSION
   - tar -xf flutter-sdk.tar.xz
   - export PATH=$PATH:$PWD/flutter/bin
+  - flutter channel beta
+  - flutter upgrade
   - flutter config --enable-web
   - echo flutter.sdk=$PWD/flutter > android/local.properties
   - chmod +x ./android/gradlew
@@ -46,11 +48,9 @@ build:apk:
   stage: build
   script:
     - flutter build apk
-    - flutter build web
   artifacts:
     paths:
       - build/app/outputs/apk/app.apk
-      - build/web/
     expire_in: 1 day
 
 # build:ios:
@@ -64,6 +64,18 @@ build:apk:
 #     paths:
 #       - build/ios/iphoneos/Runner.app
 #     expire_in: 1 day
+
+build:web:
+  only:
+    - schedules
+    - web
+  stage: build
+  script:
+    - flutter build web
+  artifacts:
+    paths:
+      - build/web/
+    expire_in: 1 day
 
 test:flutter:
   stage: test
