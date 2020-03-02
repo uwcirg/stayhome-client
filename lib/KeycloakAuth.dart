@@ -10,7 +10,7 @@ import 'package:oauth2/oauth2.dart' as oauth2;
 
 class KeycloakAuth {
   static final String _issuer = 'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp';
-  static final String _redirectUrl = 'edu.washington.cirg.mapapp:/callback';
+  static final String _redirectUrl = 'https://stayhome.cirg.washington.edu/#/home';
   static final String _clientSecret = 'b284cf4f-17e7-4464-987e-3c320b22cfac';
   static final String _clientId = 'map-app-client';
   static final _authorizationEndpoint = Uri.parse('$_issuer/protocol/openid-connect/auth');
