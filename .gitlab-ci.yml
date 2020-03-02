@@ -45,9 +45,11 @@ build:apk:
   stage: build
   script:
     - flutter build apk
+    - flutter build web
   artifacts:
     paths:
       - build/app/outputs/apk/app.apk
+      - build/web/
     expire_in: 1 day
 
 # build:ios:
