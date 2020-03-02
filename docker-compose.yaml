@@ -1,0 +1,8 @@
+---
+version: "3.4"
+services:
+  web:
+    build:
+      context: .
+    ports:
+      - ${EXTERNAL_PORT:-8010}:${PORT:-80}
