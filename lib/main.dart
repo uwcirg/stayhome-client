@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:map_app_flutter/LoginPage.dart';
-import 'package:map_app_flutter/PlanPage.dart';
 import 'package:map_app_flutter/ThemeAssets.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -27,22 +26,19 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
-  Widget _homePage;
   String _locale = 'en';
   KeycloakAuth auth;
   String title = 'CIRG Map App';
   CarePlanModel _carePlanModel;
 
   // Theme can be changed on a code level here
-  ThemeAssets themeAssets = JoyluxThemeAssets();
+  ThemeAssets themeAssets;
 
   _MyAppState() {
-    _homePage = PlanPage();
 //    if (!kIsWeb) {
     auth = KeycloakAuth();
 //    }
-
+    themeAssets = StayHomeThemeAssets();
   }
 
   onChangeLanguage(String languageCode) {

@@ -19,30 +19,32 @@ class LearningCenterPage extends StatelessWidget {
             child: ListView.separated(
           primary: true,
           separatorBuilder: (context, i) => Divider(),
-          itemBuilder: (context, i) {
-            switch (i) {
-              case 0:
-                return _buildLearningCenterListItem(context, S.of(context).vfit_faq,
-                    onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (BuildContext context) => FAQPage(FAQ.faqs()))));
-              case 1:
-                return _buildLearningCenterListItem(context, S.of(context).womens_health_resources);
-              default:
-                return _buildLearningCenterListItem(
-                  context,
-                  S.of(context).testimonials,
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            TestimonialsPage(Testimonial.testimonials())),
-                  ),
-                );
-            }
-          },
+          itemBuilder: _buildItems,
           itemCount: 3,
           shrinkWrap: true,
         )));
   }
+
+  Widget _buildItems(context, i) {
+          switch (i) {
+            case 0:
+              return _buildLearningCenterListItem(context, S.of(context).vfit_faq,
+                  onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (BuildContext context) => FAQPage(FAQ.faqs()))));
+            case 1:
+              return _buildLearningCenterListItem(context, S.of(context).womens_health_resources);
+            default:
+              return _buildLearningCenterListItem(
+                context,
+                S.of(context).testimonials,
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          TestimonialsPage(Testimonial.testimonials())),
+                ),
+              );
+          }
+        }
 
   Widget _buildLearningCenterListItem(BuildContext context, String text, {Function onTap}) {
     return InkWell(
@@ -254,5 +256,18 @@ class FAQPage extends StatelessWidget {
           itemCount: _faqs.length,
           shrinkWrap: true,
         )));
+  }
+}
+
+class StayHomeLearningCenterPage extends LearningCenterPage {
+  Widget _buildItems(context, i) {
+    switch (i) {
+      case 0:
+        return _buildLearningCenterListItem(context, "FAQs");
+      case 1:
+        return _buildLearningCenterListItem(context, "Quarantine Resources");
+      default:
+        return _buildLearningCenterListItem(context, "Health Guidelines");
+    }
   }
 }

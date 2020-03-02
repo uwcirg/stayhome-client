@@ -250,7 +250,7 @@ class StayHomeThemeAssets extends ThemeAssets {
       "/profile": (BuildContext context) =>
           new ScopedModel<AppModel>(model: new AppModel(), child: ProfilePage()),
       "/progress_insights": (BuildContext context) => ProgressInsightsPage(),
-      "/learning_center": (BuildContext context) => LearningCenterPage(),
+      "/learning_center": (BuildContext context) => StayHomeLearningCenterPage(),
       "/about": (BuildContext context) => StayHomeHelpPage(),
       "/login": (BuildContext context) => LoginPage()
     };
