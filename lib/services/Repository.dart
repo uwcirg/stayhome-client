@@ -41,7 +41,7 @@ class Repository {
   }
 
   /// Get the first returned CarePlan for the given patient.
-  static Future<CarePlan> getCarePlan(Patient patient) async {
+  static Future<CarePlan> getCarePlan(Patient patient, String templateRef) async {
     var url =
         "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/CarePlan?subject=${patient.reference}";
     var response = await get(url, headers: {});
@@ -57,7 +57,7 @@ class Repository {
       return carePlansForPatient.firstWhere((CarePlan plan) =>
           plan.basedOn != null &&
           plan.basedOn.any(
-              (Reference reference) => reference.reference == "CarePlan/54") &&
+              (Reference reference) => reference.reference == templateRef) &&
           plan.status == CarePlanStatus.active &&
           plan.period.start.isBefore(DateTime.now()) &&
           plan.period.end.isAfter(DateTime.now())

@@ -382,7 +382,7 @@ class S {
 
   String get you_have_no_active_pelvic_floor_management_careplan {
     return Intl.message(
-      'You have no active Pelvic Floor Management Careplan.',
+      'You have no active care plan.',
       name: 'you_have_no_active_pelvic_floor_management_careplan',
       desc: '',
       args: [],
@@ -391,7 +391,7 @@ class S {
 
   String get add_the_default_careplan_for_me {
     return Intl.message(
-      'Add the default CarePlan for me',
+      'Add the default care plan for me',
       name: 'add_the_default_careplan_for_me',
       desc: '',
       args: [],

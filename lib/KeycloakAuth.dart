@@ -4,53 +4,68 @@
 
 import 'dart:convert';
 
-import 'package:flutter_appauth/flutter_appauth.dart';
-import 'package:http/http.dart' show Response, get, post;
+import 'package:http/http.dart' show Response, get, post, Client;
+import 'package:simple_auth/simple_auth.dart' as simpleAuth;
+import 'package:oauth2/oauth2.dart' as oauth2;
 
 class KeycloakAuth {
+  static final String _issuer = 'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp';
+  static final String _redirectUrl = 'edu.washington.cirg.mapapp:/callback';
+  static final String _clientSecret = 'b284cf4f-17e7-4464-987e-3c320b22cfac';
+  static final String _clientId = 'map-app-client';
+  static final _authorizationEndpoint = Uri.parse('$_issuer/protocol/openid-connect/auth');
+  static final _tokenEndpoint = Uri.parse("$_issuer/protocol/openid-connect/token");
+
   String _accessToken;
   DateTime accessTokenExpirationDateTime;
   bool isLoggedIn = false;
   String _refreshToken;
-  final String _issuer =
-      'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp';
-  final String _redirectUrl = 'edu.washington.cirg.mapapp:/callback';
-  final String _clientSecret = 'b284cf4f-17e7-4464-987e-3c320b22cfac';
-  final String _clientId = 'map-app-client';
 
-  FlutterAppAuth _appAuth;
+  KeycloakApi _api;
 
   UserInfo userInfo;
 
   bool refreshTokenExpired = false;
 
+  bool isDummyLogin = false;
+
   KeycloakAuth() {
-    _appAuth = FlutterAppAuth();
+    _api = new KeycloakApi(_issuer, _clientId, _clientSecret, _redirectUrl,
+        scopes: ["openid", "profile"]);
+    var grant = oauth2.AuthorizationCodeGrant(_clientId, _authorizationEndpoint, _tokenEndpoint,
+        secret: _clientSecret);
   }
 
   Future mapAppLogin() async {
-    AuthorizationTokenResponse value = await _appAuth.authorizeAndExchangeCode(
-      AuthorizationTokenRequest(_clientId, _redirectUrl,
-          issuer: _issuer,
-          scopes: ['openid', 'profile'],
-          clientSecret: _clientSecret),
-    );
+    try {
+      simpleAuth.OAuthAccount account = await _api.authenticate();
+      print(account);
+      _accessToken = account.token;
+      _refreshToken = account.refreshToken;
+      accessTokenExpirationDateTime = account.created.add(Duration(seconds: account.expiresIn));
 
+      isLoggedIn = true;
+      refreshTokenExpired = false;
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future dummyLogin() async {
+    isDummyLogin = true;
     isLoggedIn = true;
-    _accessToken = value.accessToken;
-    accessTokenExpirationDateTime = value.accessTokenExpirationDateTime;
-    _refreshToken = value.refreshToken;
     refreshTokenExpired = false;
   }
 
   Future mapAppLogout() async {
-//    var url =
-//        'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp/protocol/openid-connect/logout?clientId=$_clientId&refresh_token=$_refreshToken&client_secret=$_clientSecret';
-//    try {
-//      var value = await get(url, headers: {
-//        'Authorization': 'Bearer $_accessToken',
-//        'Content-Type': 'application/x-www-form-urlencoded',
-//      });
+    if (isDummyLogin) {
+      isLoggedIn = false;
+      _accessToken = null;
+      accessTokenExpirationDateTime = null;
+      _refreshToken = null;
+      userInfo = null;
+      return Future.value("Logged out");
+    }
 
     var url =
         'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp/protocol/openid-connect/logout';
@@ -70,7 +85,14 @@ class KeycloakAuth {
         accessTokenExpirationDateTime = null;
         _refreshToken = null;
         userInfo = null;
-        return Future.value("Logged out");
+
+        // local logout
+        try {
+          await _api.logOut();
+          return Future.value("Logged out");
+        } catch (e) {
+          return Future.error("Logged out, but local logout failed: $e");
+        }
       } else {
         return Future.error("Log out not completed: ${value.statusCode}");
       }
@@ -80,18 +102,19 @@ class KeycloakAuth {
   }
 
   Future mapAppRefreshTokens() async {
-    FlutterAppAuth appAuth = FlutterAppAuth();
-    TokenResponse value = await appAuth.token(TokenRequest(
-        _clientId, _redirectUrl,
-        issuer: _issuer,
-        refreshToken: _refreshToken,
-        scopes: ['openid', 'profile'],
-        clientSecret: _clientSecret));
+    if (isDummyLogin) {
+      return;
+    }
 
-    isLoggedIn = true;
-    _accessToken = value.accessToken;
-    accessTokenExpirationDateTime = value.accessTokenExpirationDateTime;
-    _refreshToken = value.refreshToken;
+    var success = await _api.refreshAccount(_api.currentAccount);
+    if (success) {
+      var account = _api.currentOauthAccount;
+      _accessToken = account.token;
+      _refreshToken = account.refreshToken;
+      accessTokenExpirationDateTime = account.created.add(Duration(seconds: account.expiresIn));
+    } else {
+      return Future.error("Unable to refresh token");
+    }
   }
 
   Future<Response> _getUserInfo() {
@@ -103,6 +126,16 @@ class KeycloakAuth {
   }
 
   Future getUserInfo() async {
+    if (isDummyLogin) {
+      this.userInfo = UserInfo.from(jsonDecode(
+          '{"sub":"0df3e0be-bfd0-4602-b180-c3f1bb96b602","email_verified":true,'
+              '"name":"Bumblebee Sugartoes","preferred_username":"demo",'
+              '"given_name":"Bumblebee","family_name":"Sugartoes",'
+              '"email":"bumblebee@sugartoes.net"}'));
+
+      return Future.value(this.userInfo);
+    }
+
     var userInfoJson;
     var returnError;
 
@@ -122,8 +155,7 @@ class KeycloakAuth {
               returnError = "Error: ${value.statusCode} ${value.reasonPhrase}";
             }
           } catch (error) {
-            returnError =
-                "Error getting user info after successfully refreshing tokens: $error";
+            returnError = "Error getting user info after successfully refreshing tokens: $error";
           }
         } catch (error) {
           if (error.code == "token_failed") {
@@ -155,8 +187,8 @@ class UserInfo {
   final String familyName;
   final String email;
 
-  UserInfo(this.keycloakUserId, this.emailVerified, this.name,
-      this.preferredUsername, this._givenName, this.familyName, this.email);
+  UserInfo(this.keycloakUserId, this.emailVerified, this.name, this.preferredUsername,
+      this._givenName, this.familyName, this.email);
 
   String get givenName {
     return this._givenName != null ? this._givenName : "";
@@ -172,4 +204,12 @@ class UserInfo {
         userInfoMap["family_name"],
         userInfoMap["email"]);
   }
+}
+
+class KeycloakApi extends simpleAuth.OAuthApi {
+  KeycloakApi(String issuer, String clientId, String clientSecret, String redirectUrl,
+      {List<String> scopes, Client client, simpleAuth.AuthStorage authStorage})
+      : super("keycloak", clientId, clientSecret, "$issuer/protocol/openid-connect/token",
+            '$issuer/protocol/openid-connect/auth', redirectUrl,
+            client: client, scopes: scopes, authStorage: authStorage);
 }

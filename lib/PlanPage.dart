@@ -76,17 +76,7 @@ class _PlanPageState extends State<PlanPage> {
 
   Widget _buildCareplanInfoSection(BuildContext context, CarePlanModel model) {
     if (model.hasNoCarePlan) {
-      return Wrap(
-        children: <Widget>[
-          Text(S.of(context).you_have_no_active_pelvic_floor_management_careplan),
-          FlatButton(
-            child: Text(
-              S.of(context).add_the_default_careplan_for_me,
-            ),
-            onPressed: () => model.addDefaultCareplan(),
-          )
-        ],
-      );
+      return Container();
     }
     if (model.error != null) {
       return Wrap(
@@ -270,10 +260,10 @@ class _PlanPageState extends State<PlanPage> {
   }
 
   Widget _buildCalendar(TextStyle textStyle, BuildContext context, CarePlanModel model) {
-    if (model.hasNoCarePlan || model.error != null)
-      return Container(
-        height: 0,
-      );
+    if (model.error != null) {
+      return Text(model.error);
+      //snack(model.error, context);
+    }
 
     if (model.isLoading) return Center(child: CircularProgressIndicator());
 
@@ -301,11 +291,29 @@ class _PlanPageState extends State<PlanPage> {
             child: Text(S.of(context).my_treatment_plan, style: Theme.of(context).textTheme.title),
           ),
         ),
+        _buildAddDefaultCareplanSection(context, model),
         _buildCareplanInfoSection(context, model),
         _buildQuestionnaireButtonSection(context, model),
-        TreatmentCalendarWidget(_calendarController, model),
+        !model.hasNoCarePlan ? TreatmentCalendarWidget(_calendarController, model) : Container(height: 0,),
       ],
     );
+  }
+
+  _buildAddDefaultCareplanSection(BuildContext context, CarePlanModel model) {
+    if (model.hasNoCarePlan) {
+      return Wrap(
+        children: <Widget>[
+          Text(S.of(context).you_have_no_active_pelvic_floor_management_careplan),
+          FlatButton(
+            child: Text(
+              S.of(context).add_the_default_careplan_for_me,
+            ),
+            onPressed: () => model.addDefaultCareplan(),
+          )
+        ],
+      );
+    }
+    return Container();
   }
 
   List<Widget> _buildQuestionnaireButtons(BuildContext context, CarePlanModel model) {
@@ -479,7 +487,7 @@ class TreatmentCalendarWidget extends StatelessWidget {
       var color;
       switch (eventTypes[type]['status']) {
         case Status.Completed:
-          color = Theme.of(context).accentColor;
+          color = MyApp.of(context).themeAssets.completedCalendarItemColor;
           break;
         case Status.Scheduled:
           color = Colors.grey[600];
@@ -554,5 +562,43 @@ class TreatmentCalendarWidget extends StatelessWidget {
           "",
           style: Theme.of(context).textTheme.caption,
         ));
+  }
+}
+
+class StayHomePlanPage extends PlanPage {
+  @override
+  _PlanPageState createState() {
+    return _StayHomePlanPageState();
+  }
+}
+
+class _StayHomePlanPageState extends _PlanPageState {
+  @override
+  Widget _buildCalendar(TextStyle textStyle, BuildContext context, CarePlanModel model) {
+    if (model.error != null) {
+      return Text(model.error);
+      //snack(model.error, context);
+    }
+
+    if (model.isLoading) return Center(child: CircularProgressIndicator());
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.max,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Text(
+              "Calendar",
+              style: Theme.of(context).textTheme.title,
+            ),
+          ),
+        ),
+        _buildAddDefaultCareplanSection(context, model),
+        _buildQuestionnaireButtonSection(context, model),
+        !model.hasNoCarePlan ? TreatmentCalendarWidget(_calendarController, model) : Container(height: 0,),
+      ],
+    );
   }
 }

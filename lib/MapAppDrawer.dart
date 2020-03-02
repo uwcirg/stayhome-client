@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:map_app_flutter/ThemeAssets.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
@@ -23,10 +24,7 @@ class MapAppDrawer extends Drawer {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Image.asset(
-                    'assets/logos/Joylux_wdmk_blk_rgb.png',
-                    height: 20,
-                  ),
+                  MyApp.of(context).themeAssets.drawerBanner(context),
                   Stack(alignment: AlignmentDirectional.bottomCenter, children: <Widget>[
                     Column(
                       children: <Widget>[
@@ -69,51 +67,10 @@ class MapAppDrawer extends Drawer {
               ),
               decoration: BoxDecoration(color: Theme.of(context).highlightColor)),
         ),
-        ListTile(
-          enabled: MyApp.of(context).auth.isLoggedIn,
-          title: Text(S.of(context).my_goals),
-          leading: Icon(MdiIcons.bullseyeArrow),
-          onTap: () => navigate(context, '/goals'),
-        ),
-        ListTile(
-          enabled: MyApp.of(context).auth.isLoggedIn,
-          title: Text(S.of(context).start_a_session),
-          leading: ImageIcon(AssetImage('assets/logos/v-logo-smaller.png')),
-          onTap: () => navigate(context, '/start_session'),
-        ),
-        ListTile(
-          enabled: MyApp.of(context).auth.isLoggedIn,
-          title: Text(S.of(context).plan),
-          leading: Icon(Icons.calendar_today),
-          onTap: () => navigate(context, '/home'),
-        ),
-        ListTile(
-          enabled: MyApp.of(context).auth.isLoggedIn,
-          title: Text(S.of(context).progress__insights),
-          leading: Icon(MdiIcons.bullseyeArrow),
-          onTap: () => navigate(context, '/progress_insights'),
-        ),
-        ListTile(
-          enabled: MyApp.of(context).auth.isLoggedIn,
-          title: Text(S.of(context).devices),
-          leading: Icon(Icons.bluetooth),
-          onTap: () => navigate(context, '/devices'),
-        ),
-        ListTile(
-          title: Text(S.of(context).learning_center),
-          leading: Icon(Icons.lightbulb_outline),
-          onTap: () => navigate(context, '/learning_center'),
-        ),
-        ListTile(
-          title: Text(S.of(context).contact__community),
-          leading: Icon(Icons.chat),
-          onTap: () => navigate(context, '/contact_community'),
-        ),
-        ListTile(
-          title: Text(S.of(context).about),
-          onTap: () => navigate(context, '/about'),
-          leading: Icon(Icons.people),
-        ),
+        ...MyApp.of(context)
+            .themeAssets
+            .navItems(context)
+            .map((MenuItem item) => constructListTile(context, item)),
         Divider(),
         ListTile(
           trailing: Icon(Icons.language),
@@ -156,5 +113,14 @@ class MapAppDrawer extends Drawer {
   void navigate(BuildContext context, String activity) {
     Navigator.pop(context);
     Navigator.pushNamed(context, activity);
+  }
+
+  ListTile constructListTile(BuildContext context, MenuItem item) {
+    return ListTile(
+      enabled: item.requiresLogin ? MyApp.of(context).auth.isLoggedIn : true,
+      title: Text(item.title),
+      leading: item.icon,
+      onTap: () => navigate(context, item.route),
+    );
   }
 }

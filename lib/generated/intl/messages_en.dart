@@ -35,7 +35,7 @@ class MessageLookup extends MessageLookupByLibrary {
   static _notInlinedMessages(_) => <String, Function> {
     "about" : MessageLookupByLibrary.simpleMessage("About"),
     "activity" : MessageLookupByLibrary.simpleMessage("Activity"),
-    "add_the_default_careplan_for_me" : MessageLookupByLibrary.simpleMessage("Add the default CarePlan for me"),
+    "add_the_default_careplan_for_me" : MessageLookupByLibrary.simpleMessage("Add the default care plan for me"),
     "battery_level" : m0,
     "buttonPushText" : MessageLookupByLibrary.simpleMessage("You have pushed the button this many times:"),
     "change" : MessageLookupByLibrary.simpleMessage("Change"),
@@ -82,6 +82,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "what_is_your_name" : MessageLookupByLibrary.simpleMessage("What is your name?"),
     "what_is_your_patient_resource_id" : MessageLookupByLibrary.simpleMessage("What is your Patient Resource ID?"),
     "womens_health_resources" : MessageLookupByLibrary.simpleMessage("Women\'s Health Resources"),
-    "you_have_no_active_pelvic_floor_management_careplan" : MessageLookupByLibrary.simpleMessage("You have no active Pelvic Floor Management Careplan.")
+    "you_have_no_active_pelvic_floor_management_careplan" : MessageLookupByLibrary.simpleMessage("You have no active care plan.")
   };
 }

@@ -1,18 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:map_app_flutter/ContactCommunityPage.dart';
-import 'package:map_app_flutter/DevicesPage.dart';
-import 'package:map_app_flutter/GoalsPage.dart';
-import 'package:map_app_flutter/HelpPage.dart';
-import 'package:map_app_flutter/LearningCenterPage.dart';
 import 'package:map_app_flutter/LoginPage.dart';
 import 'package:map_app_flutter/PlanPage.dart';
-import 'package:map_app_flutter/ProfilePage.dart';
-import 'package:map_app_flutter/ProgressInsightsPage.dart';
-import 'package:map_app_flutter/SessionPage.dart';
-import 'package:map_app_flutter/color_palette.dart';
-import 'package:map_app_flutter/model/AppModel.dart';
+import 'package:map_app_flutter/ThemeAssets.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:toast/toast.dart';
@@ -20,45 +11,38 @@ import 'package:map_app_flutter/generated/l10n.dart';
 import 'KeycloakAuth.dart';
 
 void main() {
-  runApp(MyApp(new LoginPage()));
+  runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
-  Widget _home;
-
-  MyApp(this._home);
+  MyApp();
 
   static _MyAppState of(BuildContext context) =>
       context.ancestorStateOfType(const TypeMatcher<_MyAppState>());
 
   @override
   State<StatefulWidget> createState() {
-    return new _MyAppState(_home);
+    return new _MyAppState();
   }
 }
 
 class _MyAppState extends State<MyApp> {
-  Widget _defaultHome;
+
   Widget _homePage;
   String _locale = 'en';
   KeycloakAuth auth;
   String title = 'CIRG Map App';
   CarePlanModel _carePlanModel;
 
-  _MyAppState(Widget home) {
+  // Theme can be changed on a code level here
+  ThemeAssets themeAssets = JoyluxThemeAssets();
+
+  _MyAppState() {
     _homePage = PlanPage();
+//    if (!kIsWeb) {
     auth = KeycloakAuth();
+//    }
 
-    if (home != null) {
-      _defaultHome = home;
-    } else {
-      _defaultHome = _homePage;
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   onChangeLanguage(String languageCode) {
@@ -78,37 +62,19 @@ class _MyAppState extends State<MyApp> {
           title: title,
           theme: ThemeData(
               scaffoldBackgroundColor: Colors.white,
-              primarySwatch: MapAppColors.vFitPrimary,
-              accentColor: MapAppColors.vFitAccent,
-              highlightColor: MapAppColors.vFitHighlight,
-              textTheme: Theme.of(context).textTheme.apply(
-                    bodyColor: MapAppColors.vFitPrimary.shade600,
-                    displayColor: MapAppColors.vFitPrimary.shade600,
-                  ),
+              primarySwatch: themeAssets.primarySwatch,
+              accentColor: themeAssets.accentColor,
+              highlightColor: themeAssets.highlightColor,
+              textTheme: themeAssets.textThemeOverride(Theme.of(context).textTheme),
               buttonTheme: ButtonThemeData(
-                  buttonColor: MapAppColors.vFitAccent, textTheme: ButtonTextTheme.primary),
+                  buttonColor: themeAssets.accentColor, textTheme: ButtonTextTheme.primary),
               chipTheme: ChipTheme.of(context).copyWith(
-                  selectedColor: MapAppColors.vFitAccent,
-                  secondarySelectedColor: MapAppColors.vFitAccent,
+                  selectedColor: themeAssets.accentColor,
+                  secondarySelectedColor: themeAssets.accentColor,
                   labelStyle: Theme.of(context).textTheme.body1,
                   secondaryLabelStyle: Theme.of(context).accentTextTheme.body1)),
-          home: _defaultHome,
-          routes: <String, WidgetBuilder>{
-            "/home": (BuildContext context) => _homePage,
-            "/guestHome": (BuildContext context) => LearningCenterPage(),
-            "/profile": (BuildContext context) =>
-                new ScopedModel<AppModel>(model: new AppModel(), child: ProfilePage()),
-            "/help": (BuildContext context) => HelpPage(),
-            "/start_session": (BuildContext context) => SessionPage(),
-            "/devices": (BuildContext context) => DevicesPage(),
-            "/contact_community": (BuildContext context) =>
-                ContactCommunityPage(ContactPageContents.contents(context)),
-            "/progress_insights": (BuildContext context) => ProgressInsightsPage(),
-            "/learning_center": (BuildContext context) => LearningCenterPage(),
-            "/about": (BuildContext context) => HelpPage(),
-            "/goals": (BuildContext context) => GoalsPage(),
-            "/login": (BuildContext context) => LoginPage()
-          },
+          home: new LoginPage(), // Will replace after login is complete
+          routes: themeAssets.navRoutes(context),
           locale: Locale(_locale, ""),
           localizationsDelegates: [
             S.delegate,
@@ -117,6 +83,18 @@ class _MyAppState extends State<MyApp> {
           ],
           supportedLocales: S.delegate.supportedLocales,
         ));
+  }
+
+  toggleAppMode() {
+    if (themeAssets is JoyluxThemeAssets) {
+      setState(() {
+        themeAssets = StayHomeThemeAssets();
+      });
+    } else {
+      setState(() {
+        themeAssets = JoyluxThemeAssets();
+      });
+    }
   }
 }
 

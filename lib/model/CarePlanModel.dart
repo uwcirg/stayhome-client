@@ -25,14 +25,16 @@ class CarePlanModel extends Model {
   Goals goals;
 
   String _keycloakUserId;
+  String _careplanTemplateRef;
   Map<String, QuestionnaireItem> _questionsByLinkId = new Map();
 
   CarePlanModel() {
     goals = new Goals();
   }
 
-  void setUser(String keycloakUserId) {
+  void setUser(String keycloakUserId, {String careplanTemplateRef="CarePlan/54"}) {
     this._keycloakUserId = keycloakUserId;
+    this._careplanTemplateRef = careplanTemplateRef;
     load();
   }
 
@@ -57,15 +59,13 @@ class CarePlanModel extends Model {
   }
 
   Future<void> _doLoad() async {
-    // don't need to reload patient if we already have it
-    if (patient == null) {
-      patient = await Repository.getPatient(_keycloakUserId);
-    }
+    patient = await Repository.getPatient(_keycloakUserId);
+
     return _loadCarePlan();
   }
 
   Future<void> _loadCarePlan() async {
-    CarePlan carePlan = await Repository.getCarePlan(patient);
+    CarePlan carePlan = await Repository.getCarePlan(patient, _careplanTemplateRef);
     if (carePlan == null) {
       hasNoCarePlan = true;
     } else {
@@ -98,7 +98,7 @@ class CarePlanModel extends Model {
   }
 
   void addDefaultCareplan() {
-    notifyOrError(Repository.loadCarePlan("54").then((CarePlan plan) {
+    notifyOrError(Repository.loadCarePlan(_careplanTemplateRef.split('/')[1]).then((CarePlan plan) {
       CarePlan newPlan = CarePlan.fromTemplate(plan, patient);
       Repository.postCarePlan(newPlan).then((value) {
         carePlan = CarePlan.fromJson(jsonDecode(value.body));
@@ -208,7 +208,8 @@ class TreatmentCalendar {
         continue;
       }
 
-      List<TreatmentEvent> eventList = events.putIfAbsent(response.authored, () => []);
+      DateTime day = DateTime(response.authored.year, response.authored.month, response.authored.day);
+      List<TreatmentEvent> eventList = events.putIfAbsent(day, () => []);
 
       // find matching scheduled event
       TreatmentEvent event = eventList.firstWhere(

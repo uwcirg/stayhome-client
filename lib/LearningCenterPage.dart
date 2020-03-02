@@ -4,6 +4,7 @@
 
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
@@ -109,28 +110,7 @@ class TestimonialWidget extends StatelessWidget {
           padding: const EdgeInsets.all(Dimensions.fullMargin),
           child: Column(
             children: <Widget>[
-              Text.rich(TextSpan(
-                children: <InlineSpan>[
-                  WidgetSpan(
-                    child: Transform.rotate(
-                      angle: 3.1492,
-                      child: Icon(
-                        Icons.format_quote,
-                        color: Theme.of(context).textTheme.body1.color,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                  TextSpan(text: _testimonial.quote, style: textStyle),
-                  WidgetSpan(
-                      child: Icon(
-                        Icons.format_quote,
-                        color: Theme.of(context).textTheme.body1.color,
-                        size: 20,
-                      ),
-                      alignment: ui.PlaceholderAlignment.top),
-                ],
-              )),
+              buildTestimonialText(context, textStyle),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
@@ -143,6 +123,38 @@ class TestimonialWidget extends StatelessWidget {
             ],
           ),
         ));
+  }
+
+  Text buildTestimonialText(BuildContext context, TextStyle textStyle) {
+    if (kIsWeb) {
+      return Text(
+        _testimonial.quote,
+        style: textStyle,
+      );
+    }
+    return Text.rich(TextSpan(
+      children: <InlineSpan>[
+        WidgetSpan(
+          child: Transform.rotate(
+            angle: 3.1492,
+            child: Icon(
+              Icons.format_quote,
+              color: Theme.of(context).textTheme.body1.color,
+              size: 20,
+            ),
+          ),
+        ),
+        TextSpan(text: _testimonial.quote, style: textStyle),
+        WidgetSpan(
+          child: Icon(
+            Icons.format_quote,
+            color: Theme.of(context).textTheme.body1.color,
+            size: 20,
+          ),
+          alignment: ui.PlaceholderAlignment.top,
+        ),
+      ],
+    ));
   }
 }
 

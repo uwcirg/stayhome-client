@@ -1370,6 +1370,7 @@ class AnswerOption {
 
   /// returns -1 if there is no ordinal value.
   int ordinalValue() {
+    if (extension == null) return -1;
     Extension ordinalValueExtension = extension.firstWhere(
         (Extension e) => e.url == 'http://hl7.org/fhir/StructureDefinition/ordinalValue');
     if (ordinalValueExtension != null) {
@@ -1398,7 +1399,7 @@ class QuestionnaireResponse extends Resource {
     this.questionnaireReference = questionnaire.reference;
     this.basedOnCarePlan = [Reference(reference: carePlan.reference)];
     var today = new DateTime.now();
-    this.authored = new DateTime(today.year, today.month, today.day);
+    this.authored = new DateTime(today.year, today.month, today.day, today.hour, today.minute);
   }
 
   QuestionnaireResponse.fromJson(Map<String, dynamic> json) {
@@ -1438,7 +1439,7 @@ class QuestionnaireResponse extends Resource {
     if (this.subject != null) {
       data['subject'] = this.subject.toJson();
     }
-    data['authored'] = new DateFormat("yyyy-MM-dd").format(this.authored);
+    data['authored'] = this.authored.toIso8601String();
     if (this.item != null) {
       data['item'] = this.item.map((v) => v.toJson()).toList();
     }
