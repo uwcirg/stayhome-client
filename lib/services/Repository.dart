@@ -8,12 +8,14 @@ import 'package:http/http.dart' show Response, get, post, put;
 import 'package:map_app_flutter/fhir/FhirResources.dart';
 
 class Repository {
+  static final fhirBaseUrl = "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir";
+
   static Future<Patient> getPatient(String keycloakSub) async {
 
       var system = "keycloak";
       var identifier = keycloakSub;
       var patientSearchUrl =
-          "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/Patient?identifier=$system|$identifier";
+          "$fhirBaseUrl/Patient?identifier=$system|$identifier";
       var response = await get(patientSearchUrl, headers: {});
 
 
@@ -43,7 +45,7 @@ class Repository {
   /// Get the first returned CarePlan for the given patient.
   static Future<CarePlan> getCarePlan(Patient patient, String templateRef) async {
     var url =
-        "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/CarePlan?subject=${patient.reference}";
+        "$fhirBaseUrl/CarePlan?subject=${patient.reference}";
     var response = await get(url, headers: {});
     var searchResultBundle = jsonDecode(response.body);
     if (searchResultBundle["total"] == 0) {
@@ -67,14 +69,14 @@ class Repository {
 
   static Future<CarePlan> loadCarePlan(String id) async {
     var url =
-    "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/CarePlan/$id";
+    "$fhirBaseUrl/CarePlan/$id";
     var response = await get(url, headers: {});
     return CarePlan.fromJson(jsonDecode(response.body));
   }
 
   static Future<List<Procedure>> getProcedures(CarePlan carePlan) async {
     var url =
-        "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/Procedure?based-on=${carePlan.reference}";
+        "$fhirBaseUrl/Procedure?based-on=${carePlan.reference}";
     var response = await get(url, headers: {});
     var searchResultBundle = jsonDecode(response.body);
     List<Procedure> procedures = [];
@@ -89,7 +91,7 @@ class Repository {
   static Future<List<QuestionnaireResponse>> getQuestionnaireResponses(
       CarePlan carePlan) async {
     var url =
-        "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/QuestionnaireResponse?based-on=${carePlan.reference}";
+        "$fhirBaseUrl/QuestionnaireResponse?based-on=${carePlan.reference}";
     var response = await get(url, headers: {});
     var searchResultBundle = jsonDecode(response.body);
     List<QuestionnaireResponse> responses = [];
@@ -112,7 +114,7 @@ class Repository {
 
   static Future<Questionnaire> getPHQ9Questionnaire() async {
     var url =
-        "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/Questionnaire/52";
+        "$fhirBaseUrl/Questionnaire/52";
 
     var value = await get(url, headers: {});
 
@@ -132,7 +134,7 @@ class Repository {
 
   static Future<void> postCompletedSession(Procedure treatmentSession) async {
     var url =
-        "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/Procedure?_format=json";
+        "$fhirBaseUrl/Procedure?_format=json";
     String body = jsonEncode(treatmentSession.toJson());
     var headers = {
       "Accept-Charset": "utf-8",
@@ -151,7 +153,7 @@ class Repository {
   static Future<void> postQuestionnaireResponse(
       QuestionnaireResponse questionnaireResponse) async {
     var url =
-        "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/QuestionnaireResponse?_format=json";
+        "$fhirBaseUrl/QuestionnaireResponse?_format=json";
     String body = jsonEncode(questionnaireResponse.toJson());
     var headers = {
       "Accept-Charset": "utf-8",
@@ -170,7 +172,7 @@ class Repository {
   static Future<Questionnaire> getQuestionnaire(
       String questionnaireReference) async {
     var url =
-        "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/$questionnaireReference";
+        "$fhirBaseUrl/$questionnaireReference";
 
     var value = await get(url, headers: {});
 
@@ -199,7 +201,7 @@ class Repository {
 
   static Future<Response> postCarePlan(CarePlan plan) async {
     var url =
-        "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/CarePlan?_format=json";
+        "$fhirBaseUrl/CarePlan?_format=json";
     String body = jsonEncode(plan.toJson());
     var headers = {
       "Accept-Charset": "utf-8",
@@ -215,7 +217,7 @@ class Repository {
 
   static Future<Response> updateCarePlan(CarePlan plan) async {
     var url =
-        "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir/CarePlan/${plan.id}?_format=json";
+        "$fhirBaseUrl/CarePlan/${plan.id}?_format=json";
     String body = jsonEncode(plan.toJson());
     var headers = {
       "Accept-Charset": "utf-8",
@@ -226,6 +228,22 @@ class Repository {
     };
 
     return await put(url,
+        headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
+  }
+
+  static Future<Response> postPatient(Patient patient) async {
+    var url =
+        "$fhirBaseUrl/Patient?_format=json";
+    String body = jsonEncode(patient.toJson());
+    var headers = {
+      "Accept-Charset": "utf-8",
+      "Accept": "application/fhir+json;q=1.0, application/json+fhir;q=0.9",
+      "User-Agent": "HAPI-FHIR/3.8.0 (FHIR Client; FHIR 4.0.0/R4; apache)",
+      "Accept-Encoding": "gzip",
+      "Content-Type": "application/fhir+json; charset=UTF-8",
+    };
+
+    return await post(url,
         headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
   }
 }

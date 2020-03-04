@@ -23,7 +23,7 @@ class _ProgressInsightsPageState extends State<ProgressInsightsPage> {
   @override
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
-        title: S.of(context).progress__insights,
+        title: "Trends",
         child: ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
           return _buildScreen(context, model);
         }));

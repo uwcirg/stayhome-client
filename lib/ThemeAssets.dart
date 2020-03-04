@@ -165,9 +165,10 @@ class JoyluxThemeAssets extends ThemeAssets {
 
   @override
   Map<String, WidgetBuilder> navRoutes(BuildContext context) {
+    var learningCenter = LearningCenterPage();
     return <String, WidgetBuilder>{
       "/home": (BuildContext context) => new PlanPage(),
-      "/guestHome": (BuildContext context) => LearningCenterPage(),
+      "/guestHome": (BuildContext context) => learningCenter,
       "/profile": (BuildContext context) =>
           new ScopedModel<AppModel>(model: new AppModel(), child: ProfilePage()),
       "/start_session": (BuildContext context) => SessionPage(),
@@ -175,7 +176,7 @@ class JoyluxThemeAssets extends ThemeAssets {
       "/contact_community": (BuildContext context) =>
           ContactCommunityPage(ContactPageContents.contents(context)),
       "/progress_insights": (BuildContext context) => ProgressInsightsPage(),
-      "/learning_center": (BuildContext context) => LearningCenterPage(),
+      "/learning_center": (BuildContext context) => learningCenter,
       "/about": (BuildContext context) => HelpPage(),
       "/goals": (BuildContext context) => GoalsPage(),
       "/login": (BuildContext context) => LoginPage()
@@ -244,13 +245,13 @@ class StayHomeThemeAssets extends ThemeAssets {
 
   @override
   Map<String, WidgetBuilder> navRoutes(BuildContext context) {
+    var learningCenter = StayHomeLearningCenterPage();
     return <String, WidgetBuilder>{
       "/home": (BuildContext context) => new StayHomePlanPage(),
-      "/guestHome": (BuildContext context) => LearningCenterPage(),
-      "/profile": (BuildContext context) =>
-          new ScopedModel<AppModel>(model: new AppModel(), child: ProfilePage()),
+      "/guestHome": (BuildContext context) => learningCenter,
+      "/profile": (BuildContext context) => ProfilePage(),
       "/progress_insights": (BuildContext context) => ProgressInsightsPage(),
-      "/learning_center": (BuildContext context) => StayHomeLearningCenterPage(),
+      "/learning_center": (BuildContext context) => learningCenter,
       "/about": (BuildContext context) => StayHomeHelpPage(),
       "/login": (BuildContext context) => LoginPage()
     };

@@ -2,6 +2,7 @@
  * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
  */
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:map_app_flutter/const.dart';
@@ -21,7 +22,7 @@ class LoginPageState extends State<LoginPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    SimpleAuthFlutter.init(context);
+    if (!kIsWeb) SimpleAuthFlutter.init(context);
   }
 
   @override
@@ -94,10 +95,10 @@ class LoginPageState extends State<LoginPage> {
                                   padding: EdgeInsets.all(Dimensions.fullMargin),
                                   child: Text("Demo",
                                       style: Theme.of(context).primaryTextTheme.subtitle))),
-                          FlatButton(
-                              onPressed: () => MyApp.of(context).toggleAppMode(),
-                              child: Text("Toggle app mode",
-                                  style: Theme.of(context).primaryTextTheme.subtitle)),
+//                          FlatButton(
+//                              onPressed: () => MyApp.of(context).toggleAppMode(),
+//                              child: Text("Toggle app mode",
+//                                  style: Theme.of(context).primaryTextTheme.subtitle)),
                         ],
                       ),
                     ],

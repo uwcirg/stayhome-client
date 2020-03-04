@@ -4,6 +4,7 @@
 
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' show Response, get, post, Client;
 import 'package:simple_auth/simple_auth.dart' as simpleAuth;
 import 'package:oauth2/oauth2.dart' as oauth2;
@@ -68,7 +69,7 @@ class KeycloakAuth {
     }
 
     var url =
-        'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp/protocol/openid-connect/logout';
+        '$_issuer/protocol/openid-connect/logout';
 
     try {
       var value = await post(url, headers: {
@@ -119,7 +120,7 @@ class KeycloakAuth {
 
   Future<Response> _getUserInfo() {
     var url =
-        'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp/protocol/openid-connect/userinfo';
+        '$_issuer/protocol/openid-connect/userinfo';
     return post(url, headers: {
       'Authorization': 'Bearer $_accessToken',
     });

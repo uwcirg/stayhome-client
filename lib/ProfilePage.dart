@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
+import 'package:map_app_flutter/fhir/FhirResources.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/model/AppModel.dart';
+import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import 'main.dart';
@@ -22,79 +24,120 @@ class _ProfilePageState extends State<ProfilePage> {
   var _error = "";
 
   @override
-  void initState() {
-    // TODO: Move this handling somewhere more general so we can display the message whenever it is appropriate
-//      MyApp.of(context).auth.getUserInfo().then((value) {
-//        setState(() {
-//          _error = null;
-//        });
-//      }).catchError((error) {
-//        setState(() {
-//          _error = "Error getting user info: $error";
-//        });
-//        if (MyApp.of(context).auth.refreshTokenExpired) {
-//          Navigator.of(context).popUntil(ModalRoute.withName("/home"));
-//          Navigator.of(context).pushNamed("/login");
-//        }
-//      });
-    super.initState();
-//    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    String title = S.of(context).profile;
+    String title = S
+        .of(context)
+        .profile;
 
-    if (MyApp.of(context).auth.userInfo != null) {
+    if (MyApp
+        .of(context)
+        .auth
+        .userInfo != null) {
       return MapAppPageScaffold(
           title: title,
           child: Padding(
             padding: const EdgeInsets.all(Dimensions.fullMargin),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                TextFormField(
-                  decoration: InputDecoration(
-                      icon: Icon(Icons.person),
-                      hintText: S.of(context).what_is_your_name,
-                      labelText: S.of(context).name),
-                  initialValue: MyApp.of(context).auth.userInfo.name,
-                  onFieldSubmitted: (String text) {},
-                ),
-                TextFormField(
-                  decoration: InputDecoration(
-                      icon: Icon(Icons.email),
-                      hintText: S.of(context).what_is_your_email_address,
-                      labelText: S.of(context).email),
-                  initialValue: MyApp.of(context).auth.userInfo.email,
-                  onFieldSubmitted: (String text) {},
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: Dimensions.largeMargin),
-                  child: Center(
-                    child: OutlineButton(
-                      child: Text(S.of(context).logout),
-                      onPressed: () => logout(context),
+            child: ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
+              var firstName = model.patient.name[0].given[0] ?? MyApp
+                  .of(context)
+                  .auth
+                  .userInfo
+                  .givenName;
+              var lastName = model.patient.name[0].family ?? MyApp
+                  .of(context)
+                  .auth
+                  .userInfo
+                  .familyName;
+              var email = model.patient.emailAddress ?? MyApp
+                  .of(context)
+                  .auth
+                  .userInfo
+                  .email;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  TextFormField(
+                    decoration: InputDecoration(
+                        icon: Icon(Icons.person),
+                        hintText: S
+                            .of(context)
+                            .what_is_your_name,
+                        labelText: "First name"),
+                    initialValue: firstName,
+                    onFieldSubmitted: (String text) {model.patient.name[0].given[0] = text;},
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                        icon: Icon(null),
+                        hintText: S
+                            .of(context)
+                            .what_is_your_name,
+                        labelText: "Last name"),
+                    initialValue: lastName,
+                    onFieldSubmitted: (String text) {model.patient.name[0].family = text;},
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                        icon: Icon(Icons.email),
+                        hintText: S
+                            .of(context)
+                            .what_is_your_email_address,
+                        labelText: S
+                            .of(context)
+                            .email),
+                    initialValue: email,
+                    onFieldSubmitted: (String text) {model.patient.emailAddress = text;},
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                        icon: Icon(Icons.phone),
+                        hintText: "What is your phone number?",
+                        labelText: "Phone"),
+                    initialValue: model.patient.phoneNumber,
+                    onFieldSubmitted: (String text) {model.patient.phoneNumber = text;},
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                        icon: Icon(Icons.contact_mail),
+                        hintText: "What is your address?",
+                        labelText: "Address"),
+                    initialValue: model.patient.address[0]?.toString(),
+                    onFieldSubmitted: (String text) {
+                    },
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: Dimensions.largeMargin),
+                    child: Center(
+                      child: OutlineButton(
+                        child: Text(S
+                            .of(context)
+                            .logout),
+                        onPressed: () => logout(context),
+                      ),
                     ),
                   ),
-                ),
-                Divider(),
-                Text(
-                  "CouchDB debug area",
-                  style: Theme.of(context).textTheme.subtitle,
-                ),
-                ScopedModelDescendant<AppModel>(
-                  builder: (context, child, model) {
-                    if (model.docExample != null) {
-                      return Text(
-                          "CouchDB object content: ${model.docExample.getString("click")}");
-                    } else {
-                      return CircularProgressIndicator();
-                    }
-                  },
-                  rebuildOnChange: true,
-                ),
-              ],
+                  Divider(),
+                  Text(
+                    "CouchDB debug area",
+                    style: Theme
+                        .of(context)
+                        .textTheme
+                        .subtitle,
+                  ),
+//                  ScopedModelDescendant<AppModel>(
+//                    builder: (context, child, model) {
+//                      if (model.docExample != null) {
+//                        return Text(
+//                            "CouchDB object content: ${model.docExample.getString("click")}");
+//                      } else {
+//                        return CircularProgressIndicator();
+//                      }
+//                    },
+//                    rebuildOnChange: true,
+//                  ),
+                ],
+              );
+            }
             ),
           ));
     }
@@ -109,7 +152,11 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void logout(BuildContext context) {
-    MyApp.of(context).auth.mapAppLogout().then((value) {
+    MyApp
+        .of(context)
+        .auth
+        .mapAppLogout()
+        .then((value) {
       setState(() {
         _updateState = !_updateState;
       });
@@ -117,9 +164,4 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
-  void login(BuildContext context) {
-    MyApp.of(context).auth.mapAppLogin().then((value) => setState(() {
-          _updateState = !_updateState;
-        }));
-  }
 }

@@ -32,7 +32,7 @@ class CarePlanModel extends Model {
     goals = new Goals();
   }
 
-  void setUser(String keycloakUserId, {String careplanTemplateRef="CarePlan/54"}) {
+  void setUser(String keycloakUserId, {String careplanTemplateRef = "CarePlan/54"}) {
     this._keycloakUserId = keycloakUserId;
     this._careplanTemplateRef = careplanTemplateRef;
     load();
@@ -97,15 +97,14 @@ class CarePlanModel extends Model {
     treatmentCalendar = TreatmentCalendar.make(carePlan, procedures, questionnaireResponses);
   }
 
-  void addDefaultCareplan() {
+  Future createPatientResource(Patient patient) async {
+    Repository.postPatient(patient).then((value) => load());
+  }
+
+  Future addDefaultCareplan() async {
     notifyOrError(Repository.loadCarePlan(_careplanTemplateRef.split('/')[1]).then((CarePlan plan) {
       CarePlan newPlan = CarePlan.fromTemplate(plan, patient);
-      Repository.postCarePlan(newPlan).then((value) {
-        carePlan = CarePlan.fromJson(jsonDecode(value.body));
-        hasNoCarePlan = false;
-
-        _loadQuestionnaires();
-      });
+      Repository.postCarePlan(newPlan).then((value) => load());
     }));
   }
 
@@ -208,7 +207,8 @@ class TreatmentCalendar {
         continue;
       }
 
-      DateTime day = DateTime(response.authored.year, response.authored.month, response.authored.day);
+      DateTime day =
+          DateTime(response.authored.year, response.authored.month, response.authored.day);
       List<TreatmentEvent> eventList = events.putIfAbsent(day, () => []);
 
       // find matching scheduled event

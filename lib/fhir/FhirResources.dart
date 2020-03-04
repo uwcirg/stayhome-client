@@ -44,6 +44,63 @@ class Patient extends Resource {
       this.communication})
       : super(resourceType: "Patient", id: id);
 
+  Patient.fromNewPatientForm(
+      String phoneNumber, String lastName, String firstName, String emailAddress, Address address) {
+//    Name
+//    Device phone number
+//    Address
+//    County
+//    Email address
+    this.telecom = [
+      ContactPoint(use: "mobile", system: "phone", value: phoneNumber),
+      ContactPoint(system: "email", value: emailAddress)
+    ];
+    this.address = [address];
+    this.name = [
+      HumanName(family: lastName, given: [firstName])
+    ];
+  }
+
+  get firstName => this.name[0].given[0];
+
+  get lastName => this.name[0].family;
+
+  set emailAddress(String text) {
+    this.telecom ??= [];
+    ContactPoint p = this.telecom.firstWhere((ContactPoint p) => p.system == "email");
+    if (p == null) {
+      this.telecom.add(ContactPoint(system: "email", value: text));
+    } else {
+      p.value = text;
+    }
+  }
+
+  set phoneNumber(String text) {
+    this.telecom ??= [];
+    ContactPoint p = this.telecom.firstWhere((ContactPoint p) => p.system == "phone");
+    if (p == null) {
+      this.telecom.add(ContactPoint(system: "phone", value: text));
+    } else {
+      p.value = text;
+    }
+  }
+
+  get emailAddress => this.telecom != null && this.telecom.length > 0
+      ? this
+          .telecom
+          .firstWhere((ContactPoint p) => p.system == "email",
+              orElse: () => ContactPoint(value: null))
+          .value
+      : null;
+
+  get phoneNumber => this.telecom != null && this.telecom.length > 0
+      ? this
+          .telecom
+          .firstWhere((ContactPoint p) => p.system == "phone",
+              orElse: () => ContactPoint(value: null))
+          .value
+      : null;
+
   Patient.fromJson(Map<String, dynamic> json) {
     resourceType = json['resourceType'];
     id = json['id'];
@@ -216,11 +273,19 @@ class Address {
   List<Extension> extension;
   List<String> line;
   String city;
+  String district;
   String state;
   String postalCode;
   String country;
 
-  Address({this.extension, this.line, this.city, this.state, this.postalCode, this.country});
+  Address(
+      {this.extension,
+      this.line,
+      this.city,
+      this.district,
+      this.state,
+      this.postalCode,
+      this.country});
 
   Address.fromJson(Map<String, dynamic> json) {
     if (json['extension'] != null) {
@@ -233,6 +298,7 @@ class Address {
       line = json['line'].cast<String>();
     }
     city = json['city'];
+    district = json['district'];
     state = json['state'];
     postalCode = json['postalCode'];
     country = json['country'];
@@ -245,10 +311,16 @@ class Address {
     }
     data['line'] = this.line;
     data['city'] = this.city;
+    data['district'] = this.district;
     data['state'] = this.state;
     data['postalCode'] = this.postalCode;
     data['country'] = this.country;
     return data;
+  }
+
+  @override
+  String toString() {
+    return "${line.join(', ')}, $city, $state $postalCode";
   }
 }
 
