@@ -40,7 +40,8 @@ class _ProgressInsightsPageState extends State<ProgressInsightsPage> {
     for (QuestionnaireResponse q in model.questionnaireResponses) {
       if (q.item != null) {
         for (QuestionnaireResponseItem i in q.item) {
-          questions.add(model.questionForLinkId(i.linkId));
+          var questionForLinkId = model.questionForLinkId(i.linkId);
+          if (questionForLinkId != null )questions.add(questionForLinkId);
         }
       }
     }
@@ -117,18 +118,19 @@ class SimpleTimeSeriesChart extends StatelessWidget {
       defaultRenderer: new charts.LineRendererConfig(includePoints: true, includeArea: true),
       primaryMeasureAxis: new charts.NumericAxisSpec(
           tickFormatterSpec: charts.BasicNumericTickFormatterSpec((num value) {
-        switch (value) {
-          case 0:
-            return "Not at all";
-          case 1:
-            return "A little bit";
-          case 2:
-            return "Somewhat";
-          case 3:
-            return "Quite a bit";
-          default:
-            return "Very much";
-        }
+            return '$value';
+//        switch (value) {
+//          case 0:
+//            return "Not at all";
+//          case 1:
+//            return "A little bit";
+//          case 2:
+//            return "Somewhat";
+//          case 3:
+//            return "Quite a bit";
+//          default:
+//            return "Very much";
+//        }
       })),
     );
   }
@@ -144,18 +146,21 @@ class SimpleTimeSeriesChart extends StatelessWidget {
       if (response.item != null) {
         var answers =
             response.item.where((QuestionnaireResponseItem r) => r.linkId == linkId).toList();
-        if (answers.length > 0) {
+        if (answers.length > 0 && answers[0].answer != null && answers[0].answer.length > 0) {
           Answer answer = answers[0].answer[0];
-          int answerValue = answer.valueInteger;
-          if (questionnaireItem.answerOption[0].extension != null &&
-              questionnaireItem.answerOption[0].extension
-                  .any((Extension e) => e.url.contains("ordinalValue"))) {
-            AnswerOption option = questionnaireItem.answerOption
-                .firstWhere((AnswerOption o) => answer == o, orElse: () => null);
-            if (option != null) {
-              answerValue = option.extension
-                  .firstWhere((Extension e) => e.url.contains("ordinalValue"))
-                  .valueDecimal;
+          double answerValue = answer.valueDecimal;
+          if (answerValue== null) answerValue = answer.valueInteger as double;
+          if (questionnaireItem.answerOption != null && questionnaireItem.answerOption.length>0) {
+            if (questionnaireItem.answerOption[0].extension != null &&
+                questionnaireItem.answerOption[0].extension
+                    .any((Extension e) => e.url.contains("ordinalValue"))) {
+              AnswerOption option = questionnaireItem.answerOption
+                  .firstWhere((AnswerOption o) => answer == o, orElse: () => null);
+              if (option != null) {
+                answerValue = option.extension
+                    .firstWhere((Extension e) => e.url.contains("ordinalValue"))
+                    .valueDecimal as double;
+              }
             }
           }
           data.add(AnswerTimeSeries(response.authored, answerValue));
@@ -180,7 +185,7 @@ class SimpleTimeSeriesChart extends StatelessWidget {
 /// Sample time series data type.
 class AnswerTimeSeries {
   final DateTime time;
-  final int answer;
+  final double answer;
 
   AnswerTimeSeries(this.time, this.answer);
 }

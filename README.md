@@ -32,3 +32,21 @@ CocoaPods to work at all ..."
 
 In Xcode click on the project -> Project (not target) -> Info tab -> Configurations -> change the
 drop down for each of "Profile", "Release", and "Debug" to "None", then run `pod install`
+
+"error: module compiled with Swift 5.0 cannot be imported by the Swift 5.1 compiler: "
+ ... /mapapp/map-app-client/ios/Pods/CouchbaseLite-Swift/iOS/CouchbaseLiteSwift.framework/Modules/CouchbaseLiteSwift.swiftmodule/x86_64.swiftmodule
+    import CouchbaseLiteSwift"
+
+This is an issue with the Couchbase version dependency. Make sure you depend on a recent version of CouchbaseSwift (one that was compiled with swift 5.1 or newer).
+One solution is to checkout fluttercouch and build from source, making sure to update the CouchbaseLite version in the podspec:
+
+ pubspec.yaml:
+ ```
+ fluttercouch:
+    path: ../fluttercouch/
+ ```
+
+ update version dependency:
+ ```
+ sed -i 's/~> 2.5.1/~> 2.6.3/g' ../fluttercouch/ios/fluttercouch.podspec
+ ```

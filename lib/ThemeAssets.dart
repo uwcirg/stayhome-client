@@ -13,7 +13,6 @@ import 'package:map_app_flutter/SessionPage.dart';
 import 'package:map_app_flutter/color_palette.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
-import 'package:map_app_flutter/model/AppModel.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:scoped_model/scoped_model.dart';
 
@@ -170,7 +169,8 @@ class JoyluxThemeAssets extends ThemeAssets {
       "/home": (BuildContext context) => new PlanPage(),
       "/guestHome": (BuildContext context) => learningCenter,
       "/profile": (BuildContext context) =>
-          new ScopedModel<AppModel>(model: new AppModel(), child: ProfilePage()),
+//          new ScopedModel<AppModel>(model: new AppModel(), child: ProfilePage()),
+    ProfilePage(),
       "/start_session": (BuildContext context) => SessionPage(),
       "/devices": (BuildContext context) => DevicesPage(),
       "/contact_community": (BuildContext context) =>

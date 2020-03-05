@@ -1324,7 +1324,7 @@ class QuestionnaireItem {
       this.item});
 
   bool isSupported() {
-    return answerOption != null || answerValueSet != null;
+    return answerOption != null || answerValueSet != null || type == "decimal";
   }
 
   loadValueSet() async {
@@ -1583,14 +1583,17 @@ class QuestionnaireResponseItem {
 
 class Answer {
   int valueInteger;
+  double valueDecimal;
   Coding valueCoding;
 
-  Answer({this.valueInteger, this.valueCoding});
+  Answer({this.valueDecimal, this.valueInteger, this.valueCoding});
 
   bool operator ==(dynamic o) {
     if (o is Answer) {
       Answer other = o;
-      return valueInteger == other.valueInteger && valueCoding == other.valueCoding;
+      return valueInteger == other.valueInteger &&
+          valueCoding == other.valueCoding &&
+          valueDecimal == other.valueDecimal;
     } else if (o is AnswerOption) {
       AnswerOption other = o;
       return valueInteger == other.valueInteger && valueCoding == other.valueCoding;
@@ -1616,6 +1619,7 @@ class Answer {
   String toString() {
     if (valueInteger != null) return '$valueInteger';
     if (valueCoding != null) return valueCoding.toString();
+    if (valueDecimal != null) return valueDecimal.toString();
     return '';
   }
 
@@ -1626,13 +1630,15 @@ class Answer {
 
   Answer.fromJson(Map<String, dynamic> json) {
     valueInteger = json['valueInteger'];
-    valueCoding = Coding.fromJson(json['valueCoding']);
+    valueDecimal = json['valueDecimal'];
+    if (json['valueCoding'] != null) valueCoding = Coding.fromJson(json['valueCoding']);
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['valueInteger'] = this.valueInteger;
-    data['valueCoding'] = this.valueCoding.toJson();
+    if (this.valueInteger != null) data['valueInteger'] = this.valueInteger;
+    if (this.valueDecimal != null) data['valueDecimal'] = this.valueDecimal;
+    if (this.valueCoding != null) data['valueCoding'] = this.valueCoding.toJson();
     return data;
   }
 }
