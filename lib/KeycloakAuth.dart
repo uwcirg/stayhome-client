@@ -301,7 +301,7 @@ class KeycloakApi extends simpleAuth.OAuthApi {
   Future<simpleAuth.OAuthAccount> getAccountFromAuthCode(simpleAuth.WebAuthenticator authenticator) async {
 
     //TODO: Figure out why how to fix callback URL getting mangled
-    authenticator.redirectUrl = "http://[::1]:64898/#/authCallback";
+//    authenticator.redirectUrl = "http://[::1]:64898/#/authCallback";
     return super.getAccountFromAuthCode(authenticator);
   }
   @override

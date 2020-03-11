@@ -9,7 +9,7 @@ import 'package:map_app_flutter/platform_stub.dart';
 class WebDefs implements PlatformDefs {
 
   String redirectUrl() {
-    return window.location.href + 'authCallback';
+    return 'https://stayhome.cirg.washington.edu/#/authCallback';
   }
 
 }
