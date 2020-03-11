@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:map_app_flutter/AuthCallbackPage.dart';
 import 'package:map_app_flutter/ContactCommunityPage.dart';
 import 'package:map_app_flutter/DevicesPage.dart';
 import 'package:map_app_flutter/GoalsPage.dart';
@@ -179,7 +180,9 @@ class JoyluxThemeAssets extends ThemeAssets {
       "/learning_center": (BuildContext context) => learningCenter,
       "/about": (BuildContext context) => HelpPage(),
       "/goals": (BuildContext context) => GoalsPage(),
-      "/login": (BuildContext context) => LoginPage()
+      "/login": (BuildContext context) => LoginPage(),
+      "/authCallback": (BuildContext context) => AuthCallbackPage()
+
     };
   }
 }
@@ -253,7 +256,8 @@ class StayHomeThemeAssets extends ThemeAssets {
       "/progress_insights": (BuildContext context) => ProgressInsightsPage(),
       "/learning_center": (BuildContext context) => learningCenter,
       "/about": (BuildContext context) => StayHomeHelpPage(),
-      "/login": (BuildContext context) => LoginPage()
+      "/login": (BuildContext context) => LoginPage(),
+      "/authCallback": (BuildContext context) => AuthCallbackPage()
     };
   }
 }

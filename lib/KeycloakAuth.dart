@@ -3,18 +3,22 @@
  */
 
 import 'dart:convert';
-import 'dart:io' show HTTP, HttpClient, HttpClientRequest, HttpClientResponse;
+import 'dart:html';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' show Response, get, post, Client;
-import 'package:simple_auth/simple_auth.dart' as simpleAuth;
+import 'package:map_app_flutter/platform_stub.dart';
 import 'package:oauth2/oauth2.dart' as oauth2;
+import 'package:simple_auth/simple_auth.dart' as simpleAuth;
 import 'package:simple_auth_flutter/simple_auth_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+
 class KeycloakAuth {
   static final String _issuer = 'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp';
-  static final String _redirectUrl = 'https://stayhome.cirg.washington.edu/#/home';
+
+  static final String _redirectUrl = PlatformDefs().redirectUrl();
+
   static final String _clientSecret = 'b284cf4f-17e7-4464-987e-3c320b22cfac';
   static final String _clientId = 'map-app-client';
   static final _authorizationEndpoint = Uri.parse('$_issuer/protocol/openid-connect/auth');
@@ -35,7 +39,7 @@ class KeycloakAuth {
 
   KeycloakAuth() {
     _api = new KeycloakApi(_issuer, _clientId, _clientSecret, _redirectUrl,
-        scopes: ["openid", "profile"]);
+        scopes: ["openid"]);
     var grant = oauth2.AuthorizationCodeGrant(_clientId, _authorizationEndpoint, _tokenEndpoint,
         secret: _clientSecret);
   }
@@ -43,7 +47,7 @@ class KeycloakAuth {
   Future mapAppLogin() async {
     try {
       simpleAuth.OAuthAccount account = await _api.authenticate();
-      print(account);
+      print("Account has been returned mapAppLogin");
       _accessToken = account.token;
       _refreshToken = account.refreshToken;
       accessTokenExpirationDateTime = account.created.add(Duration(seconds: account.expiresIn));
@@ -59,6 +63,26 @@ class KeycloakAuth {
     isDummyLogin = true;
     isLoggedIn = true;
     refreshTokenExpired = false;
+  }
+
+  Future mapAppCreateAccount(String firstName, String lastName, String email,
+      {String userName}) async {
+    var url = '$_issuer/users';
+    if (userName == null) {
+      userName = email;
+    }
+    try {
+      var value = await post(url, body: {
+        "origin": "MapApp",
+        "username": userName,
+        "firstName": firstName,
+        "lastName": lastName,
+        "email": email
+      });
+    } catch (error) {
+      print(error);
+      return Future.error("Error creating user: $error");
+    }
   }
 
   Future mapAppLogout() async {
@@ -178,6 +202,49 @@ class KeycloakAuth {
     this.userInfo = UserInfo.from(jsonDecode(userInfoJson));
     return Future.value(this.userInfo);
   }
+
+  Future receivedCallback(String change) async {
+
+    var authenticator = _api.authenticator;
+//    var authenticator = SimpleAuthFlutter.authenticators[_api.authenticator.identifier];
+    if (change == "canceled") {
+      authenticator.cancel();
+      return;
+    } else if (change == "error") {
+      authenticator.onError("Error: $change");
+      return;
+    }
+
+    Uri uri = Uri.tryParse(change);
+    print("The URI was: $uri\n it contained code: ${uri.queryParameters.containsKey("code")}");
+
+    if (authenticator.checkUrl(uri)) {
+      // --- copy pasted sections - need cleanup!
+      // from API code
+      var token = await authenticator.getAuthCode();
+      print("Token: $token");
+      if (token?.isEmpty ?? true) {
+        throw new Exception("Null Token");
+      }
+      simpleAuth.OAuthAccount account = await _api.getAccountFromAuthCode(authenticator);
+      print("account received: $account");
+      _api.saveAccountToCache(account);
+      _api.currentAccount = account;
+
+      //from KeycloakAuth mapAppLogin callback
+      print("Account has been returned receivedCallback");
+      _accessToken = account.token;
+      _refreshToken = account.refreshToken;
+      accessTokenExpirationDateTime = account.created.add(Duration(seconds: account.expiresIn));
+
+      isLoggedIn = true;
+      refreshTokenExpired = false;
+
+      return;
+    } else {
+      authenticator.onError("Unable to get an AuthToken from the server");
+    }
+  }
 }
 
 class UserInfo {
@@ -229,62 +296,43 @@ class KeycloakApi extends simpleAuth.OAuthApi {
           authStorage: authStorage,
         );
 
+
+  @override
+  Future<simpleAuth.OAuthAccount> getAccountFromAuthCode(simpleAuth.WebAuthenticator authenticator) async {
+
+    //TODO: Figure out why how to fix callback URL getting mangled
+    authenticator.redirectUrl = "http://[::1]:64898/#/authCallback";
+    return super.getAccountFromAuthCode(authenticator);
+  }
   @override
   get showAuthenticator {
     if (!kIsWeb) return super.showAuthenticator;
-    print("Detected web authentication attempt.");
 
     return (simpleAuth.WebAuthenticator authenticator) async {
+      print("Detected web authentication attempt.");
       if (authenticator.redirectUrl == null) {
         authenticator.onError("redirectUrl cannot be null");
         return;
       }
-      var initialUrl = await authenticator.getInitialUrl();
+      Uri initialUrl = await authenticator.getInitialUrl();
       print("InitialUrl: $initialUrl");
 
       SimpleAuthFlutter.authenticators[authenticator.identifier] = authenticator;
 
-      var grant = new oauth2.AuthorizationCodeGrant(
-          identifier, Uri.parse(this.authorizationUrl), Uri.parse(this.tokenUrl),
-          secret: this.clientSecret);
-      var url = authenticator.redirectUrl;
-      print("redirectUrl: $url");
-      var auth_url = grant.getAuthorizationUrl(Uri.parse(url));
-      print("auth_url: $auth_url");
+      await _launchURL(initialUrl.toString());
 
-      _launchURL(initialUrl);
-
-      await new HttpClient().getUrl(auth_url)
-          .then((HttpClientRequest request) => request.close(), onError: (error) => print("error1: $error"))
-          .then((HttpClientResponse response) {
-        print("this is the response");
-
-      }, onError: (error) => print("error2: $error"));
-
-//      var request = await listen
-
-
-//      String url = await _channel.invokeMethod("showAuthenticator", {
-//        "initialUrl": initialUrl.toString(),
-//        "identifier": authenticator.identifier,
-//        "title": authenticator.title,
-//        "allowsCancel": authenticator.allowsCancel.toString(),
-//        "redirectUrl": authenticator.redirectUrl,
-//        "useEmbeddedBrowser": authenticator.useEmbeddedBrowser.toString()
-//      });
-//      if (url == "cancel") {
-//        authenticator.cancel();
-//        return;
-//      }
     };
   }
-  _launchURL(url) async {
-    print("Launching with url_launcher1: $url");
-    if (await canLaunch(url)) {
-      print("Launching with url_launcher2");
 
-      await launch(url);
+  _launchURL(String url) async {
+    print("Launching with url_launcher1: $url");
+    if (await canLaunch(url).catchError((error) => print("Error: $error"))) {
+      print("Launching with url_launcher2");
+      // TODO the standard API launches in a new tab - find a way around this or abstract so mobile compiles
+//      await launch(url);
+      window.open(url, "_self");
     } else {
+
       print('Could not launch $url');
       throw 'Could not launch $url';
     }
