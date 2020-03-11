@@ -2,7 +2,10 @@
  * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
  */
 
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
@@ -40,14 +43,16 @@ class ContactCommunityPage extends StatelessWidget {
   }
 
   List<Widget> _buildContactItems(BuildContext context) {
-    return _contactPageButtons(context,_contactPageContents.links, Theme.of(context).primaryColor);
+    return _contactPageButtons(context, _contactPageContents.links, Theme.of(context).primaryColor);
   }
 
   List<Widget> _buildWeblinks(BuildContext context) {
-    return _contactPageButtons(context,_contactPageContents.buttons, Theme.of(context).accentColor);
+    return _contactPageButtons(
+        context, _contactPageContents.buttons, Theme.of(context).accentColor);
   }
 
-  List<Widget> _contactPageButtons(BuildContext context, List<ContactPageItem> items, Color buttonColor) {
+  List<Widget> _contactPageButtons(
+      BuildContext context, List<ContactPageItem> items, Color buttonColor) {
     return items.map((ContactPageItem item) {
       return Padding(
         padding: const EdgeInsets.all(8.0),
@@ -71,6 +76,7 @@ class ContactCommunityPage extends StatelessWidget {
   }
 
   _launchURL(url, context) async {
+    print('Launching url: $url');
     if (await canLaunch(url)) {
       await launch(url);
     } else {
@@ -94,8 +100,7 @@ class ContactPageContents {
       ContactPageItem(MdiIcons.bookOpenVariant, S.of(context).read_our_blog,
           url: "https://www.getvfit.com/blogs/news"),
     ], [
-      ContactPageItem(MdiIcons.phone, "+1 844-872-8578",
-          url: "tel:+1 844-872-8578"),
+      ContactPageItem(MdiIcons.phone, "+1 844-872-8578", url: "tel:+1 844-872-8578"),
       ContactPageItem(MdiIcons.email, "customercare@getvfit.com",
           url: "mailto:customercare@getvfit.com"),
     ]);
