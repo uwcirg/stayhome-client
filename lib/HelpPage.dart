@@ -141,7 +141,7 @@ class _StayHomeHelpPageState extends _HelpPageState {
           ),
           Text(S.of(context).developedByCIRG),
           Text(""),
-          Text(S.of(context).versionString("0.0")),
+          Text(S.of(context).versionString(VersionInfo.version)),
           Text(""),
         ],
         crossAxisAlignment: CrossAxisAlignment.stretch,
