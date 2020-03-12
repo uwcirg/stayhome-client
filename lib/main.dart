@@ -29,7 +29,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _locale = 'en';
   KeycloakAuth auth;
-  String title = 'CIRG Map App';
+  String title = 'StayHome.app';
   CarePlanModel _carePlanModel;
 
   // Theme can be changed on a code level here
