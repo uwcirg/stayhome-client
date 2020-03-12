@@ -98,7 +98,7 @@ class LoginPageState extends State<LoginPage> {
                                       child: Text("demo",
                                           style: Theme.of(context).primaryTextTheme.title))),
                             ),
-                            Text("v2020.03.11.1",
+                            Text(VersionInfo.version,
                                 style: Theme.of(context).primaryTextTheme.subtitle)
 //                          FlatButton(
 //                              onPressed: () => MyApp.of(context).toggleAppMode(),
