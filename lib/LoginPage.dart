@@ -2,9 +2,7 @@
  * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
  */
 
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:map_app_flutter/const.dart';
@@ -22,7 +20,6 @@ class LoginPage extends StatefulWidget {
 class LoginPageState extends State<LoginPage> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     SimpleAuthFlutter.init(context);
   }
@@ -34,15 +31,7 @@ class LoginPageState extends State<LoginPage> {
       value: MyApp.of(context).themeAssets.systemUiOverlayStyle,
       child: DecoratedBox(
           position: DecorationPosition.background,
-          decoration: MyApp.of(context).themeAssets.loginBackgroundImagePath != null
-              ? BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage(MyApp.of(context).themeAssets.loginBackgroundImagePath),
-                      fit: BoxFit.fitHeight,
-                      alignment: FractionalOffset(0.8, 0)))
-              : BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                ),
+          decoration: MyApp.of(context).themeAssets.loginBackgroundDecoration(),
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -51,59 +40,74 @@ class LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   MyApp.of(context).themeAssets.loginBanner(context),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      Visibility(
-                        visible: MyApp.of(context).auth.refreshTokenExpired,
-                        child: Text(S.of(context).session_expired_please_log_in_again),
-                      ),
-                      RaisedButton(
-                          color: Color.fromRGBO(255, 255, 255, 100),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(50.0),
-                          ),
-                          elevation: 0,
-                          onPressed: () => MyApp.of(context)
-                              .auth
-                              .mapAppLogin()
-                              .then((value) => dismissLoginScreen(context))
-                              .catchError((error) => snack("$error", context)),
-                          child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 14),
-                              child: Text(
-                                S.of(context).login,
-                                style:
-                                    Theme.of(context).textTheme.subhead.apply(color: Colors.black),
-                                textAlign: TextAlign.center,
-                              ))),
-                      ...MyApp.of(context).themeAssets.additionalLoginPageViews(context),
-                      FlatButton(
-                          onPressed: () => dismissLoginScreen(context),
-                          child: Padding(
-                              padding: EdgeInsets.all(Dimensions.fullMargin),
-                              child: Text(S.of(context).not_now,
-                                  style: Theme.of(context).primaryTextTheme.subtitle))),
-                      Row(
-                        children: <Widget>[
-                          FlatButton(
-                              onPressed: () => MyApp.of(context)
-                                  .auth
-                                  .dummyLogin()
-                                  .then((value) => dismissLoginScreen(context))
-                                  .catchError((error) => snack("$error", context)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 100),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        Visibility(
+                          visible: MyApp.of(context).auth.refreshTokenExpired,
+                          child: Text(S.of(context).session_expired_please_log_in_again),
+                        ),
+                        RaisedButton(
+                            color: Colors.white,
+
+                            elevation: 0,
+                            onPressed: () => MyApp.of(context)
+                                .auth
+                                .mapAppLogin()
+                                .then((value) => dismissLoginScreen(context))
+                                .catchError((error) => snack("$error", context)),
+                            child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 45),
+                                child: Text(
+                                  S.of(context).login,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .title
+                                      .apply(color: Theme.of(context).primaryColor),
+                                  textAlign: TextAlign.center,
+                                ))),
+                        ...MyApp.of(context).themeAssets.additionalLoginPageViews(context),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: OutlineButton(
+                              onPressed: () => dismissLoginScreen(context),
+                              borderSide: BorderSide(color: Colors.white, width: 6),
+
+                              highlightElevation: 0,
                               child: Padding(
-                                  padding: EdgeInsets.all(Dimensions.fullMargin),
-                                  child: Text("Demo",
-                                      style: Theme.of(context).primaryTextTheme.subtitle))),
+                                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 45),
+                                  child: Text(S.of(context).not_now,
+                                      style: Theme.of(context).primaryTextTheme.title))),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              child: FlatButton(
+                                  onPressed: () => MyApp.of(context)
+                                      .auth
+                                      .dummyLogin()
+                                      .then((value) => dismissLoginScreen(context))
+                                      .catchError((error) => snack("$error", context)),
+                                  child: Padding(
+                                      padding: EdgeInsets.all(Dimensions.fullMargin),
+                                      child: Text("demo",
+                                          style: Theme.of(context).primaryTextTheme.title))),
+                            ),
+                            Text("v2020.03.11.1",
+                                style: Theme.of(context).primaryTextTheme.subtitle)
 //                          FlatButton(
 //                              onPressed: () => MyApp.of(context).toggleAppMode(),
 //                              child: Text("Toggle app mode",
 //                                  style: Theme.of(context).primaryTextTheme.subtitle)),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

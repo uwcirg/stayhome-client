@@ -3,10 +3,11 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:map_app_flutter/LoginPage.dart';
 import 'package:map_app_flutter/ThemeAssets.dart';
+import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:toast/toast.dart';
-import 'package:map_app_flutter/generated/l10n.dart';
+
 import 'KeycloakAuth.dart';
 
 void main() {
@@ -63,13 +64,19 @@ class _MyAppState extends State<MyApp> {
               highlightColor: themeAssets.highlightColor,
               textTheme: themeAssets.textThemeOverride(Theme.of(context).textTheme),
               buttonTheme: ButtonThemeData(
-                  buttonColor: themeAssets.accentColor, textTheme: ButtonTextTheme.primary),
+                  buttonColor: themeAssets.accentColor,
+                  textTheme: ButtonTextTheme.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(50.0),
+                  ),
+              ),
               chipTheme: ChipTheme.of(context).copyWith(
                   selectedColor: themeAssets.accentColor,
                   secondarySelectedColor: themeAssets.accentColor,
                   labelStyle: Theme.of(context).textTheme.body1,
                   secondaryLabelStyle: Theme.of(context).accentTextTheme.body1)),
-          home: new LoginPage(), // Will replace after login is complete
+          home: new LoginPage(),
+          // Will replace after login is complete
           routes: themeAssets.navRoutes(context),
           locale: Locale(_locale, ""),
           localizationsDelegates: [

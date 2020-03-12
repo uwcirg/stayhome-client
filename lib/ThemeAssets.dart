@@ -15,7 +15,6 @@ import 'package:map_app_flutter/color_palette.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:scoped_model/scoped_model.dart';
 
 abstract class ThemeAssets {
   final primarySwatch;
@@ -42,15 +41,15 @@ abstract class ThemeAssets {
 
   Widget drawerBanner(BuildContext context);
 
-  List<Widget> additionalLoginPageViews(BuildContext context) {
-    return [];
-  }
+  List<Widget> additionalLoginPageViews(BuildContext context);
 
   Widget appBarTitle();
 
   Map<String, WidgetBuilder> navRoutes(BuildContext context);
 
   List<MenuItem> navItems(BuildContext context);
+
+  loginBackgroundDecoration() {}
 }
 
 class JoyluxThemeAssets extends ThemeAssets {
@@ -94,6 +93,15 @@ class JoyluxThemeAssets extends ThemeAssets {
         mainAxisAlignment: MainAxisAlignment.center,
       )
     ];
+  }
+
+  @override
+  loginBackgroundDecoration() {
+    return BoxDecoration(
+        image: DecorationImage(
+            image: AssetImage(loginBackgroundImagePath),
+            fit: BoxFit.fitHeight,
+            alignment: FractionalOffset(0.8, 0)));
   }
 
   @override
@@ -171,7 +179,7 @@ class JoyluxThemeAssets extends ThemeAssets {
       "/guestHome": (BuildContext context) => learningCenter,
       "/profile": (BuildContext context) =>
 //          new ScopedModel<AppModel>(model: new AppModel(), child: ProfilePage()),
-    ProfilePage(),
+          ProfilePage(),
       "/start_session": (BuildContext context) => SessionPage(),
       "/devices": (BuildContext context) => DevicesPage(),
       "/contact_community": (BuildContext context) =>
@@ -182,7 +190,6 @@ class JoyluxThemeAssets extends ThemeAssets {
       "/goals": (BuildContext context) => GoalsPage(),
       "/login": (BuildContext context) => LoginPage(),
       "/authCallback": (BuildContext context) => AuthCallbackPage()
-
     };
   }
 }
@@ -197,9 +204,35 @@ class StayHomeThemeAssets extends ThemeAssets {
   Widget loginBanner(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 60),
-      child: Text(
-        "Stay Home",
-        style: Theme.of(context).primaryTextTheme.display1,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Padding(
+              padding: EdgeInsets.all(Dimensions.fullMargin),
+              child: Image.asset(
+                'assets/stayhome/icon_white.png',
+                height: 50,
+              )),
+          Text(
+            "StayHome",
+            style: Theme.of(context)
+                .primaryTextTheme
+                .headline2
+                .apply(color: Colors.white, fontWeightDelta: 2),
+          ),
+          Padding(
+              padding: EdgeInsets.all(Dimensions.quarterMargin),
+              child: Image.asset(
+                'assets/stayhome/Signature_Left_White.png',
+                height: 20,
+              )),
+          Padding(
+              padding: EdgeInsets.all(Dimensions.quarterMargin),
+              child: Image.asset(
+                'assets/stayhome/CIRG_logo_white.png',
+                height: 50,
+              )),
+        ],
       ),
     );
   }
@@ -216,6 +249,23 @@ class StayHomeThemeAssets extends ThemeAssets {
   @override
   Widget appBarTitle() {
     return Text("Stay home");
+  }
+
+  @override
+  List<Widget> additionalLoginPageViews(BuildContext context) {
+    // TODO: implement additionalLoginPageViews
+    return [];
+  }
+
+  @override
+  loginBackgroundDecoration() {
+    // TODO: implement loginBackgroundDecoration
+    return BoxDecoration(
+        gradient: LinearGradient(
+            colors: [primarySwatch, Color(0xFF5835BD)],
+            stops: [0.0, 0.7],
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter));
   }
 
   @override

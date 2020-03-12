@@ -319,7 +319,7 @@ class _PlanPageState extends State<PlanPage> {
   List<Widget> _buildQuestionnaireButtons(BuildContext context, CarePlanModel model) {
     return model.questionnaires
         .map((Questionnaire questionnaire) =>
-            _buildQuestionnaireButton(context, "Complete Questionnaire", questionnaire, model))
+            _buildQuestionnaireButton(context, "complete questionnaire", questionnaire, model))
         .toList();
   }
 
