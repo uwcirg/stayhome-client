@@ -41,7 +41,7 @@ class LoginPageState extends State<LoginPage> {
                 children: <Widget>[
                   MyApp.of(context).themeAssets.loginBanner(context),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 100),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
@@ -59,7 +59,7 @@ class LoginPageState extends State<LoginPage> {
                                 .then((value) => dismissLoginScreen(context))
                                 .catchError((error) => snack("$error", context)),
                             child: Padding(
-                                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 45),
+                                padding: EdgeInsets.symmetric(vertical: 12),
                                 child: Text(
                                   S.of(context).login,
                                   style: Theme.of(context)
@@ -77,7 +77,7 @@ class LoginPageState extends State<LoginPage> {
 
                               highlightElevation: 0,
                               child: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 45),
+                                  padding: EdgeInsets.symmetric(vertical: 12),
                                   child: Text(S.of(context).not_now,
                                       style: Theme.of(context).primaryTextTheme.title))),
                         ),
