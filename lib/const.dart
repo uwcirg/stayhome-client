@@ -20,11 +20,10 @@ class Dimensions {
 }
 
 class MapAppPadding {
-  static const buttonIconEdgeInsets =
-      const EdgeInsets.only(right: Dimensions.halfMargin);
+  static const buttonIconEdgeInsets = const EdgeInsets.only(right: Dimensions.halfMargin);
   static const cardPageMargins = const EdgeInsets.all(Dimensions.halfMargin);
   static const pageMargins = const EdgeInsets.all(Dimensions.fullMargin);
-  static const largeButtonPadding = const EdgeInsets.all(Dimensions.fullMargin);
+  static const largeButtonPadding = const EdgeInsets.all(10);
 
   MapAppPadding._();
 }

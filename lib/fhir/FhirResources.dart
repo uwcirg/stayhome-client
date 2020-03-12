@@ -852,14 +852,14 @@ class Repeat {
   double duration;
   String durationUnit;
   int frequency;
-  int period;
+  double period;
   String periodUnit;
 
   Repeat({this.frequency, this.period, this.periodUnit, this.durationUnit, this.duration});
 
   Repeat.fromJson(Map<String, dynamic> json) {
     frequency = json['frequency'];
-    period = json['period'];
+    period = json['period'].toDouble();
     if (json['duration'] != null) duration = json['duration'].toDouble();
     periodUnit = json['periodUnit'];
     durationUnit = json['durationUnit'];

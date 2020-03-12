@@ -3,7 +3,6 @@
  */
 
 import 'dart:convert';
-import 'dart:html';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' show Response, get, post, Client;
@@ -11,7 +10,6 @@ import 'package:map_app_flutter/platform_stub.dart';
 import 'package:oauth2/oauth2.dart' as oauth2;
 import 'package:simple_auth/simple_auth.dart' as simpleAuth;
 import 'package:simple_auth_flutter/simple_auth_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 
 class KeycloakAuth {
@@ -301,7 +299,7 @@ class KeycloakApi extends simpleAuth.OAuthApi {
   Future<simpleAuth.OAuthAccount> getAccountFromAuthCode(simpleAuth.WebAuthenticator authenticator) async {
 
     //TODO: Figure out why how to fix callback URL getting mangled
-//    authenticator.redirectUrl = "http://[::1]:64898/#/authCallback";
+//    authenticator.redirectUrl = "http://localhost:61615/#/authCallback";
     return super.getAccountFromAuthCode(authenticator);
   }
   @override
@@ -319,22 +317,9 @@ class KeycloakApi extends simpleAuth.OAuthApi {
 
       SimpleAuthFlutter.authenticators[authenticator.identifier] = authenticator;
 
-      await _launchURL(initialUrl.toString());
+      await PlatformDefs().launchUrl(initialUrl.toString());
 
     };
   }
 
-  _launchURL(String url) async {
-    print("Launching with url_launcher1: $url");
-    if (await canLaunch(url).catchError((error) => print("Error: $error"))) {
-      print("Launching with url_launcher2");
-      // TODO the standard API launches in a new tab - find a way around this or abstract so mobile compiles
-//      await launch(url);
-      window.open(url, "_self");
-    } else {
-
-      print('Could not launch $url');
-      throw 'Could not launch $url';
-    }
-  }
 }

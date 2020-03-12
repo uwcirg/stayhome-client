@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -74,7 +76,8 @@ class _MyAppState extends State<MyApp> {
                   selectedColor: themeAssets.accentColor,
                   secondarySelectedColor: themeAssets.accentColor,
                   labelStyle: Theme.of(context).textTheme.body1,
-                  secondaryLabelStyle: Theme.of(context).accentTextTheme.body1)),
+                  secondaryLabelStyle: Theme.of(context).accentTextTheme.body1),
+              dividerTheme: DividerThemeData(thickness: 1)),
           home: new LoginPage(),
           // Will replace after login is complete
           routes: themeAssets.navRoutes(context),

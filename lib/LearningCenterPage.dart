@@ -10,6 +10,7 @@ import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
+import 'package:map_app_flutter/platform_stub.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LearningCenterPage extends StatelessWidget {
@@ -266,28 +267,16 @@ class StayHomeLearningCenterPage extends LearningCenterPage {
     switch (i) {
       case 0:
         return _buildLearningCenterListItem(context, "CDC Information",
-            onTap: () =>
-                _launchURL("https://www.cdc.gov/coronavirus/2019-ncov/about/index.html", context));
+            onTap: () => PlatformDefs()
+                .launchUrl("https://www.cdc.gov/coronavirus/2019-ncov/about/index.html"));
       case 1:
         return _buildLearningCenterListItem(context, "King County Coronavirus Fact Sheet",
-            onTap: () => _launchURL(
-                "https://kingcounty.gov/depts/health/communicable-diseases/disease-control/novel-coronavirus/~/media/depts/health/communicable-diseases/documents/novel-coronavirus-factsheet.ashx",
-                context));
+            onTap: () => PlatformDefs().launchUrl(
+                "https://kingcounty.gov/depts/health/communicable-diseases/disease-control/novel-coronavirus/~/media/depts/health/communicable-diseases/documents/novel-coronavirus-factsheet.ashx"));
       default:
         return _buildLearningCenterListItem(context, "Quarantine Resources",
-            onTap: () => _launchURL(
-                "https://www.washington.edu/news/2020/03/05/the-food-you-need-uw-expert-on-preparing-for-an-extended-home-stay/?utm_source=UW_News_Subscribers&utm_medium=email&utm_campaign=UW_Today_row&mkt_tok=eyJpIjoiTlRGbU9UVXhZMlprTnpZeSIsInQiOiJ0NVwvRWtzajVBQ1pLb0lXcDA5UDhUMjgwQjZPakRReG9nNUNmNStpR3huNFFwYzlocGNYV0pkazJkNmdacWd6bnI0SGs0ODl5UURlS1pQeHYwaThONEZTZFFtUG81V0ZMRisxb1p2VjUyN3ZQa04xUWlsZUNxbUo0d2VrajkzaEEifQ%3D%3D",
-                context));
-    }
-  }
-
-  _launchURL(url, context) async {
-    print('Launching url: $url');
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      snack(
-          'Could not launch $url: Make sure you have an app to handle this kind of link.', context);
+            onTap: () => PlatformDefs().launchUrl(
+                "https://www.washington.edu/news/2020/03/05/the-food-you-need-uw-expert-on-preparing-for-an-extended-home-stay/?utm_source=UW_News_Subscribers&utm_medium=email&utm_campaign=UW_Today_row&mkt_tok=eyJpIjoiTlRGbU9UVXhZMlprTnpZeSIsInQiOiJ0NVwvRWtzajVBQ1pLb0lXcDA5UDhUMjgwQjZPakRReG9nNUNmNStpR3huNFFwYzlocGNYV0pkazJkNmdacWd6bnI0SGs0ODl5UURlS1pQeHYwaThONEZTZFFtUG81V0ZMRisxb1p2VjUyN3ZQa04xUWlsZUNxbUo0d2VrajkzaEEifQ%3D%3D"));
     }
   }
 }

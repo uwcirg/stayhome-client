@@ -117,7 +117,7 @@ class CarePlanModel extends Model {
     Repository.postQuestionnaireResponse(response).then((value) => load());
   }
 
-  void updateActivityFrequency(int activityIndex, int newFrequency) {
+  void updateActivityFrequency(int activityIndex, double newFrequency) {
     carePlan.activity[activityIndex].detail.scheduledTiming.repeat.period = newFrequency;
     Repository.updateCarePlan(carePlan).then((value) => load());
   }
@@ -239,9 +239,9 @@ class TreatmentCalendar {
         throw MalformedFhirResourceException(plan,
             "Resource must have a period length specified in every activity.detail.scheduledTiming");
       }
-      int every = activity.detail.scheduledTiming.repeat.period;
+      double every = activity.detail.scheduledTiming.repeat.period;
       TreatmentEvent event = TreatmentEvent.scheduledEventForActivity(activity);
-      addEvents(scheduledPeriod, every, event);
+      addScheduledTreatmentEvents(scheduledPeriod, every, event);
     }
   }
 
@@ -260,14 +260,26 @@ class TreatmentCalendar {
     return scheduledPeriod;
   }
 
-  void addEvents(Period period, int every, TreatmentEvent event) {
+  void addScheduledTreatmentEvents(Period period, double everyNumberOfDays, TreatmentEvent event) {
+    Duration interval;
+    if (everyNumberOfDays % 1 != 0) {
+      interval = Duration(hours: (everyNumberOfDays * 24).round());
+    } else {
+      interval = Duration(hours: everyNumberOfDays.round() * 24);
+    }
     var date = period.start;
+    var now = DateTime.now();
+    var today = DateTime(now.year, now.month, now.day);
     while (date.isBefore(period.end)) {
-      if (date.difference(period.start).inDays % every == 0) {
-        List<TreatmentEvent> dateEvents = events.putIfAbsent(date, () => []);
-        dateEvents.add(TreatmentEvent.from(event));
+      // add it to the same day on the calendar as all other events for that day
+      DateTime dayOfDate = DateTime(date.year, date.month, date.day);
+      // don't add scheduled events before today
+      if (!dayOfDate.isBefore(today)) {
+        List<TreatmentEvent> dateEvents = events.putIfAbsent(dayOfDate, () => []);
+        var treatmentEvent = TreatmentEvent.from(event);
+        dateEvents.add(treatmentEvent);
       }
-      date = date.add(Duration(days: every));
+      date = date.add(interval);
     }
   }
 }

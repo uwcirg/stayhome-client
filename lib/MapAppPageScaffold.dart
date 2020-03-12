@@ -50,10 +50,15 @@ class MapAppPageScaffold extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(
           top: Dimensions.largeMargin, left: Dimensions.largeMargin, right: Dimensions.largeMargin),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.title.apply(fontWeightDelta: 1),
-        textAlign: TextAlign.center,
+      child: Column(
+        children: <Widget>[
+          Text(
+            title.toLowerCase(),
+            style: Theme.of(context).textTheme.title.apply(fontWeightDelta: 1),
+            textAlign: TextAlign.center,
+          ),
+          Divider(indent: 80, endIndent: 80,)
+        ],
       ),
     );
   }

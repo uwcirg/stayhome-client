@@ -110,7 +110,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
                   padding: const EdgeInsets.all(Dimensions.halfMargin),
                   child: RaisedButton(
                     padding: MapAppPadding.largeButtonPadding,
-                    child: Text("Done"),
+                    child: Text("done", style: Theme.of(context).textTheme.button),
                     onPressed: _onPressed,
                   ),
                 );

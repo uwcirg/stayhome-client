@@ -2,17 +2,13 @@
  * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
  */
 
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
-import 'package:map_app_flutter/main.dart';
+import 'package:map_app_flutter/platform_stub.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ContactCommunityPage extends StatelessWidget {
   final ContactPageContents _contactPageContents;
@@ -68,22 +64,11 @@ class ContactCommunityPage extends StatelessWidget {
               Flexible(child: Text(item.text, style: Theme.of(context).accentTextTheme.title)),
             ]),
           ),
-          onPressed: () => _launchURL(item.url, context),
+          onPressed: () => PlatformDefs().launchUrl(item.url),
           color: buttonColor,
         ),
       );
     }).toList();
-  }
-
-  _launchURL(url, context) async {
-    print('Launching url: $url');
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      snack(
-          'Could not launch $url: Make sure you have an app to handle this kind of link.',
-          context);
-    }
   }
 }
 

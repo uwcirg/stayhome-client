@@ -58,7 +58,7 @@ class MapAppColors {
       200: Color(_stayHomeAccentValue),
     },
   );
-  static const int _stayHomeAccentValue = 0xFFb7a57a; // UW Gold
+  static const int _stayHomeAccentValue = 0xFFE8E4D2; // not UW Gold
 
   static const int _stayHomeHighlightValue = 0xFFD1C4E9; // Deep purple 100
 

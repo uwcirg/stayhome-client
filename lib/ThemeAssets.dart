@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:map_app_flutter/AuthCallbackPage.dart';
 import 'package:map_app_flutter/ContactCommunityPage.dart';
 import 'package:map_app_flutter/DevicesPage.dart';
 import 'package:map_app_flutter/GoalsPage.dart';
@@ -14,6 +13,7 @@ import 'package:map_app_flutter/SessionPage.dart';
 import 'package:map_app_flutter/color_palette.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
+import 'package:map_app_flutter/platform_stub.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 abstract class ThemeAssets {
@@ -189,7 +189,7 @@ class JoyluxThemeAssets extends ThemeAssets {
       "/about": (BuildContext context) => HelpPage(),
       "/goals": (BuildContext context) => GoalsPage(),
       "/login": (BuildContext context) => LoginPage(),
-      "/authCallback": (BuildContext context) => AuthCallbackPage()
+      "/authCallback": (BuildContext context) => PlatformDefs().getAuthCallbackPage(),
     };
   }
 }
@@ -214,7 +214,7 @@ class StayHomeThemeAssets extends ThemeAssets {
                 height: 50,
               )),
           Text(
-            "StayHome",
+            this.appName,
             style: Theme.of(context)
                 .primaryTextTheme
                 .headline2
@@ -236,19 +236,24 @@ class StayHomeThemeAssets extends ThemeAssets {
       ),
     );
   }
+  TextTheme textThemeOverride(TextTheme textTheme) {
+    return textTheme.copyWith(button: textTheme.subhead.apply(color: this.primarySwatch, fontWeightDelta: 2));
+  }
+
+  get appName => "StayHome";
 
   @override
   Widget drawerBanner(BuildContext context) {
     return Center(
         child: Text(
-      "Stay home",
+      this.appName,
       style: Theme.of(context).textTheme.title,
     ));
   }
 
   @override
   Widget appBarTitle() {
-    return Text("Stay home");
+    return Text(this.appName);
   }
 
   @override
@@ -307,7 +312,7 @@ class StayHomeThemeAssets extends ThemeAssets {
       "/learning_center": (BuildContext context) => learningCenter,
       "/about": (BuildContext context) => StayHomeHelpPage(),
       "/login": (BuildContext context) => LoginPage(),
-      "/authCallback": (BuildContext context) => AuthCallbackPage()
+      "/authCallback": (BuildContext context) => PlatformDefs().getAuthCallbackPage(),
     };
   }
 }

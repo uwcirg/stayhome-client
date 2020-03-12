@@ -38,7 +38,7 @@ class _HelpPageState extends State<HelpPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MapAppPageScaffold(child: _buildScreen(context));
+    return MapAppPageScaffold(child: _buildScreen(context), title: "about",);
   }
 
   Widget _buildScreen(BuildContext context) {
