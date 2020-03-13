@@ -105,13 +105,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flux_validator_dart:
-    dependency: "direct main"
-    description:
-      name: flux_validator_dart
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.3"
   http:
     dependency: transitive
     description:

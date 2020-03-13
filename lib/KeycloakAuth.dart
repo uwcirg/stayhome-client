@@ -18,10 +18,9 @@ class KeycloakAuth {
   static final String _clientSecret = 'b284cf4f-17e7-4464-987e-3c320b22cfac';
   static final String _clientId = 'map-app-client';
 
-  String _accessToken;
+
   DateTime accessTokenExpirationDateTime;
   bool isLoggedIn = false;
-  String _refreshToken;
 
   KeycloakApi _api;
 
@@ -39,8 +38,6 @@ class KeycloakAuth {
     try {
       simpleAuth.OAuthAccount account = await _api.authenticate();
       print("Account has been returned mapAppLogin");
-      _accessToken = account.token;
-      _refreshToken = account.refreshToken;
       accessTokenExpirationDateTime = account.created.add(Duration(seconds: account.expiresIn));
 
       isLoggedIn = true;
@@ -79,9 +76,7 @@ class KeycloakAuth {
   Future mapAppLogout() async {
     if (isDummyLogin) {
       isLoggedIn = false;
-      _accessToken = null;
       accessTokenExpirationDateTime = null;
-      _refreshToken = null;
       userInfo = null;
       return Future.value("Logged out");
     }
@@ -89,19 +84,18 @@ class KeycloakAuth {
     var url = '$_issuer/protocol/openid-connect/logout';
 
     try {
+      simpleAuth.OAuthAccount account = _api.currentOauthAccount;
       var value = await post(url, headers: {
-        "authorization": 'Bearer $_accessToken'
+        "authorization": 'Bearer ${account.token}'
       }, body: {
-        "refresh_token": _refreshToken,
+        "refresh_token": '${account.refreshToken}',
         "client_id": _clientId,
         "client_secret": _clientSecret
       });
 
       if (value.statusCode == 204) {
         isLoggedIn = false;
-        _accessToken = null;
         accessTokenExpirationDateTime = null;
-        _refreshToken = null;
         userInfo = null;
 
         // local logout
@@ -127,8 +121,6 @@ class KeycloakAuth {
     var success = await _api.refreshAccount(_api.currentAccount);
     if (success) {
       var account = _api.currentOauthAccount;
-      _accessToken = account.token;
-      _refreshToken = account.refreshToken;
       accessTokenExpirationDateTime = account.created.add(Duration(seconds: account.expiresIn));
     } else {
       return Future.error("Unable to refresh token");
@@ -137,8 +129,13 @@ class KeycloakAuth {
 
   Future<Response> _getUserInfo() {
     var url = '$_issuer/protocol/openid-connect/userinfo';
+    if (_api == null || _api.currentOauthAccount == null || _api.currentOauthAccount.token == null) {
+      print("_api.currentOauthAccount.token not set");
+      print(StackTrace.current);
+      return Future.error("Error getting user info. Please log in again.");
+    }
     return post(url, headers: {
-      'Authorization': 'Bearer $_accessToken',
+      'Authorization': 'Bearer ${_api.currentOauthAccount.token}',
     });
   }
 
@@ -162,7 +159,8 @@ class KeycloakAuth {
         userInfoJson = value.body;
       } else if (value.statusCode == 401) {
         try {
-          var value = await mapAppRefreshTokens();
+//          var value = await mapAppRefreshTokens();
+        await _api.refreshAccount(_api.currentAccount);
           try {
             var value = await _getUserInfo();
 
@@ -223,8 +221,6 @@ class KeycloakAuth {
 
       //from KeycloakAuth mapAppLogin callback
       print("Account has been returned receivedCallback");
-      _accessToken = account.token;
-      _refreshToken = account.refreshToken;
       accessTokenExpirationDateTime = account.created.add(Duration(seconds: account.expiresIn));
 
       isLoggedIn = true;
