@@ -9,44 +9,34 @@ import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
-import 'package:map_app_flutter/main.dart';
+import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:map_app_flutter/platform_stub.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:scoped_model/scoped_model.dart';
 
-class LearningCenterPage extends StatelessWidget {
+import 'main.dart';
+
+abstract class LearningCenterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
-        title: S.of(context).learning_center,
-        child: Expanded(
+      title: S.of(context).learning_center,
+      child: ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
+        if (model.isLoading) return Center(child: CircularProgressIndicator());
+        return Expanded(
             child: ListView.separated(
           primary: true,
           separatorBuilder: (context, i) => Divider(),
-          itemBuilder: _buildItems,
-          itemCount: 3,
+          itemBuilder: (context, i) => _buildItem(context, i, model),
+          itemCount: _itemCount(model),
           shrinkWrap: true,
-        )));
+        ));
+      }),
+    );
   }
 
-  Widget _buildItems(context, i) {
-    switch (i) {
-      case 0:
-        return _buildLearningCenterListItem(context, S.of(context).vfit_faq,
-            onTap: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (BuildContext context) => FAQPage(FAQ.faqs()))));
-      case 1:
-        return _buildLearningCenterListItem(context, S.of(context).womens_health_resources);
-      default:
-        return _buildLearningCenterListItem(
-          context,
-          S.of(context).testimonials,
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(
-                builder: (BuildContext context) => TestimonialsPage(Testimonial.testimonials())),
-          ),
-        );
-    }
-  }
+  Widget _buildItem(BuildContext context, int i, CarePlanModel model);
+
+  int _itemCount(CarePlanModel model);
 
   Widget _buildLearningCenterListItem(BuildContext context, String text, {Function onTap}) {
     return InkWell(
@@ -69,6 +59,49 @@ class LearningCenterPage extends StatelessWidget {
               ],
             )),
         onTap: onTap);
+  }
+}
+
+class JoyluxLearningCenterPage extends LearningCenterPage {
+  @override
+  Widget _buildItem(BuildContext context, int i, CarePlanModel model) {
+    switch (i) {
+      case 0:
+        return _buildLearningCenterListItem(context, S.of(context).vfit_faq,
+            onTap: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (BuildContext context) => FAQPage(FAQ.faqs()))));
+      case 1:
+        return _buildLearningCenterListItem(context, S.of(context).womens_health_resources);
+      default:
+        return _buildLearningCenterListItem(
+          context,
+          S.of(context).testimonials,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(
+                builder: (BuildContext context) => TestimonialsPage(Testimonial.testimonials())),
+          ),
+        );
+    }
+  }
+
+  @override
+  int _itemCount(CarePlanModel model) {
+    return 3;
+  }
+}
+
+class StayHomeLearningCenterPage extends LearningCenterPage {
+  @override
+  Widget _buildItem(BuildContext context, int i, CarePlanModel model) {
+    return _buildLearningCenterListItem(context, model.infoLinks[i].description,
+        onTap: () => model.infoLinks[i].url.isEmpty
+            ? snack("No content", context)
+            : PlatformDefs().launchUrl(model.infoLinks[i].url));
+  }
+
+  @override
+  int _itemCount(CarePlanModel model) {
+    return model != null && model.infoLinks != null ? model.infoLinks.length : 0;
   }
 }
 
@@ -258,25 +291,5 @@ class FAQPage extends StatelessWidget {
           itemCount: _faqs.length,
           shrinkWrap: true,
         )));
-  }
-}
-
-class StayHomeLearningCenterPage extends LearningCenterPage {
-  //TODO define these items/links in the database or configuration, rather than hardcoding
-  Widget _buildItems(context, i) {
-    switch (i) {
-      case 0:
-        return _buildLearningCenterListItem(context, "CDC Information",
-            onTap: () => PlatformDefs()
-                .launchUrl("https://www.cdc.gov/coronavirus/2019-ncov/about/index.html"));
-      case 1:
-        return _buildLearningCenterListItem(context, "King County Coronavirus Fact Sheet",
-            onTap: () => PlatformDefs().launchUrl(
-                "https://kingcounty.gov/depts/health/communicable-diseases/disease-control/novel-coronavirus/~/media/depts/health/communicable-diseases/documents/novel-coronavirus-factsheet.ashx"));
-      default:
-        return _buildLearningCenterListItem(context, "Quarantine Resources",
-            onTap: () => PlatformDefs().launchUrl(
-                "https://www.washington.edu/news/2020/03/05/the-food-you-need-uw-expert-on-preparing-for-an-extended-home-stay/?utm_source=UW_News_Subscribers&utm_medium=email&utm_campaign=UW_Today_row&mkt_tok=eyJpIjoiTlRGbU9UVXhZMlprTnpZeSIsInQiOiJ0NVwvRWtzajVBQ1pLb0lXcDA5UDhUMjgwQjZPakRReG9nNUNmNStpR3huNFFwYzlocGNYV0pkazJkNmdacWd6bnI0SGs0ODl5UURlS1pQeHYwaThONEZTZFFtUG81V0ZMRisxb1p2VjUyN3ZQa04xUWlsZUNxbUo0d2VrajkzaEEifQ%3D%3D"));
-    }
   }
 }

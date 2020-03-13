@@ -174,10 +174,10 @@ class JoyluxThemeAssets extends ThemeAssets {
 
   @override
   Map<String, WidgetBuilder> navRoutes(BuildContext context) {
-    var learningCenter = LearningCenterPage();
+    var learningCenter = (BuildContext context) => JoyluxLearningCenterPage();
     return <String, WidgetBuilder>{
       "/home": (BuildContext context) => new PlanPage(),
-      "/guestHome": (BuildContext context) => learningCenter,
+      "/guestHome": learningCenter,
       "/profile": (BuildContext context) =>
 //          new ScopedModel<AppModel>(model: new AppModel(), child: ProfilePage()),
           ProfilePage(),
@@ -186,7 +186,7 @@ class JoyluxThemeAssets extends ThemeAssets {
       "/contact_community": (BuildContext context) =>
           ContactCommunityPage(ContactPageContents.contents(context)),
       "/progress_insights": (BuildContext context) => ProgressInsightsPage(),
-      "/learning_center": (BuildContext context) => learningCenter,
+      "/learning_center": learningCenter,
       "/about": (BuildContext context) => HelpPage(),
       "/goals": (BuildContext context) => GoalsPage(),
       "/login": (BuildContext context) => LoginPage(),
@@ -304,13 +304,13 @@ class StayHomeThemeAssets extends ThemeAssets {
 
   @override
   Map<String, WidgetBuilder> navRoutes(BuildContext context) {
-    var learningCenter = StayHomeLearningCenterPage();
+    var learningCenter = (BuildContext context) => StayHomeLearningCenterPage();
     return <String, WidgetBuilder>{
       "/home": (BuildContext context) => new StayHomePlanPage(),
-      "/guestHome": (BuildContext context) => learningCenter,
+      "/guestHome": learningCenter,
       "/profile": (BuildContext context) => ProfilePage(),
       "/progress_insights": (BuildContext context) => ProgressInsightsPage(),
-      "/learning_center": (BuildContext context) => learningCenter,
+      "/learning_center": learningCenter,
       "/about": (BuildContext context) => StayHomeHelpPage(),
       "/login": (BuildContext context) => LoginPage(),
       "/what": (BuildContext context) => WhatPage(),

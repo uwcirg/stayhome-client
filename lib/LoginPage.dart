@@ -126,19 +126,23 @@ class LoginPageState extends State<LoginPage> {
   }
 
   void dismissLoginScreen(BuildContext context) {
+    var templateRef = MyApp.of(context).themeAssets.careplanTemplateRef;
+
     if (MyApp.of(context).auth.isLoggedIn) {
       MyApp.of(context).auth.getUserInfo().then((value) {
         var keycloakUserId = MyApp.of(context).auth.userInfo.keycloakUserId;
-        var templateRef = MyApp.of(context).themeAssets.careplanTemplateRef;
+
         ScopedModel.of<CarePlanModel>(context)
             .setUser(keycloakUserId, careplanTemplateRef: templateRef);
         Navigator.of(context).pushReplacementNamed('/home');
       }).catchError((error) {
+        ScopedModel.of<CarePlanModel>(context).setGuestUser(templateRef);
         Navigator.of(context).pushReplacementNamed('/guestHome');
       });
     } else {
       // clear credentials from browser by calling log out
       MyApp.of(context).logout();
+      ScopedModel.of<CarePlanModel>(context).setGuestUser(templateRef);
       Navigator.of(context).pushReplacementNamed('/guestHome');
     }
   }

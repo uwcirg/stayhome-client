@@ -823,6 +823,7 @@ class Detail {
   Period scheduledPeriod;
   String description;
   List<String> instantiatesCanonical;
+  List<Reference> reasonReference;
 
   Detail(
       {this.code,
@@ -832,7 +833,8 @@ class Detail {
       this.scheduledTiming,
       this.scheduledPeriod,
       this.description,
-      this.instantiatesCanonical});
+      this.instantiatesCanonical,
+      this.reasonReference});
 
   Detail.fromJson(Map<String, dynamic> json) {
     code = json['code'] != null ? new CodeableConcept.fromJson(json['code']) : null;
@@ -851,6 +853,12 @@ class Detail {
       instantiatesCanonical = new List<String>();
       json['instantiatesCanonical'].forEach((v) {
         instantiatesCanonical.add(v);
+      });
+    }
+    if (json['reasonReference'] != null) {
+      reasonReference = new List<Reference>();
+      json['reasonReference'].forEach((v) {
+        reasonReference.add(Reference.fromJson(v));
       });
     }
   }
@@ -874,6 +882,9 @@ class Detail {
     data['description'] = description;
     if (this.instantiatesCanonical != null) {
       data['instantiatesCanonical'] = this.instantiatesCanonical.map((v) => v).toList();
+    }
+    if (this.reasonReference != null) {
+      data['reasonReference'] = this.reasonReference.map((v) => v).toList();
     }
     return data;
   }
@@ -1588,6 +1599,87 @@ class QuestionnaireResponse extends Resource {
       }
     }
     return null;
+  }
+}
+
+class Content {
+  Attachment attachment;
+
+  Content({this.attachment});
+
+  Content.fromJson(Map<String, dynamic> json) {
+    if (json['attachment'] != null) {
+      attachment = Attachment.fromJson(json['attachment']);
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (this.attachment != null) {
+      data['attachment'] = this.attachment.toJson();
+    }
+    return data;
+  }
+}
+
+class DocumentReference {
+  //	"type" : Loinc 48766-0 	(Information source)
+  //	"description": string
+  //	"status": "current"
+  //	"content": [{ // R!  Document referenced
+  //    "attachment" : { Attachment }, // R!  Where to access the document
+  //    "format" : { Coding } // Format/content rules for the document
+  //  }],
+  String description;
+  List<Content> content;
+  CodeableConcept type;
+  String status;
+
+  DocumentReference({this.description, this.content, this.type, this.status});
+
+  DocumentReference.fromJson(Map<String, dynamic> json) {
+    description = json['description'];
+    status = json['status'];
+    if (json['type'] != null) {
+      type = CodeableConcept.fromJson(json['type']);
+    }
+    if (json['content'] != null) {
+      content = new List<Content>();
+      json['content'].forEach((v) {
+        content.add(new Content.fromJson(v));
+      });
+    }
+  }
+
+  String get url => content != null && content.length > 0 && content[0].attachment != null
+      ? content[0].attachment.url
+      : "";
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['description'] = this.description;
+    data['status'] = this.status;
+    if (this.content != null) {
+      data['content'] = this.content.map((v) => v.toJson()).toList();
+    }
+    //TODO: type
+    return data;
+  }
+}
+
+class Attachment {
+  String url;
+
+  Attachment({this.url});
+
+  Attachment.fromJson(Map<String, dynamic> json) {
+    url = json['url'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (this.url != null) data['url'] = this.url;
+    return data;
   }
 }
 

@@ -124,7 +124,7 @@ class _StayHomeHelpPageState extends _HelpPageState {
           Padding(
             padding: const EdgeInsets.only(bottom: Dimensions.fullMargin),
             child: Text(
-              "About Stay Home",
+              "About StayHome",
               style: sectionTitleStyle,
               textAlign: TextAlign.center,
             ),

@@ -44,6 +44,7 @@ class KeycloakAuth {
       refreshTokenExpired = false;
     } catch (e) {
       print(e);
+      return Future.error('Authentication canceled');
     }
   }
 

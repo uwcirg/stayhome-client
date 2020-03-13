@@ -72,10 +72,10 @@ class Repository {
           , orElse: () => null);
     }
   }
-
-  static Future<CarePlan> loadCarePlan(String id) async {
+  /// reference should be of format CarePlan/123
+  static Future<CarePlan> loadCarePlan(String reference) async {
     var url =
-        "$fhirBaseUrl/CarePlan/$id";
+        "$fhirBaseUrl/$reference";
     var response = await get(url, headers: {});
     return CarePlan.fromJson(jsonDecode(response.body));
   }
@@ -106,6 +106,23 @@ class Repository {
       });
     }
     return responses;
+  }
+
+  static Future<List<DocumentReference>> getResourceLinks(String carePlanTemplateRef) async {
+    CarePlan carePlan = await loadCarePlan(carePlanTemplateRef);
+    List<Reference> documentReferenceReferences = [];
+    for (Activity activity in carePlan.activity) {
+      documentReferenceReferences.addAll(activity.detail.reasonReference);
+    }
+    List<DocumentReference> documentReferences = [];
+    await Future.forEach(documentReferenceReferences, (Reference r) async {
+      var url =
+          "$fhirBaseUrl/${r.reference}";
+      var value = await get(url, headers: {});
+
+      documentReferences.add(DocumentReference.fromJson(jsonDecode(value.body)));
+    });
+    return documentReferences;
   }
 
   static Future<Questionnaire> getSimpleQuestionnaire() async {

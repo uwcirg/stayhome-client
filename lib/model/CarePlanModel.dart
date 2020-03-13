@@ -27,6 +27,8 @@ class CarePlanModel extends Model {
   String _careplanTemplateRef;
   Map<String, QuestionnaireItem> _questionsByLinkId = new Map();
 
+  List<DocumentReference> infoLinks;
+
   CarePlanModel() {
     goals = new Goals();
   }
@@ -35,6 +37,15 @@ class CarePlanModel extends Model {
     this._keycloakUserId = keycloakUserId;
     this._careplanTemplateRef = careplanTemplateRef;
     load();
+  }
+
+  void setGuestUser(String careplanTemplateRef) {
+    this._careplanTemplateRef = careplanTemplateRef;
+    isLoading = true;
+    error = null;
+    notifyListeners();
+
+    notifyOrError(loadResourceLinks());
   }
 
   static CarePlanModel of(BuildContext context) => ScopedModel.of<CarePlanModel>(context);
@@ -92,10 +103,22 @@ class CarePlanModel extends Model {
       Repository.getQuestionnaireResponses(this.carePlan)
           .then((List<QuestionnaireResponse> responses) {
         this.questionnaireResponses = responses;
+      }),
+      Repository.getResourceLinks(_careplanTemplateRef)
+          .then((List<DocumentReference> responses) {
+        this.infoLinks = responses;
       })
     ];
     await Future.wait(futures);
     rebuildTreatmentPlan();
+  }
+
+  Future<List<DocumentReference>> loadResourceLinks() async {
+    await Repository.getResourceLinks(_careplanTemplateRef)
+        .then((List<DocumentReference> responses) {
+      this.infoLinks = responses;
+    });
+    return this.infoLinks;
   }
 
   void rebuildTreatmentPlan() {
@@ -109,7 +132,7 @@ class CarePlanModel extends Model {
   }
 
   Future addDefaultCareplan() async {
-    notifyOrError(Repository.loadCarePlan(_careplanTemplateRef.split('/')[1]).then((CarePlan plan) {
+    notifyOrError(Repository.loadCarePlan(_careplanTemplateRef).then((CarePlan plan) {
       CarePlan newPlan = CarePlan.fromTemplate(plan, patient);
       Repository.postCarePlan(newPlan).then((value) => load());
     }));
