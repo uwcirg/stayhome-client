@@ -25,7 +25,7 @@ class _WhatPageState extends State<WhatPage> {
   @override
   Widget build(BuildContext context) {
      return MapAppPageScaffold(
-        title: "What is StayHome",
+        title: "",
         child: ScopedModelDescendant<CarePlanModel>(
             builder: (context, child, model) => _buildContent(context)));
   }
@@ -33,7 +33,8 @@ class _WhatPageState extends State<WhatPage> {
   Widget _buildContent(context) {
     return  Padding(
           padding: const EdgeInsets.all(12.0),
-          child: Text("What is StayHome?")
+          child: Text("What is StayHome?"
+          , textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0))
       );
   }
 }
