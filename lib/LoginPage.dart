@@ -129,8 +129,7 @@ class LoginPageState extends State<LoginPage> {
       });
     } else {
       // clear credentials from browser by calling log out
-      MyApp.of(context).auth.mapAppLogout();
-
+      MyApp.of(context).logout();
       Navigator.of(context).pushReplacementNamed('/guestHome');
     }
   }

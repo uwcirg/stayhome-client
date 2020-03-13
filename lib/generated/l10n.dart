@@ -1,6 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import 'intl/messages_all.dart';
 
 // **************************************************************************
@@ -76,7 +77,7 @@ class S {
 
   String get logout {
     return Intl.message(
-      'Logout',
+      'logout',
       name: 'logout',
       desc: '',
       args: [],
@@ -85,7 +86,7 @@ class S {
 
   String get login {
     return Intl.message(
-      'Login',
+      'login',
       name: 'login',
       desc: '',
       args: [],
@@ -157,7 +158,7 @@ class S {
 
   String get plan {
     return Intl.message(
-      'My calendar',
+      'Calendar',
       name: 'plan',
       desc: '',
       args: [],
@@ -220,7 +221,7 @@ class S {
 
   String get not_now {
     return Intl.message(
-      'Not now',
+      'guest user',
       name: 'not_now',
       desc: '',
       args: [],

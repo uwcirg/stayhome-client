@@ -2,8 +2,6 @@
  * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
  */
 
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/fhir/Exception.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
@@ -14,6 +12,7 @@ import '../const.dart';
 
 class CarePlanModel extends Model {
   bool hasNoCarePlan = false;
+  bool hasNoPatient = false;
   List<Questionnaire> questionnaires;
   List<Procedure> procedures;
   List<QuestionnaireResponse> questionnaireResponses;
@@ -42,6 +41,7 @@ class CarePlanModel extends Model {
 
   void load() {
     isLoading = true;
+    error = null;
     notifyListeners();
 
     notifyOrError(_doLoad());
@@ -49,9 +49,11 @@ class CarePlanModel extends Model {
 
   void notifyOrError(Future f) {
     f.then((value) {
+      this.error = null;
       isLoading = false;
       notifyListeners();
     }).catchError((error) {
+      print(error);
       this.error = error;
       isLoading = false;
       notifyListeners();
@@ -59,18 +61,21 @@ class CarePlanModel extends Model {
   }
 
   Future<void> _doLoad() async {
-    patient = await Repository.getPatient(_keycloakUserId);
-
-    return _loadCarePlan();
+    this.patient = await Repository.getPatient(_keycloakUserId);
+    if (patient == null) {
+      this.hasNoPatient = true;
+    } else {
+      this.hasNoPatient = false;
+      return _loadCarePlan();
+    }
   }
 
   Future<void> _loadCarePlan() async {
-    CarePlan carePlan = await Repository.getCarePlan(patient, _careplanTemplateRef);
+    this.carePlan = await Repository.getCarePlan(patient, _careplanTemplateRef);
     if (carePlan == null) {
       hasNoCarePlan = true;
     } else {
       hasNoCarePlan = false;
-      this.carePlan = carePlan;
       return _loadQuestionnaires();
     }
   }
@@ -97,7 +102,9 @@ class CarePlanModel extends Model {
     treatmentCalendar = TreatmentCalendar.make(carePlan, procedures, questionnaireResponses);
   }
 
-  Future createPatientResource(Patient patient) async {
+  Future updatePatientResource(Patient patient) async {
+    this.patient = patient;
+    this.patient.keycloakId = _keycloakUserId;
     Repository.postPatient(patient).then((value) => load());
   }
 

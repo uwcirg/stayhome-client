@@ -2,18 +2,16 @@
  * Copyright (c) 2020 Hannah Burkhardt. All rights reserved.
  */
 
-import 'dart:html';
-
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:map_app_flutter/platform_stub.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 import 'dart:html';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/src/widgets/framework.dart';
 import 'package:map_app_flutter/main.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
+import 'package:map_app_flutter/platform_stub.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class WebDefs implements PlatformDefs {
   String redirectUrl() {

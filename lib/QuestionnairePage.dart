@@ -2,13 +2,15 @@
  * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
  */
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
 import 'package:map_app_flutter/main.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
-import 'dart:math' as math;
+
 import 'const.dart';
 
 class QuestionnairePage extends StatefulWidget {
@@ -165,40 +167,34 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
 
   Widget _buildItem(BuildContext context, QuestionnaireItem questionnaireItem) {
     if (questionnaireItem.type == "decimal") {
-      return
-        Padding(
-          padding: MapAppPadding.cardPageMargins,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
-                child: Text(
-                  questionnaireItem.text,
-                  style: Theme
-                      .of(context)
-                      .textTheme
-                      .title,
-                ),
+      return Padding(
+        padding: MapAppPadding.cardPageMargins,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
+              child: Text(
+                questionnaireItem.text,
+                style: Theme.of(context).textTheme.title,
               ),
-              TextFormField(
-                  decoration: InputDecoration(
-                      hintText: "Enter body temperature (ºF)",
-                      ),
+            ),
+            TextFormField(
+                decoration: InputDecoration(
+                  hintText: "Enter body temperature (ºF)",
+                ),
                 inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
-                onChanged:  (text) {
-                double result;
-                try {
-                  result = double.parse(text);
-                } catch (Exception) {}
-                _response.setAnswer(questionnaireItem.linkId, Answer(valueDecimal:result));
-
-              }),
-            ],
-          ),
-        );
-
+                onChanged: (text) {
+                  double result;
+                  try {
+                    result = double.parse(text);
+                  } catch (Exception) {}
+                  _response.setAnswer(questionnaireItem.linkId, Answer(valueDecimal: result));
+                }),
+          ],
+        ),
+      );
     } else {
       return Padding(
         padding: MapAppPadding.cardPageMargins,
@@ -209,10 +205,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
               padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
               child: Text(
                 questionnaireItem.text,
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .title,
+                style: Theme.of(context).textTheme.title,
               ),
             ),
 //          Wrap(
@@ -297,24 +290,22 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
 }
 
 class DecimalTextInputFormatter extends TextInputFormatter {
-  DecimalTextInputFormatter({this.decimalRange})
-      : assert(decimalRange == null || decimalRange > 0);
+  DecimalTextInputFormatter({this.decimalRange}) : assert(decimalRange == null || decimalRange > 0);
 
   final int decimalRange;
 
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, // unused.
-      TextEditingValue newValue,
-      ) {
+    TextEditingValue oldValue, // unused.
+    TextEditingValue newValue,
+  ) {
     TextSelection newSelection = newValue.selection;
     String truncated = newValue.text;
 
     if (decimalRange != null) {
       String value = newValue.text;
 
-      if (value.contains(".") &&
-          value.substring(value.indexOf(".") + 1).length > decimalRange) {
+      if (value.contains(".") && value.substring(value.indexOf(".") + 1).length > decimalRange) {
         truncated = oldValue.text;
         newSelection = oldValue.selection;
       } else if (value == ".") {

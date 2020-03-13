@@ -5,12 +5,10 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' show Response, get, post, Client;
+import 'package:http/http.dart' show Response, post, Client;
 import 'package:map_app_flutter/platform_stub.dart';
-import 'package:oauth2/oauth2.dart' as oauth2;
 import 'package:simple_auth/simple_auth.dart' as simpleAuth;
 import 'package:simple_auth_flutter/simple_auth_flutter.dart';
-
 
 class KeycloakAuth {
   static final String _issuer = 'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp';
@@ -19,8 +17,6 @@ class KeycloakAuth {
 
   static final String _clientSecret = 'b284cf4f-17e7-4464-987e-3c320b22cfac';
   static final String _clientId = 'map-app-client';
-  static final _authorizationEndpoint = Uri.parse('$_issuer/protocol/openid-connect/auth');
-  static final _tokenEndpoint = Uri.parse("$_issuer/protocol/openid-connect/token");
 
   String _accessToken;
   DateTime accessTokenExpirationDateTime;
@@ -36,10 +32,7 @@ class KeycloakAuth {
   bool isDummyLogin = false;
 
   KeycloakAuth() {
-    _api = new KeycloakApi(_issuer, _clientId, _clientSecret, _redirectUrl,
-        scopes: ["openid"]);
-    var grant = oauth2.AuthorizationCodeGrant(_clientId, _authorizationEndpoint, _tokenEndpoint,
-        secret: _clientSecret);
+    _api = new KeycloakApi(_issuer, _clientId, _clientSecret, _redirectUrl, scopes: ["openid"]);
   }
 
   Future mapAppLogin() async {
@@ -202,7 +195,6 @@ class KeycloakAuth {
   }
 
   Future receivedCallback(String change) async {
-
     var authenticator = _api.authenticator;
 //    var authenticator = SimpleAuthFlutter.authenticators[_api.authenticator.identifier];
     if (change == "canceled") {
@@ -294,14 +286,14 @@ class KeycloakApi extends simpleAuth.OAuthApi {
           authStorage: authStorage,
         );
 
-
   @override
-  Future<simpleAuth.OAuthAccount> getAccountFromAuthCode(simpleAuth.WebAuthenticator authenticator) async {
-
+  Future<simpleAuth.OAuthAccount> getAccountFromAuthCode(
+      simpleAuth.WebAuthenticator authenticator) async {
     //TODO: Figure out why how to fix callback URL getting mangled
 //    authenticator.redirectUrl = "http://localhost:61615/#/authCallback";
     return super.getAccountFromAuthCode(authenticator);
   }
+
   @override
   get showAuthenticator {
     if (!kIsWeb) return super.showAuthenticator;
@@ -318,8 +310,6 @@ class KeycloakApi extends simpleAuth.OAuthApi {
       SimpleAuthFlutter.authenticators[authenticator.identifier] = authenticator;
 
       await PlatformDefs().launchUrl(initialUrl.toString());
-
     };
   }
-
 }

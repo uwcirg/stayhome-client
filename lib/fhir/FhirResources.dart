@@ -1,8 +1,9 @@
 /*
  * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
  */
-import 'package:intl/intl.dart';
 import 'package:map_app_flutter/services/Repository.dart';
+
+final keycloakIdentifierSystemName = "keycloak";
 
 class Resource {
   String resourceType;
@@ -44,30 +45,71 @@ class Patient extends Resource {
       this.communication})
       : super(resourceType: "Patient", id: id);
 
-  Patient.fromNewPatientForm(
-      String phoneNumber, String lastName, String firstName, String emailAddress, Address address) {
+  factory Patient.fromNewPatientForm(Patient originalPatient,
+      {String phoneNumber,
+      String lastName,
+      String firstName,
+      String emailAddress,
+      String zipCode}) {
 //    Name
 //    Device phone number
 //    Address
 //    County
 //    Email address
-    this.telecom = [
-      ContactPoint(use: "mobile", system: "phone", value: phoneNumber),
-      ContactPoint(system: "email", value: emailAddress)
-    ];
-    this.address = [address];
-    this.name = [
-      HumanName(family: lastName, given: [firstName])
-    ];
+
+    Patient patient;
+    if (originalPatient != null) {
+      patient = Patient.fromJson(originalPatient.toJson());
+    } else {
+      patient = Patient();
+    }
+    patient.resourceType = "Patient";
+    patient.firstName = firstName;
+    patient.lastName = lastName;
+    patient.phoneNumber = phoneNumber;
+    patient.emailAddress = emailAddress;
+    patient.zipcode = zipCode;
+    return patient;
   }
 
-  get firstName => this.name[0].given[0];
+  get firstName => this.name != null &&
+          this.name.length > 0 &&
+          this.name[0].given != null &&
+          this.name[0].given.length > 0
+      ? this.name[0].given[0]
+      : null;
 
-  get lastName => this.name[0].family;
+  set keycloakId(String keycloakId) {
+    identifier ??= [];
+    Identifier keycloakIdentifier = identifier.firstWhere(
+        (element) => element.system == keycloakIdentifierSystemName,
+        orElse: () => null);
+    if (keycloakIdentifier == null) {
+      identifier.add(Identifier(system: keycloakIdentifierSystemName, value: keycloakId));
+    } else {
+      keycloakIdentifier.value = keycloakId;
+    }
+  }
+
+  set firstName(String text) {
+    if (this.name == null || this.name.isEmpty) this.name = [HumanName()];
+    if (this.name[0].given == null || this.name[0].given.length == 0) this.name[0].given = [""];
+    this.name[0].given[0] = text;
+  }
+
+  get lastName => this.name != null && this.name.length > 0 && this.name[0].family != null
+      ? this.name[0].family
+      : null;
+
+  set lastName(String text) {
+    if (this.name == null || this.name.isEmpty) this.name = [HumanName()];
+    this.name[0].family = text;
+  }
 
   set emailAddress(String text) {
     this.telecom ??= [];
-    ContactPoint p = this.telecom.firstWhere((ContactPoint p) => p.system == "email");
+    ContactPoint p =
+        this.telecom.firstWhere((ContactPoint p) => p.system == "email", orElse: () => null);
     if (p == null) {
       this.telecom.add(ContactPoint(system: "email", value: text));
     } else {
@@ -77,7 +119,8 @@ class Patient extends Resource {
 
   set phoneNumber(String text) {
     this.telecom ??= [];
-    ContactPoint p = this.telecom.firstWhere((ContactPoint p) => p.system == "phone");
+    ContactPoint p =
+        this.telecom.firstWhere((ContactPoint p) => p.system == "phone", orElse: () => null);
     if (p == null) {
       this.telecom.add(ContactPoint(system: "phone", value: text));
     } else {
@@ -100,6 +143,14 @@ class Patient extends Resource {
               orElse: () => ContactPoint(value: null))
           .value
       : null;
+
+  get zipcode =>
+      this.address != null && this.address.length > 0 ? this.address[0].postalCode : null;
+
+  set zipcode(String text) {
+    if (this.address == null || this.address.isEmpty) this.address = [new Address()];
+    this.address[0].postalCode = text;
+  }
 
   Patient.fromJson(Map<String, dynamic> json) {
     resourceType = json['resourceType'];
@@ -152,35 +203,35 @@ class Patient extends Resource {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['resourceType'] = this.resourceType;
-    data['id'] = this.id;
+    if (this.id != null) data['id'] = this.id;
     if (this.meta != null) {
       data['meta'] = this.meta.toJson();
     }
     if (this.text != null) {
       data['text'] = this.text.toJson();
     }
-    if (this.extension != null) {
+    if (this.extension != null && this.extension.length > 0) {
       data['extension'] = this.extension.map((v) => v.toJson()).toList();
     }
-    if (this.identifier != null) {
+    if (this.identifier != null && this.identifier.length > 0) {
       data['identifier'] = this.identifier.map((v) => v.toJson()).toList();
     }
-    if (this.name != null) {
+    if (this.name != null && this.name.length > 0) {
       data['name'] = this.name.map((v) => v.toJson()).toList();
     }
-    if (this.telecom != null) {
+    if (this.telecom != null && this.telecom.length > 0) {
       data['telecom'] = this.telecom.map((v) => v.toJson()).toList();
     }
-    data['gender'] = this.gender;
-    data['birthDate'] = this.birthDate;
-    if (this.address != null) {
+    if (this.gender != null) data['gender'] = this.gender;
+    if (this.birthDate != null) data['birthDate'] = this.birthDate;
+    if (this.address != null && this.address.length > 0) {
       data['address'] = this.address.map((v) => v.toJson()).toList();
     }
     if (this.maritalStatus != null) {
       data['maritalStatus'] = this.maritalStatus.toJson();
     }
-    data['multipleBirthBoolean'] = this.multipleBirthBoolean;
-    if (this.communication != null) {
+    if (this.multipleBirthBoolean != null) data['multipleBirthBoolean'] = this.multipleBirthBoolean;
+    if (this.communication != null && this.communication.length > 0) {
       data['communication'] = this.communication.map((v) => v.toJson()).toList();
     }
     return data;
@@ -240,9 +291,9 @@ class HumanName {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['use'] = this.use;
-    data['family'] = this.family;
-    data['given'] = this.given;
+    if (this.use != null) data['use'] = this.use;
+    if (this.family != null) data['family'] = this.family;
+    if (this.given != null && this.given.length > 0) data['given'] = this.given;
     return data;
   }
 }
@@ -262,9 +313,9 @@ class ContactPoint {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['system'] = this.system;
-    data['value'] = this.value;
-    data['use'] = this.use;
+    if (this.system != null) data['system'] = this.system;
+    if (this.value != null) data['value'] = this.value;
+    if (this.use != null) data['use'] = this.use;
     return data;
   }
 }
@@ -309,12 +360,12 @@ class Address {
     if (this.extension != null) {
       data['extension'] = this.extension.map((v) => v.toJson()).toList();
     }
-    data['line'] = this.line;
-    data['city'] = this.city;
-    data['district'] = this.district;
-    data['state'] = this.state;
-    data['postalCode'] = this.postalCode;
-    data['country'] = this.country;
+    if (this.line != null) data['line'] = this.line;
+    if (this.city != null) data['city'] = this.city;
+    if (this.district != null) data['district'] = this.district;
+    if (this.state != null) data['state'] = this.state;
+    if (this.postalCode != null) data['postalCode'] = this.postalCode;
+    if (this.country != null) data['country'] = this.country;
     return data;
   }
 
@@ -709,16 +760,19 @@ class CarePlan extends Resource {
 
 class Identifier {
   String value;
+  String system;
 
-  Identifier({this.value});
+  Identifier({this.value, this.system});
 
   Identifier.fromJson(Map<String, dynamic> json) {
     value = json['value'];
+    value = json['system'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['value'] = this.value;
+    data['system'] = this.system;
     return data;
   }
 }
@@ -1630,7 +1684,7 @@ class Answer {
 
   Answer.fromJson(Map<String, dynamic> json) {
     valueInteger = json['valueInteger'];
-    valueDecimal = json['valueDecimal'];
+    if (json['valueDecimal'] != null) valueDecimal = json['valueDecimal'].toDouble();
     if (json['valueCoding'] != null) valueCoding = Coding.fromJson(json['valueCoding']);
   }
 

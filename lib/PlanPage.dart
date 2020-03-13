@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
+import 'package:map_app_flutter/ProfilePage.dart';
 import 'package:map_app_flutter/QuestionnairePage.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
@@ -68,7 +69,7 @@ class _PlanPageState extends State<PlanPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
-              _buildCalendar(textStyle, context, model),
+              _buildCalendarPage(textStyle, context, model),
             ],
           );
         }),
@@ -76,21 +77,68 @@ class _PlanPageState extends State<PlanPage> {
     );
   }
 
-  Widget _buildCareplanInfoSection(BuildContext context, CarePlanModel model) {
-    if (model.hasNoCarePlan) {
-      return Container();
-    }
+  Widget _buildCalendarPage(TextStyle textStyle, BuildContext context, CarePlanModel model) {
+    if (model == null)
+      return _buildErrorMessage("Loading error. Please log in again. (model null)",
+          buttonLabel: "logout", onPressed: () => MyApp.of(context).logout(context: context));
+
     if (model.error != null) {
-      return Wrap(
-        children: <Widget>[
-          Text(model.error),
-        ],
-      );
-    }
-    if (model.isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return _buildErrorMessage('${model.error}');
     }
 
+    if (model.isLoading) return Center(child: CircularProgressIndicator());
+
+    if (model.hasNoPatient) return _buildCreateMyProfileButton(context, model);
+
+    if (model.hasNoCarePlan) return _buildAddDefaultCareplanSection(context, model);
+
+    if (model.treatmentCalendar == null) {
+      return _buildErrorMessage(
+          "Loading error. Treatment Calendar is null. Try logging out and in again.",
+          buttonLabel: "logout",
+          onPressed: () => MyApp.of(context).logout(context: context));
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+      children: _buildCalendarPageChildren(context, model),
+    );
+  }
+
+  List<Widget> _buildCalendarPageChildren(BuildContext context, CarePlanModel model) {
+    return <Widget>[
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+          child: Text(
+            S.of(context).treatment_calendar,
+            style: Theme.of(context).textTheme.title,
+          ),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+            "Lorem ipsum dolor sit amet, eu sit explicari expetendis, nullam putent ceteros an pri. Quaeque insolens cu ius, eu nulla delicatissimi has."),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+          child: Text(S.of(context).my_treatment_plan, style: Theme.of(context).textTheme.title),
+        ),
+      ),
+      _buildCareplanInfoSection(context, model),
+      _buildQuestionnaireButtonSection(context, model),
+      !model.hasNoCarePlan
+          ? _buildTreatmentCalendarWidget(_calendarController, model)
+          : Container(
+              height: 0,
+            ),
+    ];
+  }
+
+  Widget _buildCareplanInfoSection(BuildContext context, CarePlanModel model) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Dimensions.fullMargin),
       child: Stack(
@@ -241,17 +289,6 @@ class _PlanPageState extends State<PlanPage> {
   }
 
   Widget _buildQuestionnaireButtonSection(BuildContext context, CarePlanModel model) {
-    if (model.hasNoCarePlan || model.error != null)
-      return Container(
-        height: 0,
-      );
-
-    if (model.isLoading)
-      return Padding(
-        child: Center(child: CircularProgressIndicator()),
-        padding: MapAppPadding.pageMargins,
-      );
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Dimensions.fullMargin),
       child: Column(
@@ -261,74 +298,35 @@ class _PlanPageState extends State<PlanPage> {
     );
   }
 
-  Widget _buildCalendar(TextStyle textStyle, BuildContext context, CarePlanModel model) {
-    if (model == null) return Text("Loading error. Please log in again.");
-
-    if (model.error != null) return Text(model.error);
-
-    if (model.isLoading) return Center(child: CircularProgressIndicator());
-
-    if (model.treatmentCalendar == null) return Text("Loading error. Please log in again.");
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisSize: MainAxisSize.max,
-      children: _buildCalendarPageChildren(context, model),
+  Widget _buildAddDefaultCareplanSection(BuildContext context, CarePlanModel model) {
+    return _buildErrorMessage(
+      S.of(context).you_have_no_active_pelvic_floor_management_careplan,
+      buttonLabel: S.of(context).add_the_default_careplan_for_me,
+      onPressed: () => model.addDefaultCareplan(),
     );
   }
 
-  List<Widget> _buildCalendarPageChildren(BuildContext context, CarePlanModel model) {
-    return <Widget>[
-      Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Center(
-          child: Text(
-            S.of(context).treatment_calendar,
-            style: Theme.of(context).textTheme.title,
-          ),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Text(
-            "Lorem ipsum dolor sit amet, eu sit explicari expetendis, nullam putent ceteros an pri. Quaeque insolens cu ius, eu nulla delicatissimi has."),
-      ),
-      Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Center(
-          child: Text(S.of(context).my_treatment_plan, style: Theme.of(context).textTheme.title),
-        ),
-      ),
-      _buildAddDefaultCareplanSection(context, model),
-      _buildCareplanInfoSection(context, model),
-      _buildQuestionnaireButtonSection(context, model),
-      !model.hasNoCarePlan
-          ? _buildTreatmentCalendarWidget(_calendarController, model)
-          : Container(
-              height: 0,
-            ),
-    ];
+  Widget _buildCreateMyProfileButton(BuildContext context, CarePlanModel model) {
+    return _buildErrorMessage(
+      "You do not have a patient record in the FHIR database.",
+      buttonLabel: "create one",
+      onPressed: () =>
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreateProfilePage())),
+    );
   }
 
-  _buildAddDefaultCareplanSection(BuildContext context, CarePlanModel model) {
-    if (model.hasNoCarePlan) {
-      return Wrap(
-        children: <Widget>[
-          Text(S.of(context).you_have_no_active_pelvic_floor_management_careplan),
-          FlatButton(
-            child: Text(
-              S.of(context).add_the_default_careplan_for_me,
-            ),
-            onPressed: () => model.addDefaultCareplan(),
-          )
-        ],
-      );
+  Widget _buildErrorMessage(String message, {String buttonLabel, Function onPressed}) {
+    List<Widget> children = [
+      Center(child: Text(message, textAlign: TextAlign.center)),
+    ];
+    if (buttonLabel != null) {
+      children.add(RaisedButton(child: Text(buttonLabel), onPressed: onPressed));
     }
-    return Container();
+    return Column(children: children);
   }
 
   List<Widget> _buildQuestionnaireButtons(BuildContext context, CarePlanModel model) {
-    if (model == null || model.questionnaires == null) return [];
+    if (model.questionnaires == null) return [];
     return model.questionnaires
         .map((Questionnaire questionnaire) =>
             _buildQuestionnaireButton(context, "complete questionnaire", questionnaire, model))
@@ -738,13 +736,8 @@ class _StayHomePlanPageState extends _PlanPageState {
   @override
   List<Widget> _buildCalendarPageChildren(BuildContext context, CarePlanModel model) {
     return <Widget>[
-      _buildAddDefaultCareplanSection(context, model),
       _buildQuestionnaireButtonSection(context, model),
-      !model.hasNoCarePlan
-          ? _buildTreatmentCalendarWidget(_calendarController, model)
-          : Container(
-              height: 0,
-            ),
+      _buildTreatmentCalendarWidget(_calendarController, model),
       Padding(
         padding: const EdgeInsets.only(top: 8.0),
         child: OutlineButton(

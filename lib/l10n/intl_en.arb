@@ -4,7 +4,7 @@
   "versionString": "Version {version}",
   "developedByCIRG": "Developed by the Clinical Informatics Research Group (CIRG) at University of Washington, 2019.",
   "about": "About",
-  "logout": "Logout",
+  "logout": "logout",
   "login": "login",
   "profile": "Profile",
   "email": "Email",

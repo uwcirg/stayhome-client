@@ -11,19 +11,24 @@ class Repository {
   static final fhirBaseUrl = "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir";
 
   static Future<Patient> getPatient(String keycloakSub) async {
-
-      var system = "keycloak";
-      var identifier = keycloakSub;
-      var patientSearchUrl =
-          "$fhirBaseUrl/Patient?identifier=$system|$identifier";
-      var response = await get(patientSearchUrl, headers: {});
+    var system = "keycloak";
+    var identifier = keycloakSub;
+    var patientSearchUrl =
+        "$fhirBaseUrl/Patient?identifier=$system|$identifier";
+    var response = await get(patientSearchUrl, headers: {});
 
 
     return resultFromResponse(response, "Error loading Patient/$keycloakSub").then((value) {
       var searchResultBundle = jsonDecode(value);
-      if (searchResultBundle['total'] != 1) {
+      if (searchResultBundle['total'] > 1) {
+        print("more than 1 patient");
         return Future.error("The user ID does not uniquely match a patient resource.");
       }
+      if (searchResultBundle['total'] == 0) {
+        print("no patient");
+        return null;
+      }
+      print("found patient");
       return Patient.fromJson(searchResultBundle['entry'][0]['resource']);
     });
   }
@@ -38,6 +43,7 @@ class Repository {
       } catch (e) {
         message = defaultMessage;
       }
+      print(message);
       return Future.error(message);
     }
   }
@@ -57,19 +63,19 @@ class Repository {
       });
       // return the first active careplan with the correct template
       return carePlansForPatient.firstWhere((CarePlan plan) =>
-          plan.basedOn != null &&
+      plan.basedOn != null &&
           plan.basedOn.any(
-              (Reference reference) => reference.reference == templateRef) &&
+                  (Reference reference) => reference.reference == templateRef) &&
           plan.status == CarePlanStatus.active &&
           plan.period.start.isBefore(DateTime.now()) &&
           plan.period.end.isAfter(DateTime.now())
-      , orElse: () => null);
+          , orElse: () => null);
     }
   }
 
   static Future<CarePlan> loadCarePlan(String id) async {
     var url =
-    "$fhirBaseUrl/CarePlan/$id";
+        "$fhirBaseUrl/CarePlan/$id";
     var response = await get(url, headers: {});
     return CarePlan.fromJson(jsonDecode(response.body));
   }
@@ -88,8 +94,7 @@ class Repository {
     return procedures;
   }
 
-  static Future<List<QuestionnaireResponse>> getQuestionnaireResponses(
-      CarePlan carePlan) async {
+  static Future<List<QuestionnaireResponse>> getQuestionnaireResponses(CarePlan carePlan) async {
     var url =
         "$fhirBaseUrl/QuestionnaireResponse?based-on=${carePlan.reference}";
     var response = await get(url, headers: {});
@@ -150,8 +155,7 @@ class Repository {
     return resultFromResponse(value, "An error occurred when trying to save your responses.");
   }
 
-  static Future<void> postQuestionnaireResponse(
-      QuestionnaireResponse questionnaireResponse) async {
+  static Future<void> postQuestionnaireResponse(QuestionnaireResponse questionnaireResponse) async {
     var url =
         "$fhirBaseUrl/QuestionnaireResponse?_format=json";
     String body = jsonEncode(questionnaireResponse.toJson());
@@ -169,8 +173,7 @@ class Repository {
     return resultFromResponse(value, "An error occurred when trying to save your responses.");
   }
 
-  static Future<Questionnaire> getQuestionnaire(
-      String questionnaireReference) async {
+  static Future<Questionnaire> getQuestionnaire(String questionnaireReference) async {
     var url =
         "$fhirBaseUrl/$questionnaireReference";
 
@@ -182,13 +185,12 @@ class Repository {
   }
 
   /// get all questionnaires instantiated by activities in this CarePlan
-  static Future<List<Questionnaire>> getQuestionnaires(
-      CarePlan carePlan) async {
+  static Future<List<Questionnaire>> getQuestionnaires(CarePlan carePlan) async {
     List<Questionnaire> questionnaires = [];
     await Future.forEach(carePlan.activity, (var activity) async {
       if (activity.detail.instantiatesCanonical != null) {
         for (String instantiatesReference
-            in activity.detail.instantiatesCanonical) {
+        in activity.detail.instantiatesCanonical) {
           if (instantiatesReference.startsWith("Questionnaire")) {
             Questionnaire q = await getQuestionnaire(instantiatesReference);
             questionnaires.add(q);
@@ -232,8 +234,13 @@ class Repository {
   }
 
   static Future<Response> postPatient(Patient patient) async {
-    var url =
-        "$fhirBaseUrl/Patient?_format=json";
+    // new patient URL
+    var url = "$fhirBaseUrl/Patient?_format=json";
+    // update patient URL
+    if (patient.id != null && patient.id.length > 0) {
+      url = "$fhirBaseUrl/Patient/${patient.id}?_format=json";
+    }
+
     String body = jsonEncode(patient.toJson());
     var headers = {
       "Accept-Charset": "utf-8",

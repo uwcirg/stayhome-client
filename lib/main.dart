@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -51,10 +49,23 @@ class _MyAppState extends State<MyApp> {
     S.load(Locale(_locale, ""));
     initializeDateFormatting(languageCode);
   }
+  @override
+  void initState() {
+    initializeCareplanModel();
+    super.initState();
+  }
+  @override
+  void dispose() {
+    _carePlanModel = null;
+    super.dispose();
+  }
+
+  void initializeCareplanModel() {
+    _carePlanModel = new CarePlanModel();
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (_carePlanModel == null) _carePlanModel = new CarePlanModel();
     return ScopedModel<CarePlanModel>(
         model: _carePlanModel,
         child: MaterialApp(
@@ -101,6 +112,19 @@ class _MyAppState extends State<MyApp> {
         themeAssets = JoyluxThemeAssets();
       });
     }
+  }
+
+  /// provide context in order to go back to login back after logout is complete
+  logout({BuildContext context}) {
+    auth.mapAppLogout().then((value) {
+      logoutCompleted();
+      if (context != null) Navigator.of(context).pushReplacementNamed("/login");
+    });
+  }
+
+  void logoutCompleted() {
+    initializeCareplanModel();
+    auth = new KeycloakAuth();
   }
 }
 
