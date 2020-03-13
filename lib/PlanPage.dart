@@ -78,25 +78,31 @@ class _PlanPageState extends State<PlanPage> {
   }
 
   Widget _buildCalendarPage(TextStyle textStyle, BuildContext context, CarePlanModel model) {
-    if (model == null)
-      return _buildErrorMessage("Loading error. Please log in again. (model null)",
+    if (model == null) {
+      print("Model is null.");
+      return _buildErrorMessage("Loading error. Please log in again.",
           buttonLabel: "logout", onPressed: () => MyApp.of(context).logout(context: context));
-
+    }
     if (model.error != null) {
       return _buildErrorMessage('${model.error}');
     }
 
-    if (model.isLoading) return Center(child: CircularProgressIndicator());
+    if (model.isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
 
-    if (model.hasNoPatient) return _buildCreateMyProfileButton(context, model);
+    if (model.hasNoPatient) {
+      return _buildCreateMyProfileButton(context, model);
+    }
 
-    if (model.hasNoCarePlan) return _buildAddDefaultCareplanSection(context, model);
+    if (model.hasNoCarePlan) {
+      return _buildAddDefaultCareplanSection(context, model);
+    }
 
     if (model.treatmentCalendar == null) {
-      return _buildErrorMessage(
-          "Loading error. Treatment Calendar is null. Try logging out and in again.",
-          buttonLabel: "logout",
-          onPressed: () => MyApp.of(context).logout(context: context));
+      print("Treatment calendar is null.");
+      return _buildErrorMessage("Loading error. Try logging out and in again.",
+          buttonLabel: "logout", onPressed: () => MyApp.of(context).logout(context: context));
     }
 
     return Column(

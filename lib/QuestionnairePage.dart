@@ -270,6 +270,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
         children: <Widget>[
           ChoiceChip(
               label: Text("  "),
+              selectedColor: Theme.of(context).primaryColor,
               selected: isSelected,
               onSelected: (bool) {
                 setState(() {
