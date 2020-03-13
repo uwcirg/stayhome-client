@@ -3,8 +3,8 @@ variables:
   ANDROID_COMPILE_SDK: "28"
   ANDROID_BUILD_TOOLS: "28.0.2"
   ANDROID_SDK_TOOLS:   "4333796"
-  FLUTTER_VERSION: "https://storage.googleapis.com/flutter_infra/releases/beta/linux/flutter_linux_v1.13.6-beta.tar.xz"
-  
+  FLUTTER_VERSION: "https://storage.googleapis.com/flutter_infra/releases/beta/linux/flutter_linux_v1.14.6-beta.tar.xz"
+
 
 before_script:
   - apt-get --quiet update --yes
