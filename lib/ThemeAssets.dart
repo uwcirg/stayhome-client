@@ -8,6 +8,7 @@ import 'package:map_app_flutter/LearningCenterPage.dart';
 import 'package:map_app_flutter/LoginPage.dart';
 import 'package:map_app_flutter/PlanPage.dart';
 import 'package:map_app_flutter/ProfilePage.dart';
+import 'package:map_app_flutter/WhatPage.dart';
 import 'package:map_app_flutter/ProgressInsightsPage.dart';
 import 'package:map_app_flutter/SessionPage.dart';
 import 'package:map_app_flutter/color_palette.dart';
@@ -189,7 +190,7 @@ class JoyluxThemeAssets extends ThemeAssets {
       "/about": (BuildContext context) => HelpPage(),
       "/goals": (BuildContext context) => GoalsPage(),
       "/login": (BuildContext context) => LoginPage(),
-      "/authCallback": (BuildContext context) => PlatformDefs().getAuthCallbackPage(),
+      "/authCallback": (BuildContext context) => PlatformDefs().getAuthCallbackPage()
     };
   }
 }
@@ -211,7 +212,7 @@ class StayHomeThemeAssets extends ThemeAssets {
               padding: EdgeInsets.all(Dimensions.fullMargin),
               child: Image.asset(
                 'assets/stayhome/icon_white.png',
-                height: 50,
+                height: 70,
               )),
           Text(
             this.appName,
@@ -221,13 +222,13 @@ class StayHomeThemeAssets extends ThemeAssets {
                 .apply(color: Colors.white, fontWeightDelta: 2),
           ),
           Padding(
-              padding: EdgeInsets.all(Dimensions.quarterMargin),
+              padding: EdgeInsets.all(Dimensions.fullMargin),
               child: Image.asset(
                 'assets/stayhome/Signature_Left_White.png',
                 height: 20,
               )),
           Padding(
-              padding: EdgeInsets.all(Dimensions.quarterMargin),
+              padding: EdgeInsets.only(left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, top: 12, bottom: 12),
               child: Image.asset(
                 'assets/stayhome/CIRG_logo_white.png',
                 height: 50,
@@ -312,6 +313,7 @@ class StayHomeThemeAssets extends ThemeAssets {
       "/learning_center": (BuildContext context) => learningCenter,
       "/about": (BuildContext context) => StayHomeHelpPage(),
       "/login": (BuildContext context) => LoginPage(),
+      "/what": (BuildContext context) => WhatPage(),
       "/authCallback": (BuildContext context) => PlatformDefs().getAuthCallbackPage(),
     };
   }
