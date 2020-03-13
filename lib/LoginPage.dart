@@ -104,7 +104,7 @@ class LoginPageState extends State<LoginPage> {
                                   },
                                   child: Padding(
                                       padding: EdgeInsets.all(Dimensions.fullMargin),
-                                      child: Text("What’s Stayhome?",
+                                      child: Text("What’s StayHome?",
                                           style: TextStyle(color: Colors.white, decoration: TextDecoration.underline)))),
                             ),
                             Text(VersionInfo.version,
