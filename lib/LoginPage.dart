@@ -11,6 +11,7 @@ import 'package:map_app_flutter/main.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:simple_auth_flutter/simple_auth_flutter.dart';
+import 'package:map_app_flutter/WhatPage.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -26,6 +27,8 @@ class LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    MediaQueryData deviceInfo = MediaQuery.of(context);
+    double buttonContainerInsets = deviceInfo.size.width > 768 ? deviceInfo.size.width/5 : 12;
     return Scaffold(
         body: AnnotatedRegion<SystemUiOverlayStyle>(
       value: MyApp.of(context).themeAssets.systemUiOverlayStyle,
@@ -41,7 +44,7 @@ class LoginPageState extends State<LoginPage> {
                 children: <Widget>[
                   MyApp.of(context).themeAssets.loginBanner(context),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    padding: EdgeInsets.symmetric(horizontal: buttonContainerInsets),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
@@ -86,17 +89,23 @@ class LoginPageState extends State<LoginPage> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
                             Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              padding: EdgeInsets.symmetric(vertical: 10),
                               child: FlatButton(
-                                  onPressed: () => MyApp.of(context)
-                                      .auth
-                                      .dummyLogin()
-                                      .then((value) => dismissLoginScreen(context))
-                                      .catchError((error) => snack("$error", context)),
+                                  // onPressed: () => MyApp.of(context)
+                                  //     .auth
+                                  //     .dummyLogin()
+                                  //     .then((value) => dismissLoginScreen(context))
+                                  //     .catchError((error) => snack("$error", context)),
+                                  onPressed: () {
+                                      Navigator.push(context,
+                                          MaterialPageRoute(builder: (BuildContext context) 
+                                        => WhatPage()
+                                      ));
+                                  },
                                   child: Padding(
                                       padding: EdgeInsets.all(Dimensions.fullMargin),
-                                      child: Text("demo",
-                                          style: Theme.of(context).primaryTextTheme.title))),
+                                      child: Text("What’s Stayhome?",
+                                          style: TextStyle(color: Colors.white, decoration: TextDecoration.underline)))),
                             ),
                             Text(VersionInfo.version,
                                 style: Theme.of(context).primaryTextTheme.subtitle)
