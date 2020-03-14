@@ -9,6 +9,7 @@ import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
+import 'dart:js' as js;
 
 class HelpPage extends StatefulWidget {
   @override
@@ -130,7 +131,21 @@ class _StayHomeHelpPageState extends _HelpPageState {
             ),
           ),
           Text(
-              "The COVID-19 pandemic is straining existing public health processes and workflows. Many community members may be concerned about developing COVD-19. To meet this need we have developed StayHome, an app to help people who are staying home to minimize any risk they might present to others do things like track their symptoms and temperature, connect with relevant information and resources, and maintain a diary of people with whom they have had contact. We hope the app might also help people and public health connect more easily, when needed, in a situation where public health resources may be stretched thin."),
+              "The COVID-19 pandemic is straining existing public health processes and workflows. Many community members may be concerned about developing COVD-19. To meet this need we have developed StayHome, an app to help people who are staying home to minimize any risk they might present to others do things like track their symptoms and temperature, connect with relevant information and resources, and maintain a diary of people with whom they have had contact. We hope the app might also help people and public health connect more easily, when needed, in a situation where public health resources may be stretched thin."
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: Dimensions.fullMargin),
+            child: FlatButton(
+                onPressed: () {
+                    //go to 
+                    js.context.callMethod("open", [WhatInfo.link, "_self"]);
+                },
+                child: Padding(
+                    padding: EdgeInsets.all(Dimensions.fullMargin),
+                    child: Text("Read More",
+                        textAlign: TextAlign.left,
+                        style: TextStyle(fontSize: 16, color: Colors.black, decoration: TextDecoration.underline, fontWeight: FontWeight.normal)))),
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: Dimensions.fullMargin),
             child: Text(

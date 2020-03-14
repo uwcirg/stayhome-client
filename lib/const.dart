@@ -48,3 +48,7 @@ class VersionInfo {
   //TODO possible to get this dynamically? package_info package?
   static const String version = "v2020.03.12.0";
 }
+
+class WhatInfo {
+  static const String link = "https://uwcirg.github.io/stayhomelanding/";
+}
