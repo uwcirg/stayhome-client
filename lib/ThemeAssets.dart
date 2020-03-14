@@ -8,7 +8,6 @@ import 'package:map_app_flutter/LearningCenterPage.dart';
 import 'package:map_app_flutter/LoginPage.dart';
 import 'package:map_app_flutter/PlanPage.dart';
 import 'package:map_app_flutter/ProfilePage.dart';
-import 'package:map_app_flutter/WhatPage.dart';
 import 'package:map_app_flutter/ProgressInsightsPage.dart';
 import 'package:map_app_flutter/SessionPage.dart';
 import 'package:map_app_flutter/color_palette.dart';
@@ -313,7 +312,6 @@ class StayHomeThemeAssets extends ThemeAssets {
       "/learning_center": learningCenter,
       "/about": (BuildContext context) => StayHomeHelpPage(),
       "/login": (BuildContext context) => LoginPage(),
-      "/what": (BuildContext context) => WhatPage(),
       "/authCallback": (BuildContext context) => PlatformDefs().getAuthCallbackPage(),
     };
   }

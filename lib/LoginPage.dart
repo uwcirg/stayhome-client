@@ -11,7 +11,7 @@ import 'package:map_app_flutter/main.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:simple_auth_flutter/simple_auth_flutter.dart';
-import 'package:map_app_flutter/WhatPage.dart';
+import 'dart:js' as js;
 
 class LoginPage extends StatefulWidget {
   @override
@@ -97,10 +97,8 @@ class LoginPageState extends State<LoginPage> {
                                   //     .then((value) => dismissLoginScreen(context))
                                   //     .catchError((error) => snack("$error", context)),
                                   onPressed: () {
-                                      Navigator.push(context,
-                                          MaterialPageRoute(builder: (BuildContext context) 
-                                        => WhatPage()
-                                      ));
+                                      //go to 
+                                      js.context.callMethod("open", [WhatInfo.link, "_self"]);
                                   },
                                   child: Padding(
                                       padding: EdgeInsets.all(Dimensions.fullMargin),
