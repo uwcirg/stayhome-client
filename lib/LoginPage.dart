@@ -9,9 +9,9 @@ import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
+import 'package:map_app_flutter/platform_stub.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:simple_auth_flutter/simple_auth_flutter.dart';
-import 'dart:js' as js;
 
 class LoginPage extends StatefulWidget {
   @override
@@ -28,7 +28,7 @@ class LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     MediaQueryData deviceInfo = MediaQuery.of(context);
-    double buttonContainerInsets = deviceInfo.size.width > 768 ? deviceInfo.size.width/5 : 12;
+    double buttonContainerInsets = deviceInfo.size.width > 768 ? deviceInfo.size.width / 5 : 12;
     return Scaffold(
         body: AnnotatedRegion<SystemUiOverlayStyle>(
       value: MyApp.of(context).themeAssets.systemUiOverlayStyle,
@@ -54,7 +54,6 @@ class LoginPageState extends State<LoginPage> {
                         ),
                         RaisedButton(
                             color: Colors.white,
-
                             elevation: 0,
                             onPressed: () => MyApp.of(context)
                                 .auth
@@ -77,7 +76,6 @@ class LoginPageState extends State<LoginPage> {
                           child: OutlineButton(
                               onPressed: () => dismissLoginScreen(context),
                               borderSide: BorderSide(color: Colors.white, width: 6),
-
                               highlightElevation: 0,
                               child: Padding(
                                   padding: EdgeInsets.symmetric(vertical: 12),
@@ -96,14 +94,13 @@ class LoginPageState extends State<LoginPage> {
                                   //     .dummyLogin()
                                   //     .then((value) => dismissLoginScreen(context))
                                   //     .catchError((error) => snack("$error", context)),
-                                  onPressed: () {
-                                      //go to 
-                                      js.context.callMethod("open", [WhatInfo.link, "_self"]);
-                                  },
+                                  onPressed: () => PlatformDefs().launchUrl(WhatInfo.link),
                                   child: Padding(
                                       padding: EdgeInsets.all(Dimensions.fullMargin),
                                       child: Text("What’s StayHome?",
-                                          style: TextStyle(color: Colors.white, decoration: TextDecoration.underline)))),
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              decoration: TextDecoration.underline)))),
                             ),
                             Text(VersionInfo.version,
                                 style: Theme.of(context).primaryTextTheme.subtitle)

@@ -308,7 +308,7 @@ class StayHomeThemeAssets extends ThemeAssets {
       "/home": (BuildContext context) => new StayHomePlanPage(),
       "/guestHome": learningCenter,
       "/profile": (BuildContext context) => ProfilePage(),
-      "/progress_insights": (BuildContext context) => ProgressInsightsPage(),
+      "/progress_insights": (BuildContext context) => StayHomeTrendsPage(),
       "/learning_center": learningCenter,
       "/about": (BuildContext context) => StayHomeHelpPage(),
       "/login": (BuildContext context) => LoginPage(),

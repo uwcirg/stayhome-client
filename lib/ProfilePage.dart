@@ -181,7 +181,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
                 labelText: "Phone"),
             initialValue: phone,
             validator: (value) {
-              if (!isValid("phone", value)) {
+              if (value.isNotEmpty && !isValid("phone", value)) {
                 return "A valid phone number is required";
               }
               phone = value;
@@ -195,7 +195,8 @@ class ProfileWidgetState extends State<ProfileWidget> {
                 labelText: "Zip code"),
             initialValue: zip,
             validator: (value) {
-              if (!isValid("zip", value)) {
+              // empty zip code is allowed
+              if (value.isNotEmpty && !isValid("zip", value)) {
                 return "A valid zip code is required";
               }
               zip = value;
