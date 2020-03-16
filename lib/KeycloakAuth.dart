@@ -82,8 +82,8 @@ class KeycloakAuth {
       userInfo = null;
       return Future.value("Logged out");
     }
-
-    var url = '$_issuer/protocol/openid-connect/logout';
+    String redirectUrl = Uri.encodeComponent(_redirectUrl);
+    var url = "$_issuer/protocol/openid-connect/logout?redirect_uri=$redirectUrl";
 
     try {
       simpleAuth.OAuthAccount account = _api.currentOauthAccount;
