@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:map_app_flutter/LoginPage.dart';
-import 'package:map_app_flutter/ThemeAssets.dart';
+import 'package:map_app_flutter/app_assets.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -33,13 +33,11 @@ class _MyAppState extends State<MyApp> {
   CarePlanModel _carePlanModel;
 
   // Theme can be changed on a code level here
-  ThemeAssets themeAssets;
+  AppAssets appAssets;
 
   _MyAppState() {
-//    if (!kIsWeb) {
-    auth = KeycloakAuth();
-//    }
-    themeAssets = StayHomeThemeAssets();
+    appAssets = StayHomeAppAssets();
+    auth = KeycloakAuth(appAssets.issuer, appAssets.clientSecret, appAssets.clientId);
   }
 
   onChangeLanguage(String languageCode) {
@@ -49,11 +47,13 @@ class _MyAppState extends State<MyApp> {
     S.load(Locale(_locale, ""));
     initializeDateFormatting(languageCode);
   }
+
   @override
   void initState() {
     initializeCareplanModel();
     super.initState();
   }
+
   @override
   void dispose() {
     _carePlanModel = null;
@@ -61,7 +61,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   void initializeCareplanModel() {
-    _carePlanModel = new CarePlanModel();
+    _carePlanModel =
+        new CarePlanModel(appAssets.careplanTemplateRef, appAssets.keycloakIdentifierSystemName);
   }
 
   @override
@@ -72,26 +73,26 @@ class _MyAppState extends State<MyApp> {
           title: title,
           theme: ThemeData(
               scaffoldBackgroundColor: Colors.white,
-              primarySwatch: themeAssets.primarySwatch,
-              accentColor: themeAssets.accentColor,
-              highlightColor: themeAssets.highlightColor,
-              textTheme: themeAssets.textThemeOverride(Theme.of(context).textTheme),
+              primarySwatch: appAssets.primarySwatch,
+              accentColor: appAssets.accentColor,
+              highlightColor: appAssets.highlightColor,
+              textTheme: appAssets.textThemeOverride(Theme.of(context).textTheme),
               buttonTheme: ButtonThemeData(
-                  buttonColor: themeAssets.accentColor,
-                  textTheme: ButtonTextTheme.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(50.0),
-                  ),
+                buttonColor: appAssets.accentColor,
+                textTheme: ButtonTextTheme.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(50.0),
+                ),
               ),
               chipTheme: ChipTheme.of(context).copyWith(
-                  selectedColor: themeAssets.accentColor,
-                  secondarySelectedColor: themeAssets.accentColor,
+                  selectedColor: appAssets.accentColor,
+                  secondarySelectedColor: appAssets.accentColor,
                   labelStyle: Theme.of(context).textTheme.body1,
                   secondaryLabelStyle: Theme.of(context).accentTextTheme.body1),
               dividerTheme: DividerThemeData(thickness: 1)),
           home: new LoginPage(),
           // Will replace after login is complete
-          routes: themeAssets.navRoutes(context),
+          routes: appAssets.navRoutes(context),
           locale: Locale(_locale, ""),
           localizationsDelegates: [
             S.delegate,
@@ -103,13 +104,13 @@ class _MyAppState extends State<MyApp> {
   }
 
   toggleAppMode() {
-    if (themeAssets is JoyluxThemeAssets) {
+    if (appAssets is JoyluxAppAssets) {
       setState(() {
-        themeAssets = StayHomeThemeAssets();
+        appAssets = StayHomeAppAssets();
       });
     } else {
       setState(() {
-        themeAssets = JoyluxThemeAssets();
+        appAssets = JoyluxAppAssets();
       });
     }
   }
@@ -119,12 +120,12 @@ class _MyAppState extends State<MyApp> {
     auth.mapAppLogout().then((value) {
       logoutCompleted();
       if (context != null) Navigator.of(context).pushReplacementNamed("/login");
-    });
+    }).catchError((error) => print("Logout error: $error"));
   }
 
   void logoutCompleted() {
     initializeCareplanModel();
-    auth = new KeycloakAuth();
+    auth = new KeycloakAuth.from(auth);
   }
 }
 

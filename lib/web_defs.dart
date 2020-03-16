@@ -15,9 +15,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 class WebDefs implements PlatformDefs {
   String redirectUrl() {
-//    return 'http://[::1]:52858/#/authCallback';
-    return 'https://stayhome.cirg.washington.edu/#/authCallback';
-
+    return 'http://[::1]:51058/#/authCallback';
+//    return 'https://stayhome.cirg.washington.edu/#/authCallback';
   }
 
   @override
@@ -53,9 +52,7 @@ class AuthCallbackPage extends StatelessWidget {
   void dismissLoginScreen(BuildContext context) {
     MyApp.of(context).auth.getUserInfo().then((value) {
       var keycloakUserId = MyApp.of(context).auth.userInfo.keycloakUserId;
-      var templateRef = MyApp.of(context).themeAssets.careplanTemplateRef;
-      ScopedModel.of<CarePlanModel>(context)
-          .setUser(keycloakUserId, careplanTemplateRef: templateRef);
+      ScopedModel.of<CarePlanModel>(context).setUser(keycloakUserId);
       Navigator.of(context).pushReplacementNamed('/home');
     }).catchError((error) {
       Navigator.of(context).pushReplacementNamed('/guestHome');

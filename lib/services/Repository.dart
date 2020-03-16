@@ -10,15 +10,13 @@ import 'package:map_app_flutter/fhir/FhirResources.dart';
 class Repository {
   static final fhirBaseUrl = "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir";
 
-  static Future<Patient> getPatient(String keycloakSub) async {
-    var system = "keycloak";
-    var identifier = keycloakSub;
-    var patientSearchUrl =
-        "$fhirBaseUrl/Patient?identifier=$system|$identifier";
+  static Future<Patient> getPatient(String system, String identifier) async {
+    print("Attempting to load patient with id: $system|$identifier");
+    var patientSearchUrl = "$fhirBaseUrl/Patient?identifier=$system|$identifier";
     var response = await get(patientSearchUrl, headers: {});
 
 
-    return resultFromResponse(response, "Error loading Patient/$keycloakSub").then((value) {
+    return resultFromResponse(response, "Error loading Patient/$identifier").then((value) {
       var searchResultBundle = jsonDecode(value);
       if (searchResultBundle['total'] > 1) {
         print("more than 1 patient");
@@ -95,8 +93,9 @@ class Repository {
   }
 
   static Future<List<QuestionnaireResponse>> getQuestionnaireResponses(CarePlan carePlan) async {
+    int maxToReturn = 200;
     var url =
-        "$fhirBaseUrl/QuestionnaireResponse?based-on=${carePlan.reference}";
+        "$fhirBaseUrl/QuestionnaireResponse?based-on=${carePlan.reference}&_count=$maxToReturn&_sort=-authored";
     var response = await get(url, headers: {});
     var searchResultBundle = jsonDecode(response.body);
     List<QuestionnaireResponse> responses = [];

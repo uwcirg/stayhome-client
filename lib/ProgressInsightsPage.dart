@@ -70,7 +70,8 @@ class _ProgressInsightsPageState extends State<ProgressInsightsPage> {
   }
 
   Widget _buildChartWidget(String linkId, CarePlanModel model, BuildContext context) {
-    charts.NumericAxisSpec displayMappingSpec = SimpleTimeSeriesChart._displayMappingSpec(model, linkId);
+    charts.NumericAxisSpec displayMappingSpec =
+        SimpleTimeSeriesChart._displayMappingSpec(model, linkId);
     var timeSeries = SimpleTimeSeriesChart._createTimeSeries(model, linkId, context);
 
     QuestionnaireItem question = model.questionForLinkId(linkId);
@@ -100,7 +101,8 @@ class _ProgressInsightsPageState extends State<ProgressInsightsPage> {
       List<charts.Series<AnswerTimeSeries, DateTime>> timeSeries, var displayMappingSpec) {
     return charts.TimeSeriesChart(timeSeries,
         animate: true,
-        primaryMeasureAxis: displayMappingSpec,
+        primaryMeasureAxis: charts.NumericAxisSpec.from(displayMappingSpec,
+            tickProviderSpec: new charts.BasicNumericTickProviderSpec(zeroBound: false)),
         behaviors: [
           new charts.RangeAnnotation([
             new charts.RangeAnnotationSegment(97, 99, charts.RangeAnnotationAxisType.measure,
@@ -180,7 +182,7 @@ class SimpleTimeSeriesChart extends StatelessWidget {
       seriesList,
       animate: animate,
       dateTimeFactory: const charts.LocalDateTimeFactory(),
-      defaultRenderer: new charts.LineRendererConfig(includePoints: true, includeArea: true),
+      defaultRenderer: new charts.LineRendererConfig(includePoints: true, includeArea: false),
       primaryMeasureAxis: displayMappingSpec,
     );
   }
@@ -224,7 +226,8 @@ class SimpleTimeSeriesChart extends StatelessWidget {
       new charts.Series<AnswerTimeSeries, DateTime>(
         id: 'Answers',
         colorFn: (_, __) => charts.ColorUtil.fromDartColor(Theme.of(context).primaryColor),
-        areaColorFn: (_, __) => charts.ColorUtil.fromDartColor(Theme.of(context).highlightColor),
+        areaColorFn: (_, __) =>
+            charts.ColorUtil.fromDartColor(Theme.of(context).highlightColor.withAlpha(150)),
         domainFn: (AnswerTimeSeries series, _) => series.time,
         measureFn: (AnswerTimeSeries series, _) => series.displayValue,
         data: data,

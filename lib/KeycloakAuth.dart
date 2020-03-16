@@ -11,13 +11,10 @@ import 'package:simple_auth/simple_auth.dart' as simpleAuth;
 import 'package:simple_auth_flutter/simple_auth_flutter.dart';
 
 class KeycloakAuth {
-  static final String _issuer = 'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp';
-
+  String _issuer;
+  String _clientSecret;
+  String _clientId;
   static final String _redirectUrl = PlatformDefs().redirectUrl();
-
-  static final String _clientSecret = 'b284cf4f-17e7-4464-987e-3c320b22cfac';
-  static final String _clientId = 'map-app-client';
-
 
   DateTime accessTokenExpirationDateTime;
   bool isLoggedIn = false;
@@ -30,8 +27,12 @@ class KeycloakAuth {
 
   bool isDummyLogin = false;
 
-  KeycloakAuth() {
+  KeycloakAuth(this._issuer, this._clientSecret, this._clientId) {
     _api = new KeycloakApi(_issuer, _clientId, _clientSecret, _redirectUrl, scopes: ["openid"]);
+  }
+
+  factory KeycloakAuth.from(KeycloakAuth other) {
+    return KeycloakAuth(other._issuer, other._clientSecret, other._clientId);
   }
 
   Future mapAppLogin() async {
@@ -86,20 +87,11 @@ class KeycloakAuth {
 
     try {
       simpleAuth.OAuthAccount account = _api.currentOauthAccount;
-      var value = await post(url, headers: {
-        "authorization": 'Bearer ${account.token}'
-      }, body: {
-        "refresh_token": '${account.refreshToken}',
-        "client_id": _clientId,
-        "client_secret": _clientSecret
-      });
-
-      if (value.statusCode == 204) {
+      if (account == null) {
+        // lost account...
         isLoggedIn = false;
         accessTokenExpirationDateTime = null;
         userInfo = null;
-
-        // local logout
         try {
           await _api.logOut();
           return Future.value("Logged out");
@@ -107,7 +99,31 @@ class KeycloakAuth {
           return Future.error("Logged out, but local logout failed: $e");
         }
       } else {
-        return Future.error("Log out not completed: ${value.statusCode}");
+        print("Account token: ${account.token}");
+        print("Account refresh token: ${account.refreshToken}");
+        var value = await post(url, headers: {
+          "authorization": 'Bearer ${account.token}'
+        }, body: {
+          "refresh_token": '${account.refreshToken}',
+          "client_id": _clientId,
+          "client_secret": _clientSecret
+        });
+
+        if (value.statusCode == 204) {
+          isLoggedIn = false;
+          accessTokenExpirationDateTime = null;
+          userInfo = null;
+
+          // local logout
+          try {
+            await _api.logOut();
+            return Future.value("Logged out");
+          } catch (e) {
+            return Future.error("Logged out, but local logout failed: $e");
+          }
+        } else {
+          return Future.error("Log out not completed: ${value.statusCode}");
+        }
       }
     } catch (error) {
       return Future.error("Log out error: $error");
@@ -130,7 +146,9 @@ class KeycloakAuth {
 
   Future<Response> _getUserInfo() {
     var url = '$_issuer/protocol/openid-connect/userinfo';
-    if (_api == null || _api.currentOauthAccount == null || _api.currentOauthAccount.token == null) {
+    if (_api == null ||
+        _api.currentOauthAccount == null ||
+        _api.currentOauthAccount.token == null) {
       print("_api.currentOauthAccount.token not set");
       print(StackTrace.current);
       return Future.error("Error getting user info. Please log in again.");
@@ -161,7 +179,7 @@ class KeycloakAuth {
       } else if (value.statusCode == 401) {
         try {
 //          var value = await mapAppRefreshTokens();
-        await _api.refreshAccount(_api.currentAccount);
+          await _api.refreshAccount(_api.currentAccount);
           try {
             var value = await _getUserInfo();
 

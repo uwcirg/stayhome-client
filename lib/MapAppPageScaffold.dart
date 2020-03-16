@@ -27,7 +27,7 @@ class MapAppPageScaffold extends StatelessWidget {
         backgroundColor: backgroundColor,
         appBar: AppBar(
           centerTitle: true,
-          title: MyApp.of(context).themeAssets.appBarTitle(),
+          title: MyApp.of(context).appAssets.appBarTitle(),
           actions: this.actions,
         ),
         drawer: showDrawer ? MapAppDrawer() : null,

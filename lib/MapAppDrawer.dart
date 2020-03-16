@@ -4,11 +4,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:map_app_flutter/ThemeAssets.dart';
+import 'package:map_app_flutter/app_assets.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class MapAppDrawer extends Drawer {
   @override
@@ -24,7 +23,7 @@ class MapAppDrawer extends Drawer {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  MyApp.of(context).themeAssets.drawerBanner(context),
+                  MyApp.of(context).appAssets.drawerBanner(context),
                   Stack(alignment: AlignmentDirectional.bottomCenter, children: <Widget>[
                     Column(
                       children: <Widget>[
@@ -68,7 +67,7 @@ class MapAppDrawer extends Drawer {
               decoration: BoxDecoration(color: Theme.of(context).highlightColor)),
         ),
         ...MyApp.of(context)
-            .themeAssets
+            .appAssets
             .navItems(context)
             .map((MenuItem item) => constructListTile(context, item)),
         Divider(),

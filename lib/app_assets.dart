@@ -16,7 +16,7 @@ import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/platform_stub.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-abstract class ThemeAssets {
+abstract class AppAssets {
   final primarySwatch;
   final accentColor;
   final highlightColor;
@@ -26,7 +26,13 @@ abstract class ThemeAssets {
   final textTheme;
   final careplanTemplateRef;
 
-  ThemeAssets(
+  get issuer;
+  get clientSecret;
+  get clientId;
+  get keycloakIdentifierSystemName => issuer;
+
+
+  AppAssets(
       this.primarySwatch, this.accentColor, this.highlightColor, this.completedCalendarItemColor,
       {this.loginBackgroundImagePath,
       this.systemUiOverlayStyle = SystemUiOverlayStyle.light,
@@ -52,8 +58,12 @@ abstract class ThemeAssets {
   loginBackgroundDecoration() {}
 }
 
-class JoyluxThemeAssets extends ThemeAssets {
-  JoyluxThemeAssets()
+class JoyluxAppAssets extends AppAssets {
+  get issuer => 'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp';
+  get clientSecret => 'b284cf4f-17e7-4464-987e-3c320b22cfac';
+  get clientId => 'map-app-client';
+
+  JoyluxAppAssets()
       : super(MapAppColors.vFitPrimary, MapAppColors.vFitAccent, MapAppColors.vFitHighlight,
             MapAppColors.vFitAccent,
             loginBackgroundImagePath: 'assets/photos/woman-login.jpg',
@@ -194,8 +204,12 @@ class JoyluxThemeAssets extends ThemeAssets {
   }
 }
 
-class StayHomeThemeAssets extends ThemeAssets {
-  StayHomeThemeAssets()
+class StayHomeAppAssets extends AppAssets {
+  get issuer => 'https://keycloak-dev.cirg.washington.edu/auth/realms/Stayhome';
+  get clientSecret => 'f80cc383-bb5b-47b7-a2bf-5b713b0b8a50';
+  get clientId => 'stayhome_openid_client';
+
+  StayHomeAppAssets()
       : super(MapAppColors.stayHomePrimary, MapAppColors.stayHomeAccent,
             MapAppColors.stayHomeHighlight, MapAppColors.stayHomePrimary,
             careplanTemplateRef: "CarePlan/203");

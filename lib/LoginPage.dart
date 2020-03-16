@@ -31,10 +31,10 @@ class LoginPageState extends State<LoginPage> {
     double buttonContainerInsets = deviceInfo.size.width > 768 ? deviceInfo.size.width / 5 : 12;
     return Scaffold(
         body: AnnotatedRegion<SystemUiOverlayStyle>(
-      value: MyApp.of(context).themeAssets.systemUiOverlayStyle,
+      value: MyApp.of(context).appAssets.systemUiOverlayStyle,
       child: DecoratedBox(
           position: DecorationPosition.background,
-          decoration: MyApp.of(context).themeAssets.loginBackgroundDecoration(),
+          decoration: MyApp.of(context).appAssets.loginBackgroundDecoration(),
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -42,7 +42,7 @@ class LoginPageState extends State<LoginPage> {
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  MyApp.of(context).themeAssets.loginBanner(context),
+                  MyApp.of(context).appAssets.loginBanner(context),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: buttonContainerInsets),
                     child: Column(
@@ -70,7 +70,7 @@ class LoginPageState extends State<LoginPage> {
                                       .apply(color: Theme.of(context).primaryColor),
                                   textAlign: TextAlign.center,
                                 ))),
-                        ...MyApp.of(context).themeAssets.additionalLoginPageViews(context),
+                        ...MyApp.of(context).appAssets.additionalLoginPageViews(context),
                         Padding(
                           padding: const EdgeInsets.only(top: 12),
                           child: OutlineButton(
@@ -121,23 +121,22 @@ class LoginPageState extends State<LoginPage> {
   }
 
   void dismissLoginScreen(BuildContext context) {
-    var templateRef = MyApp.of(context).themeAssets.careplanTemplateRef;
 
     if (MyApp.of(context).auth.isLoggedIn) {
       MyApp.of(context).auth.getUserInfo().then((value) {
         var keycloakUserId = MyApp.of(context).auth.userInfo.keycloakUserId;
 
         ScopedModel.of<CarePlanModel>(context)
-            .setUser(keycloakUserId, careplanTemplateRef: templateRef);
+            .setUser(keycloakUserId);
         Navigator.of(context).pushReplacementNamed('/home');
       }).catchError((error) {
-        ScopedModel.of<CarePlanModel>(context).setGuestUser(templateRef);
+        ScopedModel.of<CarePlanModel>(context).setGuestUser();
         Navigator.of(context).pushReplacementNamed('/guestHome');
       });
     } else {
       // clear credentials from browser by calling log out
       MyApp.of(context).logout();
-      ScopedModel.of<CarePlanModel>(context).setGuestUser(templateRef);
+      ScopedModel.of<CarePlanModel>(context).setGuestUser();
       Navigator.of(context).pushReplacementNamed('/guestHome');
     }
   }

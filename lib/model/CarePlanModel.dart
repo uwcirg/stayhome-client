@@ -24,23 +24,22 @@ class CarePlanModel extends Model {
   Goals goals;
 
   String _keycloakUserId;
+  String _keycloakSystem;
   String _careplanTemplateRef;
   Map<String, QuestionnaireItem> _questionsByLinkId = new Map();
 
   List<DocumentReference> infoLinks;
 
-  CarePlanModel() {
+  CarePlanModel(this._careplanTemplateRef, this._keycloakSystem) {
     goals = new Goals();
   }
 
-  void setUser(String keycloakUserId, {String careplanTemplateRef = "CarePlan/54"}) {
+  void setUser(String keycloakUserId) {
     this._keycloakUserId = keycloakUserId;
-    this._careplanTemplateRef = careplanTemplateRef;
     load();
   }
 
-  void setGuestUser(String careplanTemplateRef) {
-    this._careplanTemplateRef = careplanTemplateRef;
+  void setGuestUser() {
     isLoading = true;
     error = null;
     notifyListeners();
@@ -72,7 +71,7 @@ class CarePlanModel extends Model {
   }
 
   Future<void> _doLoad() async {
-    this.patient = await Repository.getPatient(_keycloakUserId);
+    this.patient = await Repository.getPatient(_keycloakSystem, _keycloakUserId);
     if (patient == null) {
       this.hasNoPatient = true;
     } else {
@@ -127,7 +126,7 @@ class CarePlanModel extends Model {
 
   Future updatePatientResource(Patient patient) async {
     this.patient = patient;
-    this.patient.keycloakId = _keycloakUserId;
+    this.patient.setKeycloakId(_keycloakSystem, _keycloakUserId);
     Repository.postPatient(patient).then((value) => load());
   }
 

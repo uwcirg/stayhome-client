@@ -517,7 +517,7 @@ class TreatmentCalendarWidget extends StatelessWidget {
       var color;
       switch (eventTypes[type]['status']) {
         case Status.Completed:
-          color = MyApp.of(context).themeAssets.completedCalendarItemColor;
+          color = MyApp.of(context).appAssets.completedCalendarItemColor;
           break;
         case Status.Scheduled:
           color = Colors.grey[600];
@@ -597,7 +597,7 @@ class TreatmentCalendarWidget extends StatelessWidget {
     event = event as TreatmentEvent;
     var color;
     if (event.status == Status.Completed) {
-      color = MyApp.of(context).themeAssets.completedCalendarItemColor;
+      color = MyApp.of(context).appAssets.completedCalendarItemColor;
     } else if (event.status == Status.Scheduled) {
       color = _scheduledEventColor;
     } else {

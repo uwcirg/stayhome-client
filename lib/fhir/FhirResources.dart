@@ -3,8 +3,6 @@
  */
 import 'package:map_app_flutter/services/Repository.dart';
 
-final keycloakIdentifierSystemName = "keycloak";
-
 class Resource {
   String resourceType;
   String id;
@@ -79,7 +77,7 @@ class Patient extends Resource {
       ? this.name[0].given[0]
       : null;
 
-  set keycloakId(String keycloakId) {
+  setKeycloakId(String keycloakIdentifierSystemName, String keycloakId) {
     identifier ??= [];
     Identifier keycloakIdentifier = identifier.firstWhere(
         (element) => element.system == keycloakIdentifierSystemName,
