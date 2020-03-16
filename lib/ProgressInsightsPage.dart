@@ -3,6 +3,7 @@
  */
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
@@ -63,30 +64,72 @@ class _ProgressInsightsPageState extends State<ProgressInsightsPage> {
         ),
         Visibility(
           visible: this._selectedLinkId != null,
-          child: _buildChartWidget(_selectedLinkId, model, context),
+          child: ChartWidget(_selectedLinkId, model),
         )
       ],
     );
   }
+}
+
+class ChartWidget extends StatefulWidget {
+  final String _linkId;
+  final CarePlanModel _model;
+  final bool animate;
+
+  ChartWidget(this._linkId, this._model, {this.animate = false});
+
+  @override
+  State<StatefulWidget> createState() => ChartWidgetState(_linkId, _model);
+}
+
+class ChartWidgetState extends State<ChartWidget> {
+  String _linkId;
+  DateTime _time;
+  CarePlanModel _model;
+  Map<String, Answer> _measures;
+
+  ChartWidgetState(this._linkId, this._model);
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildChartWidget(_linkId, _model, context);
+  }
 
   Widget _buildChartWidget(String linkId, CarePlanModel model, BuildContext context) {
-    charts.NumericAxisSpec displayMappingSpec =
-        SimpleTimeSeriesChart._displayMappingSpec(model, linkId);
-    var timeSeries = SimpleTimeSeriesChart._createTimeSeries(model, linkId, context);
+    charts.NumericAxisSpec displayMappingSpec = _displayMappingSpec(model, linkId);
+    var timeSeries = _createTimeSeries(model, linkId, context);
 
     QuestionnaireItem question = model.questionForLinkId(linkId);
     var chart;
-    if (question.code.firstWhere((Coding c) => c.system.contains("loinc")).code == "8310-5") {
+    if (question.isTemperature()) {
       chart = _temperatureChart(timeSeries, displayMappingSpec);
     } else {
       chart = _chart(timeSeries, displayMappingSpec);
     }
+    String selectedDate =
+        _time != null ? '${DateFormat.MMMd().format(_time)} ${DateFormat.jm().format(_time)}' : "";
     return Padding(
       padding: const EdgeInsets.all(Dimensions.fullMargin),
       child: Column(
         children: <Widget>[
           Center(child: Text(question.text)),
-          SizedBox(height: 250.0, child: chart),
+          Stack(
+            children: <Widget>[
+              SizedBox(height: 250.0, child: chart),
+              Visibility(
+                  visible: _time != null,
+                  child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                    Text(
+                      selectedDate,
+                      style: Theme.of(context).textTheme.caption,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('${_measures != null ? _measures['Answers'] : ""}'),
+                    )
+                  ]))
+            ],
+          ),
         ],
       ),
     );
@@ -94,60 +137,71 @@ class _ProgressInsightsPageState extends State<ProgressInsightsPage> {
 
   Widget _chart(
       List<charts.Series<AnswerTimeSeries, DateTime>> timeSeries, var displayMappingSpec) {
-    return SimpleTimeSeriesChart(timeSeries, animate: true, displayMappingSpec: displayMappingSpec);
+    return new charts.TimeSeriesChart(
+      timeSeries,
+      animate: widget.animate,
+      dateTimeFactory: const charts.LocalDateTimeFactory(),
+      defaultRenderer: new charts.LineRendererConfig(includePoints: true, includeArea: false),
+      primaryMeasureAxis: displayMappingSpec,
+      selectionModels: [
+        charts.SelectionModelConfig(
+            type: charts.SelectionModelType.info, changedListener: _onSelectionChangedListener)
+      ],
+      behaviors: [
+        new charts.InitialSelection(
+            selectedDataConfig: [new charts.SeriesDatumConfig('Answers', _time)])
+      ],
+    );
   }
 
   Widget _temperatureChart(
       List<charts.Series<AnswerTimeSeries, DateTime>> timeSeries, var displayMappingSpec) {
-    return charts.TimeSeriesChart(timeSeries,
-        animate: true,
-        primaryMeasureAxis: charts.NumericAxisSpec.from(displayMappingSpec,
-            tickProviderSpec: new charts.BasicNumericTickProviderSpec(zeroBound: false)),
-        behaviors: [
-          new charts.RangeAnnotation([
-            new charts.RangeAnnotationSegment(97, 99, charts.RangeAnnotationAxisType.measure,
-                labelAnchor: charts.AnnotationLabelAnchor.end,
-                color: charts.ColorUtil.fromDartColor(Theme.of(context).accentColor))
-          ], defaultLabelPosition: charts.AnnotationLabelPosition.margin),
-        ]);
+    return charts.TimeSeriesChart(
+      timeSeries,
+      animate: widget.animate,
+      primaryMeasureAxis: charts.NumericAxisSpec.from(displayMappingSpec,
+          tickProviderSpec: new charts.BasicNumericTickProviderSpec(zeroBound: false)),
+      behaviors: [
+        new charts.RangeAnnotation([
+          new charts.RangeAnnotationSegment(97, 99, charts.RangeAnnotationAxisType.measure,
+              labelAnchor: charts.AnnotationLabelAnchor.end,
+              color: charts.ColorUtil.fromDartColor(Theme.of(context).accentColor))
+        ], defaultLabelPosition: charts.AnnotationLabelPosition.margin),
+        new charts.InitialSelection(
+            selectedDataConfig: [new charts.SeriesDatumConfig('Answers', _time)])
+      ],
+      selectionModels: [
+        charts.SelectionModelConfig(
+            type: charts.SelectionModelType.info, changedListener: _onSelectionChangedListener)
+      ],
+    );
   }
-}
 
-class StayHomeTrendsPage extends ProgressInsightsPage {
-  @override
-  State<StatefulWidget> createState() => _StayHomeTrendsPageState();
-}
+  _onSelectionChangedListener(charts.SelectionModel<DateTime> model) {
+    final selectedDatum = model.selectedDatum;
 
-class _StayHomeTrendsPageState extends _ProgressInsightsPageState {
-  final int _maxChartsToShow = 8;
+    DateTime time;
+    final measures = <String, Answer>{};
 
-  @override
-  Widget _buildChartPage(
-      List<QuestionnaireItem> questionChoices, CarePlanModel model, BuildContext context) {
-    int numberOfItems = questionChoices.length;
-    if (numberOfItems > _maxChartsToShow) {
-      numberOfItems = _maxChartsToShow + 1;
+    // We get the model that updated with a list of [SeriesDatum] which is
+    // simply a pair of series & datum.
+    //
+    // Walk the selection updating the measures map, storing off the sales and
+    // series name for each selection point.
+    if (selectedDatum.isNotEmpty) {
+      time = selectedDatum.first.datum.time;
+      selectedDatum.forEach((charts.SeriesDatum datumPair) {
+        Answer answer = datumPair.datum.answer as Answer;
+        measures[datumPair.series.displayName] = answer;
+      });
     }
-    return Expanded(
-        child: ListView.builder(
-      itemBuilder: (context, i) {
-        if (i >= _maxChartsToShow) {
-          return Text("There are more children which aren't shown.");
-        }
-        return _buildChartWidget(questionChoices[i].linkId, model, context);
-      },
-      itemCount: numberOfItems,
-      shrinkWrap: true,
-    ));
+
+    // Request a build.
+    setState(() {
+      _time = time;
+      _measures = measures;
+    });
   }
-}
-
-class SimpleTimeSeriesChart extends StatelessWidget {
-  final List<charts.Series> seriesList;
-  final bool animate;
-  var displayMappingSpec;
-
-  SimpleTimeSeriesChart(this.seriesList, {this.animate, this.displayMappingSpec});
 
   static charts.NumericAxisSpec _displayMappingSpec(CarePlanModel model, String linkId) {
     var displayMappings = _displayMappings(model, linkId);
@@ -174,17 +228,6 @@ class SimpleTimeSeriesChart extends StatelessWidget {
       }
     });
     return displayMappings;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return new charts.TimeSeriesChart(
-      seriesList,
-      animate: animate,
-      dateTimeFactory: const charts.LocalDateTimeFactory(),
-      defaultRenderer: new charts.LineRendererConfig(includePoints: true, includeArea: false),
-      primaryMeasureAxis: displayMappingSpec,
-    );
   }
 
   static List<charts.Series<AnswerTimeSeries, DateTime>> _createTimeSeries(
@@ -233,6 +276,35 @@ class SimpleTimeSeriesChart extends StatelessWidget {
         data: data,
       )
     ];
+  }
+}
+
+class StayHomeTrendsPage extends ProgressInsightsPage {
+  @override
+  State<StatefulWidget> createState() => _StayHomeTrendsPageState();
+}
+
+class _StayHomeTrendsPageState extends _ProgressInsightsPageState {
+  final int _maxChartsToShow = 8;
+
+  @override
+  Widget _buildChartPage(
+      List<QuestionnaireItem> questionChoices, CarePlanModel model, BuildContext context) {
+    int numberOfItems = questionChoices.length;
+    if (numberOfItems > _maxChartsToShow) {
+      numberOfItems = _maxChartsToShow + 1;
+    }
+    return Expanded(
+        child: ListView.builder(
+      itemBuilder: (context, i) {
+        if (i >= _maxChartsToShow) {
+          return Text("There are more children which aren't shown.");
+        }
+        return ChartWidget(questionChoices[i].linkId, model);
+      },
+      itemCount: numberOfItems,
+      shrinkWrap: true,
+    ));
   }
 }
 

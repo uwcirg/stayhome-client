@@ -166,7 +166,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
   }
 
   Widget _buildItem(BuildContext context, QuestionnaireItem questionnaireItem) {
-    if (questionnaireItem.type == "decimal") {
+    if (questionnaireItem.isTemperature()) {
       return Padding(
         padding: MapAppPadding.cardPageMargins,
         child: Column(
@@ -185,13 +185,17 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
                 ),
                 inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
-                onChanged: (text) {
-                  double result;
-                  try {
-                    result = double.parse(text);
-                  } catch (Exception) {}
+            autovalidate: true,
+            validator: (value) {
+                  if (value.isEmpty) return null;
+                  double result = double.tryParse(value);
+                  if (result == null) return "Please enter a valid decimal";
+                  if (result < 90 || result > 115) {
+                    return "Please enter a value between 90 and 115 ºF";
+                  }
                   _response.setAnswer(questionnaireItem.linkId, Answer(valueDecimal: result));
-                }),
+                  return null;
+            },),
           ],
         ),
       );

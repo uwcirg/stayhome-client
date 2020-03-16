@@ -1390,6 +1390,10 @@ class QuestionnaireItem {
     return answerOption != null || answerValueSet != null || type == "decimal";
   }
 
+  bool isTemperature() {
+    return code.firstWhere((Coding c) => c.system.contains("loinc")).code == "8310-5";
+  }
+
   loadValueSet() async {
     if (answerValueSetAddress != null) {
       ValueSet answers = await Repository.getValueSet(answerValueSetAddress);
