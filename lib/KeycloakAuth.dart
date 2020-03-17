@@ -27,6 +27,10 @@ class KeycloakAuth {
 
   bool isDummyLogin = false;
 
+  String _refreshToken;
+
+  String _authToken;
+
   KeycloakAuth(this._issuer, this._clientSecret, this._clientId) {
     _api = new KeycloakApi(_issuer, _clientId, _clientSecret, _redirectUrl, scopes: ["openid"]);
   }
@@ -40,7 +44,8 @@ class KeycloakAuth {
       simpleAuth.OAuthAccount account = await _api.authenticate();
       print("Account has been returned mapAppLogin");
       accessTokenExpirationDateTime = account.created.add(Duration(seconds: account.expiresIn));
-
+      _refreshToken = account.refreshToken;
+      _authToken = account.token;
       isLoggedIn = true;
       refreshTokenExpired = false;
     } catch (e) {
@@ -82,29 +87,35 @@ class KeycloakAuth {
       userInfo = null;
       return Future.value("Logged out");
     }
-    String redirectUrl = Uri.encodeComponent(PlatformDefs().rootUrl());
-    var url = "$_issuer/protocol/openid-connect/logout?redirect_uri=$redirectUrl";
+    var url;
+    if (kIsWeb) {
+      String redirectUrl = Uri.encodeComponent(PlatformDefs().rootUrl());
+      url = "$_issuer/protocol/openid-connect/logout?redirect_uri=$redirectUrl";
+    } else {
+      url = "$_issuer/protocol/openid-connect/logout";
+    }
 
-    try {
-      simpleAuth.OAuthAccount account = _api.currentOauthAccount;
-      if (account == null) {
-        // lost account...
-        isLoggedIn = false;
-        accessTokenExpirationDateTime = null;
-        userInfo = null;
-        try {
-          await _api.logOut();
-          return Future.value("Logged out");
-        } catch (e) {
-          return Future.error("Logged out, but local logout failed: $e");
-        }
-      } else {
-        print("Account token: ${account.token}");
-        print("Account refresh token: ${account.refreshToken}");
+    if (_api.currentOauthAccount == null) {
+      // lost account...
+      print("Local account was lost");
+
+      isLoggedIn = false;
+      accessTokenExpirationDateTime = null;
+      userInfo = null;
+      try {
+        await _api.logOut();
+        return Future.value("Logged out");
+      } catch (e) {
+        return Future.error("Logged out, but local logout failed: $e");
+      }
+    } else {
+      try {
+        print("Account token: $_authToken");
+        print("Account refresh token: $_refreshToken");
         var value = await post(url, headers: {
-          "authorization": 'Bearer ${account.token}'
+          "authorization": 'Bearer $_authToken'
         }, body: {
-          "refresh_token": '${account.refreshToken}',
+          "refresh_token": '$_refreshToken',
           "client_id": _clientId,
           "client_secret": _clientSecret
         });
@@ -124,9 +135,9 @@ class KeycloakAuth {
         } else {
           return Future.error("Log out not completed: ${value.statusCode}");
         }
+      } catch (error) {
+        return Future.error("Log out error: $error");
       }
-    } catch (error) {
-      return Future.error("Log out error: $error");
     }
   }
 
@@ -237,6 +248,8 @@ class KeycloakAuth {
       print("account received: $account");
       _api.saveAccountToCache(account);
       _api.currentAccount = account;
+      _refreshToken = account.refreshToken;
+      _authToken = account.token;
 
       //from KeycloakAuth mapAppLogin callback
       print("Account has been returned receivedCallback");
