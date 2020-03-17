@@ -882,7 +882,7 @@ class Detail {
       data['instantiatesCanonical'] = this.instantiatesCanonical.map((v) => v).toList();
     }
     if (this.reasonReference != null) {
-      data['reasonReference'] = this.reasonReference.map((v) => v).toList();
+      data['reasonReference'] = this.reasonReference.map((Reference v) => v.toJson()).toList();
     }
     return data;
   }
@@ -1391,7 +1391,7 @@ class QuestionnaireItem {
   }
 
   bool isTemperature() {
-    return code.firstWhere((Coding c) => c.system.contains("loinc")).code == "8310-5";
+    return code != null && code.firstWhere((Coding c) => c.system.contains("loinc")).code == "8310-5";
   }
 
   loadValueSet() async {
