@@ -15,7 +15,12 @@ import 'package:url_launcher/url_launcher.dart';
 
 class WebDefs implements PlatformDefs {
   String redirectUrl() {
+//    return 'http://[::1]:59201/#/authCallback';
     return 'https://stayhome.cirg.washington.edu/#/authCallback';
+  }
+  String rootUrl() {
+//    return 'http://[::1]:59201';
+    return 'https://stayhome.cirg.washington.edu';
   }
 
   @override

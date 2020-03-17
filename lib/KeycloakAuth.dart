@@ -82,7 +82,7 @@ class KeycloakAuth {
       userInfo = null;
       return Future.value("Logged out");
     }
-    String redirectUrl = Uri.encodeComponent(_redirectUrl);
+    String redirectUrl = Uri.encodeComponent(PlatformDefs().rootUrl());
     var url = "$_issuer/protocol/openid-connect/logout?redirect_uri=$redirectUrl";
 
     try {

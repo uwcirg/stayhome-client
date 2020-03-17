@@ -10,6 +10,7 @@ import 'platform_interface.dart'
 
 abstract class PlatformDefs {
   String redirectUrl();
+  String rootUrl();
 
   Future launchUrl(String url, {bool newTab = false});
 

@@ -11,6 +11,9 @@ class MobileDefs implements PlatformDefs {
   String redirectUrl() {
     return 'edu.washington.cirg.mapapp:/callback';
   }
+  String rootUrl() {
+    return 'edu.washington.cirg.mapapp';
+  }
 
   @override
   Future launchUrl(String url, {bool newTab = false}) async {
