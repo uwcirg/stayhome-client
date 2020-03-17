@@ -46,7 +46,7 @@ class IconSize {
 
 class VersionInfo {
   //TODO possible to get this dynamically? package_info package?
-  static const String version = "v1.0";
+  static const String version = "v0.1";
 }
 
 class WhatInfo {
