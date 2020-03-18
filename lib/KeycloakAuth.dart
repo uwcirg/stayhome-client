@@ -83,21 +83,13 @@ class KeycloakAuth {
       return Future.value("Logged out");
     }
     String redirectUrl = Uri.encodeComponent(PlatformDefs().rootUrl());
-    var url = "$_issuer/protocol/openid-connect/logout?redirect_uri=$redirectUrl";
+    var url = "$_issuer/protocol/openid-connect/logout";
 
     try {
       simpleAuth.OAuthAccount account = _api.currentOauthAccount;
       if (account == null) {
         // lost account...
-        isLoggedIn = false;
-        accessTokenExpirationDateTime = null;
-        userInfo = null;
-        try {
-          await _api.logOut();
-          return Future.value("Logged out");
-        } catch (e) {
-          return Future.error("Logged out, but local logout failed: $e");
-        }
+        return await _completeWithLocalLogout();
       } else {
         print("Account token: ${account.token}");
         print("Account refresh token: ${account.refreshToken}");
@@ -110,23 +102,25 @@ class KeycloakAuth {
         });
 
         if (value.statusCode == 204) {
-          isLoggedIn = false;
-          accessTokenExpirationDateTime = null;
-          userInfo = null;
-
-          // local logout
-          try {
-            await _api.logOut();
-            return Future.value("Logged out");
-          } catch (e) {
-            return Future.error("Logged out, but local logout failed: $e");
-          }
+          return await _completeWithLocalLogout();
         } else {
           return Future.error("Log out not completed: ${value.statusCode}");
         }
       }
     } catch (error) {
       return Future.error("Log out error: $error");
+    }
+  }
+
+  _completeWithLocalLogout() async {
+    isLoggedIn = false;
+    accessTokenExpirationDateTime = null;
+    userInfo = null;
+    try {
+      await _api.logOut();
+      return Future.value("Logged out");
+    } catch (e) {
+      return Future.error("Logged out, but local logout failed: $e");
     }
   }
 

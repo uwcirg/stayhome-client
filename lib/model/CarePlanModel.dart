@@ -44,7 +44,7 @@ class CarePlanModel extends Model {
     error = null;
     notifyListeners();
 
-    notifyOrError(loadResourceLinks());
+    loadResourceLinks();
   }
 
   static CarePlanModel of(BuildContext context) => ScopedModel.of<CarePlanModel>(context);
@@ -112,12 +112,11 @@ class CarePlanModel extends Model {
     rebuildTreatmentPlan();
   }
 
-  Future<List<DocumentReference>> loadResourceLinks() async {
-    await Repository.getResourceLinks(_careplanTemplateRef)
+  void loadResourceLinks() async {
+    notifyOrError(Repository.getResourceLinks(_careplanTemplateRef)
         .then((List<DocumentReference> responses) {
       this.infoLinks = responses;
-    });
-    return this.infoLinks;
+    }));
   }
 
   void rebuildTreatmentPlan() {
