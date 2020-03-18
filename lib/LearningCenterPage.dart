@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
+import 'package:map_app_flutter/fhir/FhirResources.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:map_app_flutter/platform_stub.dart';
@@ -65,6 +66,17 @@ abstract class LearningCenterPage extends StatelessWidget {
             )),
         onTap: onTap);
   }
+
+  Widget _buildLearningCenterListSectionHeader(BuildContext context, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+      vertical: Dimensions.largeMargin, horizontal: Dimensions.fullMargin),
+      child: Text(
+    text,
+    style: Theme.of(context).textTheme.title.apply(color: Theme.of(context).primaryColor),
+      ),
+    );
+  }
 }
 
 class JoyluxLearningCenterPage extends LearningCenterPage {
@@ -111,18 +123,20 @@ class StayHomeLearningCenterPage extends LearningCenterPage {
   }
 
   Widget _buildLearningCenterListGroup(BuildContext context, DocumentReference infoLink) {
-    var children = infoLink.content.map((Content c) {
-      _buildLearningCenterListItem(context, c.attachment.title,
+    List<Widget> children = infoLink.content.map((Content c) {
+      return _buildLearningCenterListItem(context, c.attachment.title,
           onTap: () => _onUrlTap(c.attachment.url, context));
-    });
+    }).toList();
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(infoLink.description),
+        _buildLearningCenterListSectionHeader(context, infoLink.description),
         ...children
       ],
     );
   }
+
   _onUrlTap(String url, context) {
     if (url.isEmpty) {
       snack("No content", context);

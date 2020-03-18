@@ -1682,7 +1682,7 @@ class Attachment {
 
   Attachment.fromJson(Map<String, dynamic> json) {
     url = json['url'];
-    url = json['title'];
+    title = json['title'];
   }
 
   Map<String, dynamic> toJson() {
