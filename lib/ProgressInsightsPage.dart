@@ -111,8 +111,16 @@ class ChartWidgetState extends State<ChartWidget> {
     return Padding(
       padding: const EdgeInsets.all(Dimensions.fullMargin),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Center(child: Text(question.text)),
+          Padding(
+            padding:
+                const EdgeInsets.only(bottom: Dimensions.halfMargin, top: Dimensions.fullMargin),
+            child: Text(
+              question.text,
+              style: Theme.of(context).textTheme.title,
+            ),
+          ),
           Stack(
             children: <Widget>[
               SizedBox(height: 250.0, child: chart),
