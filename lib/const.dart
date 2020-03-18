@@ -52,3 +52,11 @@ class VersionInfo {
 class WhatInfo {
   static const String link = "https://uwcirg.github.io/stayhomelanding/";
 }
+
+class QuestionnaireConstants {
+  static const double minF = 90;
+  static const double maxF = 115;
+  static const double minC = 32;
+  static const double maxC = 46;
+
+}
