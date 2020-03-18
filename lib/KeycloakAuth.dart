@@ -15,7 +15,6 @@ class KeycloakAuth {
   String _clientSecret;
   String _clientId;
   static final String _redirectUrl = PlatformDefs().redirectUrl();
-
   DateTime accessTokenExpirationDateTime;
   bool isLoggedIn = false;
 
@@ -109,10 +108,19 @@ class KeycloakAuth {
         if (value.statusCode == 204) {
           return await _completeWithLocalLogout();
         } else {
+          //for Web platform, launching the logout url directly after local logout to clear Keycloak session if encounter error?
+          if (kIsWeb) {
+            PlatformDefs().launchUrl(url);
+          }
           return Future.error("Log out not completed: ${value.statusCode}");
         }
       }
     } catch (error) {
+        //for Web platform, launching the logout url directly after local logout to clear Keycloak session if encounter error?
+        if (kIsWeb) {
+          PlatformDefs().launchUrl(url);
+        
+        }
       return Future.error("Log out error: $error");
     }
   }
@@ -304,7 +312,7 @@ class KeycloakApi extends simpleAuth.OAuthApi {
   Future<simpleAuth.OAuthAccount> getAccountFromAuthCode(
       simpleAuth.WebAuthenticator authenticator) async {
     //TODO: Figure out why how to fix callback URL getting mangled
-//    authenticator.redirectUrl = "http://localhost:61615/#/authCallback";
+    //authenticator.redirectUrl = "http://localhost:55624/#/authCallback";
     return super.getAccountFromAuthCode(authenticator);
   }
 
