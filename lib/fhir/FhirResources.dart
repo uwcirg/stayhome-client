@@ -1391,7 +1391,8 @@ class QuestionnaireItem {
   }
 
   bool isTemperature() {
-    return code != null && code.firstWhere((Coding c) => c.system.contains("loinc")).code == "8310-5";
+    return code != null &&
+        code.firstWhere((Coding c) => c.system.contains("loinc")).code == "8310-5";
   }
 
   loadValueSet() async {
@@ -1653,6 +1654,10 @@ class DocumentReference {
     }
   }
 
+  bool isGroup() {
+    return content != null && content.length > 1 && description != null;
+  }
+
   String get url => content != null && content.length > 0 && content[0].attachment != null
       ? content[0].attachment.url
       : "";
@@ -1671,16 +1676,19 @@ class DocumentReference {
 
 class Attachment {
   String url;
+  String title;
 
-  Attachment({this.url});
+  Attachment({this.url, this.title});
 
   Attachment.fromJson(Map<String, dynamic> json) {
     url = json['url'];
+    url = json['title'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.url != null) data['url'] = this.url;
+    if (this.title != null) data['title'] = this.title;
     return data;
   }
 }

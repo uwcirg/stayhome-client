@@ -30,7 +30,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  simple_auth_flutter: ec585a6e96b415247120df0a33af43dc1d2a5839
+  simple_auth_flutter: 81eea726575ef3fae2e2e866101701898d37e26f
   url_launcher: a1c0cc845906122c4784c542523d8cacbded5626
   url_launcher_macos: fd7894421cd39320dce5f292fc99ea9270b2a313
   url_launcher_web: e5527357f037c87560776e36436bf2b0288b965c
