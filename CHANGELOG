@@ -4,6 +4,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.2] - 2020-03-17
 ### Changed
 - reStyled the Stayhome KeyCloak login page.
 - allow learning center page to show resources even when accessed via URL
