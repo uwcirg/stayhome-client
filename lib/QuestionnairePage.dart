@@ -97,51 +97,41 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
   final List<QuestionnaireItem> _questions;
   final QuestionnaireResponse _response;
   final Function _onPressed;
-  final _formKey = GlobalKey<FormState>();
-
-  Function onPressedListener() => () {
-        if (_formKey.currentState.validate()) {
-          _onPressed();
-        }
-      };
 
   QuestionListWidgetState(this._questions, this._response, this._onPressed);
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Expanded(
-          child: ListView.builder(
-              itemCount: _questions.length + 1,
-              shrinkWrap: true,
-              padding: MapAppPadding.cardPageMargins,
-              itemBuilder: (context, i) {
-                if (i == _questions.length) {
-                  return Padding(
-                    padding: const EdgeInsets.only(
-                        left: Dimensions.halfMargin,
-                        right: Dimensions.halfMargin,
-                        top: Dimensions.halfMargin,
-                        bottom: 200),
-                    child: RaisedButton(
-                      padding: MapAppPadding.largeButtonPadding,
-                      child: Text("done", style: Theme.of(context).textTheme.button),
-                      onPressed: onPressedListener(),
-                    ),
-                  );
-                }
+    return Expanded(
+        child: ListView.builder(
+            itemCount: _questions.length + 1,
+            shrinkWrap: true,
+            padding: MapAppPadding.cardPageMargins,
+            itemBuilder: (context, i) {
+              if (i == _questions.length) {
+                return Padding(
+                  padding: const EdgeInsets.only(
+                      left: Dimensions.halfMargin,
+                      right: Dimensions.halfMargin,
+                      top: Dimensions.halfMargin,
+                      bottom: 200),
+                  child: RaisedButton(
+                    padding: MapAppPadding.largeButtonPadding,
+                    child: Text("done", style: Theme.of(context).textTheme.button),
+                    onPressed: _onPressed,
+                  ),
+                );
+              }
 
-                QuestionnaireItem item = _questions[i];
-                if (item.isSupported()) {
-                  return _buildItem(context, item);
-                } else if (item.isGroup()) {
-                  return _buildGroupCard(context, item);
-                } else {
-                  return _buildUnsupportedItemCard(context, item);
-                }
-              })),
-    );
+              QuestionnaireItem item = _questions[i];
+              if (item.isSupported()) {
+                return _buildItem(context, item);
+              } else if (item.isGroup()) {
+                return _buildGroupCard(context, item);
+              } else {
+                return _buildUnsupportedItemCard(context, item);
+              }
+            }));
   }
 
   Widget _buildGroupCard(BuildContext context, QuestionnaireItem item) {
@@ -198,6 +188,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
               decoration: InputDecoration(hintText: "Enter body temperature", errorMaxLines: 3),
               inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
               keyboardType: TextInputType.numberWithOptions(decimal: true),
+              autovalidate: true,
               validator: (value) {
                 if (value.isEmpty) return null;
                 double result = double.tryParse(value);
@@ -205,7 +196,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
                 if (!isValidTempF(result) && !isValidTempC(result)) {
                   return "Enter a value between ${QuestionnaireConstants.minF} and "
                       "${QuestionnaireConstants.maxF} (ºF) or ${QuestionnaireConstants.minC} and "
-                      "${QuestionnaireConstants.maxC} (ºC).";
+                      "${QuestionnaireConstants.maxC} (ºC). This value will not be saved.";
                 }
                 // restrict to 2 decimals
                 if (!isValidTempF(result)) result = double.parse(cToF(result).toStringAsFixed(2));
@@ -243,8 +234,6 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
       );
     }
   }
-
-
 
   List<Widget> _buildChoices(QuestionnaireItem questionnaireItem, BuildContext context) {
     Answer currentResponse = _response.getResponseItem(questionnaireItem.linkId) != null
