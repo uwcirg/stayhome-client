@@ -8,9 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
-import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:map_app_flutter/platform_stub.dart';
-import 'package:scoped_model/scoped_model.dart';
 import 'package:simple_auth_flutter/simple_auth_flutter.dart';
 
 class LoginPage extends StatefulWidget {
@@ -117,28 +115,5 @@ class LoginPageState extends State<LoginPage> {
             ),
           )),
     ));
-  }
-
-  void dismissLoginScreen(BuildContext context) {
-
-    if (MyApp.of(context).auth.isLoggedIn) {
-      MyApp.of(context).auth.getUserInfo().then((value) {
-        var keycloakUserId = MyApp.of(context).auth.userInfo.keycloakUserId;
-
-        ScopedModel.of<CarePlanModel>(context)
-            .setUser(keycloakUserId);
-        ScopedModel.of<CarePlanModel>(context)
-            .setAuthToken(MyApp.of(context).auth.authToken());
-        Navigator.of(context).pushReplacementNamed('/home');
-      }).catchError((error) {
-        ScopedModel.of<CarePlanModel>(context).setGuestUser();
-        Navigator.of(context).pushReplacementNamed('/guestHome');
-      });
-    } else {
-      // clear credentials from browser by calling log out
-      MyApp.of(context).logout();
-      ScopedModel.of<CarePlanModel>(context).setGuestUser();
-      Navigator.of(context).pushReplacementNamed('/guestHome');
-    }
   }
 }

@@ -132,7 +132,8 @@ class _MyAppState extends State<MyApp> {
     if (auth.isLoggedIn) {
       auth.getUserInfo().then((value) {
         String keycloakUserId = auth.userInfo.keycloakUserId;
-        ScopedModel.of<CarePlanModel>(context).setUser(keycloakUserId);
+        String authToken = auth.authToken();
+        ScopedModel.of<CarePlanModel>(context).setUserAndAuthToken(keycloakUserId, authToken);
         Navigator.of(context).pushReplacementNamed('/home');
       }).catchError((error) {
         ScopedModel.of<CarePlanModel>(context).setGuestUser();
@@ -145,7 +146,6 @@ class _MyAppState extends State<MyApp> {
       Navigator.of(context).pushReplacementNamed('/guestHome');
     }
   }
-
 }
 
 void snack(String text, context) {

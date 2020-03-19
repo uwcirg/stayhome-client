@@ -37,13 +37,9 @@ class CarePlanModel extends Model {
     goals = new Goals();
   }
 
-  void setAuthToken(String authToken) {
-    this._authToken = authToken;
-    load();
-  }
-
-  void setUser(String keycloakUserId) {
+  void setUserAndAuthToken(String keycloakUserId, String authToken) {
     this._keycloakUserId = keycloakUserId;
+    this._authToken = authToken;
     load();
   }
 
