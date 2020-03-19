@@ -3,6 +3,7 @@
  */
 
 import 'dart:convert';
+import 'dart:io' show HttpHeaders;
 
 import 'package:http/http.dart' show Response, get, post, put;
 import 'package:map_app_flutter/fhir/FhirResources.dart';
@@ -10,10 +11,10 @@ import 'package:map_app_flutter/fhir/FhirResources.dart';
 class Repository {
   static final fhirBaseUrl = "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir";
 
-  static Future<Patient> getPatient(String system, String identifier) async {
+  static Future<Patient> getPatient(String system, String identifier, String authToken) async {
     print("Attempting to load patient with id: $system|$identifier");
     var patientSearchUrl = "$fhirBaseUrl/Patient?identifier=$system|$identifier";
-    var response = await get(patientSearchUrl, headers: {});
+    var response = await get(patientSearchUrl, headers: {HttpHeaders.authorizationHeader: "Bearer " + authToken});
 
     return resultFromResponse(response, "Error loading Patient/$identifier").then((value) {
       var searchResultBundle = jsonDecode(value);

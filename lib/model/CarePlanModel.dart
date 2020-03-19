@@ -21,6 +21,7 @@ class CarePlanModel extends Model {
   TreatmentCalendar treatmentCalendar;
   Goals goals;
 
+  String _authToken;
   String _keycloakUserId;
   String _keycloakSystem;
   String _careplanTemplateRef;
@@ -34,6 +35,11 @@ class CarePlanModel extends Model {
 
   CarePlanModel(this._careplanTemplateRef, this._keycloakSystem) {
     goals = new Goals();
+  }
+
+  void setAuthToken(String authToken) {
+    this._authToken = authToken;
+    load();
   }
 
   void setUser(String keycloakUserId) {
@@ -73,7 +79,7 @@ class CarePlanModel extends Model {
   }
 
   Future<void> _doLoad() async {
-    this.patient = await Repository.getPatient(_keycloakSystem, _keycloakUserId);
+    this.patient = await Repository.getPatient(_keycloakSystem, _keycloakUserId, _authToken);
     if (patient != null) {
       return _loadCarePlan();
     }
