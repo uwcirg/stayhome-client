@@ -127,6 +127,25 @@ class _MyAppState extends State<MyApp> {
     initializeCareplanModel();
     auth = new KeycloakAuth.from(auth);
   }
+
+  void dismissLoginScreen(BuildContext context) {
+    if (auth.isLoggedIn) {
+      auth.getUserInfo().then((value) {
+        String keycloakUserId = auth.userInfo.keycloakUserId;
+        ScopedModel.of<CarePlanModel>(context).setUser(keycloakUserId);
+        Navigator.of(context).pushReplacementNamed('/home');
+      }).catchError((error) {
+        ScopedModel.of<CarePlanModel>(context).setGuestUser();
+        Navigator.of(context).pushReplacementNamed('/guestHome');
+      });
+    } else {
+      // clear credentials from browser by calling log out
+      logout();
+      ScopedModel.of<CarePlanModel>(context).setGuestUser();
+      Navigator.of(context).pushReplacementNamed('/guestHome');
+    }
+  }
+
 }
 
 void snack(String text, context) {

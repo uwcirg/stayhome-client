@@ -58,7 +58,7 @@ class LoginPageState extends State<LoginPage> {
                             onPressed: () => MyApp.of(context)
                                 .auth
                                 .mapAppLogin()
-                                .then((value) => dismissLoginScreen(context))
+                                .then((value) => MyApp.of(context).dismissLoginScreen(context))
                                 .catchError((error) => snack("$error", context)),
                             child: Padding(
                                 padding: EdgeInsets.symmetric(vertical: 12),
@@ -74,8 +74,7 @@ class LoginPageState extends State<LoginPage> {
                         Padding(
                           padding: const EdgeInsets.only(top: 12),
                           child: OutlineButton(
-                              onPressed: () => dismissLoginScreen(context),
-                              borderSide: BorderSide(color: Colors.white, width: 6),
+                              onPressed: () => MyApp.of(context).dismissLoginScreen(context),                              borderSide: BorderSide(color: Colors.white, width: 6),
                               highlightElevation: 0,
                               child: Padding(
                                   padding: EdgeInsets.symmetric(vertical: 12),
@@ -120,24 +119,4 @@ class LoginPageState extends State<LoginPage> {
     ));
   }
 
-  void dismissLoginScreen(BuildContext context) {
-
-    if (MyApp.of(context).auth.isLoggedIn) {
-      MyApp.of(context).auth.getUserInfo().then((value) {
-        var keycloakUserId = MyApp.of(context).auth.userInfo.keycloakUserId;
-
-        ScopedModel.of<CarePlanModel>(context)
-            .setUser(keycloakUserId);
-        Navigator.of(context).pushReplacementNamed('/home');
-      }).catchError((error) {
-        ScopedModel.of<CarePlanModel>(context).setGuestUser();
-        Navigator.of(context).pushReplacementNamed('/guestHome');
-      });
-    } else {
-      // clear credentials from browser by calling log out
-      MyApp.of(context).logout();
-      ScopedModel.of<CarePlanModel>(context).setGuestUser();
-      Navigator.of(context).pushReplacementNamed('/guestHome');
-    }
-  }
 }

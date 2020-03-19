@@ -221,12 +221,12 @@ class KeycloakAuth {
   Future receivedCallback(String change) async {
     var authenticator = _api.authenticator;
 //    var authenticator = SimpleAuthFlutter.authenticators[_api.authenticator.identifier];
-    if (change == "canceled") {
+    if (change.contains("canceled")) {
       authenticator.cancel();
-      return;
-    } else if (change == "error") {
+      return Future.error("Authentication canceled");
+    } else if (change.contains("error")) {
       authenticator.onError("Error: $change");
-      return;
+      return Future.error("Authentication canceled");
     }
 
     Uri uri = Uri.tryParse(change);
