@@ -55,7 +55,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "languageName" : MessageLookupByLibrary.simpleMessage("English (EN)"),
     "last_synced_date" : m3,
     "learning_center" : MessageLookupByLibrary.simpleMessage("Learning center & Help"),
-    "login" : MessageLookupByLibrary.simpleMessage("login"),
+    "login" : MessageLookupByLibrary.simpleMessage("login / register"),
     "logout" : MessageLookupByLibrary.simpleMessage("logout"),
     "more_info" : MessageLookupByLibrary.simpleMessage("More info"),
     "my_goals" : MessageLookupByLibrary.simpleMessage("My goals"),

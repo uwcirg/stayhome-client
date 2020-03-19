@@ -5,7 +5,7 @@
   "developedByCIRG": "Developed by the Clinical Informatics Research Group (CIRG) at University of Washington, 2019.",
   "about": "About",
   "logout": "logout",
-  "login": "login",
+  "login": "login / register",
   "profile": "Profile",
   "email": "Email",
   "buttonPushText": "You have pushed the button this many times:",

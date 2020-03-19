@@ -85,7 +85,7 @@ class S {
 
   String get login {
     return Intl.message(
-      'login',
+      'login / register',
       name: 'login',
       desc: '',
       args: [],
