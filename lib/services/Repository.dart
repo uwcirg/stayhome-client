@@ -9,6 +9,7 @@ import 'package:http/http.dart' show Response, get, post, put;
 import 'package:map_app_flutter/fhir/FhirResources.dart';
 
 class Repository {
+  //static final fhirBaseUrl = "http://lo.lo:5000/api/r4";
   static final fhirBaseUrl = "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir";
 
   static Future<Patient> getPatient(String system, String identifier, String authToken) async {
@@ -47,9 +48,9 @@ class Repository {
   }
 
   /// Get the first returned CarePlan for the given patient.
-  static Future<CarePlan> getCarePlan(Patient patient, String templateRef) async {
+  static Future<CarePlan> getCarePlan(Patient patient, String templateRef, String authToken) async {
     var url = "$fhirBaseUrl/CarePlan?subject=${patient.reference}";
-    var response = await get(url, headers: {});
+    var response = await get(url, headers: {HttpHeaders.authorizationHeader: "Bearer " + authToken});
     var searchResultBundle = jsonDecode(response.body);
     if (searchResultBundle["total"] == 0) {
       return null;
@@ -71,15 +72,17 @@ class Repository {
   }
 
   /// reference should be of format CarePlan/123
-  static Future<CarePlan> loadCarePlan(String reference) async {
-    var url = "$fhirBaseUrl/$reference";
-    var response = await get(url, headers: {});
+  static Future<CarePlan> loadCarePlan(String reference, String authToken) async {
+    var url =
+        "$fhirBaseUrl/$reference";
+    var response = await get(url, headers: {HttpHeaders.authorizationHeader: "Bearer " + authToken});
     return CarePlan.fromJson(jsonDecode(response.body));
   }
 
-  static Future<List<Procedure>> getProcedures(CarePlan carePlan) async {
-    var url = "$fhirBaseUrl/Procedure?based-on=${carePlan.reference}";
-    var response = await get(url, headers: {});
+  static Future<List<Procedure>> getProcedures(CarePlan carePlan, String authToken) async {
+    var url =
+        "$fhirBaseUrl/Procedure?based-on=${carePlan.reference}";
+    var response = await get(url, headers: {HttpHeaders.authorizationHeader: "Bearer " + authToken});
     var searchResultBundle = jsonDecode(response.body);
     List<Procedure> procedures = [];
     if (searchResultBundle['total'] > 0) {
@@ -90,11 +93,11 @@ class Repository {
     return procedures;
   }
 
-  static Future<List<QuestionnaireResponse>> getQuestionnaireResponses(CarePlan carePlan) async {
+  static Future<List<QuestionnaireResponse>> getQuestionnaireResponses(CarePlan carePlan, String authToken) async {
     int maxToReturn = 200;
     var url =
         "$fhirBaseUrl/QuestionnaireResponse?based-on=${carePlan.reference}&_count=$maxToReturn&_sort=-authored";
-    var response = await get(url, headers: {});
+    var response = await get(url, headers: {HttpHeaders.authorizationHeader: "Bearer " + authToken});
     var searchResultBundle = jsonDecode(response.body);
     List<QuestionnaireResponse> responses = [];
     if (searchResultBundle['total'] > 0) {
@@ -105,35 +108,35 @@ class Repository {
     return responses;
   }
 
-  static Future<List<DocumentReference>> getResourceLinks(String carePlanTemplateRef) async {
-    CarePlan carePlan = await loadCarePlan(carePlanTemplateRef);
+  static Future<List<DocumentReference>> getResourceLinks(String carePlanTemplateRef, String authToken) async {
+    CarePlan carePlan = await loadCarePlan(carePlanTemplateRef, authToken);
     List<Reference> documentReferenceReferences = [];
     for (Activity activity in carePlan.activity) {
       documentReferenceReferences.addAll(activity.detail.reasonReference);
     }
     List<DocumentReference> documentReferences = [];
     await Future.forEach(documentReferenceReferences, (Reference r) async {
-      var url = "$fhirBaseUrl/${r.reference}";
-      var value = await get(url, headers: {});
+      var url ="$fhirBaseUrl/${r.reference}";
+      var value = await get(url, headers: {HttpHeaders.authorizationHeader: "Bearer " + authToken});
 
       documentReferences.add(DocumentReference.fromJson(jsonDecode(value.body)));
     });
     return documentReferences;
   }
 
-  static Future<Questionnaire> getSimpleQuestionnaire() async {
+  static Future<Questionnaire> getSimpleQuestionnaire(String authToken) async {
     var url = 'http://hapi.fhir.org/baseR4/Questionnaire/11723';
 
-    var value = await get(url, headers: {});
+    var value = await get(url, headers: {HttpHeaders.authorizationHeader: "Bearer " + authToken});
     var q = Questionnaire.fromJson(jsonDecode(value.body));
     await q.loadValueSets();
     return q;
   }
 
-  static Future<Questionnaire> getPHQ9Questionnaire() async {
-    var url = "$fhirBaseUrl/Questionnaire/52";
+  static Future<Questionnaire> getPHQ9Questionnaire(String authToken) async {
+    var url ="$fhirBaseUrl/Questionnaire/52";
 
-    var value = await get(url, headers: {});
+    var value = await get(url, headers: {HttpHeaders.authorizationHeader: "Bearer " + authToken});
 
     var q = Questionnaire.fromJson(jsonDecode(value.body));
     await q.loadValueSets();
@@ -148,7 +151,7 @@ class Repository {
     return ValueSet.fromJson(jsonDecode(value.body));
   }
 
-  static Future<void> postCompletedSession(Procedure treatmentSession) async {
+  static Future<void> postCompletedSession(Procedure treatmentSession, String authToken) async {
     var url = "$fhirBaseUrl/Procedure?_format=json";
     String body = jsonEncode(treatmentSession.toJson());
     var headers = {
@@ -157,6 +160,7 @@ class Repository {
       "User-Agent": "HAPI-FHIR/3.8.0 (FHIR Client; FHIR 4.0.0/R4; apache)",
       "Accept-Encoding": "gzip",
       "Content-Type": "application/fhir+json; charset=UTF-8",
+      HttpHeaders.authorizationHeader: "Bearer " + authToken,
     };
 
     Response value =
@@ -165,7 +169,7 @@ class Repository {
     return resultFromResponse(value, "An error occurred when trying to save your responses.");
   }
 
-  static Future<void> postQuestionnaireResponse(QuestionnaireResponse questionnaireResponse) async {
+  static Future<void> postQuestionnaireResponse(QuestionnaireResponse questionnaireResponse, String authToken) async {
     var url = "$fhirBaseUrl/QuestionnaireResponse?_format=json";
     String body = jsonEncode(questionnaireResponse.toJson());
     var headers = {
@@ -174,6 +178,7 @@ class Repository {
       "User-Agent": "HAPI-FHIR/3.8.0 (FHIR Client; FHIR 4.0.0/R4; apache)",
       "Accept-Encoding": "gzip",
       "Content-Type": "application/fhir+json; charset=UTF-8",
+      HttpHeaders.authorizationHeader: "Bearer " + authToken,
     };
 
     Response value =
@@ -182,10 +187,10 @@ class Repository {
     return resultFromResponse(value, "An error occurred when trying to save your responses.");
   }
 
-  static Future<Questionnaire> getQuestionnaire(String questionnaireReference) async {
+  static Future<Questionnaire> getQuestionnaire(String questionnaireReference, String authToken) async {
     var url = "$fhirBaseUrl/$questionnaireReference";
 
-    var value = await get(url, headers: {});
+    var value = await get(url, headers: {HttpHeaders.authorizationHeader: "Bearer " + authToken});
 
     var q = Questionnaire.fromJson(jsonDecode(value.body));
     await q.loadValueSets();
@@ -193,13 +198,13 @@ class Repository {
   }
 
   /// get all questionnaires instantiated by activities in this CarePlan
-  static Future<List<Questionnaire>> getQuestionnaires(CarePlan carePlan) async {
+  static Future<List<Questionnaire>> getQuestionnaires(CarePlan carePlan, String authToken) async {
     List<Questionnaire> questionnaires = [];
     await Future.forEach(carePlan.activity, (var activity) async {
       if (activity.detail.instantiatesCanonical != null) {
         for (String instantiatesReference in activity.detail.instantiatesCanonical) {
           if (instantiatesReference.startsWith("Questionnaire")) {
-            Questionnaire q = await getQuestionnaire(instantiatesReference);
+            Questionnaire q = await getQuestionnaire(instantiatesReference, authToken);
             questionnaires.add(q);
           }
         }
@@ -208,7 +213,7 @@ class Repository {
     return questionnaires;
   }
 
-  static Future postCarePlan(CarePlan plan) async {
+  static Future<Response> postCarePlan(CarePlan plan, String authToken) async {
     var url = "$fhirBaseUrl/CarePlan?_format=json";
     String body = jsonEncode(plan.toJson());
     var headers = {
@@ -217,6 +222,7 @@ class Repository {
       "User-Agent": "HAPI-FHIR/3.8.0 (FHIR Client; FHIR 4.0.0/R4; apache)",
       "Accept-Encoding": "gzip",
       "Content-Type": "application/fhir+json; charset=UTF-8",
+      HttpHeaders.authorizationHeader: "Bearer " + authToken,
     };
 
     Response response =
@@ -224,7 +230,7 @@ class Repository {
     return resultFromResponse(response, "Creating care plan failed");
   }
 
-  static Future updateCarePlan(CarePlan plan) async {
+  static Future<Response> updateCarePlan(CarePlan plan, String authToken) async {
     var url = "$fhirBaseUrl/CarePlan/${plan.id}?_format=json";
     String body = jsonEncode(plan.toJson());
     var headers = {
@@ -233,6 +239,7 @@ class Repository {
       "User-Agent": "HAPI-FHIR/3.8.0 (FHIR Client; FHIR 4.0.0/R4; apache)",
       "Accept-Encoding": "gzip",
       "Content-Type": "application/fhir+json; charset=UTF-8",
+      HttpHeaders.authorizationHeader: "Bearer " + authToken,
     };
 
     Response response =
@@ -240,7 +247,14 @@ class Repository {
     return resultFromResponse(response, "Updating care plan failed");
   }
 
-  static Future postPatient(Patient patient) async {
+  static Future postPatient(Patient patient, String authToken) async {
+    // new patient URL
+    var url = "$fhirBaseUrl/Patient?_format=json";
+    // update patient URL
+    if (patient.id != null && patient.id.length > 0) {
+      url = "$fhirBaseUrl/Patient/${patient.id}?_format=json";
+    }
+
     String body = jsonEncode(patient.toJson());
     var headers = {
       "Accept-Charset": "utf-8",
@@ -248,6 +262,7 @@ class Repository {
       "User-Agent": "HAPI-FHIR/3.8.0 (FHIR Client; FHIR 4.0.0/R4; apache)",
       "Accept-Encoding": "gzip",
       "Content-Type": "application/fhir+json; charset=UTF-8",
+      HttpHeaders.authorizationHeader: "Bearer " + authToken,
     };
 
     Response response;
