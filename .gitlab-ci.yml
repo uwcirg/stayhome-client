@@ -41,6 +41,11 @@ stages:
   - test
   - build
 
+test:flutter:
+  stage: test
+  script:
+    - flutter test
+
 build:apk:
   only:
     - schedules
@@ -76,8 +81,3 @@ build:web:
     paths:
       - build/web/
     expire_in: 1 day
-
-test:flutter:
-  stage: test
-  script:
-    - flutter test
