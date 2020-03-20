@@ -48,13 +48,8 @@ class Patient extends Resource {
       String lastName,
       String firstName,
       String emailAddress,
-      String zipCode}) {
-//    Name
-//    Device phone number
-//    Address
-//    County
-//    Email address
-
+      String homeZip,
+      String secondZip}) {
     Patient patient;
     if (originalPatient != null) {
       patient = Patient.fromJson(originalPatient.toJson());
@@ -62,11 +57,12 @@ class Patient extends Resource {
       patient = Patient();
     }
     patient.resourceType = "Patient";
-    patient.firstName = firstName;
-    patient.lastName = lastName;
-    patient.phoneNumber = phoneNumber;
-    patient.emailAddress = emailAddress;
-    patient.zipcode = zipCode;
+    if (firstName.isNotEmpty) patient.firstName = firstName;
+    if (lastName.isNotEmpty) patient.lastName = lastName;
+    if (phoneNumber.isNotEmpty) patient.phoneNumber = phoneNumber;
+    if (emailAddress.isNotEmpty) patient.emailAddress = emailAddress;
+    if (homeZip.isNotEmpty) patient.homeZip = homeZip;
+    if (secondZip.isNotEmpty) patient.secondZip = secondZip;
     return patient;
   }
 
@@ -142,12 +138,38 @@ class Patient extends Resource {
           .value
       : null;
 
-  get zipcode =>
-      this.address != null && this.address.length > 0 ? this.address[0].postalCode : null;
+  get homeZip => this.address != null && this.address.length > 0
+      ? this
+          .address
+          .firstWhere((Address a) => a.use == Use.home, orElse: () => Address())
+          .postalCode
+      : null;
 
-  set zipcode(String text) {
-    if (this.address == null || this.address.isEmpty) this.address = [new Address()];
-    this.address[0].postalCode = text;
+  set homeZip(String text) {
+    if (this.address == null) this.address = [];
+    Address address = this.address.firstWhere((Address a) => a.use == Use.home, orElse: () => null);
+    if (address == null) {
+      address = Address(use: Use.home);
+      this.address.add(address);
+    }
+    address.postalCode = text;
+  }
+
+  get secondZip => this.address != null && this.address.length > 0
+      ? this
+          .address
+          .firstWhere((Address a) => a.use != Use.home, orElse: () => Address())
+          .postalCode
+      : null;
+
+  set secondZip(String text) {
+    if (this.address == null) this.address = [];
+    Address address = this.address.firstWhere((Address a) => a.use != Use.home, orElse: () => null);
+    if (address == null) {
+      address = Address();
+      this.address.add(address);
+    }
+    address.postalCode = text;
   }
 
   Patient.fromJson(Map<String, dynamic> json) {
@@ -321,6 +343,7 @@ class ContactPoint {
 class Address {
   List<Extension> extension;
   List<String> line;
+  Use use;
   String city;
   String district;
   String state;
@@ -330,6 +353,7 @@ class Address {
   Address(
       {this.extension,
       this.line,
+      this.use,
       this.city,
       this.district,
       this.state,
@@ -347,6 +371,7 @@ class Address {
       line = json['line'].cast<String>();
     }
     city = json['city'];
+    if (json['use'] != null) use = Use.fromJson(json['use']);
     district = json['district'];
     state = json['state'];
     postalCode = json['postalCode'];
@@ -359,6 +384,7 @@ class Address {
       data['extension'] = this.extension.map((v) => v.toJson()).toList();
     }
     if (this.line != null) data['line'] = this.line;
+    if (this.use != null) data['use'] = this.use.toString();
     if (this.city != null) data['city'] = this.city;
     if (this.district != null) data['district'] = this.district;
     if (this.state != null) data['state'] = this.state;
@@ -391,12 +417,39 @@ class Communication {
   }
 }
 
+class Use {
+  final _value;
+
+  const Use._(this._value);
+
+  toString() => _value;
+
+  static fromJson(String key) {
+    return _vals.firstWhere((v) => v._value == key,
+        orElse: () => throw ArgumentError("Key does not match any Use"));
+  }
+
+  static const home = const Use._('home');
+  static const work = const Use._('work');
+  static const temp = const Use._('temp');
+  static const old = const Use._('old');
+  static const billing = const Use._('billing');
+
+  static const _vals = [home, work, temp, old, billing];
+}
+
 class ProcedureStatus {
   final _value;
 
   const ProcedureStatus._(this._value);
 
   toString() => _value;
+
+  static fromJson(String key) {
+    return _vals.firstWhere((v) => v._value == key,
+        orElse: () => throw ArgumentError("Key does not match any Use"));
+  }
+
   static const preparation = const ProcedureStatus._('preparation');
   static const in_progress = const ProcedureStatus._('in-progress');
   static const not_done = const ProcedureStatus._('not-done');
@@ -406,27 +459,16 @@ class ProcedureStatus {
   static const entered_in_error = const ProcedureStatus._('entered-in-error');
   static const unknown = const ProcedureStatus._('unknown');
 
-  static ProcedureStatus fromJson(String key) {
-    switch (key) {
-      case 'preparation':
-        return preparation;
-      case 'in-progress':
-        return in_progress;
-      case 'not-done':
-        return not_done;
-      case 'suspended':
-        return suspended;
-      case 'aborted':
-        return aborted;
-      case 'completed':
-        return completed;
-      case 'entered-in-error':
-        return entered_in_error;
-      case 'unknown':
-        return unknown;
-    }
-    return unknown;
-  }
+  static const _vals = [
+    preparation,
+    in_progress,
+    not_done,
+    suspended,
+    aborted,
+    completed,
+    entered_in_error,
+    unknown
+  ];
 }
 
 class QuestionnaireResponseStatus {
@@ -436,7 +478,10 @@ class QuestionnaireResponseStatus {
 
   toString() => _value;
 
-  toJson() => toString();
+  static fromJson(String key) {
+    return _vals.firstWhere((v) => v._value == key,
+        orElse: () => throw ArgumentError("Key does not match any Use"));
+  }
 
   static const in_progress = const QuestionnaireResponseStatus._('in-progress');
   static const stopped = const QuestionnaireResponseStatus._('stopped');
@@ -444,21 +489,7 @@ class QuestionnaireResponseStatus {
   static const amended = const QuestionnaireResponseStatus._('amended');
   static const entered_in_error = const QuestionnaireResponseStatus._('entered-in-error');
 
-  static QuestionnaireResponseStatus fromJson(String key) {
-    switch (key) {
-      case 'in-progress':
-        return in_progress;
-      case 'stopped':
-        return stopped;
-      case 'amended':
-        return amended;
-      case 'completed':
-        return completed;
-      case 'entered-in-error':
-        return entered_in_error;
-    }
-    return completed;
-  }
+  static const _vals = [in_progress, stopped, completed, amended, entered_in_error];
 }
 
 class Procedure extends Resource {
@@ -1575,7 +1606,7 @@ class QuestionnaireResponse extends Resource {
     }
     data['basedOn'] = this.basedOnCarePlan;
     data['questionnaire'] = this.questionnaireReference;
-    data['status'] = this.status.toJson();
+    data['status'] = this.status.toString();
     if (this.subject != null) {
       data['subject'] = this.subject.toJson();
     }

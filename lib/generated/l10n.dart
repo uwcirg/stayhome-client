@@ -211,7 +211,7 @@ class S {
 
   String get sign_up_or_log_in_to_access_all_functions {
     return Intl.message(
-      'Sign up or Log in to access all functions',
+      'Log in to access all functions',
       name: 'sign_up_or_log_in_to_access_all_functions',
       desc: '',
       args: [],
@@ -474,6 +474,42 @@ class S {
     return Intl.message(
       'My goals',
       name: 'my_goals',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get profile_introduction_help_text {
+    return Intl.message(
+      'If you create a profile and add certain types of information, you can see information more relevant to you, and you can convey information to public health that may help your community, or help you personally.\n\nBut remember, everything on this profile is optional.  We’re more interested in having you able to use the system than in having you worry about us collecting information, or keeping it safe.  That said, each item on this page has a use, and you can always come back and update it later.',
+      name: 'profile_introduction_help_text',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get profile_location_help_text {
+    return Intl.message(
+      'If you give us location information, we may make your symptom temperature and testing information available anonymously (no identifying information) to public health agencies responsible for those zip codes.  You can provide a real location, even if you register with a fake email address.  But, that information (level of illness, location) may be useful for public health planning even if you can not be contacted.  \n\nIf we have your location we can also personalize the information we give you about COVID-19 resources.',
+      name: 'profile_location_help_text',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get profile_contact_info_help_text {
+    return Intl.message(
+      'If you set up your account with a fake email, you can provide us a real one here.  It won’t change your username, but **if you also verify your email or phone or both**, you agree that we, or a public health jurisdiction responsible for your location, can contact you if there is a specific need that we, or they, believe to be in your interest.',
+      name: 'profile_contact_info_help_text',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get profile_identifying_info_help_text {
+    return Intl.message(
+      'If you **are willing** to provide a verified email and/or phone number, we’d like to know who we’re speaking with if we do have a need to contact you.  Similarly, if you provide information about who you are, we’d appreciate it if you’d include sex and date of birth as those are standard ways of ensuring someone’s medical information gets attached to the correct clinic, testing, or hospital records.\n\nIf you don’t provide contact, location, or identifying information, we’d like you to provide us with your sex and as much of your date of birth as you’re willing to share.  Patterns of illness by age, sex, and location can be critical in helping public health shape an effective response.',
+      name: 'profile_identifying_info_help_text',
       desc: '',
       args: [],
     );

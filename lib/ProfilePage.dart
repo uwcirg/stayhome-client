@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:map_app_flutter/KeycloakAuth.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
@@ -29,45 +30,29 @@ class _ProfilePageState extends State<ProfilePage> {
     if (MyApp.of(context).auth.userInfo != null) {
       return MapAppPageScaffold(
           title: title,
-          child: Padding(
-            padding: const EdgeInsets.all(Dimensions.fullMargin),
-            child: ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
+          child: Expanded(
+              child: ListView.builder(
+            itemBuilder: (context, i) {
               return Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  ProfileWidget(model.patient, MyApp.of(context).auth.userInfo,
-                      (Patient patient) => model.updatePatientResource(patient)),
+                  ProfileWidget(popWhenDone: false),
                   Divider(),
                   Padding(
                     padding: const EdgeInsets.only(top: Dimensions.largeMargin),
                     child: Center(
                       child: OutlineButton(
                         child: Text(S.of(context).logout),
-                        onPressed: () => logout(context),
+                        onPressed: () => logout(),
                       ),
                     ),
                   ),
-//                  Text(
-//                    "CouchDB debug area",
-//                    style: Theme
-//                        .of(context)
-//                        .textTheme
-//                        .subtitle,
-//                  ),
-//                  ScopedModelDescendant<AppModel>(
-//                    builder: (context, child, model) {
-//                      if (model.docExample != null) {
-//                        return Text(
-//                            "CouchDB object content: ${model.docExample.getString("click")}");
-//                      } else {
-//                        return CircularProgressIndicator();
-//                      }
-//                    },
-//                    rebuildOnChange: true,
-//                  ),
                 ],
               );
-            }),
-          ));
+            },
+            itemCount: 1,
+            shrinkWrap: true,
+          )));
     }
     if (_error != null) {
       return MapAppPageScaffold(
@@ -78,7 +63,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return MapAppPageScaffold(title: title, child: new CircularProgressIndicator());
   }
 
-  void logout(BuildContext context) {
+  void logout() {
     MyApp.of(context).logout(context: context);
   }
 }
@@ -87,141 +72,222 @@ class CreateProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
-        title: "create patient record",
-        showDrawer: false,
-        child: Padding(
-          padding: const EdgeInsets.all(Dimensions.fullMargin),
-          child: ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
-            return ProfileWidget(model.patient, MyApp.of(context).auth.userInfo, (Patient patient) {
-              model.updatePatientResource(patient);
-              Navigator.of(context).pop();
-            });
-          }),
-        ));
+      title: "create profile",
+      showDrawer: false,
+      child: Expanded(
+        child: ListView.builder(
+          itemBuilder: (context, i) {
+            return ProfileWidget(popWhenDone: true);
+          },
+          itemCount: 1,
+          shrinkWrap: true,
+        ),
+      ),
+    );
   }
 }
 
 class ProfileWidget extends StatefulWidget {
-  final Patient _patient;
-  final UserInfo _userInfo;
-  final Function _onPressed;
+  final bool popWhenDone;
 
-  ProfileWidget(this._patient, this._userInfo, this._onPressed);
+  ProfileWidget({this.popWhenDone});
 
   @override
-  State createState() => ProfileWidgetState(this._patient, this._userInfo, this._onPressed);
+  State createState() => ProfileWidgetState();
 }
 
 class ProfileWidgetState extends State<ProfileWidget> {
-  final Patient _originalPatient;
-  final UserInfo _userInfo;
-  final Function _onPressed;
-
+  String _formError;
   final _formKey = GlobalKey<FormState>();
 
-  ProfileWidgetState(Patient patient, this._userInfo, this._onPressed)
-      : this._originalPatient = patient != null ? Patient.fromJson(patient.toJson()) : Patient();
+  ProfileWidgetState();
 
   @override
   Widget build(BuildContext context) {
-    String firstName = _originalPatient.firstName ?? _userInfo.givenName;
-    String lastName = _originalPatient.lastName ?? _userInfo.familyName;
-    String email = _originalPatient.emailAddress ?? _userInfo.email;
-    String phone = _originalPatient.phoneNumber;
-    String zip = _originalPatient.zipcode;
-    return Form(
-        key: _formKey,
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-          TextFormField(
-            decoration: InputDecoration(
-                icon: Icon(Icons.person),
-                hintText: S.of(context).what_is_your_name,
-                labelText: "First name"),
-            initialValue: firstName,
-            validator: (value) {
-              if (value.isEmpty) {
-                return 'This field is required';
-              }
-              firstName = value;
-              return null;
-            },
-          ),
-          TextFormField(
-            decoration: InputDecoration(
-                icon: Icon(null),
-                hintText: S.of(context).what_is_your_name,
-                labelText: "Last name"),
-            initialValue: lastName,
-            validator: (value) {
-              if (value.isEmpty) {
-                return 'This field is required';
-              }
-              lastName = value;
-              return null;
-            },
-          ),
-          TextFormField(
-            decoration: InputDecoration(
-                icon: Icon(Icons.email),
-                hintText: S.of(context).what_is_your_email_address,
-                labelText: S.of(context).email),
-            initialValue: email,
-            validator: (value) {
-              if (!isValid("email", value)) {
-                return "A valid email address is required";
-              }
-              email = value;
-              return null;
-            },
-          ),
-          TextFormField(
-            decoration: InputDecoration(
-                icon: Icon(Icons.phone),
-                hintText: "What is your phone number?",
-                labelText: "Phone"),
-            initialValue: phone,
-            validator: (value) {
-              if (value.isNotEmpty && !isValid("phone", value)) {
-                return "A valid phone number is required";
-              }
-              phone = value;
-              return null;
-            },
-          ),
-          TextFormField(
-            decoration: InputDecoration(
-                icon: Icon(Icons.contact_mail),
-                hintText: "What is your zip code?",
-                labelText: "Zip code"),
-            initialValue: zip,
-            validator: (value) {
-              // empty zip code is allowed
-              if (value.isNotEmpty && !isValid("zip", value)) {
-                return "A valid zip code is required";
-              }
-              zip = value;
-              return null;
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: Dimensions.largeMargin),
-            child: Center(
-              child: OutlineButton(
-                child: Text("save"),
-                onPressed: () {
-                  if (_formKey.currentState.validate()) {
-                    _onPressed(Patient.fromNewPatientForm(_originalPatient,
-                        firstName: firstName,
-                        lastName: lastName,
-                        phoneNumber: phone,
-                        emailAddress: email,
-                        zipCode: zip));
-                  }
-                },
-              ),
-            ),
-          ),
-        ]));
+    return ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
+      return _buildForm(model);
+    });
+  }
+
+  void _onPressed(Patient patient, CarePlanModel model) {
+    model.updatePatientResource(patient).then((value) {
+      setState(() {
+        _formError = null;
+      });
+      if (widget.popWhenDone) {
+        Navigator.of(context).pop();
+      } else {
+        snack("Profile updates saved", context);
+      }
+    }).catchError((error) {
+      setState(() {
+        _formError = "There has been an error while saving profile updates. Please try again.";
+      });
+      snack("Error saving profile updates", context);
+    });
+  }
+
+  _buildForm(model) {
+    UserInfo userInfo = MyApp.of(context).auth.userInfo;
+    Patient originalPatient =
+        model.patient != null ? Patient.fromJson(model.patient.toJson()) : Patient();
+    String firstName = originalPatient.firstName;
+    String lastName = originalPatient.lastName;
+    String email = originalPatient.emailAddress ?? userInfo.email;
+    String phone = originalPatient.phoneNumber;
+    String homeZip = originalPatient.homeZip;
+    String secondZip = originalPatient.secondZip;
+    return Padding(
+      padding: const EdgeInsets.all(Dimensions.fullMargin),
+      child: Form(
+          key: _formKey,
+          child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _buildInfoTextSection(S.of(context).profile_introduction_help_text),
+                _buildSectionHeader("Location"),
+                TextFormField(
+                  decoration: InputDecoration(
+                      icon: Icon(Icons.contact_mail),
+                      hintText: "Where you spend most of your time",
+                      labelText: "Home zip code"),
+                  initialValue: homeZip,
+                  autovalidate: true,
+                  validator: (value) {
+                    // empty zip code is allowed
+                    if (value.isNotEmpty && !isValid("zip", value)) {
+                      return "Leave blank or enter a valid zip code";
+                    }
+                    homeZip = value;
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  decoration: InputDecoration(
+                      icon: Icon(null),
+                      hintText:
+                          "if you spend a lot of time in a different location (work, school, family, etc.)",
+                      labelText: "Second zip code"),
+                  initialValue: secondZip,
+                  autovalidate: true,
+                  validator: (value) {
+                    // empty zip code is allowed
+                    if (value.isNotEmpty && !isValid("zip", value)) {
+                      return "Leave blank or enter a valid zip code";
+                    }
+                    secondZip = value;
+                    return null;
+                  },
+                ),
+                _buildInfoTextSection(S.of(context).profile_location_help_text),
+                _buildSectionHeader("Contact information"),
+                TextFormField(
+                  decoration: InputDecoration(
+                      icon: Icon(Icons.email),
+                      hintText: S.of(context).what_is_your_email_address,
+                      labelText: S.of(context).email),
+                  initialValue: email,
+                  autovalidate: true,
+                  validator: (value) {
+                    // empty email is allowed
+                    if (value.isNotEmpty && !isValid("email", value)) {
+                      return "Leave blank or enter a valid email address";
+                    }
+                    email = value;
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  decoration: InputDecoration(
+                      icon: Icon(Icons.phone),
+                      hintText: "What is your phone number?",
+                      labelText: "Cell/mobile Phone"),
+                  initialValue: phone,
+                  autovalidate: true,
+                  validator: (value) {
+                    // empty phone is allowed
+                    if (value.isNotEmpty && !isValid("phone", value)) {
+                      return "Leave blank or enter a valid phone number";
+                    }
+                    phone = value;
+                    return null;
+                  },
+                ),
+                _buildInfoTextSection(S.of(context).profile_contact_info_help_text),
+                _buildSectionHeader("Identifying Information"),
+                TextFormField(
+                  decoration: InputDecoration(
+                      icon: Icon(Icons.person),
+                      hintText: S.of(context).what_is_your_name,
+                      labelText: "First name"),
+                  initialValue: firstName,
+                  validator: (value) {
+                    firstName = value;
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  decoration: InputDecoration(
+                      icon: Icon(null),
+                      hintText: S.of(context).what_is_your_name,
+                      labelText: "Last name"),
+                  initialValue: lastName,
+                  validator: (value) {
+                    lastName = value;
+                    return null;
+                  },
+                ),
+                _buildInfoTextSection(S.of(context).profile_identifying_info_help_text),
+                Padding(
+                  padding: const EdgeInsets.only(top: Dimensions.largeMargin),
+                  child: Center(
+                    child: OutlineButton(
+                      child: Text("save"),
+                      onPressed: () {
+                        if (_formKey.currentState.validate()) {
+                          _onPressed(
+                              Patient.fromNewPatientForm(originalPatient,
+                                  firstName: firstName,
+                                  lastName: lastName,
+                                  phoneNumber: phone,
+                                  emailAddress: email,
+                                  homeZip: homeZip,
+                                  secondZip: secondZip),
+                              model);
+                        } else {
+                          setState(() {
+                            _formError = "Form has errors. Please scroll up and fix your entries.";
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                ),
+                Visibility(
+                  visible: _formError != null,
+                  child: Text(_formError != null ? _formError : "",
+                      style: Theme.of(context)
+                          .textTheme
+                          .caption
+                          .apply(color: Theme.of(context).errorColor)),
+                )
+              ])),
+    );
+  }
+
+  _buildSectionHeader(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(top: Dimensions.fullMargin),
+      child: Text(text, style: Theme.of(context).textTheme.title),
+    );
+  }
+
+  _buildInfoTextSection(String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
+      child: MarkdownBody(data: text),
+    );
   }
 
   isValid(String type, String toValidate) {

@@ -11,8 +11,6 @@ import 'package:scoped_model/scoped_model.dart';
 import '../const.dart';
 
 class CarePlanModel extends Model {
-  bool hasNoCarePlan = false;
-  bool hasNoPatient = false;
   List<Questionnaire> questionnaires;
   List<Procedure> procedures;
   List<QuestionnaireResponse> questionnaireResponses;
@@ -29,6 +27,10 @@ class CarePlanModel extends Model {
   Map<String, QuestionnaireItem> _questionsByLinkId = new Map();
 
   List<DocumentReference> infoLinks;
+
+  bool get hasNoPatient => patient == null;
+
+  bool get hasNoCarePlan => carePlan == null;
 
   CarePlanModel(this._careplanTemplateRef, this._keycloakSystem) {
     goals = new Goals();
@@ -72,20 +74,14 @@ class CarePlanModel extends Model {
 
   Future<void> _doLoad() async {
     this.patient = await Repository.getPatient(_keycloakSystem, _keycloakUserId);
-    if (patient == null) {
-      this.hasNoPatient = true;
-    } else {
-      this.hasNoPatient = false;
+    if (patient != null) {
       return _loadCarePlan();
     }
   }
 
   Future<void> _loadCarePlan() async {
     this.carePlan = await Repository.getCarePlan(patient, _careplanTemplateRef);
-    if (carePlan == null) {
-      hasNoCarePlan = true;
-    } else {
-      hasNoCarePlan = false;
+    if (carePlan != null) {
       return _loadQuestionnaires();
     }
   }
@@ -103,18 +99,16 @@ class CarePlanModel extends Model {
           .then((List<QuestionnaireResponse> responses) {
         this.questionnaireResponses = responses;
       }),
-      Repository.getResourceLinks(_careplanTemplateRef)
-          .then((List<DocumentReference> responses) {
+      Repository.getResourceLinks(_careplanTemplateRef).then((List<DocumentReference> responses) {
         this.infoLinks = responses;
       })
     ];
-    await Future.wait(futures);
-    rebuildTreatmentPlan();
+    return Future.wait(futures).then((value) => rebuildTreatmentPlan());
   }
 
   void loadResourceLinks() async {
-    notifyOrError(Repository.getResourceLinks(_careplanTemplateRef)
-        .then((List<DocumentReference> responses) {
+    notifyOrError(
+        Repository.getResourceLinks(_careplanTemplateRef).then((List<DocumentReference> responses) {
       this.infoLinks = responses;
     }));
   }
@@ -126,23 +120,23 @@ class CarePlanModel extends Model {
   Future updatePatientResource(Patient patient) async {
     this.patient = patient;
     this.patient.setKeycloakId(_keycloakSystem, _keycloakUserId);
-    Repository.postPatient(patient).then((value) => load());
+    return Repository.postPatient(this.patient).then((value) => load());
   }
 
   Future addDefaultCareplan() async {
     notifyOrError(Repository.loadCarePlan(_careplanTemplateRef).then((CarePlan plan) {
       CarePlan newPlan = CarePlan.fromTemplate(plan, patient);
-      Repository.postCarePlan(newPlan).then((value) => load());
+      return Repository.postCarePlan(newPlan).then((value) => load());
     }));
   }
 
   Future addCompletedSession(int minutes) async {
     Procedure treatmentSession = Procedure.treatmentSession(minutes, carePlan);
-    Repository.postCompletedSession(treatmentSession).then((value) => load());
+    return Repository.postCompletedSession(treatmentSession).then((value) => load());
   }
 
   Future postQuestionnaireResponse(QuestionnaireResponse response) async {
-    Repository.postQuestionnaireResponse(response).then((value) => load());
+    return Repository.postQuestionnaireResponse(response).then((value) => load());
   }
 
   void updateActivityFrequency(int activityIndex, double newFrequency) {
