@@ -8,6 +8,8 @@ import 'package:map_app_flutter/app_assets.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
+import 'package:map_app_flutter/model/CarePlanModel.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class MapAppDrawer extends Drawer {
   @override
@@ -36,19 +38,26 @@ class MapAppDrawer extends Drawer {
                             onPressed: () => profileOrLogin(context)),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: IconSize.large),
-                          child: Text(
-                            MyApp.of(context).auth.isLoggedIn
-                                ? MyApp.of(context).auth.userInfo.givenName
-                                : S.of(context).sign_up_or_log_in_to_access_all_functions,
-                            softWrap: true,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context)
-                                .textTheme
-                                .body1
-                                .apply(color: Theme.of(context).iconTheme.color),
-                            textAlign: TextAlign.center,
-                          ),
+                          child: ScopedModelDescendant<CarePlanModel>(
+                              builder: (context, child, model) {
+                            return Text(
+                              MyApp.of(context).auth.isLoggedIn
+                                  ? (model != null &&
+                                          model.patient != null &&
+                                          model.patient.firstName != null
+                                      ? model.patient.firstName
+                                      : "")
+                                  : S.of(context).sign_up_or_log_in_to_access_all_functions,
+                              softWrap: true,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .body1
+                                  .apply(color: Theme.of(context).iconTheme.color),
+                              textAlign: TextAlign.center,
+                            );
+                          }),
                         ),
                       ],
                     ),

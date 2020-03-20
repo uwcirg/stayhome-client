@@ -262,27 +262,18 @@ class KeycloakAuth {
 class UserInfo {
   final String keycloakUserId;
   final bool emailVerified;
-  final String name;
   final String preferredUsername;
-  final String _givenName;
-  final String familyName;
   final String email;
 
-  UserInfo(this.keycloakUserId, this.emailVerified, this.name, this.preferredUsername,
-      this._givenName, this.familyName, this.email);
+  UserInfo(this.keycloakUserId, this.emailVerified, this.preferredUsername,
+      this.email);
 
-  String get givenName {
-    return this._givenName != null ? this._givenName : "";
-  }
 
   static UserInfo from(Map userInfoMap) {
     return UserInfo(
         userInfoMap["sub"],
         userInfoMap["email_verified"],
-        userInfoMap["name"],
         userInfoMap["preferred_username"],
-        userInfoMap["given_name"],
-        userInfoMap["family_name"],
         userInfoMap["email"]);
   }
 }
