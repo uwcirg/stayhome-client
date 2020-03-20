@@ -19,7 +19,7 @@ class Repository {
       var searchResultBundle = jsonDecode(value);
       if (searchResultBundle['total'] > 1) {
         print("more than 1 patient");
-        return Future.error("The user ID does not uniquely match a patient resource.");
+        return Future.error("The user ID does not uniquely match a patient resource. Please contact an administrator.");
       }
       if (searchResultBundle['total'] == 0) {
         print("no patient");

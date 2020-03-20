@@ -12,6 +12,26 @@ class Resource {
   get reference => "$resourceType/$id";
 }
 
+class Gender {
+  final _value;
+
+  const Gender._(this._value);
+
+  toString() => _value;
+
+  static fromJson(String key) {
+    return _vals.firstWhere((v) => v._value == key,
+        orElse: () => throw ArgumentError("Key does not match any Gender"));
+  }
+
+  static const male = const Gender._('male');
+  static const female = const Gender._('female');
+  static const other = const Gender._('other');
+  static const unknown = const Gender._('unknown');
+
+  static const _vals = [male, female, other, unknown];
+}
+
 class Patient extends Resource {
   Meta meta;
   Narrative text;
@@ -19,8 +39,8 @@ class Patient extends Resource {
   List<Identifier> identifier;
   List<HumanName> name;
   List<ContactPoint> telecom;
-  String gender;
-  String birthDate;
+  Gender gender;
+  DateTime birthDate;
   List<Address> address;
   CodeableConcept maritalStatus;
   bool multipleBirthBoolean;
@@ -49,7 +69,10 @@ class Patient extends Resource {
       String firstName,
       String emailAddress,
       String homeZip,
-      String secondZip}) {
+      String secondZip,
+      ContactPointSystem preferredContactMethod,
+      Gender gender,
+      DateTime birthDate}) {
     Patient patient;
     if (originalPatient != null) {
       patient = Patient.fromJson(originalPatient.toJson());
@@ -63,10 +86,13 @@ class Patient extends Resource {
     if (emailAddress.isNotEmpty) patient.emailAddress = emailAddress;
     if (homeZip.isNotEmpty) patient.homeZip = homeZip;
     if (secondZip.isNotEmpty) patient.secondZip = secondZip;
+    if (preferredContactMethod != null) patient.preferredContactMethod = preferredContactMethod;
+    if (gender != null) patient.gender = gender;
+    if (birthDate != null) patient.birthDate = birthDate;
     return patient;
   }
 
-  get firstName => this.name != null &&
+  String get firstName => this.name != null &&
           this.name.length > 0 &&
           this.name[0].given != null &&
           this.name[0].given.length > 0
@@ -91,7 +117,7 @@ class Patient extends Resource {
     this.name[0].given[0] = text;
   }
 
-  get lastName => this.name != null && this.name.length > 0 && this.name[0].family != null
+  String get lastName => this.name != null && this.name.length > 0 && this.name[0].family != null
       ? this.name[0].family
       : null;
 
@@ -102,10 +128,9 @@ class Patient extends Resource {
 
   set emailAddress(String text) {
     this.telecom ??= [];
-    ContactPoint p =
-        this.telecom.firstWhere((ContactPoint p) => p.system == "email", orElse: () => null);
+    ContactPoint p = _contactPointForSystem(ContactPointSystem.email);
     if (p == null) {
-      this.telecom.add(ContactPoint(system: "email", value: text));
+      this.telecom.add(ContactPoint(system: ContactPointSystem.email, value: text));
     } else {
       p.value = text;
     }
@@ -113,58 +138,70 @@ class Patient extends Resource {
 
   set phoneNumber(String text) {
     this.telecom ??= [];
-    ContactPoint p =
-        this.telecom.firstWhere((ContactPoint p) => p.system == "phone", orElse: () => null);
+    ContactPoint p = _contactPointForSystem(ContactPointSystem.phone);
     if (p == null) {
-      this.telecom.add(ContactPoint(system: "phone", value: text));
+      this.telecom.add(ContactPoint(system: ContactPointSystem.phone, value: text));
     } else {
       p.value = text;
     }
   }
 
-  get emailAddress => this.telecom != null && this.telecom.length > 0
+  ContactPoint _contactPointForSystem(ContactPointSystem system) {
+    return system != null && this.telecom != null && this.telecom.length > 0
+        ? this.telecom.firstWhere((ContactPoint p) => p.system == system, orElse: () => null)
+        : null;
+  }
+
+  set preferredContactMethod(ContactPointSystem system) {
+    _contactPointForSystem(system)?.rank = 1;
+  }
+
+  ContactPointSystem get preferredContactMethod => this.telecom != null && this.telecom.length > 0
       ? this
           .telecom
-          .firstWhere((ContactPoint p) => p.system == "email",
-              orElse: () => ContactPoint(value: null))
-          .value
+          .firstWhere((ContactPoint p) => p.rank == 1, orElse: () => ContactPoint())
+          .system
       : null;
 
-  get phoneNumber => this.telecom != null && this.telecom.length > 0
-      ? this
-          .telecom
-          .firstWhere((ContactPoint p) => p.system == "phone",
-              orElse: () => ContactPoint(value: null))
-          .value
-      : null;
+  String get emailAddress {
+    ContactPoint p = _contactPointForSystem(ContactPointSystem.email);
+    return p != null ? p.value : null;
+  }
 
-  get homeZip => this.address != null && this.address.length > 0
+  String get phoneNumber {
+    ContactPoint p = _contactPointForSystem(ContactPointSystem.phone);
+    return p != null ? p.value : null;
+  }
+
+  String get homeZip => this.address != null && this.address.length > 0
       ? this
           .address
-          .firstWhere((Address a) => a.use == Use.home, orElse: () => Address())
+          .firstWhere((Address a) => a.use == AddressUse.home, orElse: () => Address())
           .postalCode
       : null;
 
   set homeZip(String text) {
     if (this.address == null) this.address = [];
-    Address address = this.address.firstWhere((Address a) => a.use == Use.home, orElse: () => null);
+    Address address =
+        this.address.firstWhere((Address a) => a.use == AddressUse.home, orElse: () => null);
     if (address == null) {
-      address = Address(use: Use.home);
+      address = Address(use: AddressUse.home);
       this.address.add(address);
     }
     address.postalCode = text;
   }
 
-  get secondZip => this.address != null && this.address.length > 0
+  String get secondZip => this.address != null && this.address.length > 0
       ? this
           .address
-          .firstWhere((Address a) => a.use != Use.home, orElse: () => Address())
+          .firstWhere((Address a) => a.use != AddressUse.home, orElse: () => Address())
           .postalCode
       : null;
 
   set secondZip(String text) {
     if (this.address == null) this.address = [];
-    Address address = this.address.firstWhere((Address a) => a.use != Use.home, orElse: () => null);
+    Address address =
+        this.address.firstWhere((Address a) => a.use != AddressUse.home, orElse: () => null);
     if (address == null) {
       address = Address();
       this.address.add(address);
@@ -182,6 +219,9 @@ class Patient extends Resource {
       json['extension'].forEach((v) {
         extension.add(new Extension.fromJson(v));
       });
+    }
+    if (json['birthDate'] != null) {
+      birthDate = DateTime.parse(json['birthDate']);
     }
     if (json['identifier'] != null) {
       identifier = new List<Identifier>();
@@ -201,8 +241,7 @@ class Patient extends Resource {
         telecom.add(new ContactPoint.fromJson(v));
       });
     }
-    gender = json['gender'];
-    birthDate = json['birthDate'];
+    if (json['gender'] != null) gender = Gender.fromJson(json['gender']);
     if (json['address'] != null) {
       address = new List<Address>();
       json['address'].forEach((v) {
@@ -242,7 +281,7 @@ class Patient extends Resource {
     if (this.telecom != null && this.telecom.length > 0) {
       data['telecom'] = this.telecom.map((v) => v.toJson()).toList();
     }
-    if (this.gender != null) data['gender'] = this.gender;
+    if (this.gender != null) data['gender'] = this.gender.toString();
     if (this.birthDate != null) data['birthDate'] = this.birthDate;
     if (this.address != null && this.address.length > 0) {
       data['address'] = this.address.map((v) => v.toJson()).toList();
@@ -254,6 +293,7 @@ class Patient extends Resource {
     if (this.communication != null && this.communication.length > 0) {
       data['communication'] = this.communication.map((v) => v.toJson()).toList();
     }
+    if (this.birthDate != null) data['birthDate'] = this.birthDate.toIso8601String();
     return data;
   }
 }
@@ -319,23 +359,26 @@ class HumanName {
 }
 
 class ContactPoint {
-  String system;
+  ContactPointSystem system;
   String value;
   String use;
+  int rank;
 
-  ContactPoint({this.system, this.value, this.use});
+  ContactPoint({this.system, this.value, this.use, this.rank});
 
   ContactPoint.fromJson(Map<String, dynamic> json) {
-    system = json['system'];
+    if (json['system'] != null) system = ContactPointSystem.fromJson(json['system']);
     value = json['value'];
     use = json['use'];
+    if (json['rank'] != null) rank = json['rank'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.system != null) data['system'] = this.system;
+    if (this.system != null) data['system'] = this.system.toString();
     if (this.value != null) data['value'] = this.value;
     if (this.use != null) data['use'] = this.use;
+    if (this.rank != null) data['rank'] = this.rank;
     return data;
   }
 }
@@ -343,7 +386,7 @@ class ContactPoint {
 class Address {
   List<Extension> extension;
   List<String> line;
-  Use use;
+  AddressUse use;
   String city;
   String district;
   String state;
@@ -371,7 +414,7 @@ class Address {
       line = json['line'].cast<String>();
     }
     city = json['city'];
-    if (json['use'] != null) use = Use.fromJson(json['use']);
+    if (json['use'] != null) use = AddressUse.fromJson(json['use']);
     district = json['district'];
     state = json['state'];
     postalCode = json['postalCode'];
@@ -417,10 +460,10 @@ class Communication {
   }
 }
 
-class Use {
+class AddressUse {
   final _value;
 
-  const Use._(this._value);
+  const AddressUse._(this._value);
 
   toString() => _value;
 
@@ -429,13 +472,36 @@ class Use {
         orElse: () => throw ArgumentError("Key does not match any Use"));
   }
 
-  static const home = const Use._('home');
-  static const work = const Use._('work');
-  static const temp = const Use._('temp');
-  static const old = const Use._('old');
-  static const billing = const Use._('billing');
+  static const home = const AddressUse._('home');
+  static const work = const AddressUse._('work');
+  static const temp = const AddressUse._('temp');
+  static const old = const AddressUse._('old');
+  static const billing = const AddressUse._('billing');
 
   static const _vals = [home, work, temp, old, billing];
+}
+
+class ContactPointSystem {
+  final _value;
+
+  const ContactPointSystem._(this._value);
+
+  toString() => _value;
+
+  static fromJson(String key) {
+    return _vals.firstWhere((v) => v._value == key,
+        orElse: () => throw ArgumentError("Key does not match any ContactPointSystem"));
+  }
+
+  static const phone = const ContactPointSystem._('phone');
+  static const fax = const ContactPointSystem._('fax');
+  static const email = const ContactPointSystem._('email');
+  static const pager = const ContactPointSystem._('pager');
+  static const url = const ContactPointSystem._('url');
+  static const sms = const ContactPointSystem._('sms');
+  static const other = const ContactPointSystem._('other');
+
+  static const _vals = [phone, fax, email, pager, url, sms, other];
 }
 
 class ProcedureStatus {
@@ -447,7 +513,7 @@ class ProcedureStatus {
 
   static fromJson(String key) {
     return _vals.firstWhere((v) => v._value == key,
-        orElse: () => throw ArgumentError("Key does not match any Use"));
+        orElse: () => throw ArgumentError("Key does not match any ProcedureStatus"));
   }
 
   static const preparation = const ProcedureStatus._('preparation');
@@ -480,7 +546,7 @@ class QuestionnaireResponseStatus {
 
   static fromJson(String key) {
     return _vals.firstWhere((v) => v._value == key,
-        orElse: () => throw ArgumentError("Key does not match any Use"));
+        orElse: () => throw ArgumentError("Key does not match any QuestionnaireResponseStatus"));
   }
 
   static const in_progress = const QuestionnaireResponseStatus._('in-progress');
@@ -795,7 +861,7 @@ class Identifier {
 
   Identifier.fromJson(Map<String, dynamic> json) {
     value = json['value'];
-    value = json['system'];
+    system = json['system'];
   }
 
   Map<String, dynamic> toJson() {

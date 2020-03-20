@@ -35,7 +35,7 @@ class MessageLookup extends MessageLookupByLibrary {
   static _notInlinedMessages(_) => <String, Function> {
     "about" : MessageLookupByLibrary.simpleMessage("About"),
     "activity" : MessageLookupByLibrary.simpleMessage("Activity"),
-    "add_the_default_careplan_for_me" : MessageLookupByLibrary.simpleMessage("Add the default care plan for me"),
+    "add_the_default_careplan_for_me" : MessageLookupByLibrary.simpleMessage("add the default care plan for me"),
     "battery_level" : m0,
     "buttonPushText" : MessageLookupByLibrary.simpleMessage("You have pushed the button this many times:"),
     "change" : MessageLookupByLibrary.simpleMessage("Change"),
@@ -55,6 +55,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "languageName" : MessageLookupByLibrary.simpleMessage("English (EN)"),
     "last_synced_date" : m3,
     "learning_center" : MessageLookupByLibrary.simpleMessage("Learning center & Help"),
+    "loading_error_log_in_again" : MessageLookupByLibrary.simpleMessage("Loading error. Try logging out and in again."),
     "login" : MessageLookupByLibrary.simpleMessage("login / register"),
     "logout" : MessageLookupByLibrary.simpleMessage("logout"),
     "more_info" : MessageLookupByLibrary.simpleMessage("More info"),

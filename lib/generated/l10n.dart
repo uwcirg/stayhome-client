@@ -391,7 +391,7 @@ class S {
 
   String get add_the_default_careplan_for_me {
     return Intl.message(
-      'Add the default care plan for me',
+      'add the default care plan for me',
       name: 'add_the_default_careplan_for_me',
       desc: '',
       args: [],
@@ -510,6 +510,15 @@ class S {
     return Intl.message(
       'If you **are willing** to provide a verified email and/or phone number, we’d like to know who we’re speaking with if we do have a need to contact you.  Similarly, if you provide information about who you are, we’d appreciate it if you’d include sex and date of birth as those are standard ways of ensuring someone’s medical information gets attached to the correct clinic, testing, or hospital records.\n\nIf you don’t provide contact, location, or identifying information, we’d like you to provide us with your sex and as much of your date of birth as you’re willing to share.  Patterns of illness by age, sex, and location can be critical in helping public health shape an effective response.',
       name: 'profile_identifying_info_help_text',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get loading_error_log_in_again {
+    return Intl.message(
+      'Loading error. Try logging out and in again.',
+      name: 'loading_error_log_in_again',
       desc: '',
       args: [],
     );

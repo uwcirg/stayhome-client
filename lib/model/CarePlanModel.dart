@@ -32,6 +32,8 @@ class CarePlanModel extends Model {
 
   bool get hasNoCarePlan => carePlan == null;
 
+  bool get hasNoUser => _keycloakUserId == null;
+
   CarePlanModel(this._careplanTemplateRef, this._keycloakSystem) {
     goals = new Goals();
   }
@@ -42,24 +44,24 @@ class CarePlanModel extends Model {
   }
 
   void setGuestUser() {
-    isLoading = true;
-    error = null;
-    notifyListeners();
-
     loadResourceLinks();
   }
 
-  static CarePlanModel of(BuildContext context) => ScopedModel.of<CarePlanModel>(context);
+  static CarePlanModel of(BuildContext context) {
+    return ScopedModel.of<CarePlanModel>(context);
+  }
 
   void load() {
+    loadThenNotifyOrError(_doLoad());
+  }
+
+  /// This should be called when the view should be rebuilt first to show the loading screen, then
+  /// upon completion, with the error message or data view.
+  void loadThenNotifyOrError(Future f) {
     isLoading = true;
     error = null;
     notifyListeners();
 
-    notifyOrError(_doLoad());
-  }
-
-  void notifyOrError(Future f) {
     f.then((value) {
       this.error = null;
       isLoading = false;
@@ -73,6 +75,10 @@ class CarePlanModel extends Model {
   }
 
   Future<void> _doLoad() async {
+    if (hasNoUser) {
+      return Future.error("No user information. Please log in again.");
+    }
+
     this.patient = await Repository.getPatient(_keycloakSystem, _keycloakUserId);
     if (patient != null) {
       return _loadCarePlan();
@@ -107,7 +113,7 @@ class CarePlanModel extends Model {
   }
 
   void loadResourceLinks() async {
-    notifyOrError(
+    loadThenNotifyOrError(
         Repository.getResourceLinks(_careplanTemplateRef).then((List<DocumentReference> responses) {
       this.infoLinks = responses;
     }));
@@ -118,16 +124,21 @@ class CarePlanModel extends Model {
   }
 
   Future updatePatientResource(Patient patient) async {
+    if (hasNoUser) return Future.error("No user");
     this.patient = patient;
     this.patient.setKeycloakId(_keycloakSystem, _keycloakUserId);
     return Repository.postPatient(this.patient).then((value) => load());
   }
 
-  Future addDefaultCareplan() async {
-    notifyOrError(Repository.loadCarePlan(_careplanTemplateRef).then((CarePlan plan) {
+  void addDefaultCareplan() async {
+    loadThenNotifyOrError(Repository.loadCarePlan(_careplanTemplateRef).then((CarePlan plan) {
       CarePlan newPlan = CarePlan.fromTemplate(plan, patient);
       return Repository.postCarePlan(newPlan).then((value) => load());
     }));
+  }
+
+  void addBlankPatient() async {
+    loadThenNotifyOrError(updatePatientResource(Patient()));
   }
 
   Future addCompletedSession(int minutes) async {
