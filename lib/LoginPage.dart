@@ -28,7 +28,7 @@ class LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     MediaQueryData deviceInfo = MediaQuery.of(context);
-    double buttonContainerInsets = deviceInfo.size.width > 768 ? deviceInfo.size.width / 5 : 12;
+    double buttonContainerInsets = deviceInfo.size.width > MediaQueryConstants.minDesktopWidth ? deviceInfo.size.width / 5 : 12;
     return Scaffold(
         body: AnnotatedRegion<SystemUiOverlayStyle>(
       value: MyApp.of(context).appAssets.systemUiOverlayStyle,

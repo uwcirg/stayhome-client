@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'fhir/FhirResources.dart';
 
 class Dimensions {
+  static const double extraLargeMargin = 42;
   static const double largeMargin = 24;
   static const double fullMargin = 16;
   static const double halfMargin = fullMargin / 2;
@@ -59,4 +60,10 @@ class QuestionnaireConstants {
   static const double minC = 32;
   static const double maxC = 46;
 
+}
+/*
+ * media query constants to allow setting breakpoints for responsiveness 
+ */
+class MediaQueryConstants {
+  static const double minDesktopWidth = 768;
 }
