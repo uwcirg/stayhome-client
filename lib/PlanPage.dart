@@ -3,10 +3,13 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
+import 'package:map_app_flutter/ProfilePage.dart';
 import 'package:map_app_flutter/QuestionnairePage.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
+import 'package:map_app_flutter/map_app_widgets.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -46,14 +49,15 @@ class _PlanPageState extends State<PlanPage> {
   @override
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
+        title: "Calendar",
         child: Expanded(
             child: ListView.builder(
-      itemBuilder: (context, i) {
-        return _buildScreen(context);
-      },
-      itemCount: 1,
-      shrinkWrap: true,
-    )));
+          itemBuilder: (context, i) {
+            return _buildScreen(context);
+          },
+          itemCount: 1,
+          shrinkWrap: true,
+        )));
   }
 
   Widget _buildScreen(BuildContext context) {
@@ -66,7 +70,7 @@ class _PlanPageState extends State<PlanPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
-              _buildCalendar(textStyle, context, model),
+              _buildCalendarPage(textStyle, context, model),
             ],
           );
         }),
@@ -74,31 +78,80 @@ class _PlanPageState extends State<PlanPage> {
     );
   }
 
-  Widget _buildCareplanInfoSection(BuildContext context, CarePlanModel model) {
-    if (model.hasNoCarePlan) {
-      return Wrap(
-        children: <Widget>[
-          Text(S.of(context).you_have_no_active_pelvic_floor_management_careplan),
-          FlatButton(
-            child: Text(
-              S.of(context).add_the_default_careplan_for_me,
-            ),
-            onPressed: () => model.addDefaultCareplan(),
-          )
-        ],
-      );
+  Widget _buildCalendarPage(TextStyle textStyle, BuildContext context, CarePlanModel model) {
+    if (model == null) {
+      print("Model is null.");
+      return MapAppErrorMessage.loadingErrorWithLogoutButton(context);
     }
     if (model.error != null) {
-      return Wrap(
-        children: <Widget>[
-          Text(model.error),
-        ],
-      );
+      return MapAppErrorMessage('${model.error}');
     }
+
     if (model.isLoading) {
       return Center(child: CircularProgressIndicator());
     }
 
+    if (model.hasNoUser) {
+      return MapAppErrorMessage.loadingErrorWithLogoutButton(context);
+    }
+
+    if (model.hasNoPatient) {
+      return _buildCreateMyProfileButton(context, model);
+    }
+
+    if (model.hasNoCarePlan) {
+      return MapAppErrorMessage(
+        S.of(context).you_have_no_active_pelvic_floor_management_careplan,
+        buttonLabel: S.of(context).add_the_default_careplan_for_me,
+        onButtonPressed: () => model.addDefaultCareplan(),
+      );
+    }
+
+    if (model.treatmentCalendar == null) {
+      print("Treatment calendar is null.");
+      return MapAppErrorMessage.loadingErrorWithLogoutButton(context);
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+      children: _buildCalendarPageChildren(context, model),
+    );
+  }
+
+  List<Widget> _buildCalendarPageChildren(BuildContext context, CarePlanModel model) {
+    return <Widget>[
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+          child: Text(
+            S.of(context).treatment_calendar,
+            style: Theme.of(context).textTheme.title,
+          ),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+            "Lorem ipsum dolor sit amet, eu sit explicari expetendis, nullam putent ceteros an pri. Quaeque insolens cu ius, eu nulla delicatissimi has."),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+          child: Text(S.of(context).my_treatment_plan, style: Theme.of(context).textTheme.title),
+        ),
+      ),
+      _buildCareplanInfoSection(context, model),
+      _buildQuestionnaireButtonSection(context, model),
+      !model.hasNoCarePlan
+          ? _buildTreatmentCalendarWidget(_calendarController, model)
+          : Container(
+              height: 0,
+            ),
+    ];
+  }
+
+  Widget _buildCareplanInfoSection(BuildContext context, CarePlanModel model) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Dimensions.fullMargin),
       child: Stack(
@@ -249,17 +302,6 @@ class _PlanPageState extends State<PlanPage> {
   }
 
   Widget _buildQuestionnaireButtonSection(BuildContext context, CarePlanModel model) {
-    if (model.hasNoCarePlan || model.error != null)
-      return Container(
-        height: 0,
-      );
-
-    if (model.isLoading)
-      return Padding(
-        child: Center(child: CircularProgressIndicator()),
-        padding: MapAppPadding.pageMargins,
-      );
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Dimensions.fullMargin),
       child: Column(
@@ -269,62 +311,41 @@ class _PlanPageState extends State<PlanPage> {
     );
   }
 
-  Widget _buildCalendar(TextStyle textStyle, BuildContext context, CarePlanModel model) {
-    if (model.hasNoCarePlan || model.error != null)
-      return Container(
-        height: 0,
-      );
-
-    if (model.isLoading) return Center(child: CircularProgressIndicator());
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisSize: MainAxisSize.max,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: Text(
-              S.of(context).treatment_calendar,
-              style: Theme.of(context).textTheme.title,
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-              "Lorem ipsum dolor sit amet, eu sit explicari expetendis, nullam putent ceteros an pri. Quaeque insolens cu ius, eu nulla delicatissimi has."),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: Text(S.of(context).my_treatment_plan, style: Theme.of(context).textTheme.title),
-          ),
-        ),
-        _buildCareplanInfoSection(context, model),
-        _buildQuestionnaireButtonSection(context, model),
-        TreatmentCalendarWidget(_calendarController, model),
-      ],
+  Widget _buildCreateMyProfileButton(BuildContext context, CarePlanModel model) {
+    return MapAppErrorMessage(
+      "You do not have a patient record in the FHIR database.",
+      buttonLabel: "create one",
+      onButtonPressed: () =>
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreateProfilePage())),
     );
   }
 
   List<Widget> _buildQuestionnaireButtons(BuildContext context, CarePlanModel model) {
+    if (model.questionnaires == null) return [];
     return model.questionnaires
         .map((Questionnaire questionnaire) =>
-            _buildQuestionnaireButton(context, "Complete Questionnaire", questionnaire, model))
+            _buildQuestionnaireButton(context, "complete questionnaire", questionnaire, model))
         .toList();
   }
 
   RaisedButton _buildQuestionnaireButton(
       BuildContext context, String title, Questionnaire questionnaire, CarePlanModel model) {
     return RaisedButton(
+        padding: MapAppPadding.largeButtonPadding,
         child: Row(
           children: [
             Padding(
               padding: MapAppPadding.buttonIconEdgeInsets,
-              child: Icon(Icons.add),
+              child: Icon(
+                Icons.add,
+                size: IconSize.small,
+                color: Theme.of(context).textTheme.button.color,
+              ),
             ),
-            Text(title),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.button,
+            ),
           ],
           mainAxisSize: MainAxisSize.min,
         ),
@@ -385,7 +406,7 @@ class _PlanPageState extends State<PlanPage> {
               child: Text('OK'),
               onPressed: () {
                 bool valid = true;
-                if (every != null && int.tryParse(every) == null) {
+                if (every != null && double.tryParse(every) == null) {
                   snack("Not a valid frequency", context);
                   valid = false;
                 }
@@ -394,7 +415,8 @@ class _PlanPageState extends State<PlanPage> {
                   valid = false;
                 }
                 if (valid) {
-                  if (every != null) model.updateActivityFrequency(activityIndex, int.parse(every));
+                  if (every != null)
+                    model.updateActivityFrequency(activityIndex, double.parse(every));
                   if (duration != null)
                     model.updateActivityDuration(activityIndex, double.parse(duration));
                   Navigator.of(context).pop();
@@ -406,11 +428,16 @@ class _PlanPageState extends State<PlanPage> {
       },
     );
   }
+
+  _buildTreatmentCalendarWidget(CalendarController calendarController, CarePlanModel model) {
+    return TreatmentCalendarWidget(_calendarController, model);
+  }
 }
 
 class TreatmentCalendarWidget extends StatelessWidget {
   final CalendarController _calendarController;
   final CarePlanModel _model;
+  static final _scheduledEventColor = Colors.grey[500];
 
   TreatmentCalendarWidget(this._calendarController, this._model);
 
@@ -479,7 +506,7 @@ class TreatmentCalendarWidget extends StatelessWidget {
       var color;
       switch (eventTypes[type]['status']) {
         case Status.Completed:
-          color = Theme.of(context).accentColor;
+          color = MyApp.of(context).appAssets.completedCalendarItemColor;
           break;
         case Status.Scheduled:
           color = Colors.grey[600];
@@ -534,7 +561,6 @@ class TreatmentCalendarWidget extends StatelessWidget {
     return Container(
         decoration: BoxDecoration(
           border: Border.all(color: Theme.of(context).primaryColor, width: 0.2),
-          color: Theme.of(context).highlightColor,
         ),
         alignment: AlignmentDirectional.topCenter,
         child: Text(
@@ -554,5 +580,234 @@ class TreatmentCalendarWidget extends StatelessWidget {
           "",
           style: Theme.of(context).textTheme.caption,
         ));
+  }
+
+  Widget _buildSingleMarker(BuildContext context, DateTime date, event) {
+    event = event as TreatmentEvent;
+    var color;
+    if (event.status == Status.Completed) {
+      color = MyApp.of(context).appAssets.completedCalendarItemColor;
+    } else if (event.status == Status.Scheduled) {
+      color = _scheduledEventColor;
+    } else {
+      color = Theme.of(context).accentColor;
+    }
+    return Container(
+      width: 8.0,
+      height: 8.0,
+      margin: const EdgeInsets.symmetric(horizontal: 0.3),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: color,
+      ),
+    );
+  }
+}
+
+class StayHomeTreatmentCalendarWidget extends TreatmentCalendarWidget {
+  StayHomeTreatmentCalendarWidget(CalendarController calendarController, CarePlanModel model)
+      : super(calendarController, model);
+
+  @override
+  Widget build(BuildContext context) {
+    var textStyle = Theme.of(context).textTheme.caption;
+    var noInsets = const EdgeInsets.all(0);
+    return TableCalendar(
+      locale: Localizations.localeOf(context).languageCode,
+      availableCalendarFormats: {CalendarFormat.month: ""},
+      initialSelectedDay: null,
+      headerStyle: HeaderStyle(
+          centerHeaderTitle: true,
+          titleTextStyle: Theme.of(context).textTheme.subtitle.apply(fontWeightDelta: 2),
+          titleTextBuilder: (DateTime date, dynamic locale) =>
+              DateFormat.yMMMM(locale).format(_calendarController.focusedDay).toLowerCase(),
+          leftChevronPadding: noInsets,
+          rightChevronPadding: noInsets,
+          leftChevronIcon: Icon(
+            Icons.chevron_left,
+            color: Theme.of(context).textTheme.subtitle.color,
+          ),
+          rightChevronIcon: Icon(
+            Icons.chevron_right,
+            color: Theme.of(context).textTheme.subtitle.color,
+          )),
+      calendarStyle: CalendarStyle(
+        weekendStyle: textStyle,
+        weekdayStyle: textStyle,
+        todayStyle: TextStyle(color: Colors.black),
+        selectedColor: Theme.of(context).highlightColor,
+        renderSelectedFirst: false,
+        todayColor: Theme.of(context).accentColor,
+        outsideDaysVisible: false,
+        markersMaxAmount: 20,
+        markersPositionBottom: null,
+        markersAlignment: Alignment.center,
+//          markersAlignment: Alignment.center,
+      ),
+      daysOfWeekStyle: DaysOfWeekStyle(
+          dowTextBuilder: (DateTime date, dynamic locale) =>
+              DateFormat.E(locale).format(date).toString().toLowerCase(),
+          weekdayStyle: Theme.of(context).textTheme.caption.apply(fontWeightDelta: 2),
+          weekendStyle: Theme.of(context).textTheme.caption.apply(fontWeightDelta: 2)),
+      calendarController: _calendarController,
+      events: _model.treatmentCalendar.events,
+      builders: CalendarBuilders(
+//        singleMarkerBuilder: _buildSingleMarker,
+        markersBuilder: _buildMarkers,
+        dayBuilder: _buildDay,
+      ),
+    );
+  }
+
+  @override
+  Widget _buildDay(BuildContext context, DateTime date, List events) {
+    return Container(
+        decoration: BoxDecoration(
+          color: _calendarController.isToday(date) ? Theme.of(context).accentColor : null,
+          border: Border.all(color: Theme.of(context).accentColor, width: 0.5),
+        ),
+        alignment: AlignmentDirectional.topCenter,
+        padding: const EdgeInsets.only(top: 4),
+        child: Text(
+          "${date.day}",
+          style: Theme.of(context).textTheme.caption,
+        ));
+  }
+
+  @override
+  List<Widget> _buildMarkers(BuildContext context, DateTime date, List events, List holidays) {
+    Widget child;
+    if (events.length > 4) {
+      int numCompleted =
+          events.where((e) => (e as TreatmentEvent).status == Status.Completed).length;
+      int numIncomplete =
+          events.where((e) => (e as TreatmentEvent).status != Status.Completed).length;
+
+      Widget completedBubble = _buildNumberBubble('$numCompleted', Theme.of(context).primaryColor,
+          Theme.of(context).primaryTextTheme.caption);
+      Widget incompleteBubble = _buildNumberBubble('$numIncomplete',
+          TreatmentCalendarWidget._scheduledEventColor, Theme.of(context).primaryTextTheme.caption);
+      if (numIncomplete == 0) {
+        child = completedBubble;
+      } else if (numCompleted == 0) {
+        child = incompleteBubble;
+      } else {
+        child = Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [completedBubble, incompleteBubble],
+        );
+      }
+      return [Padding(padding: EdgeInsets.only(top: 10), child: child)];
+    } else {
+      child = Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: events.map((event) => _buildSingleMarker(context, date, event)).toList(),
+      );
+      return [Padding(padding: EdgeInsets.only(top: 10), child: child)];
+    }
+  }
+
+  Container _buildNumberBubble(String label, Color bubbleColor, TextStyle textStyle) {
+    return Container(
+      padding: EdgeInsets.all(4),
+      decoration: ShapeDecoration(color: bubbleColor, shape: CircleBorder()),
+      child: Text(label, style: textStyle),
+    );
+  }
+}
+
+class StayHomePlanPage extends PlanPage {
+  @override
+  _PlanPageState createState() {
+    return _StayHomePlanPageState();
+  }
+}
+
+class _StayHomePlanPageState extends _PlanPageState {
+  @override
+  List<Widget> _buildCalendarPageChildren(BuildContext context, CarePlanModel model) {
+    return <Widget>[
+      _buildQuestionnaireButtonSection(context, model),
+      _buildTreatmentCalendarWidget(_calendarController, model),
+      Padding(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: OutlineButton(
+          child: Text("change schedule"),
+          onPressed: () => _showChangeDialogForActivity(context, model, 0),
+        ),
+      )
+    ];
+  }
+
+  @override
+  _buildTreatmentCalendarWidget(CalendarController calendarController, CarePlanModel model) {
+    return StayHomeTreatmentCalendarWidget(_calendarController, model);
+  }
+
+  Future<String> _showChangeDialogForActivity(
+      BuildContext context, CarePlanModel model, int activityIndex) async {
+    Activity activity = model.carePlan.activity[activityIndex];
+
+    double period2 = activity.detail.scheduledTiming.repeat.period;
+    String every = "";
+    if (period2 != null) every = '${(1 / period2).round()}';
+
+    var duration2 = activity.detail.scheduledTiming.repeat.duration;
+    String duration = duration2 != null ? '$duration2' : null;
+    return showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      // dialog is dismissible with a tap on the barrier
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Change care plan activity schedule'),
+          content: new Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                controller: new TextEditingController(text: every),
+                autofocus: true,
+                decoration: new InputDecoration(
+                    labelText: 'Number per day', hintText: 'e.g. 2 for 2 questionnaires per day'),
+                onChanged: (value) {
+                  every = value;
+                },
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text('OK'),
+              onPressed: () {
+                bool valid = true;
+                if (every != null && int.tryParse(every) == null) {
+                  snack("Not a valid frequency", context);
+                  valid = false;
+                }
+                int everyInt = int.parse(every);
+                double newFrequency =
+                    1.0 / everyInt; //e.g. if user wants 2 per day, 0.5days is new freq
+                if (valid) {
+                  if (every != null) model.updateActivityFrequency(activityIndex, newFrequency);
+                  if (duration != null)
+                    model.updateActivityDuration(activityIndex, double.parse(duration));
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

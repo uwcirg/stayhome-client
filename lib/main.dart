@@ -1,64 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:map_app_flutter/ContactCommunityPage.dart';
-import 'package:map_app_flutter/DevicesPage.dart';
-import 'package:map_app_flutter/GoalsPage.dart';
-import 'package:map_app_flutter/HelpPage.dart';
-import 'package:map_app_flutter/LearningCenterPage.dart';
 import 'package:map_app_flutter/LoginPage.dart';
-import 'package:map_app_flutter/PlanPage.dart';
-import 'package:map_app_flutter/ProfilePage.dart';
-import 'package:map_app_flutter/ProgressInsightsPage.dart';
-import 'package:map_app_flutter/SessionPage.dart';
-import 'package:map_app_flutter/color_palette.dart';
-import 'package:map_app_flutter/model/AppModel.dart';
+import 'package:map_app_flutter/app_assets.dart';
+import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:toast/toast.dart';
-import 'package:map_app_flutter/generated/l10n.dart';
+
 import 'KeycloakAuth.dart';
 
 void main() {
-  runApp(MyApp(new LoginPage()));
+  runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
-  Widget _home;
-
-  MyApp(this._home);
+  MyApp();
 
   static _MyAppState of(BuildContext context) =>
       context.ancestorStateOfType(const TypeMatcher<_MyAppState>());
 
   @override
   State<StatefulWidget> createState() {
-    return new _MyAppState(_home);
+    return new _MyAppState();
   }
 }
 
 class _MyAppState extends State<MyApp> {
-  Widget _defaultHome;
-  Widget _homePage;
   String _locale = 'en';
   KeycloakAuth auth;
-  String title = 'CIRG Map App';
+  String title = 'StayHome.app';
   CarePlanModel _carePlanModel;
 
-  _MyAppState(Widget home) {
-    _homePage = PlanPage();
-    auth = KeycloakAuth();
+  // Theme can be changed on a code level here
+  AppAssets appAssets;
 
-    if (home != null) {
-      _defaultHome = home;
-    } else {
-      _defaultHome = _homePage;
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
+  _MyAppState() {
+    appAssets = StayHomeAppAssets();
+    auth = KeycloakAuth(appAssets.issuer, appAssets.clientSecret, appAssets.clientId);
   }
 
   onChangeLanguage(String languageCode) {
@@ -70,45 +49,50 @@ class _MyAppState extends State<MyApp> {
   }
 
   @override
+  void initState() {
+    initializeCareplanModel();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _carePlanModel = null;
+    super.dispose();
+  }
+
+  void initializeCareplanModel() {
+    _carePlanModel =
+        new CarePlanModel(appAssets.careplanTemplateRef, appAssets.keycloakIdentifierSystemName);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (_carePlanModel == null) _carePlanModel = new CarePlanModel();
     return ScopedModel<CarePlanModel>(
         model: _carePlanModel,
         child: MaterialApp(
           title: title,
           theme: ThemeData(
               scaffoldBackgroundColor: Colors.white,
-              primarySwatch: MapAppColors.vFitPrimary,
-              accentColor: MapAppColors.vFitAccent,
-              highlightColor: MapAppColors.vFitHighlight,
-              textTheme: Theme.of(context).textTheme.apply(
-                    bodyColor: MapAppColors.vFitPrimary.shade600,
-                    displayColor: MapAppColors.vFitPrimary.shade600,
-                  ),
+              primarySwatch: appAssets.primarySwatch,
+              accentColor: appAssets.accentColor,
+              highlightColor: appAssets.highlightColor,
+              textTheme: appAssets.textThemeOverride(Theme.of(context).textTheme),
               buttonTheme: ButtonThemeData(
-                  buttonColor: MapAppColors.vFitAccent, textTheme: ButtonTextTheme.primary),
+                buttonColor: appAssets.accentColor,
+                textTheme: ButtonTextTheme.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(50.0),
+                ),
+              ),
               chipTheme: ChipTheme.of(context).copyWith(
-                  selectedColor: MapAppColors.vFitAccent,
-                  secondarySelectedColor: MapAppColors.vFitAccent,
+                  selectedColor: appAssets.accentColor,
+                  secondarySelectedColor: appAssets.accentColor,
                   labelStyle: Theme.of(context).textTheme.body1,
-                  secondaryLabelStyle: Theme.of(context).accentTextTheme.body1)),
-          home: _defaultHome,
-          routes: <String, WidgetBuilder>{
-            "/home": (BuildContext context) => _homePage,
-            "/guestHome": (BuildContext context) => LearningCenterPage(),
-            "/profile": (BuildContext context) =>
-                new ScopedModel<AppModel>(model: new AppModel(), child: ProfilePage()),
-            "/help": (BuildContext context) => HelpPage(),
-            "/start_session": (BuildContext context) => SessionPage(),
-            "/devices": (BuildContext context) => DevicesPage(),
-            "/contact_community": (BuildContext context) =>
-                ContactCommunityPage(ContactPageContents.contents(context)),
-            "/progress_insights": (BuildContext context) => ProgressInsightsPage(),
-            "/learning_center": (BuildContext context) => LearningCenterPage(),
-            "/about": (BuildContext context) => HelpPage(),
-            "/goals": (BuildContext context) => GoalsPage(),
-            "/login": (BuildContext context) => LoginPage()
-          },
+                  secondaryLabelStyle: Theme.of(context).accentTextTheme.body1),
+              dividerTheme: DividerThemeData(thickness: 1)),
+          home: new LoginPage(),
+          // Will replace after login is complete
+          routes: appAssets.navRoutes(context),
           locale: Locale(_locale, ""),
           localizationsDelegates: [
             S.delegate,
@@ -118,6 +102,50 @@ class _MyAppState extends State<MyApp> {
           supportedLocales: S.delegate.supportedLocales,
         ));
   }
+
+  toggleAppMode() {
+    if (appAssets is JoyluxAppAssets) {
+      setState(() {
+        appAssets = StayHomeAppAssets();
+      });
+    } else {
+      setState(() {
+        appAssets = JoyluxAppAssets();
+      });
+    }
+  }
+
+  /// provide context in order to go back to login back after logout is complete
+  logout({BuildContext context}) {
+    auth.mapAppLogout().then((value) {
+      logoutCompleted();
+      if (context != null) Navigator.of(context).pushReplacementNamed("/login");
+    }).catchError((error) => print("Logout error: $error"));
+  }
+
+  void logoutCompleted() {
+    initializeCareplanModel();
+    auth = new KeycloakAuth.from(auth);
+  }
+
+  void dismissLoginScreen(BuildContext context) {
+    if (auth.isLoggedIn) {
+      auth.getUserInfo().then((value) {
+        String keycloakUserId = auth.userInfo.keycloakUserId;
+        ScopedModel.of<CarePlanModel>(context).setUser(keycloakUserId);
+        Navigator.of(context).pushReplacementNamed('/home');
+      }).catchError((error) {
+        ScopedModel.of<CarePlanModel>(context).setGuestUser();
+        Navigator.of(context).pushReplacementNamed('/guestHome');
+      });
+    } else {
+      // clear credentials from browser by calling log out
+      logout();
+      ScopedModel.of<CarePlanModel>(context).setGuestUser();
+      Navigator.of(context).pushReplacementNamed('/guestHome');
+    }
+  }
+
 }
 
 void snack(String text, context) {

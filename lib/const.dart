@@ -20,11 +20,10 @@ class Dimensions {
 }
 
 class MapAppPadding {
-  static const buttonIconEdgeInsets =
-      const EdgeInsets.only(right: Dimensions.halfMargin);
+  static const buttonIconEdgeInsets = const EdgeInsets.only(right: Dimensions.halfMargin);
   static const cardPageMargins = const EdgeInsets.all(Dimensions.halfMargin);
   static const pageMargins = const EdgeInsets.all(Dimensions.fullMargin);
-  static const largeButtonPadding = const EdgeInsets.all(Dimensions.fullMargin);
+  static const largeButtonPadding = const EdgeInsets.all(10);
 
   MapAppPadding._();
 }
@@ -43,4 +42,21 @@ class IconSize {
   static const double xlarge = 48;
 
   IconSize._();
+}
+
+class VersionInfo {
+  //TODO possible to get this dynamically? package_info package?
+  static const String version = "v0.3";
+}
+
+class WhatInfo {
+  static const String link = "https://uwcirg.github.io/stayhomelanding/";
+}
+
+class QuestionnaireConstants {
+  static const double minF = 90;
+  static const double maxF = 115;
+  static const double minC = 32;
+  static const double maxC = 46;
+
 }
