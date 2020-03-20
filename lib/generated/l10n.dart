@@ -220,7 +220,7 @@ class S {
 
   String get not_now {
     return Intl.message(
-      'guest user',
+      'continue without logging in',
       name: 'not_now',
       desc: '',
       args: [],
@@ -470,15 +470,6 @@ class S {
     );
   }
 
-  String get my_goals {
-    return Intl.message(
-      'My goals',
-      name: 'my_goals',
-      desc: '',
-      args: [],
-    );
-  }
-
   String get profile_introduction_help_text {
     return Intl.message(
       'If you create a profile and add certain types of information, you can see information more relevant to you, and you can convey information to public health that may help your community, or help you personally.\n\nBut remember, everything on this profile is optional.  We’re more interested in having you able to use the system than in having you worry about us collecting information, or keeping it safe.  That said, each item on this page has a use, and you can always come back and update it later.',
@@ -519,6 +510,24 @@ class S {
     return Intl.message(
       'Loading error. Try logging out and in again.',
       name: 'loading_error_log_in_again',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get my_goals {
+    return Intl.message(
+      'My goals',
+      name: 'my_goals',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get welcome {
+    return Intl.message(
+      'thank you and welcome',
+      name: 'welcome',
       desc: '',
       args: [],
     );

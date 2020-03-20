@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:map_app_flutter/ContactCommunityPage.dart';
 import 'package:map_app_flutter/DevicesPage.dart';
 import 'package:map_app_flutter/GoalsPage.dart';
+import 'package:map_app_flutter/GuestHomePage.dart';
 import 'package:map_app_flutter/HelpPage.dart';
 import 'package:map_app_flutter/LearningCenterPage.dart';
 import 'package:map_app_flutter/LoginPage.dart';
@@ -244,7 +245,7 @@ class StayHomeAppAssets extends AppAssets {
               padding: EdgeInsets.only(left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, top: 12, bottom: 12),
               child: Image.asset(
                 'assets/stayhome/CIRG_logo_white.png',
-                height: 50,
+                height: 52,
               )),
         ],
       ),
@@ -320,7 +321,7 @@ class StayHomeAppAssets extends AppAssets {
     var learningCenter = (BuildContext context) => StayHomeLearningCenterPage();
     return <String, WidgetBuilder>{
       "/home": (BuildContext context) => new StayHomePlanPage(),
-      "/guestHome": learningCenter,
+      "/guestHome": (BuildContext context) => new GuestHomePage(),
       "/profile": (BuildContext context) => ProfilePage(),
       "/progress_insights": (BuildContext context) => StayHomeTrendsPage(),
       "/learning_center": learningCenter,
