@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:intl/intl.dart';
 import 'package:map_app_flutter/KeycloakAuth.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
+import 'package:map_app_flutter/map_app_widgets.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:scoped_model/scoped_model.dart';
 
@@ -26,7 +28,6 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     String title = S.of(context).profile;
-
     if (MyApp.of(context).auth.userInfo != null) {
       return MapAppPageScaffold(
           title: title,
@@ -54,6 +55,7 @@ class _ProfilePageState extends State<ProfilePage> {
             shrinkWrap: true,
           )));
     }
+
     if (_error != null) {
       return MapAppPageScaffold(
         title: title,
@@ -105,6 +107,9 @@ class ProfileWidgetState extends State<ProfileWidget> {
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
+      if (model != null && model.error != null) {
+        return MapAppErrorMessage.modelError(model);
+      }
       return _buildForm(model);
     });
   }
@@ -127,16 +132,26 @@ class ProfileWidgetState extends State<ProfileWidget> {
     });
   }
 
-  _buildForm(model) {
+  _buildForm(CarePlanModel model) {
+    if (model.isLoading) return Center(child: CircularProgressIndicator());
+    if (model.hasNoUser) {
+      KeycloakAuth auth = MyApp.of(context).auth;
+      print("Keycloak user id: ${auth.userInfo.keycloakUserId}");
+      return Text("No user");
+    }
+    if (model.hasNoPatient) return Text("No patient");
     UserInfo userInfo = MyApp.of(context).auth.userInfo;
-    Patient originalPatient =
-        model.patient != null ? Patient.fromJson(model.patient.toJson()) : Patient();
+    Patient originalPatient = Patient.fromJson(model.patient.toJson());
     String firstName = originalPatient.firstName;
     String lastName = originalPatient.lastName;
     String email = originalPatient.emailAddress ?? userInfo.email;
     String phone = originalPatient.phoneNumber;
     String homeZip = originalPatient.homeZip;
     String secondZip = originalPatient.secondZip;
+    ContactPointSystem preferredContactMethod = originalPatient.preferredContactMethod;
+    Gender gender = originalPatient.gender;
+    DateTime birthDate = originalPatient.birthDate;
+
     return Padding(
       padding: const EdgeInsets.all(Dimensions.fullMargin),
       child: Form(
@@ -214,6 +229,12 @@ class ProfileWidgetState extends State<ProfileWidget> {
                     return null;
                   },
                 ),
+                RadioButtonFormField(
+                    "Preferred contact method",
+                    [ContactPointSystem.email, ContactPointSystem.phone],
+                    preferredContactMethod, (value) {
+                  preferredContactMethod = value;
+                }),
                 _buildInfoTextSection(S.of(context).profile_contact_info_help_text),
                 _buildSectionHeader("Identifying Information"),
                 TextFormField(
@@ -222,6 +243,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
                       hintText: S.of(context).what_is_your_name,
                       labelText: "First name"),
                   initialValue: firstName,
+                  autovalidate: true,
                   validator: (value) {
                     firstName = value;
                     return null;
@@ -233,10 +255,38 @@ class ProfileWidgetState extends State<ProfileWidget> {
                       hintText: S.of(context).what_is_your_name,
                       labelText: "Last name"),
                   initialValue: lastName,
+                  autovalidate: true,
                   validator: (value) {
                     lastName = value;
                     return null;
                   },
+                ),
+                TextFormField(
+                  decoration: InputDecoration(
+                      icon: Icon(Icons.cake),
+                      hintText: "Enter date of birth (m/d/y)",
+                      labelText: "Date of birth"),
+                  initialValue: birthDate != null ? DateFormat.yMd().format(birthDate) : "",
+                  autovalidate: true,
+                  validator: (value) {
+                    if (value.isEmpty) return null;
+                    try {
+                      birthDate = DateFormat.yMd().parse(value);
+                      print("parsed birthdate: ${birthDate.toIso8601String()}");
+                    } catch (FormatException) {
+                      return "Enter a valid date";
+                    }
+                    return null;
+                  },
+                ),
+                RadioButtonFormField(
+                  "Sex",
+                  [Gender.female, Gender.male, Gender.other, Gender.unknown],
+                  gender,
+                  (value) {
+                    gender = value;
+                  },
+                  displayOverrides: {Gender.unknown: "decline to state"},
                 ),
                 _buildInfoTextSection(S.of(context).profile_identifying_info_help_text),
                 Padding(
@@ -253,7 +303,10 @@ class ProfileWidgetState extends State<ProfileWidget> {
                                   phoneNumber: phone,
                                   emailAddress: email,
                                   homeZip: homeZip,
-                                  secondZip: secondZip),
+                                  secondZip: secondZip,
+                                  preferredContactMethod: preferredContactMethod,
+                                  gender: gender,
+                              birthDate:birthDate),
                               model);
                         } else {
                           setState(() {
@@ -307,5 +360,67 @@ class ProfileWidgetState extends State<ProfileWidget> {
         throw ArgumentError("No such type");
     }
     return RegExp(source).hasMatch(toValidate);
+  }
+}
+
+class RadioButtonFormField extends StatefulWidget {
+  final String _title;
+  final List<dynamic> _options;
+  final Function _onChanged;
+  final _initialValue;
+  final Map<dynamic, String> displayOverrides;
+
+  const RadioButtonFormField(this._title, this._options, this._initialValue, this._onChanged,
+      {Map<dynamic, String> displayOverrides})
+      : displayOverrides = displayOverrides != null ? displayOverrides : const {};
+
+  @override
+  State<StatefulWidget> createState() => RadioButtonFormFieldState(_initialValue);
+}
+
+class RadioButtonFormFieldState extends State<RadioButtonFormField> {
+  var _selectedValue;
+
+  RadioButtonFormFieldState(this._selectedValue);
+
+  String displayString(option) {
+    if (widget.displayOverrides.containsKey(option)) {
+      return widget.displayOverrides[option];
+    }
+    return option.toString();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    List<Widget> children = widget._options.map((option) {
+      var onChanged = (value) {
+        setState(() {
+          _selectedValue = option;
+        });
+        widget._onChanged(option);
+      };
+      return InkWell(
+        onTap: () => onChanged(option),
+        child: Row( mainAxisSize:MainAxisSize.min,
+            children: [
+          Radio(
+            value: option,
+            groupValue: _selectedValue,
+            activeColor: Theme.of(context).primaryColor,
+            onChanged: onChanged,
+          ),
+          Text(displayString(option)),
+        ]),
+      );
+    }).toList();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+            padding: const EdgeInsets.only(top: Dimensions.fullMargin),
+            child: Text(widget._title, style: Theme.of(context).textTheme.caption)),
+        Wrap(children: children),
+      ],
+    );
   }
 }

@@ -9,6 +9,7 @@ import 'package:map_app_flutter/ProfilePage.dart';
 import 'package:map_app_flutter/QuestionnairePage.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
+import 'package:map_app_flutter/map_app_widgets.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -80,15 +81,18 @@ class _PlanPageState extends State<PlanPage> {
   Widget _buildCalendarPage(TextStyle textStyle, BuildContext context, CarePlanModel model) {
     if (model == null) {
       print("Model is null.");
-      return _buildErrorMessage("Loading error. Please log in again.",
-          buttonLabel: "logout", onPressed: () => MyApp.of(context).logout(context: context));
+      return MapAppErrorMessage.loadingErrorWithLogoutButton(context);
     }
     if (model.error != null) {
-      return _buildErrorMessage('${model.error}');
+      return MapAppErrorMessage('${model.error}');
     }
 
     if (model.isLoading) {
       return Center(child: CircularProgressIndicator());
+    }
+
+    if (model.hasNoUser) {
+      return MapAppErrorMessage.loadingErrorWithLogoutButton(context);
     }
 
     if (model.hasNoPatient) {
@@ -96,13 +100,16 @@ class _PlanPageState extends State<PlanPage> {
     }
 
     if (model.hasNoCarePlan) {
-      return _buildAddDefaultCareplanSection(context, model);
+      return MapAppErrorMessage(
+        S.of(context).you_have_no_active_pelvic_floor_management_careplan,
+        buttonLabel: S.of(context).add_the_default_careplan_for_me,
+        onButtonPressed: () => model.addDefaultCareplan(),
+      );
     }
 
     if (model.treatmentCalendar == null) {
       print("Treatment calendar is null.");
-      return _buildErrorMessage("Loading error. Try logging out and in again.",
-          buttonLabel: "logout", onPressed: () => MyApp.of(context).logout(context: context));
+      return MapAppErrorMessage.loadingErrorWithLogoutButton(context);
     }
 
     return Column(
@@ -304,31 +311,13 @@ class _PlanPageState extends State<PlanPage> {
     );
   }
 
-  Widget _buildAddDefaultCareplanSection(BuildContext context, CarePlanModel model) {
-    return _buildErrorMessage(
-      S.of(context).you_have_no_active_pelvic_floor_management_careplan,
-      buttonLabel: S.of(context).add_the_default_careplan_for_me,
-      onPressed: () => model.addDefaultCareplan(),
-    );
-  }
-
   Widget _buildCreateMyProfileButton(BuildContext context, CarePlanModel model) {
-    return _buildErrorMessage(
+    return MapAppErrorMessage(
       "You do not have a patient record in the FHIR database.",
       buttonLabel: "create one",
-      onPressed: () =>
+      onButtonPressed: () =>
           Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreateProfilePage())),
     );
-  }
-
-  Widget _buildErrorMessage(String message, {String buttonLabel, Function onPressed}) {
-    List<Widget> children = [
-      Center(child: Text(message, textAlign: TextAlign.center)),
-    ];
-    if (buttonLabel != null) {
-      children.add(RaisedButton(child: Text(buttonLabel), onPressed: onPressed));
-    }
-    return Column(children: children);
   }
 
   List<Widget> _buildQuestionnaireButtons(BuildContext context, CarePlanModel model) {

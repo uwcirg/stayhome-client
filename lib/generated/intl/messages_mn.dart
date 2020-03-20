@@ -35,7 +35,7 @@ class MessageLookup extends MessageLookupByLibrary {
   static _notInlinedMessages(_) => <String, Function> {
     "about" : MessageLookupByLibrary.simpleMessage("About. The honorary stem taxes my unread beast."),
     "activity" : MessageLookupByLibrary.simpleMessage("Activity"),
-    "add_the_default_careplan_for_me" : MessageLookupByLibrary.simpleMessage("Add the default care plan for me"),
+    "add_the_default_careplan_for_me" : MessageLookupByLibrary.simpleMessage("add the default care plan for me pretty pleeaaaaaaaaaaaaaaaaaaaase"),
     "battery_level" : m0,
     "buttonPushText" : MessageLookupByLibrary.simpleMessage("You have pushed the button this many times:"),
     "change" : MessageLookupByLibrary.simpleMessage("Change"),
