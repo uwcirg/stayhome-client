@@ -24,8 +24,6 @@ class KeycloakAuth {
 
   bool refreshTokenExpired = false;
 
-  bool isDummyLogin = false;
-
   KeycloakAuth(this._issuer, this._clientSecret, this._clientId) {
     _api = new KeycloakApi(_issuer, _clientId, _clientSecret, _redirectUrl, scopes: ["openid"]);
   }
@@ -37,7 +35,6 @@ class KeycloakAuth {
   Future mapAppLogin() async {
     try {
       simpleAuth.OAuthAccount account = await _api.authenticate();
-      print("Account has been returned mapAppLogin");
       accessTokenExpirationDateTime = account.created.add(Duration(seconds: account.expiresIn));
 
       isLoggedIn = true;
@@ -46,12 +43,6 @@ class KeycloakAuth {
       print(e);
       return Future.error('Authentication canceled');
     }
-  }
-
-  Future dummyLogin() async {
-    isDummyLogin = true;
-    isLoggedIn = true;
-    refreshTokenExpired = false;
   }
 
   Future mapAppCreateAccount(String firstName, String lastName, String email,
@@ -75,12 +66,6 @@ class KeycloakAuth {
   }
 
   Future mapAppLogout() async {
-    if (isDummyLogin) {
-      isLoggedIn = false;
-      accessTokenExpirationDateTime = null;
-      userInfo = null;
-      return Future.value("Logged out");
-    }
     var url;
     if (kIsWeb) {
       String redirectUrl = Uri.encodeComponent(PlatformDefs().rootUrl());
@@ -95,8 +80,6 @@ class KeycloakAuth {
         // lost account...
         return await _completeWithLocalLogout();
       } else {
-        print("Account token: ${account.token}");
-        print("Account refresh token: ${account.refreshToken}");
         var value = await post(url, headers: {
           "authorization": 'Bearer ${account.token}'
         }, body: {
@@ -138,10 +121,6 @@ class KeycloakAuth {
   }
 
   Future mapAppRefreshTokens() async {
-    if (isDummyLogin) {
-      return;
-    }
-
     var success = await _api.refreshAccount(_api.currentAccount);
     if (success) {
       var account = _api.currentOauthAccount;
@@ -166,16 +145,6 @@ class KeycloakAuth {
   }
 
   Future getUserInfo() async {
-    if (isDummyLogin) {
-      this.userInfo = UserInfo.from(
-          jsonDecode('{"sub":"0df3e0be-bfd0-4602-b180-c3f1bb96b602","email_verified":true,'
-              '"name":"Bumblebee Sugartoes","preferred_username":"demo",'
-              '"given_name":"Bumblebee","family_name":"Sugartoes",'
-              '"email":"bumblebee@sugartoes.net"}'));
-
-      return Future.value(this.userInfo);
-    }
-
     var userInfoJson;
     var returnError;
 
@@ -230,23 +199,19 @@ class KeycloakAuth {
     }
 
     Uri uri = Uri.tryParse(change);
-    print("The URI was: $uri\n it contained code: ${uri.queryParameters.containsKey("code")}");
 
     if (authenticator.checkUrl(uri)) {
       // --- copy pasted sections - need cleanup!
       // from API code
       var token = await authenticator.getAuthCode();
-      print("Token: $token");
       if (token?.isEmpty ?? true) {
         throw new Exception("Null Token");
       }
       simpleAuth.OAuthAccount account = await _api.getAccountFromAuthCode(authenticator);
-      print("account received: $account");
       _api.saveAccountToCache(account);
       _api.currentAccount = account;
 
       //from KeycloakAuth mapAppLogin callback
-      print("Account has been returned receivedCallback");
       accessTokenExpirationDateTime = account.created.add(Duration(seconds: account.expiresIn));
 
       isLoggedIn = true;
@@ -300,14 +265,6 @@ class KeycloakApi extends simpleAuth.OAuthApi {
         );
 
   @override
-  Future<simpleAuth.OAuthAccount> getAccountFromAuthCode(
-      simpleAuth.WebAuthenticator authenticator) async {
-    //TODO: Figure out why how to fix callback URL getting mangled
-    //authenticator.redirectUrl = "http://localhost:55624/#/authCallback";
-    return super.getAccountFromAuthCode(authenticator);
-  }
-
-  @override
   get showAuthenticator {
     if (!kIsWeb) return super.showAuthenticator;
 
@@ -318,7 +275,6 @@ class KeycloakApi extends simpleAuth.OAuthApi {
         return;
       }
       Uri initialUrl = await authenticator.getInitialUrl();
-      print("InitialUrl: $initialUrl");
 
       SimpleAuthFlutter.authenticators[authenticator.identifier] = authenticator;
 

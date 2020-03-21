@@ -131,10 +131,12 @@ class CarePlanModel extends Model {
   }
 
   void addDefaultCareplan() async {
-    loadThenNotifyOrError(Repository.loadCarePlan(_careplanTemplateRef).then((CarePlan plan) {
+    this.isLoading = true;
+    notifyListeners();
+    Repository.loadCarePlan(_careplanTemplateRef).then((CarePlan plan) {
       CarePlan newPlan = CarePlan.fromTemplate(plan, patient);
-      return Repository.postCarePlan(newPlan).then((value) => load());
-    }));
+      Repository.postCarePlan(newPlan).then((value) => load());
+    });
   }
 
   void addBlankPatient() async {

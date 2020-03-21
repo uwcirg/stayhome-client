@@ -37,6 +37,7 @@ dependencies:
   url_launcher_web: ^0.1.0
   charts_flutter:
   flutter_markdown: 0.3.4
+  global_configuration: ^1.5.0
 
 dev_dependencies:
   test:
@@ -62,6 +63,7 @@ flutter:
     - assets/logos/
     - assets/icons/
     - assets/stayhome/
+    - assets/cfg/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

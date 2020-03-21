@@ -80,15 +80,15 @@ class Patient extends Resource {
       patient = Patient();
     }
     patient.resourceType = "Patient";
-    if (firstName.isNotEmpty) patient.firstName = firstName;
-    if (lastName.isNotEmpty) patient.lastName = lastName;
-    if (phoneNumber.isNotEmpty) patient.phoneNumber = phoneNumber;
-    if (emailAddress.isNotEmpty) patient.emailAddress = emailAddress;
-    if (homeZip.isNotEmpty) patient.homeZip = homeZip;
-    if (secondZip.isNotEmpty) patient.secondZip = secondZip;
-    if (preferredContactMethod != null) patient.preferredContactMethod = preferredContactMethod;
-    if (gender != null) patient.gender = gender;
-    if (birthDate != null) patient.birthDate = birthDate;
+    patient.firstName = firstName;
+    patient.lastName = lastName;
+    patient.phoneNumber = phoneNumber;
+    patient.emailAddress = emailAddress;
+    patient.homeZip = homeZip;
+    patient.secondZip = secondZip;
+    patient.preferredContactMethod = preferredContactMethod;
+    patient.gender = gender;
+    patient.birthDate = birthDate;
     return patient;
   }
 
@@ -153,7 +153,38 @@ class Patient extends Resource {
   }
 
   set preferredContactMethod(ContactPointSystem system) {
-    _contactPointForSystem(system)?.rank = 1;
+    // if sms is preferred and we have a phone number, use that and set its use to sms.
+    // if phone is preferred and we have a sms number, use that and set its use to phone.
+    // then set the contact point as preferred.
+
+    if (this.telecom == null || this.telecom.length == 0) return;
+
+    if (system == ContactPointSystem.phone || system == ContactPointSystem.sms) {
+      ContactPoint sms = _contactPointForSystem(ContactPointSystem.sms);
+      ContactPoint phone = _contactPointForSystem(ContactPointSystem.phone);
+      // if we have neither, there's nothing to do
+      if (phone == null && sms == null) return;
+
+      if (system == ContactPointSystem.phone) {
+        if (phone == null) {
+          // if we have sms, update it to phone
+          sms.system = ContactPointSystem.phone;
+        }
+      } else {
+        if (sms == null) {
+          phone.system = ContactPointSystem.sms;
+        }
+      }
+    }
+
+    // update rank of all contact points
+    this.telecom.forEach((ContactPoint p) {
+      if (system == null || p.system != system) {
+        p.rank = 99;
+      } else {
+        p.rank = 1;
+      }
+    });
   }
 
   ContactPointSystem get preferredContactMethod => this.telecom != null && this.telecom.length > 0
@@ -169,7 +200,18 @@ class Patient extends Resource {
   }
 
   String get phoneNumber {
-    ContactPoint p = _contactPointForSystem(ContactPointSystem.phone);
+    ContactPoint phone = _contactPointForSystem(ContactPointSystem.phone);
+    ContactPoint sms = _contactPointForSystem(ContactPointSystem.sms);
+    ContactPoint p;
+    if (phone == null || sms == null) {
+      if (phone == null) {
+        p = sms;
+      } else {
+        p = phone;
+      }
+    } else {
+      p = phone;
+    }
     return p != null ? p.value : null;
   }
 
