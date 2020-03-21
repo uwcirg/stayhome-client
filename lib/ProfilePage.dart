@@ -137,11 +137,10 @@ class ProfileWidgetState extends State<ProfileWidget> {
     if (model.hasNoUser) {
       KeycloakAuth auth = MyApp.of(context).auth;
       print("Keycloak user id: ${auth.userInfo.keycloakUserId}");
-      return Text("No user");
+      return MapAppErrorMessage("No user");
     }
-    if (model.hasNoPatient) return Text("No patient");
     UserInfo userInfo = MyApp.of(context).auth.userInfo;
-    Patient originalPatient = Patient.fromJson(model.patient.toJson());
+    Patient originalPatient = model.patient != null ? Patient.fromJson(model.patient.toJson()) : Patient();
     String firstName = originalPatient.firstName;
     String lastName = originalPatient.lastName;
     String email = originalPatient.emailAddress ?? userInfo.email;
