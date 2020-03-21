@@ -107,7 +107,10 @@ class ProfileWidgetState extends State<ProfileWidget> {
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
-      if (model != null && model.error != null) {
+      if (model == null) {
+        return MapAppErrorMessage.loadingErrorWithLogoutButton(context);
+      }
+      if (model.error != null) {
         return MapAppErrorMessage.modelError(model);
       }
       return _buildForm(model);
@@ -140,7 +143,8 @@ class ProfileWidgetState extends State<ProfileWidget> {
       return MapAppErrorMessage("No user");
     }
     UserInfo userInfo = MyApp.of(context).auth.userInfo;
-    Patient originalPatient = model.patient != null ? Patient.fromJson(model.patient.toJson()) : Patient();
+    Patient originalPatient =
+        model.patient != null ? Patient.fromJson(model.patient.toJson()) : Patient();
     String firstName = originalPatient.firstName;
     String lastName = originalPatient.lastName;
     String email = originalPatient.emailAddress ?? userInfo.email;
@@ -230,9 +234,12 @@ class ProfileWidgetState extends State<ProfileWidget> {
                 ),
                 RadioButtonFormField(
                     "Preferred contact method",
-                    [ContactPointSystem.email, ContactPointSystem.phone],
+                    [ContactPointSystem.email, ContactPointSystem.phone, ContactPointSystem.sms],
                     preferredContactMethod, (value) {
                   preferredContactMethod = value;
+                }, displayOverrides: {
+                  ContactPointSystem.phone: "call",
+                  ContactPointSystem.sms: "text"
                 }),
                 _buildInfoTextSection(S.of(context).profile_contact_info_help_text),
                 _buildSectionHeader("Identifying Information"),
@@ -305,7 +312,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
                                   secondZip: secondZip,
                                   preferredContactMethod: preferredContactMethod,
                                   gender: gender,
-                              birthDate:birthDate),
+                                  birthDate: birthDate),
                               model);
                         } else {
                           setState(() {
@@ -400,8 +407,7 @@ class RadioButtonFormFieldState extends State<RadioButtonFormField> {
       };
       return InkWell(
         onTap: () => onChanged(option),
-        child: Row( mainAxisSize:MainAxisSize.min,
-            children: [
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
           Radio(
             value: option,
             groupValue: _selectedValue,
