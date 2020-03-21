@@ -139,8 +139,8 @@ class ProfileWidgetState extends State<ProfileWidget> {
     if (model.isLoading) return Center(child: CircularProgressIndicator());
     if (model.hasNoUser) {
       KeycloakAuth auth = MyApp.of(context).auth;
-      print("Keycloak user id: ${auth.userInfo.keycloakUserId}");
-      return MapAppErrorMessage("No user");
+      print("model has no user / KeycloakAuth has user id: ${auth.userInfo.keycloakUserId}");
+      return MapAppErrorMessage.loadingErrorWithLogoutButton(context);
     }
     UserInfo userInfo = MyApp.of(context).auth.userInfo;
     Patient originalPatient =
@@ -338,7 +338,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
   _buildSectionHeader(String text) {
     return Padding(
       padding: const EdgeInsets.only(top: Dimensions.fullMargin),
-      child: Text(text, style: Theme.of(context).textTheme.title),
+      child: Text(text, style: Theme.of(context).textTheme.headline6),
     );
   }
 
@@ -400,9 +400,15 @@ class RadioButtonFormFieldState extends State<RadioButtonFormField> {
   Widget build(BuildContext context) {
     List<Widget> children = widget._options.map((option) {
       var onChanged = (value) {
-        setState(() {
-          _selectedValue = option;
-        });
+        if (_selectedValue != option) {
+          setState(() {
+            _selectedValue = option;
+          });
+        } else {
+          setState(() {
+            _selectedValue = null;
+          });
+        }
         widget._onChanged(option);
       };
       return InkWell(
@@ -412,7 +418,7 @@ class RadioButtonFormFieldState extends State<RadioButtonFormField> {
             value: option,
             groupValue: _selectedValue,
             activeColor: Theme.of(context).primaryColor,
-            onChanged: onChanged,
+            onChanged: null,
           ),
           Text(displayString(option)),
         ]),
