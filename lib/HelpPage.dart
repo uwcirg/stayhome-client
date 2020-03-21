@@ -126,24 +126,6 @@ class _StayHomeHelpPageState extends _HelpPageState {
             ),
             SectionTitle("About CIRG"),
             Text(S.of(context).developedByCIRG),
-
-            SectionTitle("Terms of Use"),
-            Text("""
-          This app was set up by the Clinical Informatics Research Group, at the University of Washington, in order to benefit people, like you, who may be concerned about infection with Coronavirus (COVID-19) and want to track your symptoms, or access to other information.  
-
-We do our best to keep our systems private and secure, but we are offering this application without any assurance or warranty.  If you are hesitant about privacy, you can enter false identifying information in the profile, or you can choose not to enter clinical information, or both.  We think you might find the benefits are greater than the risks, but that’s your decision.
-
-There are non-personalized features in the app, that have information about COVID-19 and that do not require logging in.  You are welcome to use those features without logging in.
-
-We ask you to add your current zip code (where you are currently staying) so we can identify which public health jurisdiction you are in.  If you identify your location, then we may share your information, including a way to contact you, with public health agencies responsible for that jurisdiction.  If you do not identify your location, but you do create an account, we may share your health information, without any contact information, along with our best guess of the general location from which you are accessing the app, with the public health agencies responsible for that jurisdiction and the app may generate a reminder asking you to contact them.  That information may be helpful to public health agencies, but it is probably in your interest to provide them with a way to contact you
-
-By creating an account and using the app's functionality while logged in, you accept these terms and conditions.
-
-Or
-
-Do not accept these terms, and you are welcome to use the public parts of the app.
-
-          """),
             Text(""),
             Text(S.of(context).versionString(VersionInfo.version)),
           ]),

@@ -58,7 +58,7 @@ class S {
 
   String get developedByCIRG {
     return Intl.message(
-      'Developed by the Clinical Informatics Research Group (CIRG) at University of Washington, 2019.',
+      'Developed by the Clinical Informatics Research Group (CIRG) at University of Washington, 2019-2020.',
       name: 'developedByCIRG',
       desc: '',
       args: [],

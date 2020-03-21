@@ -41,7 +41,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "change" : MessageLookupByLibrary.simpleMessage("Change"),
     "contact__community" : MessageLookupByLibrary.simpleMessage("Contact"),
     "demoVersionBannerText" : MessageLookupByLibrary.simpleMessage("Demo version - not for clinical use."),
-    "developedByCIRG" : MessageLookupByLibrary.simpleMessage("Developed by the Clinical Informatics Research Group (CIRG) at University of Washington, 2019."),
+    "developedByCIRG" : MessageLookupByLibrary.simpleMessage("Developed by the Clinical Informatics Research Group (CIRG) at University of Washington, 2019-2020."),
     "devices" : MessageLookupByLibrary.simpleMessage("Devices"),
     "duration" : MessageLookupByLibrary.simpleMessage("Duration:"),
     "duration_duration_durationunit" : m1,
