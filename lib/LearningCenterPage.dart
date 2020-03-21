@@ -141,7 +141,7 @@ class StayHomeLearningCenterPage extends LearningCenterPage {
     if (url.isEmpty) {
       snack("No content", context);
     } else {
-      PlatformDefs().launchUrl(url);
+      PlatformDefs().launchUrl(url, newTab: true);
     }
   }
 }
