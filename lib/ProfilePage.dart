@@ -409,7 +409,7 @@ class RadioButtonFormFieldState extends State<RadioButtonFormField> {
             _selectedValue = null;
           });
         }
-        widget._onChanged(option);
+        widget._onChanged(_selectedValue);
       };
       return InkWell(
         onTap: () => onChanged(option),
