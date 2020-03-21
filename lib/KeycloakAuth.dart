@@ -32,6 +32,10 @@ class KeycloakAuth {
     return KeycloakAuth(other._issuer, other._clientSecret, other._clientId);
   }
 
+  String authToken(){
+    return _api.currentOauthAccount.token;
+  }
+
   Future mapAppLogin() async {
     try {
       simpleAuth.OAuthAccount account = await _api.authenticate();

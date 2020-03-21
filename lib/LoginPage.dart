@@ -8,9 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
-import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:map_app_flutter/platform_stub.dart';
-import 'package:scoped_model/scoped_model.dart';
 import 'package:simple_auth_flutter/simple_auth_flutter.dart';
 
 class LoginPage extends StatefulWidget {
@@ -118,5 +116,4 @@ class LoginPageState extends State<LoginPage> {
           )),
     ));
   }
-
 }

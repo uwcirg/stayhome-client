@@ -21,6 +21,7 @@ class CarePlanModel extends Model {
   TreatmentCalendar treatmentCalendar;
   Goals goals;
 
+  String _authToken;
   String _keycloakUserId;
   String _keycloakSystem;
   String _careplanTemplateRef;
@@ -38,8 +39,9 @@ class CarePlanModel extends Model {
     goals = new Goals();
   }
 
-  void setUser(String keycloakUserId) {
+  void setUserAndAuthToken(String keycloakUserId, String authToken) {
     this._keycloakUserId = keycloakUserId;
+    this._authToken = authToken;
     load();
   }
 
@@ -79,14 +81,14 @@ class CarePlanModel extends Model {
       return Future.error("No user information. Please log in again.");
     }
 
-    this.patient = await Repository.getPatient(_keycloakSystem, _keycloakUserId);
+    this.patient = await Repository.getPatient(_keycloakSystem, _keycloakUserId, _authToken);
     if (patient != null) {
       return _loadCarePlan();
     }
   }
 
   Future<void> _loadCarePlan() async {
-    this.carePlan = await Repository.getCarePlan(patient, _careplanTemplateRef);
+    this.carePlan = await Repository.getCarePlan(patient, _careplanTemplateRef, _authToken);
     if (carePlan != null) {
       return _loadQuestionnaires();
     }
@@ -94,18 +96,18 @@ class CarePlanModel extends Model {
 
   Future<void> _loadQuestionnaires() async {
     List<Future> futures = [
-      Repository.getQuestionnaires(this.carePlan).then((var questionnaires) {
+      Repository.getQuestionnaires(this.carePlan, _authToken).then((var questionnaires) {
         this.questionnaires = questionnaires;
         _createQuestionMap();
       }),
-      Repository.getProcedures(this.carePlan).then((List<Procedure> procedures) {
+      Repository.getProcedures(this.carePlan, _authToken).then((List<Procedure> procedures) {
         this.procedures = procedures;
       }),
-      Repository.getQuestionnaireResponses(this.carePlan)
+      Repository.getQuestionnaireResponses(this.carePlan, _authToken)
           .then((List<QuestionnaireResponse> responses) {
         this.questionnaireResponses = responses;
       }),
-      Repository.getResourceLinks(_careplanTemplateRef).then((List<DocumentReference> responses) {
+      Repository.getResourceLinks(_careplanTemplateRef, _authToken).then((List<DocumentReference> responses) {
         this.infoLinks = responses;
       })
     ];
@@ -114,7 +116,7 @@ class CarePlanModel extends Model {
 
   void loadResourceLinks() async {
     loadThenNotifyOrError(
-        Repository.getResourceLinks(_careplanTemplateRef).then((List<DocumentReference> responses) {
+        Repository.getResourceLinks(_careplanTemplateRef, _authToken).then((List<DocumentReference> responses) {
       this.infoLinks = responses;
     }));
   }
@@ -127,15 +129,15 @@ class CarePlanModel extends Model {
     if (hasNoUser) return Future.error("No user");
     this.patient = patient;
     this.patient.setKeycloakId(_keycloakSystem, _keycloakUserId);
-    return Repository.postPatient(this.patient).then((value) => load());
+    return Repository.postPatient(this.patient, _authToken).then((value) => load());
   }
 
   void addDefaultCareplan() async {
     this.isLoading = true;
     notifyListeners();
-    Repository.loadCarePlan(_careplanTemplateRef).then((CarePlan plan) {
+    Repository.loadCarePlan(_careplanTemplateRef, _authToken).then((CarePlan plan) {
       CarePlan newPlan = CarePlan.fromTemplate(plan, patient);
-      Repository.postCarePlan(newPlan).then((value) => load());
+      Repository.postCarePlan(newPlan, _authToken).then((value) => load());
     });
   }
 
@@ -145,21 +147,21 @@ class CarePlanModel extends Model {
 
   Future addCompletedSession(int minutes) async {
     Procedure treatmentSession = Procedure.treatmentSession(minutes, carePlan);
-    return Repository.postCompletedSession(treatmentSession).then((value) => load());
+    return Repository.postCompletedSession(treatmentSession, _authToken).then((value) => load());
   }
 
   Future postQuestionnaireResponse(QuestionnaireResponse response) async {
-    return Repository.postQuestionnaireResponse(response).then((value) => load());
+    return Repository.postQuestionnaireResponse(response, _authToken).then((value) => load());
   }
 
   void updateActivityFrequency(int activityIndex, double newFrequency) {
     carePlan.activity[activityIndex].detail.scheduledTiming.repeat.period = newFrequency;
-    Repository.updateCarePlan(carePlan).then((value) => load());
+    Repository.updateCarePlan(carePlan, _authToken).then((value) => load());
   }
 
   void updateActivityDuration(int activityIndex, double newDuration) {
     carePlan.activity[activityIndex].detail.scheduledTiming.repeat.duration = newDuration;
-    Repository.updateCarePlan(carePlan).then((value) => load());
+    Repository.updateCarePlan(carePlan, _authToken).then((value) => load());
   }
 
   QuestionnaireItem questionForLinkId(String linkId) {
