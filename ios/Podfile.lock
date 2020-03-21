@@ -1,39 +1,54 @@
 PODS:
+  - AppAuth (1.2.0):
+    - AppAuth/Core (= 1.2.0)
+    - AppAuth/ExternalUserAgent (= 1.2.0)
+  - AppAuth/Core (1.2.0)
+  - AppAuth/ExternalUserAgent (1.2.0)
+  - CouchbaseLite-Swift (2.6.3)
   - Flutter (1.0.0)
+  - flutter_appauth (0.0.1):
+    - AppAuth (= 1.2.0)
+    - Flutter
+  - fluttercouch (0.0.1):
+    - CouchbaseLite-Swift (~> 2.6.3)
+    - Flutter
   - simple_auth_flutter (0.0.1):
     - Flutter
   - url_launcher (0.0.1):
     - Flutter
-  - url_launcher_macos (0.0.1):
-    - Flutter
-  - url_launcher_web (0.0.1):
-    - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
+  - flutter_appauth (from `.symlinks/plugins/flutter_appauth/ios`)
+  - fluttercouch (from `.symlinks/plugins/fluttercouch/ios`)
   - simple_auth_flutter (from `.symlinks/plugins/simple_auth_flutter/ios`)
   - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
-  - url_launcher_macos (from `.symlinks/plugins/url_launcher_macos/ios`)
-  - url_launcher_web (from `.symlinks/plugins/url_launcher_web/ios`)
+
+SPEC REPOS:
+  trunk:
+    - AppAuth
+    - CouchbaseLite-Swift
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
+  flutter_appauth:
+    :path: ".symlinks/plugins/flutter_appauth/ios"
+  fluttercouch:
+    :path: ".symlinks/plugins/fluttercouch/ios"
   simple_auth_flutter:
     :path: ".symlinks/plugins/simple_auth_flutter/ios"
   url_launcher:
     :path: ".symlinks/plugins/url_launcher/ios"
-  url_launcher_macos:
-    :path: ".symlinks/plugins/url_launcher_macos/ios"
-  url_launcher_web:
-    :path: ".symlinks/plugins/url_launcher_web/ios"
 
 SPEC CHECKSUMS:
+  AppAuth: bce82c76043657c99d91e7882e8a9e1a93650cd4
+  CouchbaseLite-Swift: af73817c4db5222f01de6e59196dcf6389bd51a2
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  simple_auth_flutter: 81eea726575ef3fae2e2e866101701898d37e26f
+  flutter_appauth: df12d7d65012a380f1ab11311866cfcbfd55370f
+  fluttercouch: a09d4937668b54a2fa54e6c271df15f59d2104ba
+  simple_auth_flutter: ec585a6e96b415247120df0a33af43dc1d2a5839
   url_launcher: a1c0cc845906122c4784c542523d8cacbded5626
-  url_launcher_macos: fd7894421cd39320dce5f292fc99ea9270b2a313
-  url_launcher_web: e5527357f037c87560776e36436bf2b0288b965c
 
 PODFILE CHECKSUM: 1b66dae606f75376c5f2135a8290850eeb09ae83
 

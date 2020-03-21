@@ -2,6 +2,8 @@
  * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
  */
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/fhir/Exception.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
@@ -11,6 +13,7 @@ import 'package:scoped_model/scoped_model.dart';
 import '../const.dart';
 
 class CarePlanModel extends Model {
+  bool hasNoCarePlan = false;
   List<Questionnaire> questionnaires;
   List<Procedure> procedures;
   List<QuestionnaireResponse> questionnaireResponses;
@@ -22,19 +25,9 @@ class CarePlanModel extends Model {
   Goals goals;
 
   String _keycloakUserId;
-  String _keycloakSystem;
-  String _careplanTemplateRef;
   Map<String, QuestionnaireItem> _questionsByLinkId = new Map();
 
-  List<DocumentReference> infoLinks;
-
-  bool get hasNoPatient => patient == null;
-
-  bool get hasNoCarePlan => carePlan == null;
-
-  bool get hasNoUser => _keycloakUserId == null;
-
-  CarePlanModel(this._careplanTemplateRef, this._keycloakSystem) {
+  CarePlanModel() {
     goals = new Goals();
   }
 
@@ -43,31 +36,20 @@ class CarePlanModel extends Model {
     load();
   }
 
-  void setGuestUser() {
-    loadResourceLinks();
-  }
-
-  static CarePlanModel of(BuildContext context) {
-    return ScopedModel.of<CarePlanModel>(context);
-  }
+  static CarePlanModel of(BuildContext context) => ScopedModel.of<CarePlanModel>(context);
 
   void load() {
-    loadThenNotifyOrError(_doLoad());
-  }
-
-  /// This should be called when the view should be rebuilt first to show the loading screen, then
-  /// upon completion, with the error message or data view.
-  void loadThenNotifyOrError(Future f) {
     isLoading = true;
-    error = null;
     notifyListeners();
 
+    notifyOrError(_doLoad());
+  }
+
+  void notifyOrError(Future f) {
     f.then((value) {
-      this.error = null;
       isLoading = false;
       notifyListeners();
     }).catchError((error) {
-      print(error);
       this.error = error;
       isLoading = false;
       notifyListeners();
@@ -75,19 +57,20 @@ class CarePlanModel extends Model {
   }
 
   Future<void> _doLoad() async {
-    if (hasNoUser) {
-      return Future.error("No user information. Please log in again.");
+    // don't need to reload patient if we already have it
+    if (patient == null) {
+      patient = await Repository.getPatient(_keycloakUserId);
     }
-
-    this.patient = await Repository.getPatient(_keycloakSystem, _keycloakUserId);
-    if (patient != null) {
-      return _loadCarePlan();
-    }
+    return _loadCarePlan();
   }
 
   Future<void> _loadCarePlan() async {
-    this.carePlan = await Repository.getCarePlan(patient, _careplanTemplateRef);
-    if (carePlan != null) {
+    CarePlan carePlan = await Repository.getCarePlan(patient);
+    if (carePlan == null) {
+      hasNoCarePlan = true;
+    } else {
+      hasNoCarePlan = false;
+      this.carePlan = carePlan;
       return _loadQuestionnaires();
     }
   }
@@ -104,53 +87,38 @@ class CarePlanModel extends Model {
       Repository.getQuestionnaireResponses(this.carePlan)
           .then((List<QuestionnaireResponse> responses) {
         this.questionnaireResponses = responses;
-      }),
-      Repository.getResourceLinks(_careplanTemplateRef).then((List<DocumentReference> responses) {
-        this.infoLinks = responses;
       })
     ];
-    return Future.wait(futures).then((value) => rebuildTreatmentPlan());
-  }
-
-  void loadResourceLinks() async {
-    loadThenNotifyOrError(
-        Repository.getResourceLinks(_careplanTemplateRef).then((List<DocumentReference> responses) {
-      this.infoLinks = responses;
-    }));
+    await Future.wait(futures);
+    rebuildTreatmentPlan();
   }
 
   void rebuildTreatmentPlan() {
     treatmentCalendar = TreatmentCalendar.make(carePlan, procedures, questionnaireResponses);
   }
 
-  Future updatePatientResource(Patient patient) async {
-    if (hasNoUser) return Future.error("No user");
-    this.patient = patient;
-    this.patient.setKeycloakId(_keycloakSystem, _keycloakUserId);
-    return Repository.postPatient(this.patient).then((value) => load());
-  }
-
-  void addDefaultCareplan() async {
-    loadThenNotifyOrError(Repository.loadCarePlan(_careplanTemplateRef).then((CarePlan plan) {
+  void addDefaultCareplan() {
+    notifyOrError(Repository.loadCarePlan("54").then((CarePlan plan) {
       CarePlan newPlan = CarePlan.fromTemplate(plan, patient);
-      return Repository.postCarePlan(newPlan).then((value) => load());
-    }));
-  }
+      Repository.postCarePlan(newPlan).then((value) {
+        carePlan = CarePlan.fromJson(jsonDecode(value.body));
+        hasNoCarePlan = false;
 
-  void addBlankPatient() async {
-    loadThenNotifyOrError(updatePatientResource(Patient()));
+        _loadQuestionnaires();
+      });
+    }));
   }
 
   Future addCompletedSession(int minutes) async {
     Procedure treatmentSession = Procedure.treatmentSession(minutes, carePlan);
-    return Repository.postCompletedSession(treatmentSession).then((value) => load());
+    Repository.postCompletedSession(treatmentSession).then((value) => load());
   }
 
   Future postQuestionnaireResponse(QuestionnaireResponse response) async {
-    return Repository.postQuestionnaireResponse(response).then((value) => load());
+    Repository.postQuestionnaireResponse(response).then((value) => load());
   }
 
-  void updateActivityFrequency(int activityIndex, double newFrequency) {
+  void updateActivityFrequency(int activityIndex, int newFrequency) {
     carePlan.activity[activityIndex].detail.scheduledTiming.repeat.period = newFrequency;
     Repository.updateCarePlan(carePlan).then((value) => load());
   }
@@ -240,9 +208,7 @@ class TreatmentCalendar {
         continue;
       }
 
-      DateTime day =
-          DateTime(response.authored.year, response.authored.month, response.authored.day);
-      List<TreatmentEvent> eventList = events.putIfAbsent(day, () => []);
+      List<TreatmentEvent> eventList = events.putIfAbsent(response.authored, () => []);
 
       // find matching scheduled event
       TreatmentEvent event = eventList.firstWhere(
@@ -272,9 +238,9 @@ class TreatmentCalendar {
         throw MalformedFhirResourceException(plan,
             "Resource must have a period length specified in every activity.detail.scheduledTiming");
       }
-      double every = activity.detail.scheduledTiming.repeat.period;
+      int every = activity.detail.scheduledTiming.repeat.period;
       TreatmentEvent event = TreatmentEvent.scheduledEventForActivity(activity);
-      addScheduledTreatmentEvents(scheduledPeriod, every, event);
+      addEvents(scheduledPeriod, every, event);
     }
   }
 
@@ -293,26 +259,14 @@ class TreatmentCalendar {
     return scheduledPeriod;
   }
 
-  void addScheduledTreatmentEvents(Period period, double everyNumberOfDays, TreatmentEvent event) {
-    Duration interval;
-    if (everyNumberOfDays % 1 != 0) {
-      interval = Duration(hours: (everyNumberOfDays * 24).round());
-    } else {
-      interval = Duration(hours: everyNumberOfDays.round() * 24);
-    }
+  void addEvents(Period period, int every, TreatmentEvent event) {
     var date = period.start;
-    var now = DateTime.now();
-    var today = DateTime(now.year, now.month, now.day);
     while (date.isBefore(period.end)) {
-      // add it to the same day on the calendar as all other events for that day
-      DateTime dayOfDate = DateTime(date.year, date.month, date.day);
-      // don't add scheduled events before today
-      if (!dayOfDate.isBefore(today)) {
-        List<TreatmentEvent> dateEvents = events.putIfAbsent(dayOfDate, () => []);
-        var treatmentEvent = TreatmentEvent.from(event);
-        dateEvents.add(treatmentEvent);
+      if (date.difference(period.start).inDays % every == 0) {
+        List<TreatmentEvent> dateEvents = events.putIfAbsent(date, () => []);
+        dateEvents.add(TreatmentEvent.from(event));
       }
-      date = date.add(interval);
+      date = date.add(Duration(days: every));
     }
   }
 }

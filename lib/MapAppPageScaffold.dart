@@ -6,8 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppDrawer.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
-import 'package:map_app_flutter/main.dart';
-
 class MapAppPageScaffold extends StatelessWidget {
   final Widget child;
   final String title;
@@ -26,8 +24,10 @@ class MapAppPageScaffold extends StatelessWidget {
     return Scaffold(
         backgroundColor: backgroundColor,
         appBar: AppBar(
-          centerTitle: true,
-          title: MyApp.of(context).appAssets.appBarTitle(),
+          title: Image.asset(
+            'assets/logos/Joylux_wdmk_rev_rgb.png',
+            height: 25,
+          ),
           actions: this.actions,
         ),
         drawer: showDrawer ? MapAppDrawer() : null,
@@ -50,15 +50,10 @@ class MapAppPageScaffold extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(
           top: Dimensions.largeMargin, left: Dimensions.largeMargin, right: Dimensions.largeMargin),
-      child: Column(
-        children: <Widget>[
-          Text(
-            title.toLowerCase(),
-            style: Theme.of(context).textTheme.title.apply(fontWeightDelta: 1),
-            textAlign: TextAlign.center,
-          ),
-          Divider(indent: 80, endIndent: 80,)
-        ],
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.title.apply(fontWeightDelta: 1),
+        textAlign: TextAlign.center,
       ),
     );
   }

@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
  */
+import 'package:intl/intl.dart';
 import 'package:map_app_flutter/services/Repository.dart';
 
 class Resource {
@@ -12,26 +13,6 @@ class Resource {
   get reference => "$resourceType/$id";
 }
 
-class Gender {
-  final _value;
-
-  const Gender._(this._value);
-
-  toString() => _value;
-
-  static fromJson(String key) {
-    return _vals.firstWhere((v) => v._value == key,
-        orElse: () => throw ArgumentError("Key does not match any Gender"));
-  }
-
-  static const male = const Gender._('male');
-  static const female = const Gender._('female');
-  static const other = const Gender._('other');
-  static const unknown = const Gender._('unknown');
-
-  static const _vals = [male, female, other, unknown];
-}
-
 class Patient extends Resource {
   Meta meta;
   Narrative text;
@@ -39,8 +20,8 @@ class Patient extends Resource {
   List<Identifier> identifier;
   List<HumanName> name;
   List<ContactPoint> telecom;
-  Gender gender;
-  DateTime birthDate;
+  String gender;
+  String birthDate;
   List<Address> address;
   CodeableConcept maritalStatus;
   bool multipleBirthBoolean;
@@ -63,152 +44,6 @@ class Patient extends Resource {
       this.communication})
       : super(resourceType: "Patient", id: id);
 
-  factory Patient.fromNewPatientForm(Patient originalPatient,
-      {String phoneNumber,
-      String lastName,
-      String firstName,
-      String emailAddress,
-      String homeZip,
-      String secondZip,
-      ContactPointSystem preferredContactMethod,
-      Gender gender,
-      DateTime birthDate}) {
-    Patient patient;
-    if (originalPatient != null) {
-      patient = Patient.fromJson(originalPatient.toJson());
-    } else {
-      patient = Patient();
-    }
-    patient.resourceType = "Patient";
-    if (firstName.isNotEmpty) patient.firstName = firstName;
-    if (lastName.isNotEmpty) patient.lastName = lastName;
-    if (phoneNumber.isNotEmpty) patient.phoneNumber = phoneNumber;
-    if (emailAddress.isNotEmpty) patient.emailAddress = emailAddress;
-    if (homeZip.isNotEmpty) patient.homeZip = homeZip;
-    if (secondZip.isNotEmpty) patient.secondZip = secondZip;
-    if (preferredContactMethod != null) patient.preferredContactMethod = preferredContactMethod;
-    if (gender != null) patient.gender = gender;
-    if (birthDate != null) patient.birthDate = birthDate;
-    return patient;
-  }
-
-  String get firstName => this.name != null &&
-          this.name.length > 0 &&
-          this.name[0].given != null &&
-          this.name[0].given.length > 0
-      ? this.name[0].given[0]
-      : null;
-
-  setKeycloakId(String keycloakIdentifierSystemName, String keycloakId) {
-    identifier ??= [];
-    Identifier keycloakIdentifier = identifier.firstWhere(
-        (element) => element.system == keycloakIdentifierSystemName,
-        orElse: () => null);
-    if (keycloakIdentifier == null) {
-      identifier.add(Identifier(system: keycloakIdentifierSystemName, value: keycloakId));
-    } else {
-      keycloakIdentifier.value = keycloakId;
-    }
-  }
-
-  set firstName(String text) {
-    if (this.name == null || this.name.isEmpty) this.name = [HumanName()];
-    if (this.name[0].given == null || this.name[0].given.length == 0) this.name[0].given = [""];
-    this.name[0].given[0] = text;
-  }
-
-  String get lastName => this.name != null && this.name.length > 0 && this.name[0].family != null
-      ? this.name[0].family
-      : null;
-
-  set lastName(String text) {
-    if (this.name == null || this.name.isEmpty) this.name = [HumanName()];
-    this.name[0].family = text;
-  }
-
-  set emailAddress(String text) {
-    this.telecom ??= [];
-    ContactPoint p = _contactPointForSystem(ContactPointSystem.email);
-    if (p == null) {
-      this.telecom.add(ContactPoint(system: ContactPointSystem.email, value: text));
-    } else {
-      p.value = text;
-    }
-  }
-
-  set phoneNumber(String text) {
-    this.telecom ??= [];
-    ContactPoint p = _contactPointForSystem(ContactPointSystem.phone);
-    if (p == null) {
-      this.telecom.add(ContactPoint(system: ContactPointSystem.phone, value: text));
-    } else {
-      p.value = text;
-    }
-  }
-
-  ContactPoint _contactPointForSystem(ContactPointSystem system) {
-    return system != null && this.telecom != null && this.telecom.length > 0
-        ? this.telecom.firstWhere((ContactPoint p) => p.system == system, orElse: () => null)
-        : null;
-  }
-
-  set preferredContactMethod(ContactPointSystem system) {
-    _contactPointForSystem(system)?.rank = 1;
-  }
-
-  ContactPointSystem get preferredContactMethod => this.telecom != null && this.telecom.length > 0
-      ? this
-          .telecom
-          .firstWhere((ContactPoint p) => p.rank == 1, orElse: () => ContactPoint())
-          .system
-      : null;
-
-  String get emailAddress {
-    ContactPoint p = _contactPointForSystem(ContactPointSystem.email);
-    return p != null ? p.value : null;
-  }
-
-  String get phoneNumber {
-    ContactPoint p = _contactPointForSystem(ContactPointSystem.phone);
-    return p != null ? p.value : null;
-  }
-
-  String get homeZip => this.address != null && this.address.length > 0
-      ? this
-          .address
-          .firstWhere((Address a) => a.use == AddressUse.home, orElse: () => Address())
-          .postalCode
-      : null;
-
-  set homeZip(String text) {
-    if (this.address == null) this.address = [];
-    Address address =
-        this.address.firstWhere((Address a) => a.use == AddressUse.home, orElse: () => null);
-    if (address == null) {
-      address = Address(use: AddressUse.home);
-      this.address.add(address);
-    }
-    address.postalCode = text;
-  }
-
-  String get secondZip => this.address != null && this.address.length > 0
-      ? this
-          .address
-          .firstWhere((Address a) => a.use != AddressUse.home, orElse: () => Address())
-          .postalCode
-      : null;
-
-  set secondZip(String text) {
-    if (this.address == null) this.address = [];
-    Address address =
-        this.address.firstWhere((Address a) => a.use != AddressUse.home, orElse: () => null);
-    if (address == null) {
-      address = Address();
-      this.address.add(address);
-    }
-    address.postalCode = text;
-  }
-
   Patient.fromJson(Map<String, dynamic> json) {
     resourceType = json['resourceType'];
     id = json['id'];
@@ -219,9 +54,6 @@ class Patient extends Resource {
       json['extension'].forEach((v) {
         extension.add(new Extension.fromJson(v));
       });
-    }
-    if (json['birthDate'] != null) {
-      birthDate = DateTime.parse(json['birthDate']);
     }
     if (json['identifier'] != null) {
       identifier = new List<Identifier>();
@@ -241,7 +73,8 @@ class Patient extends Resource {
         telecom.add(new ContactPoint.fromJson(v));
       });
     }
-    if (json['gender'] != null) gender = Gender.fromJson(json['gender']);
+    gender = json['gender'];
+    birthDate = json['birthDate'];
     if (json['address'] != null) {
       address = new List<Address>();
       json['address'].forEach((v) {
@@ -262,38 +95,37 @@ class Patient extends Resource {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['resourceType'] = this.resourceType;
-    if (this.id != null) data['id'] = this.id;
+    data['id'] = this.id;
     if (this.meta != null) {
       data['meta'] = this.meta.toJson();
     }
     if (this.text != null) {
       data['text'] = this.text.toJson();
     }
-    if (this.extension != null && this.extension.length > 0) {
+    if (this.extension != null) {
       data['extension'] = this.extension.map((v) => v.toJson()).toList();
     }
-    if (this.identifier != null && this.identifier.length > 0) {
+    if (this.identifier != null) {
       data['identifier'] = this.identifier.map((v) => v.toJson()).toList();
     }
-    if (this.name != null && this.name.length > 0) {
+    if (this.name != null) {
       data['name'] = this.name.map((v) => v.toJson()).toList();
     }
-    if (this.telecom != null && this.telecom.length > 0) {
+    if (this.telecom != null) {
       data['telecom'] = this.telecom.map((v) => v.toJson()).toList();
     }
-    if (this.gender != null) data['gender'] = this.gender.toString();
-    if (this.birthDate != null) data['birthDate'] = this.birthDate;
-    if (this.address != null && this.address.length > 0) {
+    data['gender'] = this.gender;
+    data['birthDate'] = this.birthDate;
+    if (this.address != null) {
       data['address'] = this.address.map((v) => v.toJson()).toList();
     }
     if (this.maritalStatus != null) {
       data['maritalStatus'] = this.maritalStatus.toJson();
     }
-    if (this.multipleBirthBoolean != null) data['multipleBirthBoolean'] = this.multipleBirthBoolean;
-    if (this.communication != null && this.communication.length > 0) {
+    data['multipleBirthBoolean'] = this.multipleBirthBoolean;
+    if (this.communication != null) {
       data['communication'] = this.communication.map((v) => v.toJson()).toList();
     }
-    if (this.birthDate != null) data['birthDate'] = this.birthDate.toIso8601String();
     return data;
   }
 }
@@ -351,34 +183,31 @@ class HumanName {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.use != null) data['use'] = this.use;
-    if (this.family != null) data['family'] = this.family;
-    if (this.given != null && this.given.length > 0) data['given'] = this.given;
+    data['use'] = this.use;
+    data['family'] = this.family;
+    data['given'] = this.given;
     return data;
   }
 }
 
 class ContactPoint {
-  ContactPointSystem system;
+  String system;
   String value;
   String use;
-  int rank;
 
-  ContactPoint({this.system, this.value, this.use, this.rank});
+  ContactPoint({this.system, this.value, this.use});
 
   ContactPoint.fromJson(Map<String, dynamic> json) {
-    if (json['system'] != null) system = ContactPointSystem.fromJson(json['system']);
+    system = json['system'];
     value = json['value'];
     use = json['use'];
-    if (json['rank'] != null) rank = json['rank'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.system != null) data['system'] = this.system.toString();
-    if (this.value != null) data['value'] = this.value;
-    if (this.use != null) data['use'] = this.use;
-    if (this.rank != null) data['rank'] = this.rank;
+    data['system'] = this.system;
+    data['value'] = this.value;
+    data['use'] = this.use;
     return data;
   }
 }
@@ -386,22 +215,12 @@ class ContactPoint {
 class Address {
   List<Extension> extension;
   List<String> line;
-  AddressUse use;
   String city;
-  String district;
   String state;
   String postalCode;
   String country;
 
-  Address(
-      {this.extension,
-      this.line,
-      this.use,
-      this.city,
-      this.district,
-      this.state,
-      this.postalCode,
-      this.country});
+  Address({this.extension, this.line, this.city, this.state, this.postalCode, this.country});
 
   Address.fromJson(Map<String, dynamic> json) {
     if (json['extension'] != null) {
@@ -414,8 +233,6 @@ class Address {
       line = json['line'].cast<String>();
     }
     city = json['city'];
-    if (json['use'] != null) use = AddressUse.fromJson(json['use']);
-    district = json['district'];
     state = json['state'];
     postalCode = json['postalCode'];
     country = json['country'];
@@ -426,19 +243,12 @@ class Address {
     if (this.extension != null) {
       data['extension'] = this.extension.map((v) => v.toJson()).toList();
     }
-    if (this.line != null) data['line'] = this.line;
-    if (this.use != null) data['use'] = this.use.toString();
-    if (this.city != null) data['city'] = this.city;
-    if (this.district != null) data['district'] = this.district;
-    if (this.state != null) data['state'] = this.state;
-    if (this.postalCode != null) data['postalCode'] = this.postalCode;
-    if (this.country != null) data['country'] = this.country;
+    data['line'] = this.line;
+    data['city'] = this.city;
+    data['state'] = this.state;
+    data['postalCode'] = this.postalCode;
+    data['country'] = this.country;
     return data;
-  }
-
-  @override
-  String toString() {
-    return "${line.join(', ')}, $city, $state $postalCode";
   }
 }
 
@@ -460,62 +270,12 @@ class Communication {
   }
 }
 
-class AddressUse {
-  final _value;
-
-  const AddressUse._(this._value);
-
-  toString() => _value;
-
-  static fromJson(String key) {
-    return _vals.firstWhere((v) => v._value == key,
-        orElse: () => throw ArgumentError("Key does not match any Use"));
-  }
-
-  static const home = const AddressUse._('home');
-  static const work = const AddressUse._('work');
-  static const temp = const AddressUse._('temp');
-  static const old = const AddressUse._('old');
-  static const billing = const AddressUse._('billing');
-
-  static const _vals = [home, work, temp, old, billing];
-}
-
-class ContactPointSystem {
-  final _value;
-
-  const ContactPointSystem._(this._value);
-
-  toString() => _value;
-
-  static fromJson(String key) {
-    return _vals.firstWhere((v) => v._value == key,
-        orElse: () => throw ArgumentError("Key does not match any ContactPointSystem"));
-  }
-
-  static const phone = const ContactPointSystem._('phone');
-  static const fax = const ContactPointSystem._('fax');
-  static const email = const ContactPointSystem._('email');
-  static const pager = const ContactPointSystem._('pager');
-  static const url = const ContactPointSystem._('url');
-  static const sms = const ContactPointSystem._('sms');
-  static const other = const ContactPointSystem._('other');
-
-  static const _vals = [phone, fax, email, pager, url, sms, other];
-}
-
 class ProcedureStatus {
   final _value;
 
   const ProcedureStatus._(this._value);
 
   toString() => _value;
-
-  static fromJson(String key) {
-    return _vals.firstWhere((v) => v._value == key,
-        orElse: () => throw ArgumentError("Key does not match any ProcedureStatus"));
-  }
-
   static const preparation = const ProcedureStatus._('preparation');
   static const in_progress = const ProcedureStatus._('in-progress');
   static const not_done = const ProcedureStatus._('not-done');
@@ -525,16 +285,27 @@ class ProcedureStatus {
   static const entered_in_error = const ProcedureStatus._('entered-in-error');
   static const unknown = const ProcedureStatus._('unknown');
 
-  static const _vals = [
-    preparation,
-    in_progress,
-    not_done,
-    suspended,
-    aborted,
-    completed,
-    entered_in_error,
-    unknown
-  ];
+  static ProcedureStatus fromJson(String key) {
+    switch (key) {
+      case 'preparation':
+        return preparation;
+      case 'in-progress':
+        return in_progress;
+      case 'not-done':
+        return not_done;
+      case 'suspended':
+        return suspended;
+      case 'aborted':
+        return aborted;
+      case 'completed':
+        return completed;
+      case 'entered-in-error':
+        return entered_in_error;
+      case 'unknown':
+        return unknown;
+    }
+    return unknown;
+  }
 }
 
 class QuestionnaireResponseStatus {
@@ -544,10 +315,7 @@ class QuestionnaireResponseStatus {
 
   toString() => _value;
 
-  static fromJson(String key) {
-    return _vals.firstWhere((v) => v._value == key,
-        orElse: () => throw ArgumentError("Key does not match any QuestionnaireResponseStatus"));
-  }
+  toJson() => toString();
 
   static const in_progress = const QuestionnaireResponseStatus._('in-progress');
   static const stopped = const QuestionnaireResponseStatus._('stopped');
@@ -555,7 +323,21 @@ class QuestionnaireResponseStatus {
   static const amended = const QuestionnaireResponseStatus._('amended');
   static const entered_in_error = const QuestionnaireResponseStatus._('entered-in-error');
 
-  static const _vals = [in_progress, stopped, completed, amended, entered_in_error];
+  static QuestionnaireResponseStatus fromJson(String key) {
+    switch (key) {
+      case 'in-progress':
+        return in_progress;
+      case 'stopped':
+        return stopped;
+      case 'amended':
+        return amended;
+      case 'completed':
+        return completed;
+      case 'entered-in-error':
+        return entered_in_error;
+    }
+    return completed;
+  }
 }
 
 class Procedure extends Resource {
@@ -855,19 +637,16 @@ class CarePlan extends Resource {
 
 class Identifier {
   String value;
-  String system;
 
-  Identifier({this.value, this.system});
+  Identifier({this.value});
 
   Identifier.fromJson(Map<String, dynamic> json) {
     value = json['value'];
-    system = json['system'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['value'] = this.value;
-    data['system'] = this.system;
     return data;
   }
 }
@@ -918,7 +697,6 @@ class Detail {
   Period scheduledPeriod;
   String description;
   List<String> instantiatesCanonical;
-  List<Reference> reasonReference;
 
   Detail(
       {this.code,
@@ -928,8 +706,7 @@ class Detail {
       this.scheduledTiming,
       this.scheduledPeriod,
       this.description,
-      this.instantiatesCanonical,
-      this.reasonReference});
+      this.instantiatesCanonical});
 
   Detail.fromJson(Map<String, dynamic> json) {
     code = json['code'] != null ? new CodeableConcept.fromJson(json['code']) : null;
@@ -948,12 +725,6 @@ class Detail {
       instantiatesCanonical = new List<String>();
       json['instantiatesCanonical'].forEach((v) {
         instantiatesCanonical.add(v);
-      });
-    }
-    if (json['reasonReference'] != null) {
-      reasonReference = new List<Reference>();
-      json['reasonReference'].forEach((v) {
-        reasonReference.add(Reference.fromJson(v));
       });
     }
   }
@@ -977,9 +748,6 @@ class Detail {
     data['description'] = description;
     if (this.instantiatesCanonical != null) {
       data['instantiatesCanonical'] = this.instantiatesCanonical.map((v) => v).toList();
-    }
-    if (this.reasonReference != null) {
-      data['reasonReference'] = this.reasonReference.map((Reference v) => v.toJson()).toList();
     }
     return data;
   }
@@ -1012,14 +780,14 @@ class Repeat {
   double duration;
   String durationUnit;
   int frequency;
-  double period;
+  int period;
   String periodUnit;
 
   Repeat({this.frequency, this.period, this.periodUnit, this.durationUnit, this.duration});
 
   Repeat.fromJson(Map<String, dynamic> json) {
     frequency = json['frequency'];
-    period = json['period'].toDouble();
+    period = json['period'];
     if (json['duration'] != null) duration = json['duration'].toDouble();
     periodUnit = json['periodUnit'];
     durationUnit = json['durationUnit'];
@@ -1484,12 +1252,7 @@ class QuestionnaireItem {
       this.item});
 
   bool isSupported() {
-    return answerOption != null || answerValueSet != null || type == "decimal";
-  }
-
-  bool isTemperature() {
-    return code != null &&
-        code.firstWhere((Coding c) => c.system.contains("loinc")).code == "8310-5";
+    return answerOption != null || answerValueSet != null;
   }
 
   loadValueSet() async {
@@ -1607,7 +1370,6 @@ class AnswerOption {
 
   /// returns -1 if there is no ordinal value.
   int ordinalValue() {
-    if (extension == null) return -1;
     Extension ordinalValueExtension = extension.firstWhere(
         (Extension e) => e.url == 'http://hl7.org/fhir/StructureDefinition/ordinalValue');
     if (ordinalValueExtension != null) {
@@ -1636,7 +1398,7 @@ class QuestionnaireResponse extends Resource {
     this.questionnaireReference = questionnaire.reference;
     this.basedOnCarePlan = [Reference(reference: carePlan.reference)];
     var today = new DateTime.now();
-    this.authored = new DateTime(today.year, today.month, today.day, today.hour, today.minute);
+    this.authored = new DateTime(today.year, today.month, today.day);
   }
 
   QuestionnaireResponse.fromJson(Map<String, dynamic> json) {
@@ -1672,11 +1434,11 @@ class QuestionnaireResponse extends Resource {
     }
     data['basedOn'] = this.basedOnCarePlan;
     data['questionnaire'] = this.questionnaireReference;
-    data['status'] = this.status.toString();
+    data['status'] = this.status.toJson();
     if (this.subject != null) {
       data['subject'] = this.subject.toJson();
     }
-    data['authored'] = this.authored.toIso8601String();
+    data['authored'] = new DateFormat("yyyy-MM-dd").format(this.authored);
     if (this.item != null) {
       data['item'] = this.item.map((v) => v.toJson()).toList();
     }
@@ -1699,94 +1461,6 @@ class QuestionnaireResponse extends Resource {
       }
     }
     return null;
-  }
-}
-
-class Content {
-  Attachment attachment;
-
-  Content({this.attachment});
-
-  Content.fromJson(Map<String, dynamic> json) {
-    if (json['attachment'] != null) {
-      attachment = Attachment.fromJson(json['attachment']);
-    }
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.attachment != null) {
-      data['attachment'] = this.attachment.toJson();
-    }
-    return data;
-  }
-}
-
-class DocumentReference {
-  //	"type" : Loinc 48766-0 	(Information source)
-  //	"description": string
-  //	"status": "current"
-  //	"content": [{ // R!  Document referenced
-  //    "attachment" : { Attachment }, // R!  Where to access the document
-  //    "format" : { Coding } // Format/content rules for the document
-  //  }],
-  String description;
-  List<Content> content;
-  CodeableConcept type;
-  String status;
-
-  DocumentReference({this.description, this.content, this.type, this.status});
-
-  DocumentReference.fromJson(Map<String, dynamic> json) {
-    description = json['description'];
-    status = json['status'];
-    if (json['type'] != null) {
-      type = CodeableConcept.fromJson(json['type']);
-    }
-    if (json['content'] != null) {
-      content = new List<Content>();
-      json['content'].forEach((v) {
-        content.add(new Content.fromJson(v));
-      });
-    }
-  }
-
-  bool isGroup() {
-    return content != null && content.length > 1 && description != null;
-  }
-
-  String get url => content != null && content.length > 0 && content[0].attachment != null
-      ? content[0].attachment.url
-      : "";
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['description'] = this.description;
-    data['status'] = this.status;
-    if (this.content != null) {
-      data['content'] = this.content.map((v) => v.toJson()).toList();
-    }
-    //TODO: type
-    return data;
-  }
-}
-
-class Attachment {
-  String url;
-  String title;
-
-  Attachment({this.url, this.title});
-
-  Attachment.fromJson(Map<String, dynamic> json) {
-    url = json['url'];
-    title = json['title'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.url != null) data['url'] = this.url;
-    if (this.title != null) data['title'] = this.title;
-    return data;
   }
 }
 
@@ -1836,17 +1510,14 @@ class QuestionnaireResponseItem {
 
 class Answer {
   int valueInteger;
-  double valueDecimal;
   Coding valueCoding;
 
-  Answer({this.valueDecimal, this.valueInteger, this.valueCoding});
+  Answer({this.valueInteger, this.valueCoding});
 
   bool operator ==(dynamic o) {
     if (o is Answer) {
       Answer other = o;
-      return valueInteger == other.valueInteger &&
-          valueCoding == other.valueCoding &&
-          valueDecimal == other.valueDecimal;
+      return valueInteger == other.valueInteger && valueCoding == other.valueCoding;
     } else if (o is AnswerOption) {
       AnswerOption other = o;
       return valueInteger == other.valueInteger && valueCoding == other.valueCoding;
@@ -1872,7 +1543,6 @@ class Answer {
   String toString() {
     if (valueInteger != null) return '$valueInteger';
     if (valueCoding != null) return valueCoding.toString();
-    if (valueDecimal != null) return valueDecimal.toString();
     return '';
   }
 
@@ -1883,15 +1553,13 @@ class Answer {
 
   Answer.fromJson(Map<String, dynamic> json) {
     valueInteger = json['valueInteger'];
-    if (json['valueDecimal'] != null) valueDecimal = json['valueDecimal'].toDouble();
-    if (json['valueCoding'] != null) valueCoding = Coding.fromJson(json['valueCoding']);
+    valueCoding = Coding.fromJson(json['valueCoding']);
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.valueInteger != null) data['valueInteger'] = this.valueInteger;
-    if (this.valueDecimal != null) data['valueDecimal'] = this.valueDecimal;
-    if (this.valueCoding != null) data['valueCoding'] = this.valueCoding.toJson();
+    data['valueInteger'] = this.valueInteger;
+    data['valueCoding'] = this.valueCoding.toJson();
     return data;
   }
 }

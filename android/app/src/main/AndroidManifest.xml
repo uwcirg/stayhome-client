@@ -8,16 +8,16 @@
          additional functionality it is fine to subclass or reimplement
          FlutterApplication and put your custom class here. -->
     <application
+        tools:replace="android:label"
         android:name="io.flutter.app.FlutterApplication"
-        android:icon="@mipmap/ic_launcher"
         android:label="map_app_flutter"
-        tools:replace="android:label">
+        android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
-            android:hardwareAccelerated="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
             <!-- This keeps the window background of the activity showing
                  until Flutter renders its first frame. It can be removed if
@@ -27,29 +27,9 @@
                 android:name="io.flutter.app.android.SplashScreenUntilFirstFrame"
                 android:value="true" />
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-        <activity android:name="com.linusu.flutter_web_auth.CallbackActivity">
-            <intent-filter android:label="flutter_web_auth">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="edu.washington.cirg.mapapp" />
-            </intent-filter>
-        </activity>
-        <activity android:name="clancey.simpleauth.simpleauthflutter.SimpleAuthCallbackActivity" >
-            <intent-filter android:label="simple_auth">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="edu.washington.cirg.mapapp" />
-            </intent-filter>
-        </activity>
-
     </application>
 </manifest>

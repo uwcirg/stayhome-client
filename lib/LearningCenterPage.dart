@@ -4,45 +4,44 @@
 
 import 'dart:ui' as ui;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
-import 'package:map_app_flutter/fhir/FhirResources.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
-import 'package:map_app_flutter/model/CarePlanModel.dart';
-import 'package:map_app_flutter/platform_stub.dart';
-import 'package:scoped_model/scoped_model.dart';
 
-import 'main.dart';
-
-abstract class LearningCenterPage extends StatelessWidget {
+class LearningCenterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
-      title: S.of(context).learning_center,
-      child: ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
-        if (model.isLoading || model.infoLinks == null) {
-          model.loadResourceLinks();
-          return Center(child: CircularProgressIndicator());
-        } else if (model.error != null) {
-          return Text('${model.error}');
-        }
-        return Expanded(
+        title: S.of(context).learning_center,
+        child: Expanded(
             child: ListView.separated(
           primary: true,
           separatorBuilder: (context, i) => Divider(),
-          itemBuilder: (context, i) => _buildItem(context, i, model),
-          itemCount: _itemCount(model),
+          itemBuilder: (context, i) {
+            switch (i) {
+              case 0:
+                return _buildLearningCenterListItem(context, S.of(context).vfit_faq,
+                    onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (BuildContext context) => FAQPage(FAQ.faqs()))));
+              case 1:
+                return _buildLearningCenterListItem(context, S.of(context).womens_health_resources);
+              default:
+                return _buildLearningCenterListItem(
+                  context,
+                  S.of(context).testimonials,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            TestimonialsPage(Testimonial.testimonials())),
+                  ),
+                );
+            }
+          },
+          itemCount: 3,
           shrinkWrap: true,
-        ));
-      }),
-    );
+        )));
   }
-
-  Widget _buildItem(BuildContext context, int i, CarePlanModel model);
-
-  int _itemCount(CarePlanModel model);
 
   Widget _buildLearningCenterListItem(BuildContext context, String text, {Function onTap}) {
     return InkWell(
@@ -65,84 +64,6 @@ abstract class LearningCenterPage extends StatelessWidget {
               ],
             )),
         onTap: onTap);
-  }
-
-  Widget _buildLearningCenterListSectionHeader(BuildContext context, String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-      vertical: Dimensions.largeMargin, horizontal: Dimensions.fullMargin),
-      child: Text(
-    text,
-    style: Theme.of(context).textTheme.title.apply(color: Theme.of(context).primaryColor),
-      ),
-    );
-  }
-}
-
-class JoyluxLearningCenterPage extends LearningCenterPage {
-  @override
-  Widget _buildItem(BuildContext context, int i, CarePlanModel model) {
-    switch (i) {
-      case 0:
-        return _buildLearningCenterListItem(context, S.of(context).vfit_faq,
-            onTap: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (BuildContext context) => FAQPage(FAQ.faqs()))));
-      case 1:
-        return _buildLearningCenterListItem(context, S.of(context).womens_health_resources);
-      default:
-        return _buildLearningCenterListItem(
-          context,
-          S.of(context).testimonials,
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(
-                builder: (BuildContext context) => TestimonialsPage(Testimonial.testimonials())),
-          ),
-        );
-    }
-  }
-
-  @override
-  int _itemCount(CarePlanModel model) {
-    return 3;
-  }
-}
-
-class StayHomeLearningCenterPage extends LearningCenterPage {
-  @override
-  Widget _buildItem(BuildContext context, int i, CarePlanModel model) {
-    if (model.infoLinks[i].isGroup()) {
-      return _buildLearningCenterListGroup(context, model.infoLinks[i]);
-    }
-    return _buildLearningCenterListItem(context, model.infoLinks[i].description,
-        onTap: () => _onUrlTap(model.infoLinks[i].url, context));
-  }
-
-  @override
-  int _itemCount(CarePlanModel model) {
-    return model != null && model.infoLinks != null ? model.infoLinks.length : 0;
-  }
-
-  Widget _buildLearningCenterListGroup(BuildContext context, DocumentReference infoLink) {
-    List<Widget> children = infoLink.content.map((Content c) {
-      return _buildLearningCenterListItem(context, c.attachment.title,
-          onTap: () => _onUrlTap(c.attachment.url, context));
-    }).toList();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        _buildLearningCenterListSectionHeader(context, infoLink.description),
-        ...children
-      ],
-    );
-  }
-
-  _onUrlTap(String url, context) {
-    if (url.isEmpty) {
-      snack("No content", context);
-    } else {
-      PlatformDefs().launchUrl(url);
-    }
   }
 }
 
@@ -188,7 +109,28 @@ class TestimonialWidget extends StatelessWidget {
           padding: const EdgeInsets.all(Dimensions.fullMargin),
           child: Column(
             children: <Widget>[
-              buildTestimonialText(context, textStyle),
+              Text.rich(TextSpan(
+                children: <InlineSpan>[
+                  WidgetSpan(
+                    child: Transform.rotate(
+                      angle: 3.1492,
+                      child: Icon(
+                        Icons.format_quote,
+                        color: Theme.of(context).textTheme.body1.color,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                  TextSpan(text: _testimonial.quote, style: textStyle),
+                  WidgetSpan(
+                      child: Icon(
+                        Icons.format_quote,
+                        color: Theme.of(context).textTheme.body1.color,
+                        size: 20,
+                      ),
+                      alignment: ui.PlaceholderAlignment.top),
+                ],
+              )),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
@@ -201,38 +143,6 @@ class TestimonialWidget extends StatelessWidget {
             ],
           ),
         ));
-  }
-
-  Text buildTestimonialText(BuildContext context, TextStyle textStyle) {
-    if (kIsWeb) {
-      return Text(
-        _testimonial.quote,
-        style: textStyle,
-      );
-    }
-    return Text.rich(TextSpan(
-      children: <InlineSpan>[
-        WidgetSpan(
-          child: Transform.rotate(
-            angle: 3.1492,
-            child: Icon(
-              Icons.format_quote,
-              color: Theme.of(context).textTheme.body1.color,
-              size: 20,
-            ),
-          ),
-        ),
-        TextSpan(text: _testimonial.quote, style: textStyle),
-        WidgetSpan(
-          child: Icon(
-            Icons.format_quote,
-            color: Theme.of(context).textTheme.body1.color,
-            size: 20,
-          ),
-          alignment: ui.PlaceholderAlignment.top,
-        ),
-      ],
-    ));
   }
 }
 

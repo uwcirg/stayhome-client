@@ -2,15 +2,11 @@
  * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
  */
 
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
 import 'package:map_app_flutter/main.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
-import 'package:map_app_flutter/value_utils.dart';
 
 import 'const.dart';
 
@@ -110,14 +106,10 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
             itemBuilder: (context, i) {
               if (i == _questions.length) {
                 return Padding(
-                  padding: const EdgeInsets.only(
-                      left: Dimensions.halfMargin,
-                      right: Dimensions.halfMargin,
-                      top: Dimensions.halfMargin,
-                      bottom: 200),
+                  padding: const EdgeInsets.all(Dimensions.halfMargin),
                   child: RaisedButton(
                     padding: MapAppPadding.largeButtonPadding,
-                    child: Text("done", style: Theme.of(context).textTheme.button),
+                    child: Text("Done"),
                     onPressed: _onPressed,
                   ),
                 );
@@ -171,68 +163,29 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
   }
 
   Widget _buildItem(BuildContext context, QuestionnaireItem questionnaireItem) {
-    if (questionnaireItem.isTemperature()) {
-      return Padding(
-        padding: MapAppPadding.cardPageMargins,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
-              child: Text(
-                questionnaireItem.text,
-                style: Theme.of(context).textTheme.title,
-              ),
+    return Padding(
+      padding: MapAppPadding.cardPageMargins,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
+            child: Text(
+              questionnaireItem.text,
+              style: Theme.of(context).textTheme.title,
             ),
-            TextFormField(
-              decoration: InputDecoration(hintText: "Enter body temperature", errorMaxLines: 3),
-              inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              autovalidate: true,
-              validator: (value) {
-                if (value.isEmpty) return null;
-                double result = double.tryParse(value);
-                if (result == null) return "Please enter a valid decimal";
-                if (!isValidTempF(result) && !isValidTempC(result)) {
-                  return "Enter a value between ${QuestionnaireConstants.minF} and "
-                      "${QuestionnaireConstants.maxF} (ºF) or ${QuestionnaireConstants.minC} and "
-                      "${QuestionnaireConstants.maxC} (ºC). This value will not be saved.";
-                }
-                // restrict to 2 decimals
-                if (!isValidTempF(result)) result = double.parse(cToF(result).toStringAsFixed(2));
-                _response.setAnswer(questionnaireItem.linkId, Answer(valueDecimal: result));
-                return null;
-              },
-            ),
-          ],
-        ),
-      );
-    } else {
-      return Padding(
-        padding: MapAppPadding.cardPageMargins,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
-              child: Text(
-                questionnaireItem.text,
-                style: Theme.of(context).textTheme.title,
-              ),
-            ),
+          ),
 //          Wrap(
 //            runSpacing: -8,
 //            spacing: Dimensions.halfMargin,
 //            children: _buildChoices(questionnaireItem, context),
 //          ),
-            Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: _buildChoices(questionnaireItem, context))
-          ],
-        ),
-      );
-    }
+          Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: _buildChoices(questionnaireItem, context))
+        ],
+      ),
+    );
   }
 
   List<Widget> _buildChoices(QuestionnaireItem questionnaireItem, BuildContext context) {
@@ -282,7 +235,6 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
         children: <Widget>[
           ChoiceChip(
               label: Text("  "),
-              selectedColor: Theme.of(context).primaryColor,
               selected: isSelected,
               onSelected: (bool) {
                 setState(() {
@@ -299,43 +251,5 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
         ],
       ),
     );
-  }
-}
-
-class DecimalTextInputFormatter extends TextInputFormatter {
-  DecimalTextInputFormatter({this.decimalRange}) : assert(decimalRange == null || decimalRange > 0);
-
-  final int decimalRange;
-
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue, // unused.
-    TextEditingValue newValue,
-  ) {
-    TextSelection newSelection = newValue.selection;
-    String truncated = newValue.text;
-
-    if (decimalRange != null) {
-      String value = newValue.text;
-
-      if (value.contains(".") && value.substring(value.indexOf(".") + 1).length > decimalRange) {
-        truncated = oldValue.text;
-        newSelection = oldValue.selection;
-      } else if (value == ".") {
-        truncated = "0.";
-
-        newSelection = newValue.selection.copyWith(
-          baseOffset: math.min(truncated.length, truncated.length + 1),
-          extentOffset: math.min(truncated.length, truncated.length + 1),
-        );
-      }
-
-      return TextEditingValue(
-        text: truncated,
-        selection: newSelection,
-        composing: TextRange.empty,
-      );
-    }
-    return newValue;
   }
 }

@@ -3,8 +3,8 @@ variables:
   ANDROID_COMPILE_SDK: "28"
   ANDROID_BUILD_TOOLS: "28.0.2"
   ANDROID_SDK_TOOLS:   "4333796"
-  FLUTTER_VERSION: "https://storage.googleapis.com/flutter_infra/releases/beta/linux/flutter_linux_v1.14.6-beta.tar.xz"
-
+  FLUTTER_VERSION: "https://storage.googleapis.com/flutter_infra/releases/stable/linux/flutter_linux_v1.7.8+hotfix.4-stable.tar.xz"
+  
 
 before_script:
   - apt-get --quiet update --yes
@@ -26,12 +26,9 @@ before_script:
   - wget --output-document=flutter-sdk.tar.xz $FLUTTER_VERSION
   - tar -xf flutter-sdk.tar.xz
   - export PATH=$PATH:$PWD/flutter/bin
-  - flutter channel beta
-  - flutter upgrade
-  - flutter config --enable-web
   - echo flutter.sdk=$PWD/flutter > android/local.properties
   - chmod +x ./android/gradlew
-  # fluttercouch setup (incl. update the version via sed)
+  # fluttercouch setup
   - pwd
   - rm -rf ../fluttercouch
   - git clone git://github.com/fluttercouch/fluttercouch.git ../fluttercouch
@@ -64,18 +61,6 @@ build:apk:
 #     paths:
 #       - build/ios/iphoneos/Runner.app
 #     expire_in: 1 day
-
-build:web:
-  only:
-    - schedules
-    - web
-  stage: build
-  script:
-    - flutter build web
-  artifacts:
-    paths:
-      - build/web/
-    expire_in: 1 day
 
 test:flutter:
   stage: test

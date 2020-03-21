@@ -82,6 +82,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "what_is_your_name" : MessageLookupByLibrary.simpleMessage("Wie heißen Sie?"),
     "what_is_your_patient_resource_id" : MessageLookupByLibrary.simpleMessage("Wie lautet ihre Patientenressourcen-ID?"),
     "womens_health_resources" : MessageLookupByLibrary.simpleMessage("Bildungsressourcen zu frauenspezifischen Gesundheitsthemen"),
-    "you_have_no_active_pelvic_floor_management_careplan" : MessageLookupByLibrary.simpleMessage("Sie haben keinen aktiven Pflegeplan.")
+    "you_have_no_active_pelvic_floor_management_careplan" : MessageLookupByLibrary.simpleMessage("Sie haben keinen aktiven Beckenbodenpflegeplan.")
   };
 }
