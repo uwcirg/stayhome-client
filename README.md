@@ -50,3 +50,5 @@ One solution is to checkout fluttercouch and build from source, making sure to u
  ```
  sed -i 's/~> 2.5.1/~> 2.6.3/g' ../fluttercouch/ios/fluttercouch.podspec
  ```
+ 
+ On iOS, if you start getting "no user" errors on hot reload or hot restart, try restarting the simulator.
