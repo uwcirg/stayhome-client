@@ -1,0 +1,4 @@
+{
+  "fhirBaseUrl": "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir",
+  "appRootUrl": "https://stayhome.cirg.washington.edu"
+}

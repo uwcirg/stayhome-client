@@ -8,7 +8,10 @@ import 'package:http/http.dart' show Response, get, post, put;
 import 'package:map_app_flutter/fhir/FhirResources.dart';
 
 class Repository {
-  static final fhirBaseUrl = "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir";
+  static String fhirBaseUrl;
+  static void init(String fhirBaseUrl) {
+    Repository.fhirBaseUrl = fhirBaseUrl;
+  }
 
   static Future<Patient> getPatient(String system, String identifier) async {
     print("Attempting to load patient with id: $system|$identifier");
@@ -18,8 +21,13 @@ class Repository {
     return resultFromResponse(response, "Error loading Patient/$identifier").then((value) {
       var searchResultBundle = jsonDecode(value);
       if (searchResultBundle['total'] > 1) {
-        print("more than 1 patient");
-        return Future.error("The user ID does not uniquely match a patient resource. Please contact an administrator.");
+        String patientsIds = searchResultBundle['entry']
+            .map((entry) => "${entry['resource']['resourceType']}/${entry['resource']['id']}")
+            .toList()
+            .join("\n");
+        print("Multiple patients match:\n$patientsIds");
+        return Future.error(
+            "The user ID does not uniquely match a patient resource. Please contact an administrator.");
       }
       if (searchResultBundle['total'] == 0) {
         print("no patient");
@@ -32,6 +40,10 @@ class Repository {
 
   static Future resultFromResponse(Response response, String defaultErrorMessage) {
     if (response.statusCode == 200 || response.statusCode == 201) {
+      if (response.reasonPhrase == "Created") {
+        var resource = jsonDecode(response.body);
+        print("Created record: ${resource['resourceType']}/${resource['id']}");
+      }
       return Future.value(response.body);
     } else {
       var message;

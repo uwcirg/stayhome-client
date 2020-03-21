@@ -7,18 +7,18 @@ import 'dart:html';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:map_app_flutter/config/AppConfig.dart';
 import 'package:map_app_flutter/main.dart';
 import 'package:map_app_flutter/platform_stub.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class WebDefs implements PlatformDefs {
   String redirectUrl() {
-//    return 'http://[::1]:59201/#/authCallback';
-    return 'https://stayhome.cirg.washington.edu/#/authCallback';
+    return '${rootUrl()}/#/authCallback';
   }
+
   String rootUrl() {
-//    return 'http://[::1]:59201';
-    return 'https://stayhome.cirg.washington.edu';
+    return AppConfig.appRootUrl;
   }
 
   @override
