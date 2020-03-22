@@ -1,7 +1,0 @@
-{
-  "fhirBaseUrl": "https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir",
-  "appRootUrl": "https://stayhome.cirg.washington.edu",
-  "issuerUrl": "https://keycloak-dev.cirg.washington.edu/auth/realms/Stayhome",
-  "clientId": "stayhome_openid_client",
-  "clientSecret": "f80cc383-bb5b-47b7-a2bf-5b713b0b8a50"
-}

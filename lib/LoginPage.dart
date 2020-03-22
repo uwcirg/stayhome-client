@@ -5,6 +5,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:map_app_flutter/config/AppConfig.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
@@ -99,7 +100,7 @@ class LoginPageState extends State<LoginPage> {
                                               color: Colors.white,
                                               decoration: TextDecoration.underline)))),
                             ),
-                            Text(VersionInfo.version,
+                            Text(AppConfig.version,
                                 style: Theme.of(context).primaryTextTheme.subtitle)
 //                          FlatButton(
 //                              onPressed: () => MyApp.of(context).toggleAppMode(),
