@@ -10,6 +10,7 @@ import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
+import 'package:map_app_flutter/map_app_widgets.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:map_app_flutter/platform_stub.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -22,11 +23,14 @@ abstract class LearningCenterPage extends StatelessWidget {
     return MapAppPageScaffold(
       title: S.of(context).learning_center,
       child: ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
-        if (model.isLoading || model.infoLinks == null) {
+        if (model.isLoading) return Center(child: CircularProgressIndicator());
+        if (model.error != null) {
+          print("Error loading resource links: ${model.error}");
+          return MapAppErrorMessage.modelError(model);
+        }
+        if (model.infoLinks == null) {
           model.loadResourceLinks();
           return Center(child: CircularProgressIndicator());
-        } else if (model.error != null) {
-          return Text('${model.error}');
         }
         return Expanded(
             child: ListView.separated(
@@ -70,10 +74,10 @@ abstract class LearningCenterPage extends StatelessWidget {
   Widget _buildLearningCenterListSectionHeader(BuildContext context, String text) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-      vertical: Dimensions.largeMargin, horizontal: Dimensions.fullMargin),
+          vertical: Dimensions.largeMargin, horizontal: Dimensions.fullMargin),
       child: Text(
-    text,
-    style: Theme.of(context).textTheme.title.apply(color: Theme.of(context).primaryColor),
+        text,
+        style: Theme.of(context).textTheme.title.apply(color: Theme.of(context).primaryColor),
       ),
     );
   }
