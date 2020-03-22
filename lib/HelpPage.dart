@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
+import 'package:map_app_flutter/config/AppConfig.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
@@ -127,7 +128,7 @@ class _StayHomeHelpPageState extends _HelpPageState {
             SectionTitle("About CIRG"),
             Text(S.of(context).developedByCIRG),
             Text(""),
-            Text(S.of(context).versionString(VersionInfo.version)),
+            Text(S.of(context).versionString(AppConfig.version)),
           ]),
     );
   }

@@ -4,8 +4,6 @@
 
 import 'package:flutter/material.dart';
 
-import 'fhir/FhirResources.dart';
-
 class Dimensions {
   static const double extraLargeMargin = 42;
   static const double largeMargin = 24;
@@ -43,11 +41,6 @@ class IconSize {
   static const double xlarge = 48;
 
   IconSize._();
-}
-
-class VersionInfo {
-  //TODO possible to get this dynamically? package_info package?
-  static const String version = "v0.3";
 }
 
 class WhatInfo {

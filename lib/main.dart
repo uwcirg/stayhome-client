@@ -12,11 +12,11 @@ import 'package:toast/toast.dart';
 
 import 'KeycloakAuth.dart';
 
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await AppConfig.init("app_settings.json");
+  await AppConfig.init("app_settings.yaml");
+  print("Version: ${AppConfig.version}");
   Repository.init(AppConfig.fhirBaseUrl);
 
   runApp(MyApp());
