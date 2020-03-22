@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:map_app_flutter/config/AppConfig.dart';
 import 'package:map_app_flutter/ContactCommunityPage.dart';
 import 'package:map_app_flutter/DevicesPage.dart';
 import 'package:map_app_flutter/GoalsPage.dart';
@@ -206,9 +207,9 @@ class JoyluxAppAssets extends AppAssets {
 }
 
 class StayHomeAppAssets extends AppAssets {
-  get issuer => 'https://keycloak-dev.cirg.washington.edu/auth/realms/Stayhome';
-  get clientSecret => 'f80cc383-bb5b-47b7-a2bf-5b713b0b8a50';
-  get clientId => 'stayhome_openid_client';
+  get issuer => AppConfig.issuerUrl;
+  get clientSecret => AppConfig.clientSecret;
+  get clientId => AppConfig.clientId;
 
   StayHomeAppAssets()
       : super(MapAppColors.stayHomePrimary, MapAppColors.stayHomeAccent,

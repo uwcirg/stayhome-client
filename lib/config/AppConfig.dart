@@ -8,4 +8,10 @@ class AppConfig {
   static String get fhirBaseUrl => GlobalConfiguration().getString("fhirBaseUrl");
 
   static String get appRootUrl => GlobalConfiguration().getString("appRootUrl");
+
+  static String get issuerUrl => GlobalConfiguration().getString("issuerUrl");
+
+  static String get clientId => GlobalConfiguration().getString("clientId");
+
+  static String get clientSecret => GlobalConfiguration().getString("clientSecret");
 }
