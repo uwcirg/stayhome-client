@@ -122,6 +122,7 @@ class Repository {
   static Future<List<DocumentReference>> getResourceLinks(
       String carePlanTemplateRef, String authToken) async {
     CarePlan carePlan = await loadCarePlan(carePlanTemplateRef, authToken);
+    if (carePlan == null) return Future.error("Could not load info links");
     List<Reference> documentReferenceReferences = [];
     for (Activity activity in carePlan.activity) {
       documentReferenceReferences.addAll(activity.detail.reasonReference);
@@ -211,6 +212,34 @@ class Repository {
       }
     });
     return questionnaires;
+  }
+  /// get all communication records which are active and pertinent
+  static Future<List<Communication>> getCommunications(Patient patient, String authToken) async {
+    int maxToReturn = 200;
+    String status = "in-progress";
+    var url =
+        "$fhirBaseUrl/Communication?recipient=${patient.reference}&status=$status&_count=$maxToReturn";
+    var response = await get(url, headers: _defaultShortHeaders(authToken));
+    var searchResultBundle = jsonDecode(response.body);
+    List<Communication> responses = [];
+    if (searchResultBundle['total'] > 0) {
+      await Future.forEach(searchResultBundle['entry'], (var entry) async {
+        responses.add(Communication.fromJson(entry['resource']));
+      });
+    }
+    return responses;
+  }
+
+  static Future<void> updateCommunication(
+      Communication communication, String authToken) async {
+    var url = "$fhirBaseUrl/Communication/${communication.id}?_format=json";
+    String body = jsonEncode(communication.toJson());
+    var headers = _defaultFullHeaders(authToken);
+
+    Response value =
+    await put(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
+
+    return resultFromResponse(value, "An error occurred when trying to update the communication.");
   }
 
   static Future postCarePlan(CarePlan plan, String authToken) async {

@@ -29,6 +29,8 @@ class CarePlanModel extends Model {
 
   List<DocumentReference> infoLinks;
 
+  List<Communication> communications;
+
   bool get hasNoPatient => patient == null;
 
   bool get hasNoCarePlan => carePlan == null;
@@ -109,6 +111,9 @@ class CarePlanModel extends Model {
       }),
       Repository.getResourceLinks(_careplanTemplateRef, _authToken).then((List<DocumentReference> responses) {
         this.infoLinks = responses;
+      }),
+      Repository.getCommunications(patient, _authToken).then((List<Communication> responses) {
+        this.communications = responses;
       })
     ];
     return Future.wait(futures).then((value) => rebuildTreatmentPlan());
@@ -152,6 +157,9 @@ class CarePlanModel extends Model {
 
   Future postQuestionnaireResponse(QuestionnaireResponse response) async {
     return Repository.postQuestionnaireResponse(response, _authToken).then((value) => load());
+  }
+  Future updateCommunication(Communication communication) async {
+    return Repository.updateCommunication(communication, _authToken).then((value) => load());
   }
 
   void updateActivityFrequency(int activityIndex, double newFrequency) {

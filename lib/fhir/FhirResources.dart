@@ -32,6 +32,149 @@ class Gender {
   static const _vals = [male, female, other, unknown];
 }
 
+class CommunicationStatus {
+  final _value;
+
+  const CommunicationStatus._(this._value);
+
+  toString() => _value;
+
+  static fromJson(String key) {
+    return _vals.firstWhere((v) => v._value == key,
+        orElse: () => throw ArgumentError("Key does not match any CommunicationStatus"));
+  }
+
+  static const preparation = const CommunicationStatus._('preparation');
+  static const in_progress = const CommunicationStatus._('in-progress');
+  static const not_done = const CommunicationStatus._('not-done');
+  static const on_hold = const CommunicationStatus._('on-hold');
+  static const stopped = const CommunicationStatus._('stopped');
+  static const completed = const CommunicationStatus._('completed');
+  static const entered_in_error = const CommunicationStatus._('entered-in-error');
+  static const unknown = const CommunicationStatus._('unknown');
+
+  static const _vals = [
+    preparation,
+    in_progress,
+    not_done,
+    on_hold,
+    stopped,
+    completed,
+    entered_in_error,
+    unknown
+  ];
+}
+
+class Priority {
+  final _value;
+
+  const Priority._(this._value);
+
+  toString() => _value;
+
+  static fromJson(String key) {
+    return _vals.firstWhere((v) => v._value == key,
+        orElse: () => throw ArgumentError("Key does not match any Priority"));
+  }
+
+  static const routine = const Priority._('routine');
+  static const urgent = const Priority._('urgent');
+  static const asap = const Priority._('asap');
+  static const stat = const Priority._('stat');
+
+  static const _vals = [routine, urgent, asap, stat];
+}
+
+class Communication extends Resource {
+  Meta meta;
+  CommunicationStatus status;
+  Priority priority;
+  List<CodeableConcept> category;
+  List<Reference> recipient;
+  List<Payload> payload;
+  DateTime sent;
+
+  Communication(
+      {resourceType,
+      id,
+      this.meta,
+      this.status,
+      this.priority,
+      this.category,
+      this.recipient,
+      this.payload,
+      this.sent})
+      : super(resourceType: "Communication", id: id);
+
+  Communication.fromJson(Map<String, dynamic> json) {
+    resourceType = json['resourceType'];
+    id = json['id'];
+    meta = json['meta'] != null ? Meta.fromJson(json['meta']) : null;
+
+    if (json['status'] != null) status = CommunicationStatus.fromJson(json['status']);
+    if (json['priority'] != null) priority = Priority.fromJson(json['priority']);
+    if (json['category'] != null) {
+      category = new List<CodeableConcept>();
+      json['category'].forEach((v) {
+        category.add(new CodeableConcept.fromJson(v));
+      });
+    }
+    if (json['recipient'] != null) {
+      recipient = new List<Reference>();
+      json['recipient'].forEach((v) {
+        recipient.add(new Reference.fromJson(v));
+      });
+    }
+    if (json['payload'] != null) {
+      payload = new List<Payload>();
+      json['payload'].forEach((v) {
+        payload.add(new Payload.fromJson(v));
+      });
+    }
+    if (json['sent'] != null) sent = DateTime.parse(json['sent']);
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+
+    if (this.id != null) data['id'] = id;
+    if (this.resourceType != null) data['resourceType'] = resourceType;
+    if (this.meta != null) data['meta'] = meta.toJson();
+    if (this.status != null) data['status'] = status.toString();
+    if (this.priority != null) data['priority'] = priority.toString();
+    if (this.category != null) data['category'] = this.category.map((v) => v.toJson()).toList();
+    if (this.recipient != null) data['recipient'] = this.recipient.map((v) => v.toJson()).toList();
+    if (this.payload != null) data['payload'] = this.payload.map((v) => v.toJson()).toList();
+    if (this.sent != null) data['sent'] = sent.toIso8601String();
+
+    return data;
+  }
+}
+
+class Payload {
+  String contentString;
+  Attachment contentAttachment;
+  Reference contentReference;
+
+  Payload({this.contentString, this.contentAttachment, this.contentReference});
+
+  Payload.fromJson(Map<String, dynamic> json) {
+    contentString = json['contentString'];
+    if (json['contentAttachment'] != null)
+      contentAttachment = Attachment.fromJson(json['contentAttachment']);
+    if (json['contentReference'] != null)
+      contentReference = Reference.fromJson(json['contentReference']);
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (this.contentString != null) data['contentString'] = this.contentString;
+    if (this.contentAttachment != null) data['contentAttachment'] = this.contentAttachment.toJson();
+    if (this.contentReference != null) data['contentReference'] = this.contentReference.toJson();
+    return data;
+  }
+}
+
 class Patient extends Resource {
   Meta meta;
   Narrative text;
@@ -44,7 +187,7 @@ class Patient extends Resource {
   List<Address> address;
   CodeableConcept maritalStatus;
   bool multipleBirthBoolean;
-  List<Communication> communication;
+  List<PatientCommunication> communication;
 
   Patient(
       {String resourceType,
@@ -294,9 +437,9 @@ class Patient extends Resource {
         json['maritalStatus'] != null ? new CodeableConcept.fromJson(json['maritalStatus']) : null;
     multipleBirthBoolean = json['multipleBirthBoolean'];
     if (json['communication'] != null) {
-      communication = new List<Communication>();
+      communication = new List<PatientCommunication>();
       json['communication'].forEach((v) {
-        communication.add(new Communication.fromJson(v));
+        communication.add(new PatientCommunication.fromJson(v));
       });
     }
   }
@@ -484,12 +627,12 @@ class Address {
   }
 }
 
-class Communication {
+class PatientCommunication {
   CodeableConcept language;
 
-  Communication({this.language});
+  PatientCommunication({this.language});
 
-  Communication.fromJson(Map<String, dynamic> json) {
+  PatientCommunication.fromJson(Map<String, dynamic> json) {
     language = json['language'] != null ? new CodeableConcept.fromJson(json['language']) : null;
   }
 
