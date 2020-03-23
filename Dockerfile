@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends xz-utils git ca
 
 # Install Flutter beta
 ADD https://storage.googleapis.com/flutter_infra/releases/beta/linux/flutter_linux_v1.15.17-beta.tar.xz /tmp/flutter_linux_v1.15.17-beta.tar.xz
-RUN tar xvf /tmp/flutter_linux_v1.15.17-beta.tar.xz -C /usr/local
+RUN tar xf /tmp/flutter_linux_v1.15.17-beta.tar.xz -C /usr/local
 
 # Run flutter doctor and set path
 RUN /usr/local/flutter/bin/flutter doctor -v
