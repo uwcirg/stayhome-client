@@ -339,10 +339,10 @@ class _PlanPageState extends State<PlanPage> {
 
   List<Widget> _buildQuestionnaireButtons(BuildContext context, CarePlanModel model) {
     if (model.questionnaires == null) return [];
-    return model.questionnaires
-        .map((Questionnaire questionnaire) =>
-            _buildQuestionnaireButton(context, "complete questionnaire", questionnaire, model))
-        .toList();
+    return model.questionnaires.map((Questionnaire questionnaire) {
+      String title = questionnaire.title != null ? questionnaire.title : "questionnaire";
+      return _buildQuestionnaireButton(context, title, questionnaire, model);
+    }).toList();
   }
 
   RaisedButton _buildQuestionnaireButton(

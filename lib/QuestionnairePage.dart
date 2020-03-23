@@ -6,6 +6,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
 import 'package:map_app_flutter/main.dart';
@@ -109,18 +110,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
             padding: MapAppPadding.cardPageMargins,
             itemBuilder: (context, i) {
               if (i == _questions.length) {
-                return Padding(
-                  padding: const EdgeInsets.only(
-                      left: Dimensions.halfMargin,
-                      right: Dimensions.halfMargin,
-                      top: Dimensions.halfMargin,
-                      bottom: 200),
-                  child: RaisedButton(
-                    padding: MapAppPadding.largeButtonPadding,
-                    child: Text("done", style: Theme.of(context).textTheme.button),
-                    onPressed: _onPressed,
-                  ),
-                );
+                return _buildSubmitButton(context);
               }
 
               QuestionnaireItem item = _questions[i];
@@ -132,6 +122,21 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
                 return _buildUnsupportedItemCard(context, item);
               }
             }));
+  }
+
+  Padding _buildSubmitButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(
+          left: Dimensions.halfMargin,
+          right: Dimensions.halfMargin,
+          top: Dimensions.halfMargin,
+          bottom: 200),
+      child: RaisedButton(
+        padding: MapAppPadding.largeButtonPadding,
+        child: Text("done", style: Theme.of(context).textTheme.button),
+        onPressed: _onPressed,
+      ),
+    );
   }
 
   Widget _buildGroupCard(BuildContext context, QuestionnaireItem item) {
@@ -171,68 +176,160 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
   }
 
   Widget _buildItem(BuildContext context, QuestionnaireItem questionnaireItem) {
+    Widget item;
     if (questionnaireItem.isTemperature()) {
-      return Padding(
-        padding: MapAppPadding.cardPageMargins,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
-              child: Text(
-                questionnaireItem.text,
-                style: Theme.of(context).textTheme.title,
-              ),
-            ),
-            TextFormField(
-              decoration: InputDecoration(hintText: "Enter body temperature", errorMaxLines: 3),
-              inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              autovalidate: true,
-              validator: (value) {
-                if (value.isEmpty) return null;
-                double result = double.tryParse(value);
-                if (result == null) return "Please enter a valid decimal";
-                if (!isValidTempF(result) && !isValidTempC(result)) {
-                  return "Enter a value between ${QuestionnaireConstants.minF} and "
-                      "${QuestionnaireConstants.maxF} (ºF) or ${QuestionnaireConstants.minC} and "
-                      "${QuestionnaireConstants.maxC} (ºC). This value will not be saved.";
-                }
-                // restrict to 2 decimals
-                if (!isValidTempF(result)) result = double.parse(cToF(result).toStringAsFixed(2));
-                _response.setAnswer(questionnaireItem.linkId, Answer(valueDecimal: result));
-                return null;
-              },
-            ),
-          ],
-        ),
-      );
+      item = _buildTemperatureItem(questionnaireItem, context);
+    } else if (questionnaireItem.type == "choice") {
+      item = _buildChoiceItem(questionnaireItem, context);
+    } else if (questionnaireItem.type == "display") {
+      item = Padding(padding: MapAppPadding.cardPageMargins, child: Text(questionnaireItem.text));
+    } else if (questionnaireItem.type == "string") {
+      item = _buildStringItem(questionnaireItem, context);
+    } else if (questionnaireItem.type == "date") {
+      item = _buildDateItem(questionnaireItem, context);
+    } else if (questionnaireItem.type == "dateTime") {
+      item = _buildDateTimeItem(questionnaireItem, context);
     } else {
-      return Padding(
-        padding: MapAppPadding.cardPageMargins,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
-              child: Text(
-                questionnaireItem.text,
-                style: Theme.of(context).textTheme.title,
-              ),
-            ),
-//          Wrap(
-//            runSpacing: -8,
-//            spacing: Dimensions.halfMargin,
-//            children: _buildChoices(questionnaireItem, context),
-//          ),
-            Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: _buildChoices(questionnaireItem, context))
-          ],
-        ),
-      );
+      throw UnimplementedError("Not implemented: ${questionnaireItem.type}");
     }
+    return Padding(
+        padding: MapAppPadding.cardPageMargins,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
+            child: Text(
+              questionnaireItem.text,
+              style: Theme.of(context).textTheme.title,
+            ),
+          ),
+          Visibility(
+              visible: questionnaireItem.helpText != null,
+              child: Text(
+                questionnaireItem.helpText ?? "",
+                style: Theme.of(context).textTheme.caption,
+              )),
+          item
+        ]));
+  }
+
+  Widget _buildStringItem(QuestionnaireItem questionnaireItem, BuildContext context) {
+    return Padding(
+      padding: MapAppPadding.cardPageMargins,
+      child: TextFormField(
+        onChanged: (value) {
+          setState(() {
+            _response.setAnswer(questionnaireItem.linkId, Answer(valueString: value));
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _buildDateItem(QuestionnaireItem questionnaireItem, BuildContext context) {
+    DateTime date;
+    return Padding(
+      padding: MapAppPadding.cardPageMargins,
+      child: TextFormField(
+        decoration: InputDecoration(
+          hintText: "e.g. 3/22/2020",
+        ),
+        autovalidate: true,
+        validator: (value) {
+          if (value.isEmpty) return null;
+          try {
+            date = DateFormat.yMd().parse(value);
+          } catch (FormatException) {
+            return "Enter a valid date";
+          }
+          _response.setAnswer(questionnaireItem.linkId, Answer(valueDate: date));
+          return null;
+        },
+      ),
+    );
+  }
+
+  Widget _buildDateTimeItem(QuestionnaireItem questionnaireItem, BuildContext context) {
+    DateTime date;
+    return Padding(
+      padding: MapAppPadding.cardPageMargins,
+      child: TextFormField(
+        decoration: InputDecoration(
+          hintText: "e.g. 3/22/2020 8:00 PM",
+        ),
+        autovalidate: true,
+        validator: (value) {
+          if (value.isEmpty) return null;
+          try {
+            date = DateFormat('M/d/y HH:mm a').parse(value);
+          } catch (FormatException) {
+            return "Enter a valid date and time";
+          }
+          _response.setAnswer(questionnaireItem.linkId, Answer(valueDateTime: date));
+          return null;
+        },
+      ),
+    );
+  }
+
+  Widget _buildChoiceItem(QuestionnaireItem questionnaireItem, BuildContext context) {
+    if (questionnaireItem.choiceCount > 5) return _buildDropDown(questionnaireItem);
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: _buildChoices(questionnaireItem, context));
+  }
+
+  Widget _buildDropDown(QuestionnaireItem questionnaireItem) {
+    Answer currentResponse = _response.getResponseItem(questionnaireItem.linkId) != null
+        ? _response.getResponseItem(questionnaireItem.linkId).answer[0]
+        : null;
+    List<ChoiceOption> choices = questionnaireItem.choiceOptions;
+
+    return DropdownButton(
+      isExpanded: true,
+      hint: Text(
+        currentResponse.toString(),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
+//      underline: Container(
+//        height: 0,
+//      ),
+      items: choices.map((ChoiceOption choice) {
+        return new DropdownMenuItem<ChoiceOption>(
+          child: Text(choice.toString()),
+          value: choice,
+        );
+      }).toList(),
+      onChanged: (ChoiceOption item) {
+        setState(() {
+          _response.setAnswer(questionnaireItem.linkId, item.ifSelected);
+        });
+      },
+    );
+  }
+
+  Widget _buildTemperatureItem(QuestionnaireItem questionnaireItem, BuildContext context) {
+    return TextFormField(
+      decoration: InputDecoration(hintText: "Enter body temperature", errorMaxLines: 3),
+      inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
+      keyboardType: TextInputType.numberWithOptions(decimal: true),
+      autovalidate: true,
+      validator: (value) {
+        if (value.isEmpty) return null;
+        double result = double.tryParse(value);
+        if (result == null) return "Please enter a valid decimal";
+        if (!isValidTempF(result) && !isValidTempC(result)) {
+          return "Enter a value between ${QuestionnaireConstants.minF} and "
+              "${QuestionnaireConstants.maxF} (ºF) or ${QuestionnaireConstants.minC} and "
+              "${QuestionnaireConstants.maxC} (ºC). This value will not be saved.";
+        }
+        // restrict to 2 decimals
+        if (!isValidTempF(result)) result = double.parse(cToF(result).toStringAsFixed(2));
+        _response.setAnswer(questionnaireItem.linkId, Answer(valueDecimal: result));
+        return null;
+      },
+    );
   }
 
   List<Widget> _buildChoices(QuestionnaireItem questionnaireItem, BuildContext context) {
@@ -266,7 +363,8 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
       QuestionnaireItem questionnaireItem, Answer currentResponse, BuildContext context) {
     return questionnaireItem.answerValueSet.map((Coding option) {
       return _buildChip('$option', currentResponse == option, context, questionnaireItem,
-          new Answer(valueCoding: option));
+          new Answer(valueCoding: option),
+          helpLabel: '$option');
     }).toList();
   }
 
@@ -292,7 +390,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
           Visibility(
             visible: helpLabel != null,
             child: Text(
-              helpLabel == "Somewhat" ? "Some\u00ADwhat" : helpLabel,
+              helpLabel == "Somewhat" ? "Some\u00ADwhat" : (helpLabel ?? ""),
               textAlign: TextAlign.center,
             ),
           )

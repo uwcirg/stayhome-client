@@ -1446,8 +1446,17 @@ class Questionnaire extends Resource {
 
   Future<void> loadValueSets() async {
     return Future.wait(item.map((QuestionnaireItem questionnaireItem) async {
-      await questionnaireItem.loadValueSet();
+      List<Future> futures = _loadValueSetsForSelfAndChildren(questionnaireItem);
+      await Future.wait(futures);
     }));
+  }
+
+  List<Future> _loadValueSetsForSelfAndChildren(QuestionnaireItem item) {
+    List<Future> futures = [item.loadValueSet()];
+    item.item?.forEach((element) {
+      futures.addAll(_loadValueSetsForSelfAndChildren(element));
+    });
+    return futures;
   }
 
   Questionnaire.fromJson(Map<String, dynamic> json) {
@@ -1530,10 +1539,11 @@ class CodeableConcept {
   int get hashCode => coding.hashCode;
 }
 
-class Coding {
+class Coding implements ChoiceOption {
   String system;
   String code;
   String display;
+  Answer get ifSelected => new Answer(valueCoding: this);
 
   Coding({this.system, this.code, this.display});
 
@@ -1669,12 +1679,20 @@ class QuestionnaireItem {
       this.item});
 
   bool isSupported() {
-    return answerOption != null || answerValueSet != null || type == "decimal";
+    return type == "choice" ||
+        type == "decimal" ||
+        type == "string" ||
+        type == "date" ||
+        type == "dateTime";
   }
 
   bool isTemperature() {
     return code != null &&
-        code.firstWhere((Coding c) => c.system.contains("loinc")).code == "8310-5";
+        code
+                .firstWhere((Coding c) => c.system != null && c.system.contains("loinc"),
+                    orElse: () => null)
+                ?.code ==
+            "8310-5";
   }
 
   loadValueSet() async {
@@ -1682,6 +1700,22 @@ class QuestionnaireItem {
       ValueSet answers = await Repository.getValueSet(answerValueSetAddress);
       answerValueSet = answers.expansion.contains;
     }
+  }
+
+  List<ChoiceOption> get choiceOptions => answerOption ?? answerValueSet;
+  int get choiceCount => choiceOptions != null ? choiceOptions.length : 0;
+
+  String get helpText {
+    // find the first sub item that has a help type extension
+    QuestionnaireItem helpTextSubItem = item?.firstWhere((QuestionnaireItem subItem) =>
+        subItem.extension != null &&
+        subItem.extension.any((Extension extension) =>
+            extension.valueCodeableConcept != null &&
+            extension.valueCodeableConcept.coding != null &&
+            extension.valueCodeableConcept.coding.any((Coding coding) =>
+                coding.code == "help" &&
+                coding.system == "http://hl7.org/fhir/questionnaire-item-control")));
+    return helpTextSubItem?.text;
   }
 
   QuestionnaireItem.fromJson(Map<String, dynamic> json) {
@@ -1749,14 +1783,19 @@ class QuestionnaireItem {
   }
 
   bool isGroup() {
-    return item != null;
+    return type == "group";
   }
 }
 
-class AnswerOption {
+abstract class ChoiceOption {
+  Answer get ifSelected;
+}
+
+class AnswerOption implements ChoiceOption {
   int valueInteger;
   List<Extension> extension;
   Coding valueCoding;
+  Answer get ifSelected => new Answer.fromAnswerOption(this);
 
   AnswerOption({this.valueInteger, this.extension, this.valueCoding});
 
@@ -2023,15 +2062,27 @@ class Answer {
   int valueInteger;
   double valueDecimal;
   Coding valueCoding;
+  String valueString;
+  DateTime valueDate;
+  DateTime valueDateTime;
 
-  Answer({this.valueDecimal, this.valueInteger, this.valueCoding});
+  Answer(
+      {this.valueDecimal,
+      this.valueInteger,
+      this.valueCoding,
+      this.valueString,
+      this.valueDate,
+      this.valueDateTime});
 
   bool operator ==(dynamic o) {
     if (o is Answer) {
       Answer other = o;
       return valueInteger == other.valueInteger &&
           valueCoding == other.valueCoding &&
-          valueDecimal == other.valueDecimal;
+          valueDecimal == other.valueDecimal &&
+          valueString == other.valueString &&
+          valueDate == other.valueDate &&
+          valueDateTime == other.valueDateTime;
     } else if (o is AnswerOption) {
       AnswerOption other = o;
       return valueInteger == other.valueInteger && valueCoding == other.valueCoding;
@@ -2050,6 +2101,15 @@ class Answer {
     if (valueCoding != null) {
       result = 37 * result + valueCoding.hashCode;
     }
+    if (valueString != null) {
+      result = 37 * result + valueString.hashCode;
+    }
+    if (valueDate != null) {
+      result = 37 * result + valueDate.hashCode;
+    }
+    if (valueDateTime != null) {
+      result = 37 * result + valueDateTime.hashCode;
+    }
     return result;
   }
 
@@ -2058,18 +2118,23 @@ class Answer {
     if (valueInteger != null) return '$valueInteger';
     if (valueCoding != null) return valueCoding.toString();
     if (valueDecimal != null) return valueDecimal.toString();
+    if (valueString != null) return valueString;
+    if (valueDate != null) return valueDate.toString();
+    if (valueDateTime != null) return valueDateTime.toString();
     return '';
   }
 
-  Answer.fromAnswerOption(AnswerOption option) {
-    valueInteger = option.valueInteger;
-    valueCoding = option.valueCoding;
+  factory Answer.fromAnswerOption(AnswerOption option) {
+    return Answer.fromJson(option.toJson());
   }
 
   Answer.fromJson(Map<String, dynamic> json) {
     valueInteger = json['valueInteger'];
     if (json['valueDecimal'] != null) valueDecimal = json['valueDecimal'].toDouble();
     if (json['valueCoding'] != null) valueCoding = Coding.fromJson(json['valueCoding']);
+    if (json['valueString'] != null) valueString = json['valueString'];
+    if (json['valueDate'] != null) valueDate = DateTime.parse(json['valueDate']);
+    if (json['valueDateTime'] != null) valueDateTime = DateTime.parse(json['valueDateTime']);
   }
 
   Map<String, dynamic> toJson() {
@@ -2077,6 +2142,9 @@ class Answer {
     if (this.valueInteger != null) data['valueInteger'] = this.valueInteger;
     if (this.valueDecimal != null) data['valueDecimal'] = this.valueDecimal;
     if (this.valueCoding != null) data['valueCoding'] = this.valueCoding.toJson();
+    if (this.valueString != null) data['valueString'] = this.valueString;
+    if (this.valueDate != null) data['valueDate'] = this.valueDate.toIso8601String();
+    if (this.valueDateTime != null) data['valueDateTime'] = this.valueDateTime.toIso8601String();
     return data;
   }
 }

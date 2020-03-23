@@ -28,6 +28,10 @@ abstract class AppAssets {
   final textTheme;
   final careplanTemplateRef;
 
+  String get appName;
+  String get whatLinkTitle;
+  String get whatLink;
+
   get issuer;
   get clientSecret;
   get clientId;
@@ -40,6 +44,7 @@ abstract class AppAssets {
       this.systemUiOverlayStyle = SystemUiOverlayStyle.light,
       this.textTheme,
       this.careplanTemplateRef});
+
 
   TextTheme textThemeOverride(TextTheme textTheme) {
     return textTheme;
@@ -64,6 +69,13 @@ class JoyluxAppAssets extends AppAssets {
   get issuer => 'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp';
   get clientSecret => 'b284cf4f-17e7-4464-987e-3c320b22cfac';
   get clientId => 'map-app-client';
+
+  @override
+  String get appName => "Joylux";
+  @override
+  String get whatLinkTitle => "What’s vFit?";
+  @override
+  String get whatLink => "https://joylux.com/";
 
   JoyluxAppAssets()
       : super(MapAppColors.vFitPrimary, MapAppColors.vFitAccent, MapAppColors.vFitHighlight,
@@ -211,6 +223,13 @@ class StayHomeAppAssets extends AppAssets {
   get clientSecret => AppConfig.clientSecret;
   get clientId => AppConfig.clientId;
 
+  @override
+  String get appName => "StayHome";
+  @override
+  String get whatLinkTitle => "What’s StayHome?";
+  @override
+  String get whatLink => WhatInfo.link;
+
   StayHomeAppAssets()
       : super(MapAppColors.stayHomePrimary, MapAppColors.stayHomeAccent,
             MapAppColors.stayHomeHighlight, MapAppColors.stayHomePrimary,
@@ -256,8 +275,6 @@ class StayHomeAppAssets extends AppAssets {
     return textTheme.copyWith(button: textTheme.subhead.apply(color: this.primarySwatch, fontWeightDelta: 2));
   }
 
-  get appName => "StayHome";
-
   @override
   Widget drawerBanner(BuildContext context) {
     return Center(
@@ -274,13 +291,11 @@ class StayHomeAppAssets extends AppAssets {
 
   @override
   List<Widget> additionalLoginPageViews(BuildContext context) {
-    // TODO: implement additionalLoginPageViews
     return [];
   }
 
   @override
   loginBackgroundDecoration() {
-    // TODO: implement loginBackgroundDecoration
     return BoxDecoration(
         gradient: LinearGradient(
             colors: [primarySwatch, Color(0xFF5835BD)],

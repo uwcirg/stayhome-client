@@ -87,15 +87,10 @@ class LoginPageState extends State<LoginPage> {
                             Padding(
                               padding: EdgeInsets.symmetric(vertical: 10),
                               child: FlatButton(
-                                  // onPressed: () => MyApp.of(context)
-                                  //     .auth
-                                  //     .dummyLogin()
-                                  //     .then((value) => dismissLoginScreen(context))
-                                  //     .catchError((error) => snack("$error", context)),
-                                  onPressed: () => PlatformDefs().launchUrl(WhatInfo.link),
+                                  onPressed: () => PlatformDefs().launchUrl(MyApp.of(context).appAssets.whatLink),
                                   child: Padding(
                                       padding: EdgeInsets.all(Dimensions.fullMargin),
-                                      child: Text("What’s StayHome?",
+                                      child: Text(MyApp.of(context).appAssets.whatLinkTitle,
                                           style: TextStyle(
                                               color: Colors.white,
                                               decoration: TextDecoration.underline)))),
