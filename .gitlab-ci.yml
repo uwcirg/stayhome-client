@@ -103,4 +103,4 @@ build:docker_web:
   after_script:
     # only push docker images on master branch
     # todo: move to separate stage; use gitlab ci `only` syntax (and push to GitLab image registry to persist between stages)
-    - if [ "$CI_COMMIT_BRANCH" = master]; then docker-compose push; fi
+    - if [ "$CI_COMMIT_BRANCH" = master ]; then docker-compose push; fi
