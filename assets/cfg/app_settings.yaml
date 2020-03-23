@@ -1,9 +1,11 @@
-fhirBaseUrl: https://hapi-fhir.cirg.washington.edu/hapi-fhir-jpaserver/fhir
-#appRootUrl: http://[::1]:18919 #local dev example
-appRootUrl: https://stayhome.cirg.washington.edu
+fhirBaseUrl: https://mapapp-dev.cirg.washington.edu/api/r4
+appRootUrl: http://[::1]:18919 #local dev example
+#appRootUrl: https://stayhome.cirg.washington.edu
 
 issuerUrl: https://keycloak-dev.cirg.washington.edu/auth/realms/Stayhome
 clientId: stayhome_openid_client
 clientSecret: f80cc383-bb5b-47b7-a2bf-5b713b0b8a50
 
-version: v0.4
+careplanTemplateId: 203
+
+version: v0.3
