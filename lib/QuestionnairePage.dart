@@ -216,6 +216,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
     return Padding(
       padding: MapAppPadding.cardPageMargins,
       child: TextFormField(
+        decoration: InputDecoration(hintText: questionnaireItem.text),
         onChanged: (value) {
           setState(() {
             _response.setAnswer(questionnaireItem.linkId, Answer(valueString: value));
@@ -288,13 +289,10 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
     return DropdownButton(
       isExpanded: true,
       hint: Text(
-        currentResponse.toString(),
+        currentResponse != null ? currentResponse.toString(): "Select",
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
       ),
-//      underline: Container(
-//        height: 0,
-//      ),
       items: choices.map((ChoiceOption choice) {
         return new DropdownMenuItem<ChoiceOption>(
           child: Text(choice.toString()),
