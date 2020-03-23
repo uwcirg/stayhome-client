@@ -125,7 +125,9 @@ class Repository {
     if (carePlan == null) return Future.error("Could not load info links");
     List<Reference> documentReferenceReferences = [];
     for (Activity activity in carePlan.activity) {
-      documentReferenceReferences.addAll(activity.detail.reasonReference);
+      if (activity.detail.reasonReference !=null) {
+        documentReferenceReferences.addAll(activity.detail.reasonReference);
+      }
     }
     List<DocumentReference> documentReferences = [];
     await Future.forEach(documentReferenceReferences, (Reference r) async {

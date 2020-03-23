@@ -70,8 +70,11 @@ class CarePlanModel extends Model {
       this.error = null;
       isLoading = false;
       notifyListeners();
-    }).catchError((error) {
+    }).catchError((error, stacktrace) {
       print(error);
+      if (stacktrace != null) {
+        print(stacktrace);
+      }
       this.error = error;
       isLoading = false;
       notifyListeners();
@@ -109,7 +112,8 @@ class CarePlanModel extends Model {
           .then((List<QuestionnaireResponse> responses) {
         this.questionnaireResponses = responses;
       }),
-      Repository.getResourceLinks(_careplanTemplateRef, _authToken).then((List<DocumentReference> responses) {
+      Repository.getResourceLinks(_careplanTemplateRef, _authToken)
+          .then((List<DocumentReference> responses) {
         this.infoLinks = responses;
       }),
       Repository.getCommunications(patient, _authToken).then((List<Communication> responses) {
@@ -120,8 +124,8 @@ class CarePlanModel extends Model {
   }
 
   void loadResourceLinks() async {
-    loadThenNotifyOrError(
-        Repository.getResourceLinks(_careplanTemplateRef, _authToken).then((List<DocumentReference> responses) {
+    loadThenNotifyOrError(Repository.getResourceLinks(_careplanTemplateRef, _authToken)
+        .then((List<DocumentReference> responses) {
       this.infoLinks = responses;
     }));
   }
@@ -158,6 +162,7 @@ class CarePlanModel extends Model {
   Future postQuestionnaireResponse(QuestionnaireResponse response) async {
     return Repository.postQuestionnaireResponse(response, _authToken).then((value) => load());
   }
+
   Future updateCommunication(Communication communication) async {
     return Repository.updateCommunication(communication, _authToken).then((value) => load());
   }
@@ -274,19 +279,21 @@ class TreatmentCalendar {
 
   void addScheduledActivities(CarePlan plan) {
     for (Activity activity in plan.activity) {
-      if (activity.detail.scheduledTiming.repeat.periodUnit != "d") {
-        throw UnimplementedError("Can only handle periodUnit of 'd' for now.");
-      }
+      if (activity.detail.scheduledTiming != null) {
+        if (activity.detail.scheduledTiming.repeat.periodUnit != "d") {
+          throw UnimplementedError("Can only handle periodUnit of 'd' for now.");
+        }
 
-      Period scheduledPeriod = getScheduledPeriod(plan, activity);
+        Period scheduledPeriod = getScheduledPeriod(plan, activity);
 
-      if (activity.detail.scheduledTiming.repeat.period == null) {
-        throw MalformedFhirResourceException(plan,
-            "Resource must have a period length specified in every activity.detail.scheduledTiming");
+        if (activity.detail.scheduledTiming.repeat.period == null) {
+          throw MalformedFhirResourceException(plan,
+              "Resource must have a period length specified in every activity.detail.scheduledTiming");
+        }
+        double every = activity.detail.scheduledTiming.repeat.period;
+        TreatmentEvent event = TreatmentEvent.scheduledEventForActivity(activity);
+        addScheduledTreatmentEvents(scheduledPeriod, every, event);
       }
-      double every = activity.detail.scheduledTiming.repeat.period;
-      TreatmentEvent event = TreatmentEvent.scheduledEventForActivity(activity);
-      addScheduledTreatmentEvents(scheduledPeriod, every, event);
     }
   }
 
