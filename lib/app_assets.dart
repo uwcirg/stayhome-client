@@ -233,7 +233,7 @@ class StayHomeAppAssets extends AppAssets {
   StayHomeAppAssets()
       : super(MapAppColors.stayHomePrimary, MapAppColors.stayHomeAccent,
             MapAppColors.stayHomeHighlight, MapAppColors.stayHomePrimary,
-            careplanTemplateRef: "CarePlan/203");
+            careplanTemplateRef: "CarePlan/${AppConfig.careplanTemplateId}");
 
   @override
   Widget loginBanner(BuildContext context) {

@@ -29,4 +29,6 @@ class AppConfig {
   static String get clientSecret => GlobalConfiguration().get("clientSecret")?.toString();
 
   static String get version => GlobalConfiguration().get("version")?.toString();
+
+  static String get careplanTemplateId => GlobalConfiguration().get("careplanTemplateId")?.toString();
 }
