@@ -124,10 +124,10 @@ class _MyAppState extends State<MyApp> {
   }
 
   /// provide context in order to go back to login back after logout is complete
-  logout({BuildContext context}) {
+  logout({bool pushLogin=true}) {
     auth.mapAppLogout().then((value) {
       logoutCompleted();
-      if (context != null) Navigator.of(context).pushReplacementNamed("/login");
+      if (pushLogin) Navigator.of(context).pushReplacementNamed("/login");
     }).catchError((error) => print("Logout error: $error"));
   }
 
@@ -149,7 +149,7 @@ class _MyAppState extends State<MyApp> {
       });
     } else {
       // clear credentials from browser by calling log out
-      logout();
+      logout(pushLogin: false);
       ScopedModel.of<CarePlanModel>(context).setGuestUser();
       Navigator.of(context).pushReplacementNamed('/guestHome');
     }

@@ -23,7 +23,7 @@ class MapAppErrorMessage extends StatelessWidget {
     return MapAppErrorMessage(
       S.of(context).loading_error_log_in_again,
       buttonLabel: "logout",
-      onButtonPressed: () => MyApp.of(context).logout(context: context),
+      onButtonPressed: () => MyApp.of(context).logout(),
     );
   }
 
