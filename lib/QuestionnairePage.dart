@@ -262,12 +262,15 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
     return Padding(
         padding: MapAppPadding.cardPageMargins,
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
-            child: Text(questionnaireItem.text, style: questionTitleStyle),
+          Visibility(
+            visible: questionnaireItem.text != null && questionnaireItem.text.isNotEmpty,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
+              child: Text(questionnaireItem.text ?? "", style: questionTitleStyle),
+            ),
           ),
           Visibility(
-              visible: questionnaireItem.helpText != null,
+              visible: questionnaireItem.helpText != null && questionnaireItem.helpText.isNotEmpty,
               child: Text(
                 questionnaireItem.helpText ?? "",
                 style: Theme.of(context).textTheme.caption,
