@@ -60,7 +60,7 @@ class HomePage extends StatelessWidget {
                 },
               ),
               SpringboardTile(
-                assetPath: 'assets/stayhome/Risk.png',
+                assetPath: 'assets/stayhome/Risk.transparent.png',
                 text: "enter exposure or travel",
                 onPressed: model.questionnaires.length > 1
                     ? () {
@@ -77,9 +77,15 @@ class HomePage extends StatelessWidget {
           child: Row(
             children: <Widget>[
               SpringboardTile(
-                assetPath: 'assets/stayhome/Testing.png',
+                assetPath: 'assets/stayhome/Testing.transparent.png',
                 text: "record COVID-19 testing",
-                onPressed: null,
+                onPressed: model.questionnaires.length > 2
+                    ? () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) =>
+                          QuestionnairePage(model.questionnaires[2], model)));
+                }
+                    : null,
               ),
               SpringboardTile(
                 assetPath: 'assets/stayhome/profile_icon.png',
