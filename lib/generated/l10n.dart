@@ -31,7 +31,7 @@ class S {
 
   String demoVersionBannerText(dynamic deploymentType) {
     return Intl.message(
-      'This is a $deploymentType system - not for clinical use.',
+      'This is a $deploymentType system - not for real data.',
       name: 'demoVersionBannerText',
       desc: '',
       args: [deploymentType],

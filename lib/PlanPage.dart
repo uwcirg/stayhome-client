@@ -699,13 +699,13 @@ class _StayHomePlanPageState extends _PlanPageState {
     return <Widget>[
       _buildQuestionnaireButtonSection(context, model),
       _buildTreatmentCalendarWidget(_calendarController, model),
-      Padding(
-        padding: const EdgeInsets.only(top: 8.0),
-        child: OutlineButton(
-          child: Text("change schedule"),
-          onPressed: () => _showChangeDialogForActivity(context, model, 0),
-        ),
-      )
+//      Padding(
+//        padding: const EdgeInsets.only(top: 8.0),
+//        child: OutlineButton(
+//          child: Text("change schedule"),
+//          onPressed: () => _showChangeDialogForActivity(context, model, 0),
+//        ),
+//      )
     ];
   }
 

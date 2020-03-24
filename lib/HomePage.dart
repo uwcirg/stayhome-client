@@ -17,14 +17,21 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
       title: "home",
-      child: new Padding(
-        padding: MapAppPadding.pageMargins,
-        child: ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
-          Widget errorWidget = MapAppErrorMessage.fromModel(model, context);
-          if (errorWidget != null) return errorWidget;
-          return _buildPage(context, model);
-        }),
-      ),
+      child: Expanded(
+          child: ListView.builder(
+            itemBuilder: (context, i) {
+              return new Padding(
+                padding: MapAppPadding.pageMargins,
+                child: ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
+                  Widget errorWidget = MapAppErrorMessage.fromModel(model, context);
+                  if (errorWidget != null) return errorWidget;
+                  return _buildPage(context, model);
+                }),
+              );
+            },
+            itemCount: 1,
+            shrinkWrap: true,
+          ))
     );
   }
 
@@ -39,6 +46,7 @@ class HomePage extends StatelessWidget {
             child: ActiveNotificationsWidget(model),
           ),
         ),
+        // TODO: Dynamically add a tile for each questionnaire in the questionnaire list.
         IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -52,25 +60,7 @@ class HomePage extends StatelessWidget {
                 },
               ),
               SpringboardTile(
-                assetPath: 'assets/stayhome/profile_icon.png',
-                text: "update profile or sharing",
-                onPressed: () => MapAppDrawer.navigate(context, "/profile"),
-              ),
-            ],
-          ),
-        ),
-// TODO: Add the following two items when the other two questionnaires are added. Ideally, don't
-// hardcode them and dynamically add a tile for each questionnaire in the questionnaire list.
-        IntrinsicHeight(
-          child: Row(
-            children: <Widget>[
-              SpringboardTile(
-                assetPath: 'assets/stayhome/Testing.png',
-                text: "record COVID-19 testing",
-                onPressed: null,
-              ),
-              SpringboardTile(
-                assetPath: 'assets/stayhome/Risk.png',
+                assetPath: 'assets/stayhome/Risk.transparent.png',
                 text: "enter exposure or travel",
                 onPressed: model.questionnaires.length > 1
                     ? () {
@@ -79,6 +69,28 @@ class HomePage extends StatelessWidget {
                                 QuestionnairePage(model.questionnaires[1], model)));
                       }
                     : null,
+              ),
+            ],
+          ),
+        ),
+        IntrinsicHeight(
+          child: Row(
+            children: <Widget>[
+              SpringboardTile(
+                assetPath: 'assets/stayhome/Testing.transparent.png',
+                text: "record COVID-19 testing",
+                onPressed: model.questionnaires.length > 2
+                    ? () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) =>
+                          QuestionnairePage(model.questionnaires[2], model)));
+                }
+                    : null,
+              ),
+              SpringboardTile(
+                assetPath: 'assets/stayhome/profile_icon.png',
+                text: "update profile or sharing",
+                onPressed: () => MapAppDrawer.navigate(context, "/profile"),
               ),
             ],
           ),
@@ -124,11 +136,8 @@ class SpringboardTile extends StatelessWidget {
               padding: MapAppPadding.pageMargins,
               child: Column(
                 children: <Widget>[
-                  Image.asset(
-                    this.assetPath,
-                    height: 80,
-                    color: enabled ? null : Theme.of(context).disabledColor
-                  ),
+                  Image.asset(this.assetPath,
+                      height: 80, color: enabled ? null : Theme.of(context).disabledColor),
                   Text(
                     this.text,
                     textAlign: TextAlign.center,

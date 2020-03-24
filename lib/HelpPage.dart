@@ -122,11 +122,17 @@ class _StayHomeHelpPageState extends _HelpPageState {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: Dimensions.fullMargin),
               child: OutlineButton(
-                  onPressed: () => PlatformDefs().launchUrl(WhatInfo.link),
+                  onPressed: () => PlatformDefs().launchUrl(WhatInfo.link, newTab: true),
                   child: Text("Read More")),
             ),
             SectionTitle("About CIRG"),
             Text(S.of(context).developedByCIRG),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: Dimensions.fullMargin),
+              child: OutlineButton(
+                  onPressed: () => PlatformDefs().launchUrl(WhatInfo.cirgLink, newTab: true),
+                  child: Text("Read More")),
+            ),
             Text(""),
             Text(S.of(context).versionString(AppConfig.version)),
           ]),

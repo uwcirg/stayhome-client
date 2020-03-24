@@ -41,18 +41,60 @@ class QuestionnairePageState extends State<QuestionnairePage> {
     }
   }
 
+  _onDonePressed() {
+    _response.status = QuestionnaireResponseStatus.completed;
+    _model.postQuestionnaireResponse(_response).then((value) {
+      Navigator.of(context).pop();
+    }).catchError((error) => snack(error, context));
+  }
+  _onCancelPressed() {
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return new MapAppPageScaffold(
-      title: _questionnaire.title,
-      child: QuestionListWidget(_questionnaire.item, _response, () {
-        _response.status = QuestionnaireResponseStatus.completed;
-        _model.postQuestionnaireResponse(_response).then((value) {
-          Navigator.of(context).pop();
-        }).catchError((error) => snack(error, context));
-      }),
-      showDrawer: false,
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: new MapAppPageScaffold(
+        title: _questionnaire.title,
+        child: QuestionListWidget(
+            questions: _questionnaire.item,
+            response: _response,
+            onDonePressed: _onDonePressed,
+            onCancelPressed: _onCancelPressed),
+        showDrawer: false,
+      ),
     );
+  }
+
+  Future<bool> _onWillPop() async {
+    if (_response.isEmpty) {
+      return true;
+    }
+    return (await showDialog(
+          context: context,
+          builder: (context) => new AlertDialog(
+            title: new Text("You have unsaved responses"),
+            content: new Text('What do you want to do?'),
+            actions: <Widget>[
+              new FlatButton(
+                onPressed: () {
+                  Navigator.of(context).pop(false); //dismiss dialog with result
+                  _onCancelPressed();
+                },
+                child: new Text('discard'),
+              ),
+              new FlatButton(
+                onPressed: () {
+                  Navigator.of(context).pop(false); //dismiss dialog with result
+                  _onDonePressed();
+                },
+                child: new Text('save'),
+              ),
+            ],
+          ),
+        )) ??
+        false;
   }
 }
 
@@ -76,30 +118,38 @@ class QuestionnaireItemPageState extends State<QuestionnaireItemPage> {
   Widget build(BuildContext context) {
     return new MapAppPageScaffold(
       title: _questionnaireItem.text,
-      child:
-          QuestionListWidget(_questionnaireItem.item, _response, () => Navigator.of(context).pop()),
+      child: QuestionListWidget(
+          questions: _questionnaireItem.item,
+          response: _response,
+          onDonePressed: () => Navigator.of(context).pop(),
+          onCancelPressed: () =>
+              Navigator.of(context).popUntil((route) => route.toString() == '/home')),
       showDrawer: false,
     );
   }
 }
 
 class QuestionListWidget extends StatefulWidget {
-  final List<QuestionnaireItem> _questions;
-  final QuestionnaireResponse _response;
-  final Function _onPressed;
+  final List<QuestionnaireItem> questions;
+  final QuestionnaireResponse response;
+  final Function onDonePressed;
+  final Function onCancelPressed;
 
-  QuestionListWidget(this._questions, this._response, this._onPressed);
+  QuestionListWidget({this.questions, this.response, this.onDonePressed, this.onCancelPressed});
 
   @override
-  State createState() => QuestionListWidgetState(this._questions, this._response, this._onPressed);
+  State createState() => QuestionListWidgetState(
+      this.questions, this.response, this.onDonePressed, this.onCancelPressed);
 }
 
 class QuestionListWidgetState extends State<QuestionListWidget> {
   final List<QuestionnaireItem> _questions;
   final QuestionnaireResponse _response;
-  final Function _onPressed;
+  final Function _onDonePressed;
+  final Function _onCancelPressed;
 
-  QuestionListWidgetState(this._questions, this._response, this._onPressed);
+  QuestionListWidgetState(
+      this._questions, this._response, this._onDonePressed, this._onCancelPressed);
 
   @override
   Widget build(BuildContext context) {
@@ -131,10 +181,24 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
           right: Dimensions.halfMargin,
           top: Dimensions.halfMargin,
           bottom: 200),
-      child: RaisedButton(
-        padding: MapAppPadding.largeButtonPadding,
-        child: Text("done", style: Theme.of(context).textTheme.button),
-        onPressed: _onPressed,
+      child: Row(
+        children: <Widget>[
+          OutlineButton(
+            padding: MapAppPadding.largeButtonPadding,
+            child: Text("cancel"),
+            onPressed: _onCancelPressed,
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(left: Dimensions.fullMargin),
+              child: RaisedButton(
+                padding: MapAppPadding.largeButtonPadding,
+                child: Text("save", style: Theme.of(context).textTheme.button),
+                onPressed: _onDonePressed,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -198,12 +262,15 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
     return Padding(
         padding: MapAppPadding.cardPageMargins,
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
-            child: Text(questionnaireItem.text, style: questionTitleStyle),
+          Visibility(
+            visible: questionnaireItem.text != null && questionnaireItem.text.isNotEmpty,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
+              child: Text(questionnaireItem.text ?? "", style: questionTitleStyle),
+            ),
           ),
           Visibility(
-              visible: questionnaireItem.helpText != null,
+              visible: questionnaireItem.helpText != null && questionnaireItem.helpText.isNotEmpty,
               child: Text(
                 questionnaireItem.helpText ?? "",
                 style: Theme.of(context).textTheme.caption,
@@ -313,7 +380,8 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
 
   Widget _buildTemperatureItem(QuestionnaireItem questionnaireItem, BuildContext context) {
     return TextFormField(
-      decoration: InputDecoration(hintText: "Enter body temperature", errorMaxLines: 3),
+      decoration:
+          InputDecoration(hintText: "Enter body temperature, in either °F or °C", errorMaxLines: 3),
       inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
       keyboardType: TextInputType.numberWithOptions(decimal: true),
       autovalidate: true,
@@ -323,8 +391,8 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
         if (result == null) return "Please enter a valid decimal";
         if (!isValidTempF(result) && !isValidTempC(result)) {
           return "Enter a value between ${QuestionnaireConstants.minF} and "
-              "${QuestionnaireConstants.maxF} (ºF) or ${QuestionnaireConstants.minC} and "
-              "${QuestionnaireConstants.maxC} (ºC). This value will not be saved.";
+              "${QuestionnaireConstants.maxF} (°F) or ${QuestionnaireConstants.minC} and "
+              "${QuestionnaireConstants.maxC} (°C). This value will not be saved.";
         }
         // restrict to 2 decimals
         if (!isValidTempF(result)) result = double.parse(cToF(result).toStringAsFixed(2));
