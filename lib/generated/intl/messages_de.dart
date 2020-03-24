@@ -21,15 +21,17 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m0(device) => "${device}% geladen";
 
-  static m1(duration, durationUnit) => "${duration} ${durationUnit}";
+  static m1(deploymentType) => "System ist im ${deploymentType}-Modus - nicht für den klinischen Gebrauch vorgesehen.";
 
-  static m2(number, unit) => "${number} Mal pro ${unit}";
+  static m2(duration, durationUnit) => "${duration} ${durationUnit}";
 
-  static m3(date, time) => "Zuletzt synchronisiert: ${date} at ${time}";
+  static m3(number, unit) => "${number} Mal pro ${unit}";
 
-  static m4(timeLeftInSeconds) => "Zeit bis Token abläuft: ${timeLeftInSeconds} Sekunden";
+  static m4(date, time) => "Zuletzt synchronisiert: ${date} at ${time}";
 
-  static m5(version) => "Version ${version}";
+  static m5(timeLeftInSeconds) => "Zeit bis Token abläuft: ${timeLeftInSeconds} Sekunden";
+
+  static m6(version) => "Version ${version}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -40,20 +42,20 @@ class MessageLookup extends MessageLookupByLibrary {
     "buttonPushText" : MessageLookupByLibrary.simpleMessage("Der Knopf wurde so oft gedrückt:"),
     "change" : MessageLookupByLibrary.simpleMessage("Ändern"),
     "contact__community" : MessageLookupByLibrary.simpleMessage("Kontakt & Gemeinschaft"),
-    "demoVersionBannerText" : MessageLookupByLibrary.simpleMessage("Demo version - nicht für den klinischen Gebrauch vorgesehen."),
+    "demoVersionBannerText" : m1,
     "developedByCIRG" : MessageLookupByLibrary.simpleMessage("Entwickelt von der Clinical Informatics Research Group (CIRG) an der University of Washington, 2019."),
     "devices" : MessageLookupByLibrary.simpleMessage("Geräte"),
     "duration" : MessageLookupByLibrary.simpleMessage("Dauer:"),
-    "duration_duration_durationunit" : m1,
+    "duration_duration_durationunit" : m2,
     "email" : MessageLookupByLibrary.simpleMessage("E-Mail"),
     "forget" : MessageLookupByLibrary.simpleMessage("Vergessen"),
     "frequency" : MessageLookupByLibrary.simpleMessage("Häufigkeit:"),
-    "frequency_with_contents" : m2,
+    "frequency_with_contents" : m3,
     "hello" : MessageLookupByLibrary.simpleMessage("Hallo!"),
     "help" : MessageLookupByLibrary.simpleMessage("Hilfe"),
     "language" : MessageLookupByLibrary.simpleMessage("Sprache"),
     "languageName" : MessageLookupByLibrary.simpleMessage("Deutsch (DE)"),
-    "last_synced_date" : m3,
+    "last_synced_date" : m4,
     "learning_center" : MessageLookupByLibrary.simpleMessage("Lernzentrum"),
     "login" : MessageLookupByLibrary.simpleMessage("Anmelden"),
     "logout" : MessageLookupByLibrary.simpleMessage("Abmelden"),
@@ -73,9 +75,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "start_a_session" : MessageLookupByLibrary.simpleMessage("Session starten"),
     "testimonials" : MessageLookupByLibrary.simpleMessage("Kundenreferenzen"),
     "timeFormat" : MessageLookupByLibrary.simpleMessage("H:mm:ss"),
-    "time_left_until_token_expiration" : m4,
+    "time_left_until_token_expiration" : m5,
     "treatment_calendar" : MessageLookupByLibrary.simpleMessage("Behandlungskalender"),
-    "versionString" : m5,
+    "versionString" : m6,
     "vfit_faq" : MessageLookupByLibrary.simpleMessage("vFit Häufig Gestellte Fragen"),
     "visit_our_facebook_page" : MessageLookupByLibrary.simpleMessage("Besuchen Sie uns auf Facebook"),
     "what_is_your_email_address" : MessageLookupByLibrary.simpleMessage("Was ist Ihre E-Mail Adresse?"),

@@ -1,9 +1,9 @@
 /*
  * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
  */
-import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppDrawer.dart';
+import 'package:map_app_flutter/config/AppConfig.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
@@ -68,7 +68,7 @@ class DemoVersionWarningBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Visibility(
-        visible: !Foundation.kReleaseMode,
+        visible: !AppConfig.isProd,
         child: Container(
             padding: const EdgeInsets.all(Dimensions.quarterMargin),
             color: Colors.amber.shade100,
@@ -77,7 +77,7 @@ class DemoVersionWarningBanner extends StatelessWidget {
               children: <Widget>[
                 Flexible(
                     child: Text(
-                  S.of(context).demoVersionBannerText,
+                  S.of(context).demoVersionBannerText(AppConfig.deploymentType),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   textAlign: Theme.of(context).platform == TargetPlatform.iOS

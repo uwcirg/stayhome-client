@@ -1,5 +1,5 @@
 {
-  "demoVersionBannerText": "Demo version - nicht für den klinischen Gebrauch vorgesehen.",
+  "demoVersionBannerText": "System ist im {deploymentType}-Modus - nicht für den klinischen Gebrauch vorgesehen.",
   "hello": "Hallo!",
   "versionString": "Version {version}",
   "developedByCIRG": "Entwickelt von der Clinical Informatics Research Group (CIRG) an der University of Washington, 2019.",
