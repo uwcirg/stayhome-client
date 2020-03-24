@@ -89,7 +89,7 @@ class LoginPageState extends State<LoginPage> {
                               child: FlatButton(
                                   onPressed: () => PlatformDefs().launchUrl(MyApp.of(context).appAssets.whatLink),
                                   child: Padding(
-                                      padding: EdgeInsets.all(Dimensions.fullMargin),
+                                      padding: EdgeInsets.symmetric(vertical: Dimensions.fullMargin),
                                       child: Text(MyApp.of(context).appAssets.whatLinkTitle,
                                           style: TextStyle(
                                               color: Colors.white,

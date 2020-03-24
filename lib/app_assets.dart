@@ -242,7 +242,7 @@ class StayHomeAppAssets extends AppAssets {
   @override
   Widget loginBanner(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 60),
+      padding: const EdgeInsets.only(top: Dimensions.extraLargeMargin),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -253,7 +253,7 @@ class StayHomeAppAssets extends AppAssets {
                 height: 20,
               )),
           Padding(
-              padding: EdgeInsets.only(left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, top: 12, bottom: Dimensions.extraLargeMargin),
+              padding: EdgeInsets.only(left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, top: 8, bottom: Dimensions.largeMargin),
               child: Image.asset(
                 'assets/stayhome/CIRG_logo_white.png',
                 height: 48,

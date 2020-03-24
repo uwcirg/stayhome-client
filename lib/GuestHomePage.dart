@@ -21,6 +21,27 @@ class GuestHomeState extends State<GuestHomePage> {
   Widget build(BuildContext context) {
     MediaQueryData deviceInfo = MediaQuery.of(context);
     double sideInsets = deviceInfo.size.width > MediaQueryConstants.minDesktopWidth ? Dimensions.extraLargeMargin : Dimensions.fullMargin;
+    var childWidgets = <Widget>[
+                       Padding(
+                        padding: EdgeInsets.only(top: Dimensions.quarterMargin, bottom: Dimensions.quarterMargin, left: Dimensions.quarterMargin, right: Dimensions.quarterMargin),
+                        child: OutlineButton(
+                          child: Text("back to login/register"),
+                            onPressed: () {
+                              Navigator.of(context).pushReplacementNamed('/login');
+                            }
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: Dimensions.quarterMargin, bottom: Dimensions.quarterMargin, left: Dimensions.quarterMargin, right: Dimensions.quarterMargin),
+                        child: OutlineButton(
+                          child: Text("continue to resources"),
+                            onPressed: () {
+                              Navigator.of(context).pushReplacementNamed('/learning_center');
+                            }
+                        ),
+                      ),
+
+                    ];
     return MapAppPageScaffold(
       title: S.of(context).welcome,
       child: 
@@ -28,41 +49,27 @@ class GuestHomeState extends State<GuestHomePage> {
         padding: const EdgeInsets.symmetric(horizontal: Dimensions.fullMargin),
         child:
         Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
                 Container(
                   padding: EdgeInsets.symmetric(vertical: Dimensions.fullMargin, horizontal: sideInsets),
                   child: Text('StayHome includes a resource directory that gives you direct access to trusted information sources to support your need for accurate information about how to maintain physical, financial, and personal wellbeing during the COVID-19 outbreak.'),
                 ),
                 Container(
-                  padding: EdgeInsets.symmetric(vertical: Dimensions.halfMargin, horizontal: sideInsets),
+                  padding: EdgeInsets.only(top: Dimensions.halfMargin, left: sideInsets, right: sideInsets, bottom: Dimensions.largeMargin),
                   child: Text('You can browse these sources or create an account to start tracking your own symptom information, temperature, travel, exposures or risks, and testing.'),
                 ),
+                deviceInfo.size.width > MediaQueryConstants.minTabletWidth ?
                 Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                       Padding(
-                        padding: EdgeInsets.symmetric(vertical: Dimensions.largeMargin, horizontal: Dimensions.quarterMargin),
-                        child: OutlineButton(
-                          child: Text("back"),
-                            onPressed: () {
-                              Navigator.of(context).pushReplacementNamed('/login');
-                            }
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: Dimensions.largeMargin, horizontal: Dimensions.quarterMargin),
-                        child: OutlineButton(
-                          child: Text("access resources"),
-                            onPressed: () {
-                              Navigator.of(context).pushReplacementNamed('/learning_center');
-                            }
-                        ),
-                      ),
-
-                    ]
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: childWidgets
+                ) :
+                Column (
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: childWidgets
                 )
             ],
         )
