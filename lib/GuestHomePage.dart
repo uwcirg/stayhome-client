@@ -34,7 +34,7 @@ class GuestHomeState extends State<GuestHomePage> {
         child: OutlineButton(
             child: Text("back to login/register"),
             onPressed: () {
-              MyApp.of(context).logout();
+              MyApp.of(context).logout(context: context);
             }),
       ),
       Padding(

@@ -25,14 +25,19 @@ class KeycloakAuth {
   bool refreshTokenExpired = false;
 
   KeycloakAuth(this._issuer, this._clientSecret, this._clientId) {
-    _api = new KeycloakApi(_issuer, _clientId, _clientSecret, _redirectUrl, scopes: ["openid"]);
+    if (kIsWeb) {
+      _api = new KeycloakApi(_issuer, _clientId, _clientSecret, _redirectUrl,
+          scopes: ["openid"], authStorage: MapAppWebAuthStorage());
+    } else {
+      _api = new KeycloakApi(_issuer, _clientId, _clientSecret, _redirectUrl, scopes: ["openid"]);
+    }
   }
 
   factory KeycloakAuth.from(KeycloakAuth other) {
     return KeycloakAuth(other._issuer, other._clientSecret, other._clientId);
   }
 
-  String authToken(){
+  String authToken() {
     return _api.currentOauthAccount.token;
   }
 
@@ -103,11 +108,10 @@ class KeycloakAuth {
         }
       }
     } catch (error) {
-        //for Web platform, launching the logout url directly after local logout to clear Keycloak session if encounter error?
-        if (kIsWeb) {
-          PlatformDefs().launchUrl(url);
-        
-        }
+      //for Web platform, launching the logout url directly after local logout to clear Keycloak session if encounter error?
+      if (kIsWeb) {
+        PlatformDefs().launchUrl(url);
+      }
       return Future.error("Log out error: $error");
     }
   }
@@ -234,16 +238,24 @@ class UserInfo {
   final String preferredUsername;
   final String email;
 
-  UserInfo(this.keycloakUserId, this.emailVerified, this.preferredUsername,
-      this.email);
-
+  UserInfo(this.keycloakUserId, this.emailVerified, this.preferredUsername, this.email);
 
   static UserInfo from(Map userInfoMap) {
-    return UserInfo(
-        userInfoMap["sub"],
-        userInfoMap["email_verified"],
-        userInfoMap["preferred_username"],
-        userInfoMap["email"]);
+    return UserInfo(userInfoMap["sub"], userInfoMap["email_verified"],
+        userInfoMap["preferred_username"], userInfoMap["email"]);
+  }
+}
+
+class MapAppWebAuthStorage implements simpleAuth.AuthStorage {
+  @override
+  Future<String> read({String key}) {
+    // TODO: implement read (using cookies)
+    return null;
+  }
+
+  @override
+  Future<void> write({String key, String value}) {
+    // TODO: implement write (using cookies)
   }
 }
 

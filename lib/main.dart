@@ -124,10 +124,11 @@ class _MyAppState extends State<MyApp> {
   }
 
   /// provide context in order to go back to login back after logout is complete
-  logout({bool pushLogin=true}) {
+  logout({bool pushLogin=true, BuildContext context}) {
+    BuildContext c = context ?? this.context;
     auth.mapAppLogout().then((value) {
       logoutCompleted();
-      if (pushLogin) Navigator.of(context).pushReplacementNamed("/login");
+      if (pushLogin) Navigator.of(c).pushReplacementNamed("/login");
     }).catchError((error) => print("Logout error: $error"));
   }
 
