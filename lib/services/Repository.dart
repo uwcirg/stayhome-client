@@ -286,6 +286,7 @@ class Repository {
     return {
       HttpHeaders.acceptHeader: 'application/json',
       HttpHeaders.authorizationHeader: "Bearer $authToken",
+      HttpHeaders.contentTypeHeader: 'application/json'
     };
   }
 }
