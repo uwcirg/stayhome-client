@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
  */
-
 import 'dart:convert';
 import 'dart:io' show HttpHeaders;
 
@@ -18,9 +17,9 @@ class Repository {
   static Future<Patient> getPatient(String system, String identifier, String authToken) async {
     print("Attempting to load patient with id: $system|$identifier");
     var patientSearchUrl = "$fhirBaseUrl/Patient?identifier=$system|$identifier";
-    var response = await get(patientSearchUrl, headers: _defaultShortHeaders(authToken));
+    var response = await get(patientSearchUrl, headers: _defaultHeaders(authToken));
 
-    return resultFromResponse(response, "Error loading Patient/$identifier").then((value) {
+    return resultFromResponse(response, "Error loading patient").then((value) {
       var searchResultBundle = jsonDecode(value);
       if (searchResultBundle['total'] > 1) {
         String patientsIds = searchResultBundle['entry']
@@ -35,8 +34,9 @@ class Repository {
         print("no patient");
         return null;
       }
-      print("found patient");
-      return Patient.fromJson(searchResultBundle['entry'][0]['resource']);
+      var entry = searchResultBundle['entry'][0];
+      print("found patient: ${entry['resource']['resourceType']}/${entry['resource']['id']}");
+      return Patient.fromJson(entry['resource']);
     });
   }
 
@@ -48,6 +48,7 @@ class Repository {
       }
       return Future.value(response.body);
     } else {
+      print("Status code: ${response.statusCode} ${response.reasonPhrase}");
       var message;
       try {
         message = jsonDecode(response.body)['issue'][0]['diagnostics'];
@@ -62,7 +63,7 @@ class Repository {
   /// Get the first returned CarePlan for the given patient.
   static Future<CarePlan> getCarePlan(Patient patient, String templateRef, String authToken) async {
     var url = "$fhirBaseUrl/CarePlan?subject=${patient.reference}";
-    var response = await get(url, headers: _defaultShortHeaders(authToken));
+    var response = await get(url, headers: _defaultHeaders(authToken));
     var searchResultBundle = jsonDecode(response.body);
     if (searchResultBundle["total"] == 0) {
       return null;
@@ -86,13 +87,13 @@ class Repository {
   /// reference should be of format CarePlan/123
   static Future<CarePlan> loadCarePlan(String reference, String authToken) async {
     var url = "$fhirBaseUrl/$reference";
-    var response = await get(url, headers: _defaultShortHeaders(authToken));
+    var response = await get(url, headers: _defaultHeaders(authToken));
     return CarePlan.fromJson(jsonDecode(response.body));
   }
 
   static Future<List<Procedure>> getProcedures(CarePlan carePlan, String authToken) async {
     var url = "$fhirBaseUrl/Procedure?based-on=${carePlan.reference}";
-    var response = await get(url, headers: _defaultShortHeaders(authToken));
+    var response = await get(url, headers: _defaultHeaders(authToken));
     var searchResultBundle = jsonDecode(response.body);
     List<Procedure> procedures = [];
     if (searchResultBundle['total'] > 0) {
@@ -108,7 +109,7 @@ class Repository {
     int maxToReturn = 200;
     var url =
         "$fhirBaseUrl/QuestionnaireResponse?based-on=${carePlan.reference}&_count=$maxToReturn&_sort=-authored";
-    var response = await get(url, headers: _defaultShortHeaders(authToken));
+    var response = await get(url, headers: _defaultHeaders(authToken));
     var searchResultBundle = jsonDecode(response.body);
     List<QuestionnaireResponse> responses = [];
     if (searchResultBundle['total'] > 0) {
@@ -132,7 +133,7 @@ class Repository {
     List<DocumentReference> documentReferences = [];
     await Future.forEach(documentReferenceReferences, (Reference r) async {
       var url = "$fhirBaseUrl/${r.reference}";
-      var value = await get(url, headers: _defaultShortHeaders(authToken));
+      var value = await get(url, headers: _defaultHeaders(authToken));
 
       documentReferences.add(DocumentReference.fromJson(jsonDecode(value.body)));
     });
@@ -142,7 +143,7 @@ class Repository {
   static Future<Questionnaire> getSimpleQuestionnaire(String authToken) async {
     var url = 'http://hapi.fhir.org/baseR4/Questionnaire/11723';
 
-    var value = await get(url, headers: _defaultShortHeaders(authToken));
+    var value = await get(url, headers: _defaultHeaders(authToken));
     var q = Questionnaire.fromJson(jsonDecode(value.body));
     await q.loadValueSets();
     return q;
@@ -151,7 +152,7 @@ class Repository {
   static Future<Questionnaire> getPHQ9Questionnaire(String authToken) async {
     var url = "$fhirBaseUrl/Questionnaire/52";
 
-    var value = await get(url, headers: _defaultShortHeaders(authToken));
+    var value = await get(url, headers: _defaultHeaders(authToken));
 
     var q = Questionnaire.fromJson(jsonDecode(value.body));
     await q.loadValueSets();
@@ -169,7 +170,7 @@ class Repository {
   static Future<void> postCompletedSession(Procedure treatmentSession, String authToken) async {
     var url = "$fhirBaseUrl/Procedure?_format=json";
     String body = jsonEncode(treatmentSession.toJson());
-    var headers = _defaultFullHeaders(authToken);
+    var headers = _defaultHeaders(authToken);
 
     Response value =
         await post(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
@@ -181,7 +182,7 @@ class Repository {
       QuestionnaireResponse questionnaireResponse, String authToken) async {
     var url = "$fhirBaseUrl/QuestionnaireResponse?_format=json";
     String body = jsonEncode(questionnaireResponse.toJson());
-    var headers = _defaultFullHeaders(authToken);
+    var headers = _defaultHeaders(authToken);
 
     Response value =
         await post(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
@@ -193,7 +194,7 @@ class Repository {
       String questionnaireReference, String authToken) async {
     var url = "$fhirBaseUrl/$questionnaireReference";
 
-    var value = await get(url, headers: _defaultShortHeaders(authToken));
+    var value = await get(url, headers: _defaultHeaders(authToken));
 
     var q = Questionnaire.fromJson(jsonDecode(value.body));
     await q.loadValueSets();
@@ -221,7 +222,7 @@ class Repository {
     String status = "in-progress";
     var url =
         "$fhirBaseUrl/Communication?recipient=${patient.reference}&status=$status&_count=$maxToReturn";
-    var response = await get(url, headers: _defaultShortHeaders(authToken));
+    var response = await get(url, headers: _defaultHeaders(authToken));
     var searchResultBundle = jsonDecode(response.body);
     List<Communication> responses = [];
     if (searchResultBundle['total'] > 0) {
@@ -236,7 +237,7 @@ class Repository {
       Communication communication, String authToken) async {
     var url = "$fhirBaseUrl/Communication/${communication.id}?_format=json";
     String body = jsonEncode(communication.toJson());
-    var headers = _defaultFullHeaders(authToken);
+    var headers = _defaultHeaders(authToken);
 
     Response value =
     await put(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
@@ -247,7 +248,7 @@ class Repository {
   static Future postCarePlan(CarePlan plan, String authToken) async {
     var url = "$fhirBaseUrl/CarePlan?_format=json";
     String body = jsonEncode(plan.toJson());
-    var headers = _defaultFullHeaders(authToken);
+    var headers = _defaultHeaders(authToken);
 
     Response response =
         await post(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
@@ -257,7 +258,7 @@ class Repository {
   static Future updateCarePlan(CarePlan plan, String authToken) async {
     var url = "$fhirBaseUrl/CarePlan/${plan.id}?_format=json";
     String body = jsonEncode(plan.toJson());
-    var headers = _defaultFullHeaders(authToken);
+    var headers = _defaultHeaders(authToken);
 
     Response response =
         await put(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
@@ -266,7 +267,7 @@ class Repository {
 
   static Future postPatient(Patient patient, String authToken) async {
     String body = jsonEncode(patient.toJson());
-    var headers = _defaultFullHeaders(authToken);
+    var headers = _defaultHeaders(authToken);
 
     Response response;
     if (patient.id != null && patient.id.length > 0) {
@@ -281,17 +282,10 @@ class Repository {
     return resultFromResponse(response, "Saving patient failed");
   }
 
-  static Map<String, String> _defaultShortHeaders(String authToken) =>
-      {HttpHeaders.authorizationHeader: "Bearer " + authToken};
-
-  static Map<String, String> _defaultFullHeaders(String authToken) {
+  static Map<String, String> _defaultHeaders(String authToken) {
     return {
-      HttpHeaders.acceptCharsetHeader: "utf-8",
-      HttpHeaders.acceptHeader: "application/fhir+json;q=1.0, application/json+fhir;q=0.9",
-      HttpHeaders.userAgentHeader: "HAPI-FHIR/3.8.0 (FHIR Client; FHIR 4.0.0/R4; apache)",
-      HttpHeaders.acceptEncodingHeader: "gzip",
-      HttpHeaders.contentTypeHeader: "application/fhir+json; charset=UTF-8",
-      HttpHeaders.authorizationHeader: "Bearer " + authToken,
+      HttpHeaders.acceptHeader: 'application/json',
+      HttpHeaders.authorizationHeader: "Bearer $authToken",
     };
   }
 }
