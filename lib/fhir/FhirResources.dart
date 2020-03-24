@@ -1543,6 +1543,7 @@ class Coding implements ChoiceOption {
   String system;
   String code;
   String display;
+
   Answer get ifSelected => new Answer(valueCoding: this);
 
   Coding({this.system, this.code, this.display});
@@ -1704,6 +1705,7 @@ class QuestionnaireItem {
   }
 
   List<ChoiceOption> get choiceOptions => answerOption ?? answerValueSet;
+
   int get choiceCount => choiceOptions != null ? choiceOptions.length : 0;
 
   String get helpText {
@@ -1796,6 +1798,7 @@ class AnswerOption implements ChoiceOption {
   int valueInteger;
   List<Extension> extension;
   Coding valueCoding;
+
   Answer get ifSelected => new Answer.fromAnswerOption(this);
 
   AnswerOption({this.valueInteger, this.extension, this.valueCoding});
@@ -1887,6 +1890,11 @@ class QuestionnaireResponse extends Resource {
       });
     }
   }
+
+  bool get isEmpty =>
+      this.item == null ||
+      this.item.isEmpty ||
+      this.item.every((QuestionnaireResponseItem element) => element.isEmpty);
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
@@ -2037,6 +2045,8 @@ class QuestionnaireResponseItem {
   String linkId;
   List<Answer> answer;
 
+  bool get isEmpty => answer == null || answer.isEmpty || answer.every((Answer a) => a.isEmpty);
+
   QuestionnaireResponseItem({this.linkId, this.answer});
 
   QuestionnaireResponseItem.fromJson(Map<String, dynamic> json) {
@@ -2066,6 +2076,14 @@ class Answer {
   String valueString;
   DateTime valueDate;
   DateTime valueDateTime;
+
+  bool get isEmpty =>
+      valueInteger == null &&
+      valueDecimal == null &&
+      valueCoding == null &&
+      (valueString == null || valueString.isEmpty) &&
+      valueDate == null &&
+      valueDateTime == null;
 
   Answer(
       {this.valueDecimal,
