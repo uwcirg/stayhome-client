@@ -176,13 +176,16 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
   }
 
   Widget _buildItem(BuildContext context, QuestionnaireItem questionnaireItem) {
+    var questionTitleStyle = Theme.of(context).textTheme.title;
     Widget item;
     if (questionnaireItem.isTemperature()) {
       item = _buildTemperatureItem(questionnaireItem, context);
     } else if (questionnaireItem.type == "choice") {
       item = _buildChoiceItem(questionnaireItem, context);
     } else if (questionnaireItem.type == "display") {
-      item = Padding(padding: MapAppPadding.cardPageMargins, child: Text(questionnaireItem.text));
+      item = Container();
+      questionTitleStyle =
+          questionTitleStyle.apply(color: Theme.of(context).primaryColor, fontWeightDelta: 2);
     } else if (questionnaireItem.type == "string") {
       item = _buildStringItem(questionnaireItem, context);
     } else if (questionnaireItem.type == "date") {
@@ -197,10 +200,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
           Padding(
             padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
-            child: Text(
-              questionnaireItem.text,
-              style: Theme.of(context).textTheme.title,
-            ),
+            child: Text(questionnaireItem.text, style: questionTitleStyle),
           ),
           Visibility(
               visible: questionnaireItem.helpText != null,
@@ -263,7 +263,11 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
           try {
             date = DateFormat('M/d/y HH:mm a').parse(value);
           } catch (FormatException) {
-            return "Enter a valid date and time";
+            try {
+              date = DateFormat('M/d/y').parse(value);
+            } catch (FormatException) {
+              return "Enter a valid date and time";
+            }
           }
           _response.setAnswer(questionnaireItem.linkId, Answer(valueDateTime: date));
           return null;
@@ -289,7 +293,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
     return DropdownButton(
       isExpanded: true,
       hint: Text(
-        currentResponse != null ? currentResponse.toString(): "Select",
+        currentResponse != null ? currentResponse.toString() : "Select",
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
       ),
