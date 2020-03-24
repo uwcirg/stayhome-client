@@ -21,7 +21,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m0(device) => "${device}% charged";
 
-  static m1(deploymentType) => "This is a ${deploymentType} system - not for clinical use.";
+  static m1(deploymentType) => "This is a ${deploymentType} system - not for real data.";
 
   static m2(duration, durationUnit) => "${duration} ${durationUnit}";
 
