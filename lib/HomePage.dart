@@ -17,14 +17,21 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
       title: "home",
-      child: new Padding(
-        padding: MapAppPadding.pageMargins,
-        child: ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
-          Widget errorWidget = MapAppErrorMessage.fromModel(model, context);
-          if (errorWidget != null) return errorWidget;
-          return _buildPage(context, model);
-        }),
-      ),
+      child: Expanded(
+          child: ListView.builder(
+            itemBuilder: (context, i) {
+              return new Padding(
+                padding: MapAppPadding.pageMargins,
+                child: ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
+                  Widget errorWidget = MapAppErrorMessage.fromModel(model, context);
+                  if (errorWidget != null) return errorWidget;
+                  return _buildPage(context, model);
+                }),
+              );
+            },
+            itemCount: 1,
+            shrinkWrap: true,
+          ))
     );
   }
 
