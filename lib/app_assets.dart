@@ -32,6 +32,7 @@ abstract class AppAssets {
   String get whatLinkTitle;
   String get whatLink;
 
+
   get issuer;
   get clientSecret;
   get clientId;
@@ -76,6 +77,7 @@ class JoyluxAppAssets extends AppAssets {
   String get whatLinkTitle => "What’s vFit?";
   @override
   String get whatLink => "https://joylux.com/";
+
 
   JoyluxAppAssets()
       : super(MapAppColors.vFitPrimary, MapAppColors.vFitAccent, MapAppColors.vFitHighlight,
@@ -245,6 +247,18 @@ class StayHomeAppAssets extends AppAssets {
           Padding(
               padding: EdgeInsets.all(Dimensions.fullMargin),
               child: Image.asset(
+                'assets/stayhome/Signature_Left_White.png',
+                height: 20,
+              )),
+          Padding(
+              padding: EdgeInsets.only(left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, top: 12, bottom: Dimensions.extraLargeMargin),
+              child: Image.asset(
+                'assets/stayhome/CIRG_logo_white.png',
+                height: 48,
+              )),
+          Padding(
+              padding: EdgeInsets.only(left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, top: Dimensions.fullMargin, bottom: 12),
+              child: Image.asset(
                 'assets/stayhome/icon_white.png',
                 height: 70,
               )),
@@ -256,17 +270,15 @@ class StayHomeAppAssets extends AppAssets {
                 .apply(color: Colors.white, fontWeightDelta: 2),
           ),
           Padding(
-              padding: EdgeInsets.all(Dimensions.fullMargin),
-              child: Image.asset(
-                'assets/stayhome/Signature_Left_White.png',
-                height: 20,
-              )),
-          Padding(
-              padding: EdgeInsets.only(left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, top: 12, bottom: 12),
-              child: Image.asset(
-                'assets/stayhome/CIRG_logo_white.png',
-                height: 52,
-              )),
+            padding: EdgeInsets.only(left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, top: 12, bottom: Dimensions.halfMargin),
+            child: Text(
+              'Support during COVID-19',
+              style: Theme.of(context)
+                    .primaryTextTheme
+                    .headline5
+                    .apply(color: Colors.white, fontWeightDelta: 1)
+            ),
+          )
         ],
       ),
     );
