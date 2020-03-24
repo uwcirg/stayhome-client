@@ -401,14 +401,17 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
           result = null;
         } else {
           result = double.tryParse(value);
-          if (result == null) message = "Please enter a valid decimal";
-          if (!isValidTempF(result) && !isValidTempC(result)) {
-            message = "Enter a value between ${QuestionnaireConstants.minF} and "
-                "${QuestionnaireConstants.maxF} (°F) or ${QuestionnaireConstants.minC} and "
-                "${QuestionnaireConstants.maxC} (°C). This value will not be saved.";
+          if (result == null) {
+            message = "Please enter a valid decimal";
+          } else {
+            if (!isValidTempF(result) && !isValidTempC(result)) {
+              message = "Enter a value between ${QuestionnaireConstants.minF} and "
+                  "${QuestionnaireConstants.maxF} (°F) or ${QuestionnaireConstants.minC} and "
+                  "${QuestionnaireConstants.maxC} (°C). This value will not be saved.";
+            }
+            // restrict to 2 decimals
+            if (!isValidTempF(result)) result = double.parse(cToF(result).toStringAsFixed(2));
           }
-          // restrict to 2 decimals
-          if (!isValidTempF(result)) result = double.parse(cToF(result).toStringAsFixed(2));
         }
         _response.setAnswer(questionnaireItem.linkId, Answer(valueDecimal: result));
         return message;
