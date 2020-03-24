@@ -61,18 +61,28 @@ class HomePage extends StatelessWidget {
         ),
 // TODO: Add the following two items when the other two questionnaires are added. Ideally, don't
 // hardcode them and dynamically add a tile for each questionnaire in the questionnaire list.
-//            Row(
-//              children: <Widget>[
-//                SpringboardTile(
-//                  assetPath: 'assets/stayhome/Testing.png',
-//                  text: "record COVID-19 testing",
-//                ),
-//                SpringboardTile(
-//                  assetPath: 'assets/stayhome/Risk.png',
-//                  text: "note possible exposure",
-//                ),
-//              ],
-//            ),
+        IntrinsicHeight(
+          child: Row(
+            children: <Widget>[
+              SpringboardTile(
+                assetPath: 'assets/stayhome/Testing.png',
+                text: "record COVID-19 testing",
+                onPressed: null,
+              ),
+              SpringboardTile(
+                assetPath: 'assets/stayhome/Risk.png',
+                text: "enter exposure or travel",
+                onPressed: model.questionnaires.length > 1
+                    ? () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                QuestionnairePage(model.questionnaires[1], model)));
+                      }
+                    : null,
+              ),
+            ],
+          ),
+        ),
         Row(
           children: <Widget>[
             SpringboardTile(
@@ -98,10 +108,18 @@ class SpringboardTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool enabled = onPressed != null;
+    var cardColor = enabled ? Theme.of(context).accentColor : Colors.grey[300];
+    var textStyle = Theme.of(context).textTheme.title;
+    if (enabled) {
+      textStyle = textStyle.apply(color: Theme.of(context).primaryColor);
+    } else {
+      textStyle = textStyle.apply(color: Theme.of(context).disabledColor);
+    }
     return Expanded(
       child: InkWell(
         child: Card(
-            color: Theme.of(context).accentColor,
+            color: cardColor,
             child: Padding(
               padding: MapAppPadding.pageMargins,
               child: Column(
@@ -109,15 +127,13 @@ class SpringboardTile extends StatelessWidget {
                   Image.asset(
                     this.assetPath,
                     height: 80,
+                    color: enabled ? null : Theme.of(context).disabledColor
                   ),
                   Text(
                     this.text,
                     textAlign: TextAlign.center,
                     maxLines: 3,
-                    style: Theme.of(context)
-                        .textTheme
-                        .title
-                        .apply(color: Theme.of(context).primaryColor),
+                    style: textStyle,
                   ),
                 ],
               ),
