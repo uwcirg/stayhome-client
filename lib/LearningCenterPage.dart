@@ -24,13 +24,13 @@ abstract class LearningCenterPage extends StatelessWidget {
       title: MyApp.of(context).appAssets.learningCenterPageTitle(context),
       child: ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
         if (model.isLoading) return Center(child: CircularProgressIndicator());
-        if (model.error != null) {
-          print("Error loading resource links: ${model.error}");
-          return MapAppErrorMessage.modelError(model);
-        }
         if (model.infoLinks == null) {
           model.loadResourceLinks();
           return Center(child: CircularProgressIndicator());
+        }
+        if (!model.hasNoUser && model.error != null) {
+          print("Error loading resource links: ${model.error}");
+          return MapAppErrorMessage.modelError(model);
         }
         return Expanded(
             child: ListView.separated(
