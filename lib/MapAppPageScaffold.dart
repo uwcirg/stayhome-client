@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
+ * Copyright (c) 2020 CIRG. All rights reserved.
  */
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppDrawer.dart';

@@ -8,6 +8,7 @@ import 'package:map_app_flutter/MapAppDrawer.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/QuestionnairePage.dart';
 import 'package:map_app_flutter/const.dart';
+import 'package:map_app_flutter/map_app_widgets.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:scoped_model/scoped_model.dart';
 
@@ -19,26 +20,12 @@ class HomePage extends StatelessWidget {
       child: new Padding(
         padding: MapAppPadding.pageMargins,
         child: ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
-//          Widget errorWidget = MapAppErrorMessage.fromModel(model, context);
-//          if (errorWidget != null) return errorWidget;
+          Widget errorWidget = MapAppErrorMessage.fromModel(model, context);
+          if (errorWidget != null) return errorWidget;
           return _buildPage(context, model);
         }),
       ),
     );
-//        Wrap(children: [
-//          InkWell(child: Card(child: Text("First"))),
-//          InkWell(child: Card(child: Text("Second"))),
-//          InkWell(child: Card(child: Text("Third")))
-//        ])
-//        Expanded(
-//            child: ListView.builder(
-//              itemBuilder: (context, i) {
-//                return _buildScreen(context);
-//              },
-//              itemCount: 1,
-//              shrinkWrap: true,
-//            ))
-//        );
   }
 
   Column _buildPage(BuildContext context, CarePlanModel model) {
@@ -72,6 +59,8 @@ class HomePage extends StatelessWidget {
             ],
           ),
         ),
+// TODO: Add the following two items when the other two questionnaires are added. Ideally, don't
+// hardcode them and dynamically add a tile for each questionnaire in the questionnaire list.
 //            Row(
 //              children: <Widget>[
 //                SpringboardTile(
