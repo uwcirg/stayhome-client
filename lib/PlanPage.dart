@@ -5,13 +5,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
-import 'package:map_app_flutter/ProfilePage.dart';
 import 'package:map_app_flutter/QuestionnairePage.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/map_app_widgets.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -51,22 +49,6 @@ class _PlanPageState extends State<PlanPage> {
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
         title: "Calendar",
-        actions: <Widget>[
-          ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
-            return IconButton(
-              icon: Icon(Icons.refresh),
-              onPressed: () {
-                model.load();
-              },
-            );
-          }),
-          IconButton(
-            icon: Icon(MdiIcons.logout),
-            onPressed: () {
-              MyApp.of(context).logout(context: context);
-            },
-          )
-        ],
         child: Expanded(
             child: ListView.builder(
           itemBuilder: (context, i) {
@@ -96,33 +78,8 @@ class _PlanPageState extends State<PlanPage> {
   }
 
   Widget _buildCalendarPage(TextStyle textStyle, BuildContext context, CarePlanModel model) {
-    if (model == null) {
-      print("Model is null.");
-      return MapAppErrorMessage.loadingErrorWithLogoutButton(context);
-    }
-    if (model.error != null) {
-      return MapAppErrorMessage('${model.error}');
-    }
-
-    if (model.isLoading) {
-      return Center(child: CircularProgressIndicator());
-    }
-
-    if (model.hasNoUser) {
-      return MapAppErrorMessage.loadingErrorWithLogoutButton(context);
-    }
-
-    if (model.hasNoPatient) {
-      return _buildCreateMyProfileButton(context, model);
-    }
-
-    if (model.hasNoCarePlan) {
-      return MapAppErrorMessage(
-        S.of(context).you_have_no_active_pelvic_floor_management_careplan,
-        buttonLabel: S.of(context).add_the_default_careplan_for_me,
-        onButtonPressed: () => model.addDefaultCareplan(),
-      );
-    }
+    Widget errorWidget = MapAppErrorMessage.fromModel(model, context);
+    if (errorWidget != null) return errorWidget;
 
     if (model.treatmentCalendar == null) {
       print("Treatment calendar is null.");
@@ -328,19 +285,11 @@ class _PlanPageState extends State<PlanPage> {
     );
   }
 
-  Widget _buildCreateMyProfileButton(BuildContext context, CarePlanModel model) {
-    return MapAppErrorMessage(
-      "You do not have a patient record in the FHIR database.",
-      buttonLabel: "create one",
-      onButtonPressed: () =>
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreateProfilePage())),
-    );
-  }
-
   List<Widget> _buildQuestionnaireButtons(BuildContext context, CarePlanModel model) {
     if (model.questionnaires == null) return [];
     return model.questionnaires.map((Questionnaire questionnaire) {
-      String title = questionnaire.title != null ? questionnaire.title : "questionnaire";
+      String title =
+          questionnaire.title != null ? questionnaire.title.toLowerCase() : "questionnaire";
       return _buildQuestionnaireButton(context, title, questionnaire, model);
     }).toList();
   }
@@ -748,13 +697,6 @@ class _StayHomePlanPageState extends _PlanPageState {
   @override
   List<Widget> _buildCalendarPageChildren(BuildContext context, CarePlanModel model) {
     return <Widget>[
-      Visibility(
-        visible: model.communications != null && model.communications.isNotEmpty,
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: Dimensions.halfMargin),
-          child: NotificationsWidget(model),
-        ),
-      ),
       _buildQuestionnaireButtonSection(context, model),
       _buildTreatmentCalendarWidget(_calendarController, model),
       Padding(
@@ -833,66 +775,5 @@ class _StayHomePlanPageState extends _PlanPageState {
         );
       },
     );
-  }
-}
-
-class NotificationsWidget extends StatelessWidget {
-  final CarePlanModel model;
-
-  const NotificationsWidget(this.model);
-
-  @override
-  Widget build(BuildContext context) {
-    if (model.communications == null || model.communications.isEmpty) {
-      return Container();
-    }
-    return Column(
-      children: model.communications.map((Communication c) {
-        return Card(
-          color: _colorForPriority(c.priority),
-          child: Padding(
-            padding: const EdgeInsets.all(Dimensions.halfMargin),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  c.sent != null
-                      ? "${DateFormat.MEd().format(c.sent)} ${DateFormat.jm().format(c.sent)}"
-                      : "No date",
-                  style: Theme.of(context).textTheme.caption,
-                ),
-                Text(c.payload[0].contentString),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    OutlineButton(
-                        child: Text("Dismiss"),
-                        onPressed: () {
-                          c.status = CommunicationStatus.completed;
-                          model.updateCommunication(c);
-                        }),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  _colorForPriority(Priority priority) {
-    switch (priority) {
-      case Priority.routine:
-        return Colors.blue[50];
-      case Priority.urgent:
-        return Colors.yellow[50];
-      case Priority.asap:
-        return Colors.orange[50];
-      case Priority.stat:
-        return Colors.red[50];
-      default:
-        return Colors.grey[50];
-    }
   }
 }

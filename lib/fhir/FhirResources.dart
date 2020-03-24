@@ -1682,6 +1682,7 @@ class QuestionnaireItem {
     return type == "choice" ||
         type == "decimal" ||
         type == "string" ||
+        type == "display" ||
         type == "date" ||
         type == "dateTime";
   }

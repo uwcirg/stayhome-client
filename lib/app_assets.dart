@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:map_app_flutter/CommunicationsPage.dart';
+import 'package:map_app_flutter/HomePage.dart';
 import 'package:map_app_flutter/config/AppConfig.dart';
 import 'package:map_app_flutter/ContactCommunityPage.dart';
 import 'package:map_app_flutter/DevicesPage.dart';
@@ -321,15 +323,27 @@ class StayHomeAppAssets extends AppAssets {
     return [
       MenuItem(
         requiresLogin: true,
+        title:"Home",
+        icon: Icon(Icons.home),
+        route: '/home',
+      ),
+      MenuItem(
+        requiresLogin: true,
         title: S.of(context).plan,
         icon: Icon(Icons.calendar_today),
-        route: '/home',
+        route: '/calendar_history',
       ),
       MenuItem(
         requiresLogin: true,
         title: "Trends",
         icon: Icon(Icons.show_chart),
         route: '/progress_insights',
+      ),
+      MenuItem(
+        requiresLogin: true,
+        title: "Communications",
+        icon: Icon(Icons.chat_bubble),
+        route: '/communications',
       ),
       MenuItem(
         title: S.of(context).learning_center,
@@ -348,7 +362,8 @@ class StayHomeAppAssets extends AppAssets {
   Map<String, WidgetBuilder> navRoutes(BuildContext context) {
     var learningCenter = (BuildContext context) => StayHomeLearningCenterPage();
     return <String, WidgetBuilder>{
-      "/home": (BuildContext context) => new StayHomePlanPage(),
+      "/home": (BuildContext context) => HomePage(),
+      "/calendar_history": (BuildContext context) => StayHomePlanPage(),
       "/guestHome": (BuildContext context) => new GuestHomePage(),
       "/profile": (BuildContext context) => ProfilePage(),
       "/progress_insights": (BuildContext context) => StayHomeTrendsPage(),
@@ -356,6 +371,7 @@ class StayHomeAppAssets extends AppAssets {
       "/about": (BuildContext context) => StayHomeHelpPage(),
       "/login": (BuildContext context) => LoginPage(),
       "/authCallback": (BuildContext context) => PlatformDefs().getAuthCallbackPage(),
+      "/communications": (BuildContext context) => CommunicationsPage(),
     };
   }
 }

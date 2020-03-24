@@ -8,6 +8,6 @@ clientId: stayhome_openid_client
 clientSecret: f80cc383-bb5b-47b7-a2bf-5b713b0b8a50
 
 deploymentType: test # prod vs. test, dev, demo, ...
-careplanTemplateId: 203
+careplanTemplateId: 1058
 version: v0.5
 
