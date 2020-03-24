@@ -168,7 +168,7 @@ class Repository {
   }
 
   static Future<void> postCompletedSession(Procedure treatmentSession, String authToken) async {
-    var url = "$fhirBaseUrl/Procedure?_format=json";
+    var url = "$fhirBaseUrl/Procedure";
     String body = jsonEncode(treatmentSession.toJson());
     var headers = _defaultHeaders(authToken);
 
@@ -180,7 +180,7 @@ class Repository {
 
   static Future<void> postQuestionnaireResponse(
       QuestionnaireResponse questionnaireResponse, String authToken) async {
-    var url = "$fhirBaseUrl/QuestionnaireResponse?_format=json";
+    var url = "$fhirBaseUrl/QuestionnaireResponse";
     String body = jsonEncode(questionnaireResponse.toJson());
     var headers = _defaultHeaders(authToken);
 
@@ -235,7 +235,7 @@ class Repository {
 
   static Future<void> updateCommunication(
       Communication communication, String authToken) async {
-    var url = "$fhirBaseUrl/Communication/${communication.id}?_format=json";
+    var url = "$fhirBaseUrl/Communication/${communication.id}";
     String body = jsonEncode(communication.toJson());
     var headers = _defaultHeaders(authToken);
 
@@ -246,7 +246,7 @@ class Repository {
   }
 
   static Future postCarePlan(CarePlan plan, String authToken) async {
-    var url = "$fhirBaseUrl/CarePlan?_format=json";
+    var url = "$fhirBaseUrl/CarePlan";
     String body = jsonEncode(plan.toJson());
     var headers = _defaultHeaders(authToken);
 
@@ -256,7 +256,7 @@ class Repository {
   }
 
   static Future updateCarePlan(CarePlan plan, String authToken) async {
-    var url = "$fhirBaseUrl/CarePlan/${plan.id}?_format=json";
+    var url = "$fhirBaseUrl/CarePlan/${plan.id}";
     String body = jsonEncode(plan.toJson());
     var headers = _defaultHeaders(authToken);
 
@@ -271,11 +271,11 @@ class Repository {
 
     Response response;
     if (patient.id != null && patient.id.length > 0) {
-      var url = "$fhirBaseUrl/Patient/${patient.id}?_format=json";
+      var url = "$fhirBaseUrl/Patient/${patient.id}";
       response =
           await put(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
     } else {
-      var url = "$fhirBaseUrl/Patient?_format=json";
+      var url = "$fhirBaseUrl/Patient";
       response =
           await post(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
     }

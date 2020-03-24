@@ -1,6 +1,7 @@
-fhirBaseUrl: https://mapapp-dev.cirg.washington.edu/api/r4
-#appRootUrl: http://[::1]:18919 #local dev example
-appRootUrl: https://stayhome.cirg.washington.edu
+fhirBaseUrl: http://lo.lo:5000/api/r4
+#fhirBaseUrl: https://mapapp-dev.cirg.washington.edu/api/r4
+appRootUrl: http://[::1]:8888
+#appRootUrl: https://stayhome.cirg.washington.edu
 
 issuerUrl: https://keycloak-dev.cirg.washington.edu/auth/realms/Stayhome
 clientId: stayhome_openid_client
