@@ -261,9 +261,12 @@ class StayHomeAppAssets extends AppAssets {
               )),
           Padding(
               padding: EdgeInsets.only(left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, top: 8, bottom: Dimensions.largeMargin),
-              child: Image.asset(
-                'assets/stayhome/CIRG_logo_white.png',
-                height: 48,
+              child: InkWell(
+                onTap: () => PlatformDefs().launchUrl(WhatInfo.cirgLink, newTab: true),
+                child: Image.asset(
+                  'assets/stayhome/CIRG_logo_white.png',
+                  height: 48,
+                ),
               )),
           Padding(
               padding: EdgeInsets.only(left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, top: Dimensions.fullMargin, bottom: 12),
