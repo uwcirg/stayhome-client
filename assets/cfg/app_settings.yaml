@@ -9,5 +9,5 @@ clientSecret: f80cc383-bb5b-47b7-a2bf-5b713b0b8a50
 
 deploymentType: test # prod vs. test, dev, demo, ...
 careplanTemplateId: 1058
-version: v0.5
+version: v0.6 24-Mar-2020
 
