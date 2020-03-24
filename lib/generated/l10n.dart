@@ -29,12 +29,12 @@ class S {
 
   final String localeName;
 
-  String get demoVersionBannerText {
+  String demoVersionBannerText(dynamic deploymentType) {
     return Intl.message(
-      'Demo version - not for clinical use.',
+      'This is a $deploymentType system - not for clinical use.',
       name: 'demoVersionBannerText',
       desc: '',
-      args: [],
+      args: [deploymentType],
     );
   }
 

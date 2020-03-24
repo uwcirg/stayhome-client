@@ -21,15 +21,17 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m0(device) => "${device}% charged";
 
-  static m1(duration, durationUnit) => "${duration} ${durationUnit}";
+  static m1(deploymentType) => "This is a ${deploymentType} system - not for clinical use.";
 
-  static m2(number, unit) => "Once every ${number} ${unit}";
+  static m2(duration, durationUnit) => "${duration} ${durationUnit}";
 
-  static m3(date, time) => "Last synced: ${date} at ${time}";
+  static m3(number, unit) => "Once every ${number} ${unit}";
 
-  static m4(timeLeftInSeconds) => "Time left until token expiration: ${timeLeftInSeconds} seconds";
+  static m4(date, time) => "Last synced: ${date} at ${time}";
 
-  static m5(version) => "Version ${version}";
+  static m5(timeLeftInSeconds) => "Time left until token expiration: ${timeLeftInSeconds} seconds";
+
+  static m6(version) => "Version ${version}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -40,20 +42,20 @@ class MessageLookup extends MessageLookupByLibrary {
     "buttonPushText" : MessageLookupByLibrary.simpleMessage("You have pushed the button this many times:"),
     "change" : MessageLookupByLibrary.simpleMessage("Change"),
     "contact__community" : MessageLookupByLibrary.simpleMessage("Contact"),
-    "demoVersionBannerText" : MessageLookupByLibrary.simpleMessage("Demo version - not for clinical use."),
+    "demoVersionBannerText" : m1,
     "developedByCIRG" : MessageLookupByLibrary.simpleMessage("Developed by the Clinical Informatics Research Group (CIRG) at University of Washington, 2019-2020."),
     "devices" : MessageLookupByLibrary.simpleMessage("Devices"),
     "duration" : MessageLookupByLibrary.simpleMessage("Duration:"),
-    "duration_duration_durationunit" : m1,
+    "duration_duration_durationunit" : m2,
     "email" : MessageLookupByLibrary.simpleMessage("Email"),
     "forget" : MessageLookupByLibrary.simpleMessage("Forget"),
     "frequency" : MessageLookupByLibrary.simpleMessage("Frequency:"),
-    "frequency_with_contents" : m2,
+    "frequency_with_contents" : m3,
     "hello" : MessageLookupByLibrary.simpleMessage("Hello!"),
     "help" : MessageLookupByLibrary.simpleMessage("Help"),
     "language" : MessageLookupByLibrary.simpleMessage("Language"),
     "languageName" : MessageLookupByLibrary.simpleMessage("English (EN)"),
-    "last_synced_date" : m3,
+    "last_synced_date" : m4,
     "learning_center" : MessageLookupByLibrary.simpleMessage("Learning center & Help"),
     "loading_error_log_in_again" : MessageLookupByLibrary.simpleMessage("Loading error. Try logging out and in again."),
     "login" : MessageLookupByLibrary.simpleMessage("login / register"),
@@ -78,9 +80,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "start_a_session" : MessageLookupByLibrary.simpleMessage("Start a session"),
     "testimonials" : MessageLookupByLibrary.simpleMessage("Testimonials"),
     "timeFormat" : MessageLookupByLibrary.simpleMessage("h:mm:ss aaa"),
-    "time_left_until_token_expiration" : m4,
+    "time_left_until_token_expiration" : m5,
     "treatment_calendar" : MessageLookupByLibrary.simpleMessage("Treatment Calendar"),
-    "versionString" : m5,
+    "versionString" : m6,
     "vfit_faq" : MessageLookupByLibrary.simpleMessage("vFit FAQ"),
     "visit_our_facebook_page" : MessageLookupByLibrary.simpleMessage("Visit our Facebook Page"),
     "welcome" : MessageLookupByLibrary.simpleMessage("thank you and welcome"),
