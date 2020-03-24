@@ -3,6 +3,7 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:map_app_flutter/platform_stub.dart';
 
 class Dimensions {
   static const double extraLargeMargin = 42;
@@ -45,6 +46,7 @@ class IconSize {
 
 class WhatInfo {
   static const String link = "https://uwcirg.github.io/stayhomelanding/";
+  static String changelogLink = "https://uwcirg.github.io/stayhomelanding/?return_uri="+Uri.encodeComponent(PlatformDefs().rootUrl())+"#change-log";
 }
 
 class QuestionnaireConstants {

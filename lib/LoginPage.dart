@@ -95,8 +95,17 @@ class LoginPageState extends State<LoginPage> {
                                               color: Colors.white,
                                               decoration: TextDecoration.underline)))),
                             ),
-                            Text(AppConfig.version,
-                                style: Theme.of(context).primaryTextTheme.subtitle)
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              child: FlatButton(
+                                  onPressed: () => PlatformDefs().launchUrl(WhatInfo.changelogLink),
+                                  child: Padding(
+                                      padding: EdgeInsets.all(Dimensions.fullMargin),
+                                      child: Text(AppConfig.version,
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              decoration: TextDecoration.underline)))),
+                            )
 //                          FlatButton(
 //                              onPressed: () => MyApp.of(context).toggleAppMode(),
 //                              child: Text("Toggle app mode",
