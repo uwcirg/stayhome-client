@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
+import 'package:map_app_flutter/main.dart';
 
 class GuestHomePage extends StatefulWidget {
   @override
@@ -27,7 +28,7 @@ class GuestHomeState extends State<GuestHomePage> {
                         child: OutlineButton(
                           child: Text("back to login/register"),
                             onPressed: () {
-                              Navigator.of(context).pushReplacementNamed('/login');
+                              MyApp.of(context).logout();
                             }
                         ),
                       ),
