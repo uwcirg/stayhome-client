@@ -60,5 +60,6 @@ class QuestionnaireConstants {
  * media query constants to allow setting breakpoints for responsiveness 
  */
 class MediaQueryConstants {
+  static const double minTabletWidth = 699;
   static const double minDesktopWidth = 768;
 }
