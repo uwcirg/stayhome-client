@@ -7,28 +7,40 @@ import 'package:map_app_flutter/config/AppConfig.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
+import 'package:map_app_flutter/model/CarePlanModel.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class MapAppPageScaffold extends StatelessWidget {
   final Widget child;
   final String title;
   final bool showDrawer;
+  final bool showStandardAppBarActions;
 
   final Color backgroundColor;
 
   final List<Widget> actions;
 
   MapAppPageScaffold(
-      {Key key, this.child, this.title, this.showDrawer = true, this.backgroundColor, this.actions})
+      {Key key,
+      this.child,
+      this.title,
+      this.showDrawer = true,
+      this.backgroundColor,
+      this.actions,
+      this.showStandardAppBarActions = true})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var actions = getActions(context);
+
     return Scaffold(
         backgroundColor: backgroundColor,
         appBar: AppBar(
           centerTitle: true,
           title: MyApp.of(context).appAssets.appBarTitle(),
-          actions: this.actions,
+          actions: actions,
         ),
         drawer: showDrawer ? MapAppDrawer() : null,
         body: Column(
@@ -57,10 +69,36 @@ class MapAppPageScaffold extends StatelessWidget {
             style: Theme.of(context).textTheme.title.apply(fontWeightDelta: 1),
             textAlign: TextAlign.center,
           ),
-          Divider(indent: 80, endIndent: 80,)
+          Divider(
+            indent: 80,
+            endIndent: 80,
+          )
         ],
       ),
     );
+  }
+
+  List<Widget> getActions(BuildContext context) {
+    List<Widget> actions = this.actions;
+    if (showStandardAppBarActions) {
+      actions = <Widget>[
+        ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
+          return IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              model.load();
+            },
+          );
+        }),
+        IconButton(
+          icon: Icon(MdiIcons.logout),
+          onPressed: () {
+            MyApp.of(context).logout(context: context);
+          },
+        )
+      ];
+    }
+    return actions;
   }
 }
 

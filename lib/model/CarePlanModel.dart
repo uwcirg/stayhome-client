@@ -30,6 +30,12 @@ class CarePlanModel extends Model {
   List<DocumentReference> infoLinks;
 
   List<Communication> communications;
+  List<Communication> get activeCommunications => communications != null ? communications
+      .where((Communication c) => c.status == CommunicationStatus.in_progress)
+      .toList() : [];
+  List<Communication> get nonActiveCommunications => communications != null ? communications
+      .where((Communication c) => c.status != CommunicationStatus.in_progress)
+      .toList() : [];
 
   bool get hasNoPatient => patient == null;
 

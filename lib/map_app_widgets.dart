@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:map_app_flutter/ProfilePage.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
@@ -38,5 +39,41 @@ class MapAppErrorMessage extends StatelessWidget {
       children.add(RaisedButton(child: Text(_buttonLabel), onPressed: _onPressed));
     }
     return Column(children: children);
+  }
+
+  static Widget fromModel(CarePlanModel model, BuildContext context) {
+    if (model == null) {
+      print("Model is null.");
+      return MapAppErrorMessage.loadingErrorWithLogoutButton(context);
+    }
+    if (model.error != null) {
+      return MapAppErrorMessage('${model.error}');
+    }
+
+    if (model.isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+
+    if (model.hasNoUser) {
+      return MapAppErrorMessage.loadingErrorWithLogoutButton(context);
+    }
+
+    if (model.hasNoPatient) {
+      return MapAppErrorMessage(
+        "You do not have a patient record in the FHIR database.",
+        buttonLabel: "create one",
+        onButtonPressed: () =>
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreateProfilePage())),
+      );
+    }
+
+    if (model.hasNoCarePlan) {
+      return MapAppErrorMessage(
+        S.of(context).you_have_no_active_pelvic_floor_management_careplan,
+        buttonLabel: S.of(context).add_the_default_careplan_for_me,
+        onButtonPressed: () => model.addDefaultCareplan(),
+      );
+    }
+    return null;
   }
 }

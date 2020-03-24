@@ -118,7 +118,7 @@ class MapAppDrawer extends Drawer {
     }
   }
 
-  void navigate(BuildContext context, String activity) {
+  static void navigate(BuildContext context, String activity) {
     Navigator.pop(context);
     Navigator.pushNamed(context, activity);
   }

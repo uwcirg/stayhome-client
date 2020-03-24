@@ -88,7 +88,12 @@ class Repository {
   static Future<CarePlan> loadCarePlan(String reference, String authToken) async {
     var url = "$fhirBaseUrl/$reference";
     var response = await get(url, headers: _defaultHeaders(authToken));
-    return CarePlan.fromJson(jsonDecode(response.body));
+    if (response.statusCode == 200) {
+      return CarePlan.fromJson(jsonDecode(response.body));
+    } else {
+      print("Status code: ${response.statusCode} ${response.reasonPhrase}");
+      return Future.error("Could not load care plan");
+    }
   }
 
   static Future<List<Procedure>> getProcedures(CarePlan carePlan, String authToken) async {
@@ -104,11 +109,12 @@ class Repository {
     return procedures;
   }
 
-  static Future<List<QuestionnaireResponse>> getQuestionnaireResponses(
-      CarePlan carePlan, String authToken) async {
+  static Future<List<QuestionnaireResponse>> getQuestionnaireResponses(CarePlan carePlan,
+      String authToken) async {
     int maxToReturn = 200;
     var url =
-        "$fhirBaseUrl/QuestionnaireResponse?based-on=${carePlan.reference}&_count=$maxToReturn&_sort=-authored";
+        "$fhirBaseUrl/QuestionnaireResponse?based-on=${carePlan
+        .reference}&_count=$maxToReturn&_sort=-authored";
     var response = await get(url, headers: _defaultHeaders(authToken));
     var searchResultBundle = jsonDecode(response.body);
     List<QuestionnaireResponse> responses = [];
@@ -120,13 +126,16 @@ class Repository {
     return responses;
   }
 
-  static Future<List<DocumentReference>> getResourceLinks(
-      String carePlanTemplateRef, String authToken) async {
-    CarePlan carePlan = await loadCarePlan(carePlanTemplateRef, authToken);
-    if (carePlan == null) return Future.error("Could not load info links");
+  static Future<List<DocumentReference>> getResourceLinks(String carePlanTemplateRef,
+      String authToken) async {
+    CarePlan carePlan;
+    try {
+      carePlan = await loadCarePlan(carePlanTemplateRef, authToken);
+    } catch (e) {}
+    if (carePlan == null) return Future.error("Could not load info resource");
     List<Reference> documentReferenceReferences = [];
     for (Activity activity in carePlan.activity) {
-      if (activity.detail.reasonReference !=null) {
+      if (activity.detail.reasonReference != null) {
         documentReferenceReferences.addAll(activity.detail.reasonReference);
       }
     }
@@ -173,7 +182,7 @@ class Repository {
     var headers = _defaultHeaders(authToken);
 
     Response value =
-        await post(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
+    await post(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
 
     return resultFromResponse(value, "An error occurred when trying to save your responses.");
   }
@@ -216,12 +225,13 @@ class Repository {
     });
     return questionnaires;
   }
+
   /// get all communication records which are active and pertinent
   static Future<List<Communication>> getCommunications(Patient patient, String authToken) async {
     int maxToReturn = 200;
-    String status = "in-progress";
     var url =
-        "$fhirBaseUrl/Communication?recipient=${patient.reference}&status=$status&_count=$maxToReturn";
+        "$fhirBaseUrl/Communication?recipient=${patient
+        .reference}&_count=$maxToReturn&_sort=sent";
     var response = await get(url, headers: _defaultHeaders(authToken));
     var searchResultBundle = jsonDecode(response.body);
     List<Communication> responses = [];
