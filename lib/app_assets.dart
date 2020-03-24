@@ -65,6 +65,8 @@ abstract class AppAssets {
   List<MenuItem> navItems(BuildContext context);
 
   loginBackgroundDecoration() {}
+
+  String learningCenterPageTitle(BuildContext context);
 }
 
 class JoyluxAppAssets extends AppAssets {
@@ -180,7 +182,7 @@ class JoyluxAppAssets extends AppAssets {
         route: '/devices',
       ),
       MenuItem(
-        title: S.of(context).learning_center,
+        title: learningCenterPageTitle(context),
         icon: Icon(Icons.lightbulb_outline),
         route: '/learning_center',
       ),
@@ -217,6 +219,11 @@ class JoyluxAppAssets extends AppAssets {
       "/login": (BuildContext context) => LoginPage(),
       "/authCallback": (BuildContext context) => PlatformDefs().getAuthCallbackPage()
     };
+  }
+
+  @override
+  String learningCenterPageTitle(BuildContext context) {
+    return S.of(context).learning_center;
   }
 }
 
@@ -334,7 +341,7 @@ class StayHomeAppAssets extends AppAssets {
         route: '/communications',
       ),
       MenuItem(
-        title: S.of(context).learning_center,
+        title: learningCenterPageTitle(context),
         icon: Icon(Icons.lightbulb_outline),
         route: '/learning_center',
       ),
@@ -361,6 +368,11 @@ class StayHomeAppAssets extends AppAssets {
       "/authCallback": (BuildContext context) => PlatformDefs().getAuthCallbackPage(),
       "/communications": (BuildContext context) => CommunicationsPage(),
     };
+  }
+
+  @override
+  String learningCenterPageTitle(BuildContext context) {
+    return "Information & Resources";
   }
 }
 

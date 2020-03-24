@@ -21,7 +21,7 @@ abstract class LearningCenterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
-      title: S.of(context).learning_center,
+      title: MyApp.of(context).appAssets.learningCenterPageTitle(context),
       child: ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
         if (model.isLoading) return Center(child: CircularProgressIndicator());
         if (model.error != null) {
