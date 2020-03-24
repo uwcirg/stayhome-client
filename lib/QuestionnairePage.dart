@@ -131,10 +131,22 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
           right: Dimensions.halfMargin,
           top: Dimensions.halfMargin,
           bottom: 200),
-      child: RaisedButton(
-        padding: MapAppPadding.largeButtonPadding,
-        child: Text("done", style: Theme.of(context).textTheme.button),
-        onPressed: _onPressed,
+      child: Row(
+        children: <Widget>[
+          OutlineButton(padding:MapAppPadding.largeButtonPadding,
+          child: Text("cancel"),
+          onPressed: () => Navigator.of(context).pop(),),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(left:Dimensions.fullMargin),
+              child: RaisedButton(
+                padding: MapAppPadding.largeButtonPadding,
+                child: Text("save", style: Theme.of(context).textTheme.button),
+                onPressed: _onPressed,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -313,7 +325,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
 
   Widget _buildTemperatureItem(QuestionnaireItem questionnaireItem, BuildContext context) {
     return TextFormField(
-      decoration: InputDecoration(hintText: "Enter body temperature", errorMaxLines: 3),
+      decoration: InputDecoration(hintText: "Enter body temperature, in either °F or °C", errorMaxLines: 3),
       inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
       keyboardType: TextInputType.numberWithOptions(decimal: true),
       autovalidate: true,
@@ -323,8 +335,8 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
         if (result == null) return "Please enter a valid decimal";
         if (!isValidTempF(result) && !isValidTempC(result)) {
           return "Enter a value between ${QuestionnaireConstants.minF} and "
-              "${QuestionnaireConstants.maxF} (ºF) or ${QuestionnaireConstants.minC} and "
-              "${QuestionnaireConstants.maxC} (ºC). This value will not be saved.";
+              "${QuestionnaireConstants.maxF} (°F) or ${QuestionnaireConstants.minC} and "
+              "${QuestionnaireConstants.maxC} (°C). This value will not be saved.";
         }
         // restrict to 2 decimals
         if (!isValidTempF(result)) result = double.parse(cToF(result).toStringAsFixed(2));
