@@ -47,6 +47,7 @@ class QuestionnairePageState extends State<QuestionnairePage> {
       Navigator.of(context).pop();
     }).catchError((error) => snack(error, context));
   }
+
   _onCancelPressed() {
     Navigator.of(context).pop();
   }
@@ -303,14 +304,18 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
         ),
         autovalidate: true,
         validator: (value) {
-          if (value.isEmpty) return null;
-          try {
-            date = DateFormat.yMd().parse(value);
-          } catch (FormatException) {
-            return "Enter a valid date";
+          String message;
+          if (value.isEmpty) {
+            date = null;
+          } else {
+            try {
+              date = DateFormat.yMd().parse(value);
+            } catch (FormatException) {
+              message = "Enter a valid date";
+            }
           }
           _response.setAnswer(questionnaireItem.linkId, Answer(valueDate: date));
-          return null;
+          return message;
         },
       ),
     );
@@ -326,18 +331,22 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
         ),
         autovalidate: true,
         validator: (value) {
-          if (value.isEmpty) return null;
-          try {
-            date = DateFormat('M/d/y HH:mm a').parse(value);
-          } catch (FormatException) {
+          String message;
+          if (value.isEmpty) {
+            date = null;
+          } else {
             try {
-              date = DateFormat('M/d/y').parse(value);
+              date = DateFormat.yMd().parseStrict(value);
             } catch (FormatException) {
-              return "Enter a valid date and time";
+              try {
+                date = DateFormat.yMd().add_jm().parseStrict(value);
+              } catch (FormatException) {
+                message = "Enter a valid date and time";
+              }
             }
           }
           _response.setAnswer(questionnaireItem.linkId, Answer(valueDateTime: date));
-          return null;
+          return message;
         },
       ),
     );
@@ -386,18 +395,23 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
       keyboardType: TextInputType.numberWithOptions(decimal: true),
       autovalidate: true,
       validator: (value) {
-        if (value.isEmpty) return null;
-        double result = double.tryParse(value);
-        if (result == null) return "Please enter a valid decimal";
-        if (!isValidTempF(result) && !isValidTempC(result)) {
-          return "Enter a value between ${QuestionnaireConstants.minF} and "
-              "${QuestionnaireConstants.maxF} (°F) or ${QuestionnaireConstants.minC} and "
-              "${QuestionnaireConstants.maxC} (°C). This value will not be saved.";
+        String message;
+        double result;
+        if (value.isEmpty) {
+          result = null;
+        } else {
+          result = double.tryParse(value);
+          if (result == null) message = "Please enter a valid decimal";
+          if (!isValidTempF(result) && !isValidTempC(result)) {
+            message = "Enter a value between ${QuestionnaireConstants.minF} and "
+                "${QuestionnaireConstants.maxF} (°F) or ${QuestionnaireConstants.minC} and "
+                "${QuestionnaireConstants.maxC} (°C). This value will not be saved.";
+          }
+          // restrict to 2 decimals
+          if (!isValidTempF(result)) result = double.parse(cToF(result).toStringAsFixed(2));
         }
-        // restrict to 2 decimals
-        if (!isValidTempF(result)) result = double.parse(cToF(result).toStringAsFixed(2));
         _response.setAnswer(questionnaireItem.linkId, Answer(valueDecimal: result));
-        return null;
+        return message;
       },
     );
   }
