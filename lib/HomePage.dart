@@ -8,7 +8,6 @@ import 'package:map_app_flutter/MapAppDrawer.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/QuestionnairePage.dart';
 import 'package:map_app_flutter/const.dart';
-import 'package:map_app_flutter/map_app_widgets.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:scoped_model/scoped_model.dart';
 
