@@ -27,16 +27,17 @@ class LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     MediaQueryData deviceInfo = MediaQuery.of(context);
-    double buttonContainerInsets = deviceInfo.size.width > MediaQueryConstants.minDesktopWidth ? deviceInfo.size.width / 5 : 12;
+    double buttonContainerInsets = deviceInfo.size.width > MediaQueryConstants.minDesktopWidth ? deviceInfo.size.width / 4.5 : 12;
+    double scaleFactor = deviceInfo.size.width > MediaQueryConstants.minTabletWidth ? 1: 0.9;
     return Scaffold(
         body: AnnotatedRegion<SystemUiOverlayStyle>(
-      value: MyApp.of(context).appAssets.systemUiOverlayStyle,
-      child: DecoratedBox(
+        value: MyApp.of(context).appAssets.systemUiOverlayStyle,
+        child: DecoratedBox(
           position: DecorationPosition.background,
           decoration: MyApp.of(context).appAssets.loginBackgroundDecoration(),
           child: SafeArea(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -84,28 +85,38 @@ class LoginPageState extends State<LoginPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.symmetric(vertical: 10),
-                              child: FlatButton(
-                                  onPressed: () => PlatformDefs().launchUrl(MyApp.of(context).appAssets.whatLink),
-                                  child: Padding(
-                                      padding: EdgeInsets.symmetric(vertical: Dimensions.fullMargin),
-                                      child: Text(MyApp.of(context).appAssets.whatLinkTitle,
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              decoration: TextDecoration.underline)))),
+                            Expanded(
+                              flex: 1,
+                              child:  Padding(
+                                padding: EdgeInsets.symmetric(vertical: 10),
+                                child: FlatButton(
+                                    onPressed: () => PlatformDefs().launchUrl(MyApp.of(context).appAssets.whatLink),
+                                    child: Padding(
+                                        padding: EdgeInsets.symmetric(vertical: Dimensions.fullMargin),
+                                        child: Text(MyApp.of(context).appAssets.whatLinkTitle,
+                                            textScaleFactor: scaleFactor,
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                decoration: TextDecoration.underline)))),
+                              ),
                             ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(vertical: 10),
-                              child: FlatButton(
-                                  onPressed: () => PlatformDefs().launchUrl(WhatInfo.changelogLink),
-                                  child: Padding(
-                                      padding: EdgeInsets.all(Dimensions.fullMargin),
-                                      child: Text(AppConfig.version,
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              decoration: TextDecoration.underline)))),
-                            )
+                            Expanded(
+                              flex: 1,
+                              child: 
+                                Padding(
+                                  padding: EdgeInsets.only(top: 10, bottom: 10),
+                                  child: FlatButton(
+                                      onPressed: () => PlatformDefs().launchUrl(WhatInfo.changelogLink),
+                                      child: Padding(
+                                          padding: EdgeInsets.symmetric(vertical: Dimensions.fullMargin),
+                                          child: Text(AppConfig.version,
+                                              textScaleFactor: scaleFactor,
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  decoration: TextDecoration.underline)))),
+                                )
+                            ,)
+                            
 //                          FlatButton(
 //                              onPressed: () => MyApp.of(context).toggleAppMode(),
 //                              child: Text("Toggle app mode",
