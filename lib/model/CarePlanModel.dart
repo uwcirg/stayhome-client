@@ -25,7 +25,7 @@ class CarePlanModel extends Model {
   Goals goals;
 
   KeycloakAuth _auth;
-  OAuthApi get _authToken => _auth?.api;
+  OAuthApi get _api => _auth?.api;
   String _keycloakUserId;
   String _keycloakSystem;
   String _careplanTemplateRef;
@@ -88,8 +88,11 @@ class CarePlanModel extends Model {
       isLoading = false;
       notifyListeners();
     }).catchError((error, stacktrace) {
-      if (error is Response) {print('${error.body}');}
-      else {print('$error');}
+      if (error is Response) {
+        print('${error.body}');
+      } else {
+        print('$error');
+      }
       if (stacktrace != null) {
         print(stacktrace);
       }
@@ -106,78 +109,109 @@ class CarePlanModel extends Model {
       return Future.error("No user information. Please log in again.");
     }
 
-    this.patient = await Repository.getPatient(_keycloakSystem, _keycloakUserId, _authToken);
+    this.patient = await Repository.getPatient(_keycloakSystem, _keycloakUserId, _api);
     if (patient != null) {
       return _loadCarePlan();
     } else {
       // this means there is no matching patient in the database! create one.
       try {
-        await _addBlankPatient();
+        this.patient = await _addBlankPatient();
       } catch (e) {
         return Future.error("Failed to create patient record.");
       }
-      // reload - this time patient should load.
-      return _doLoad();
+      if (patient != null) {
+        print("Successfully created ${patient.reference}");
+        return _loadCarePlan();
+      } else {
+        return Future.error("Returned patient was null");
+      }
     }
   }
 
-  Future<String> _addBlankPatient() async {
+  Future<Patient> _addBlankPatient() async {
     if (hasNoUser) return Future.error("No user");
     Patient patient = Patient();
     patient.setKeycloakId(_keycloakSystem, _keycloakUserId);
     print("Creating a new patient.");
-    return Repository.postPatient(patient, _authToken);
+    return Repository.postPatient(patient, _api);
   }
 
   Future<void> _loadCarePlan() async {
-    this.carePlan = await Repository.getCarePlan(patient, _careplanTemplateRef, _authToken);
+    this.carePlan = await Repository.getCarePlan(patient, _careplanTemplateRef, _api);
     if (carePlan != null) {
       print("Found careplan: ${carePlan.reference}");
+      print("Loading communications");
+      await _loadCommunications();
       return _loadQuestionnaires();
     } else {
+      print("no careplan");
       // this means there is no matching careplan in the database! create one.
       try {
-        await _addDefaultCarePlan();
+        this.carePlan = await _addDefaultCarePlan();
       } catch (e) {
-        return Future.error("Failed to create careplan record: $e");
+        var error;
+        if (e is Response) {error = e.body;} else {error=e;}
+        return Future.error("Failed to create careplan record: $error}");
       }
-      // create the welcome message for new users as well.
-      try {
-        await _addNewUserWelcomeMessage();
-      } catch (e) {
-        return Future.error("Failed to create new user welcome message: $e");
+
+      if (carePlan != null) {
+        print("Successfully created ${carePlan.reference}");
+        // create the welcome message for new users as well.
+        await _createNewUserMessage();
+        return _loadQuestionnaires();
+      } else {
+        return Future.error("Returned careplan was null");
       }
-      // reload - this time careplan should load.
-      return _loadCarePlan();
+    }
+  }
+
+  Future<void> _createNewUserMessage() async {
+    Communication newUserMessage;
+    try {
+      newUserMessage = await _addNewUserWelcomeMessage();
+    } catch (e) {
+      return Future.error("Failed to create new user welcome message: $e");
+    }
+    if (newUserMessage != null) {
+      print("Successfully created ${newUserMessage.reference}");
+      this.communications = [newUserMessage];
+    } else {
+      return Future.error("Returned communication was null");
+    }
+  }
+
+  Future<void> _loadCommunications() async {
+    List<Communication> responses = await Repository.getCommunications(patient, _api);
+    if (responses != null) {
+      this.communications = responses;
+    } else {
+      return Future.error("Communications could not be loaded.");
     }
   }
 
   Future<void> _loadQuestionnaires() async {
     List<Future> futures = [
-      Repository.getQuestionnaires(this.carePlan, _authToken).then((var questionnaires) {
+      Repository.getQuestionnaires(this.carePlan, _api).then((var questionnaires) {
         this.questionnaires = questionnaires;
         _createQuestionMap();
       }),
-      Repository.getProcedures(this.carePlan, _authToken).then((List<Procedure> procedures) {
+      Repository.getProcedures(this.carePlan, _api).then((List<Procedure> procedures) {
         this.procedures = procedures;
       }),
-      Repository.getQuestionnaireResponses(this.carePlan, _authToken)
+      Repository.getQuestionnaireResponses(this.carePlan, _api)
           .then((List<QuestionnaireResponse> responses) {
         this.questionnaireResponses = responses;
       }),
-      Repository.getResourceLinks(_careplanTemplateRef, _authToken)
+      Repository.getResourceLinks(_careplanTemplateRef, _api)
           .then((List<DocumentReference> responses) {
         this.infoLinks = responses;
       }),
-      Repository.getCommunications(patient, _authToken).then((List<Communication> responses) {
-        this.communications = responses;
-      })
     ];
     return Future.wait(futures).then((value) => rebuildTreatmentPlan());
   }
 
   void loadResourceLinks() async {
-    loadThenNotifyOrError(Repository.getResourceLinks(_careplanTemplateRef, _authToken)
+    loadThenNotifyOrError(Repository.getResourceLinks(_careplanTemplateRef, _api)
         .then((List<DocumentReference> responses) {
       this.infoLinks = responses;
     }));
@@ -187,71 +221,76 @@ class CarePlanModel extends Model {
     treatmentCalendar = TreatmentCalendar.make(carePlan, procedures, questionnaireResponses);
   }
 
-  Future updatePatientResource(Patient patient) async {
+  Future<void> updatePatientResource(Patient patient) async {
     if (hasNoUser) return Future.error("No user");
-    this.patient = patient;
-    this.patient.setKeycloakId(_keycloakSystem, _keycloakUserId);
-    return Repository.postPatient(this.patient, _authToken).then((value) => load());
+    patient.setKeycloakId(_keycloakSystem, _keycloakUserId);
+    patient = await Repository.postPatient(patient, _api);
+    if (patient != null) {
+      this.patient = patient;
+    } else {
+      return Future.error("Failed to post patient updates");
+    }
   }
 
   void addDefaultCarePlan() {
     _addDefaultCarePlan().then((value) => load());
   }
 
-  Future<String> _addDefaultCarePlan() async {
+  Future<CarePlan> _addDefaultCarePlan() async {
     if (hasNoUser) return Future.error("No user");
     if (hasNoPatient) return Future.error("No patient");
 
-    print("Creating a new care plan from template $_careplanTemplateRef.");
+    print("Creating a new care plan. Loading template careplan $_careplanTemplateRef.");
     CarePlan carePlanTemplate;
     try {
-      carePlanTemplate = await Repository.loadCarePlan(_careplanTemplateRef, _authToken);
+      carePlanTemplate = await Repository.loadCarePlan(_careplanTemplateRef, _api);
+      print("Loaded careplan ${carePlanTemplate.reference}.");
     } catch (e) {
       return Future.error("Could not load template care plan.");
     }
 
     CarePlan newPlan = CarePlan.fromTemplate(carePlanTemplate, patient);
-    return Repository.postResource(newPlan, _authToken);
+    return await Repository.postCarePlan(newPlan, _api);
   }
 
-  Future<String> _addNewUserWelcomeMessage() async {
+  Future<Communication> _addNewUserWelcomeMessage() async {
     if (hasNoUser) return Future.error("No user");
     if (hasNoPatient) return Future.error("No patient");
 
     String templateId = AppConfig.newUserWelcomeMessageTemplateId;
-    print("Creating a new communication from template $templateId.");
+    print("Creating the new user communication. Loading template Communication/$templateId.");
     Communication commTemplate;
     try {
-      commTemplate = await Repository.loadCommunication(templateId, _authToken);
+      commTemplate = await Repository.loadCommunication(templateId, _api);
     } catch (e) {
       return Future.error("Could not load template communication.");
     }
-
+    print("Loaded communication ${commTemplate.reference}");
     Communication newComm = Communication.fromTemplate(commTemplate, patient);
-    return Repository.postResource(newComm, _authToken);
+    return Repository.postCommunication(newComm, _api);
   }
 
   Future addCompletedSession(int minutes) async {
     Procedure treatmentSession = Procedure.treatmentSession(minutes, carePlan);
-    return Repository.postCompletedSession(treatmentSession, _authToken).then((value) => load());
+    return Repository.postCompletedSession(treatmentSession, _api).then((value) => load());
   }
 
   Future postQuestionnaireResponse(QuestionnaireResponse response) async {
-    return Repository.postQuestionnaireResponse(response, _authToken).then((value) => load());
+    return Repository.postQuestionnaireResponse(response, _api).then((value) => load());
   }
 
   Future updateCommunication(Communication communication) async {
-    return Repository.updateResource(communication, _authToken).then((value) => load());
+    return Repository.updateCommunication(communication, _api).then((value) => load());
   }
 
   void updateActivityFrequency(int activityIndex, double newFrequency) {
     carePlan.activity[activityIndex].detail.scheduledTiming.repeat.period = newFrequency;
-    Repository.updateResource(carePlan, _authToken).then((value) => load());
+    Repository.updateResource(carePlan, _api).then((value) => load());
   }
 
   void updateActivityDuration(int activityIndex, double newDuration) {
     carePlan.activity[activityIndex].detail.scheduledTiming.repeat.duration = newDuration;
-    Repository.updateResource(carePlan, _authToken).then((value) => load());
+    Repository.updateResource(carePlan, _api).then((value) => load());
   }
 
   QuestionnaireItem questionForLinkId(String linkId) {

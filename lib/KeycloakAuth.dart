@@ -56,26 +56,6 @@ class KeycloakAuth {
     }
   }
 
-  Future mapAppCreateAccount(String firstName, String lastName, String email,
-      {String userName}) async {
-    var url = '$_issuer/users';
-    if (userName == null) {
-      userName = email;
-    }
-    try {
-      var value = await post(url, body: {
-        "origin": "MapApp",
-        "username": userName,
-        "firstName": firstName,
-        "lastName": lastName,
-        "email": email
-      });
-    } catch (error) {
-      print(error);
-      return Future.error("Error creating user: $error");
-    }
-  }
-
   Future mapAppLogout() async {
     var url;
     if (kIsWeb) {
@@ -261,6 +241,19 @@ class MapAppWebAuthStorage implements simpleAuth.AuthStorage {
   }
 }
 
+class NoneConverter implements simpleAuth.Converter {
+  @override
+  Future<simpleAuth.Response> decode(
+      simpleAuth.Response response, Type responseType, bool responseIsList) {
+    return Future.value(response);
+  }
+
+  @override
+  Future<simpleAuth.Request> encode(simpleAuth.Request request) {
+    return Future.value(request);
+  }
+}
+
 class KeycloakApi extends simpleAuth.OAuthApi {
   KeycloakApi(
     String issuer,
@@ -280,6 +273,7 @@ class KeycloakApi extends simpleAuth.OAuthApi {
           client: client,
           scopes: scopes,
           authStorage: authStorage,
+          converter: NoneConverter(),
         );
 
   @override
