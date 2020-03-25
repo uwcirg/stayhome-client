@@ -249,26 +249,11 @@ class StayHomeAppAssets extends AppAssets {
   @override
   Widget loginBanner(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: Dimensions.extraLargeMargin),
+      padding: const EdgeInsets.only(top: 42),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Padding(
-              padding: EdgeInsets.all(Dimensions.fullMargin),
-              child: Image.asset(
-                'assets/stayhome/Signature_Left_White.png',
-                height: 20,
-              )),
-          Padding(
-              padding: EdgeInsets.only(left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, top: 8, bottom: Dimensions.largeMargin),
-              child: InkWell(
-                onTap: () => PlatformDefs().launchUrl(WhatInfo.cirgLink, newTab: true),
-                child: Image.asset(
-                  'assets/stayhome/CIRG_logo_white.png',
-                  height: 48,
-                ),
-              )),
-          Padding(
+           Padding(
               padding: EdgeInsets.only(left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, top: Dimensions.fullMargin, bottom: 12),
               child: Image.asset(
                 'assets/stayhome/icon_white.png',
@@ -282,15 +267,30 @@ class StayHomeAppAssets extends AppAssets {
                 .apply(color: Colors.white, fontWeightDelta: 2),
           ),
           Padding(
-            padding: EdgeInsets.only(left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, top: 12, bottom: Dimensions.halfMargin),
+            padding: EdgeInsets.only(left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, top: 10, bottom: Dimensions.fullMargin),
             child: Text(
               'Support during COVID-19',
               style: Theme.of(context)
                     .primaryTextTheme
                     .headline5
-                    .apply(color: Colors.white, fontWeightDelta: 1)
+                    .apply(color: Colors.white)
             ),
-          )
+          ),
+          Padding(
+              padding: EdgeInsets.all(Dimensions.fullMargin),
+              child: Image.asset(
+                'assets/stayhome/Signature_Left_White.png',
+                height: 20,
+              )),
+          Padding(
+              padding: EdgeInsets.only(left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, top: 2, bottom: Dimensions.largeMargin),
+              child: InkWell(
+                onTap: () => PlatformDefs().launchUrl(WhatInfo.cirgLink, newTab: true),
+                child: Image.asset(
+                  'assets/stayhome/CIRG_logo_white.png',
+                  height: 48,
+                ),
+              )),
         ],
       ),
     );
