@@ -31,6 +31,7 @@ class AppConfig {
   static String get version => GlobalConfiguration().get("version")?.toString();
 
   static String get careplanTemplateId => GlobalConfiguration().get("careplanTemplateId")?.toString();
+  static String get newUserWelcomeMessageTemplateId => GlobalConfiguration().get("newUserWelcomeMessageTemplateId")?.toString();
 
   static String get deploymentType => GlobalConfiguration().get("deploymentType")?.toString();
   static bool get isProd => deploymentType != null && deploymentType == "prod";

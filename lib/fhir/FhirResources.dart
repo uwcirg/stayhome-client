@@ -2,8 +2,9 @@
  * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
  */
 import 'package:map_app_flutter/services/Repository.dart';
+import "package:simple_auth/simple_auth.dart" show JsonSerializable;
 
-class Resource {
+abstract class Resource implements JsonSerializable {
   String resourceType;
   String id;
 
@@ -85,7 +86,7 @@ class Priority {
   static const _vals = [routine, urgent, asap, stat];
 }
 
-class Communication extends Resource {
+class Communication extends Resource implements JsonSerializable {
   Meta meta;
   CommunicationStatus status;
   Priority priority;
@@ -106,7 +107,10 @@ class Communication extends Resource {
       this.sent})
       : super(resourceType: "Communication", id: id);
 
-  Communication.fromJson(Map<String, dynamic> json) {
+  factory Communication.fromJson(Map<String, dynamic> json) {
+    return Communication._fromJson(json);
+  }
+  Communication._fromJson(Map<String, dynamic> json) {
     resourceType = json['resourceType'];
     id = json['id'];
     meta = json['meta'] != null ? Meta.fromJson(json['meta']) : null;
@@ -148,6 +152,13 @@ class Communication extends Resource {
     if (this.sent != null) data['sent'] = sent.toIso8601String();
 
     return data;
+  }
+
+  factory Communication.fromTemplate(Communication commTemplate, Patient patient) {
+    Communication comm = Communication.fromJson(commTemplate.toJson());
+    comm.recipient = [Reference(reference: patient.reference)];
+    comm.sent = DateTime.now();
+    return comm;
   }
 }
 

@@ -4,8 +4,9 @@
 import 'dart:convert';
 import 'dart:io' show HttpHeaders;
 
-import 'package:http/http.dart' show Response, get, post, put;
+import 'package:http/http.dart' show get;
 import 'package:map_app_flutter/fhir/FhirResources.dart';
+import 'package:simple_auth/simple_auth.dart' show HttpMethod, OAuthApi, Request, Response;
 
 class Repository {
   static String fhirBaseUrl;
@@ -14,13 +15,17 @@ class Repository {
     Repository.fhirBaseUrl = fhirBaseUrl;
   }
 
-  static Future<Patient> getPatient(String system, String identifier, String authToken) async {
+  static Future<Patient> getPatient(String system, String identifier, OAuthApi api) async {
     print("Attempting to load patient with id: $system|$identifier");
-    var patientSearchUrl = "$fhirBaseUrl/Patient?identifier=$system|$identifier";
-    var response = await get(patientSearchUrl, headers: _defaultHeaders(authToken));
+    var patientSearchUrl = "$fhirBaseUrl/Patient";
+    var request = new Request(HttpMethod.Get, patientSearchUrl,
+        headers: _defaultHeaders(), parameters: {"identifier": "$system|$identifier"});
+    var response = await api.send<String>(request);
+//    var response = await get(patientSearchUrl, headers: _defaultHeaders(authToken));
 
-    return resultFromResponse(response, "Error loading patient").then((value) {
-      var searchResultBundle = jsonDecode(value);
+    if (response.statusCode == 200) {
+      var searchResultBundle = jsonDecode(response.body);
+      // multiple patients
       if (searchResultBundle['total'] > 1) {
         String patientsIds = searchResultBundle['entry']
             .map((entry) => "${entry['resource']['resourceType']}/${entry['resource']['id']}")
@@ -30,25 +35,54 @@ class Repository {
         return Future.error(
             "The user ID does not uniquely match a patient resource. Please contact an administrator.");
       }
+      // no patients
       if (searchResultBundle['total'] == 0) {
         print("no patient");
         return null;
       }
+      // found exactly one patient!
       var entry = searchResultBundle['entry'][0];
-      print("found patient: ${entry['resource']['resourceType']}/${entry['resource']['id']}");
+      print("Found patient: ${entry['resource']['resourceType']}/${entry['resource']['id']}");
       return Patient.fromJson(entry['resource']);
-    });
+    } else {
+      print("Status code: ${response.statusCode}");
+      return Future.error("Could not load patient");
+    }
   }
 
-  static Future resultFromResponse(Response response, String defaultErrorMessage) {
+  static Future<Patient> postPatient(Patient patient, OAuthApi api) async {
+    String body = jsonEncode(patient.toJson());
+    var headers = _defaultHeaders();
+
+    var response;
+    if (patient.id != null && patient.id.length > 0) {
+      var url = "$fhirBaseUrl/Patient/${patient.id}";
+      var request = new Request(HttpMethod.Put, url, body: body, headers: headers);
+      response = await api.send<String>(request);
+//      response =
+//      await put(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
+    } else {
+      var url = "$fhirBaseUrl/Patient";
+      var request = new Request(HttpMethod.Post, url, body: body, headers: headers);
+      response = await api.send<String>(request);
+//      response =
+//      await post(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
+    }
+    String result = await resultFromResponse(response, "Saving patient failed");
+    return Patient.fromJson(jsonDecode(result));
+  }
+
+  /// Use only when we don't care about the response other than whether it succeeded. E.g. when
+  /// posting a new resource  - in that case, we just want to reload everything.
+  static Future<String> resultFromResponse(Response response, String defaultErrorMessage) {
     if (response.statusCode == 200 || response.statusCode == 201) {
-      if (response.reasonPhrase == "Created") {
+      if (response.base.reasonPhrase == "Created") {
         var resource = jsonDecode(response.body);
         print("Created record: ${resource['resourceType']}/${resource['id']}");
       }
       return Future.value(response.body);
     } else {
-      print("Status code: ${response.statusCode} ${response.reasonPhrase}");
+      print("Status code: ${response.statusCode} ${response.base.reasonPhrase}");
       var message;
       try {
         message = jsonDecode(response.body)['issue'][0]['diagnostics'];
@@ -61,9 +95,12 @@ class Repository {
   }
 
   /// Get the first returned CarePlan for the given patient.
-  static Future<CarePlan> getCarePlan(Patient patient, String templateRef, String authToken) async {
-    var url = "$fhirBaseUrl/CarePlan?subject=${patient.reference}";
-    var response = await get(url, headers: _defaultHeaders(authToken));
+  static Future<CarePlan> getCarePlan(Patient patient, String templateRef, OAuthApi api) async {
+    var url = "$fhirBaseUrl/CarePlan";
+    var request = new Request(HttpMethod.Get, url,
+        parameters: {"subject": "${patient.reference}"}, headers: _defaultHeaders());
+    var response = await api.send<String>(request);
+//    var response = await get(url, headers: _defaultHeaders(authToken));
     var searchResultBundle = jsonDecode(response.body);
     if (searchResultBundle["total"] == 0) {
       return null;
@@ -84,21 +121,12 @@ class Repository {
     }
   }
 
-  /// reference should be of format CarePlan/123
-  static Future<CarePlan> loadCarePlan(String reference, String authToken) async {
-    var url = "$fhirBaseUrl/$reference";
-    var response = await get(url, headers: _defaultHeaders(authToken));
-    if (response.statusCode == 200) {
-      return CarePlan.fromJson(jsonDecode(response.body));
-    } else {
-      print("Status code: ${response.statusCode} ${response.reasonPhrase}");
-      return Future.error("Could not load care plan");
-    }
-  }
-
-  static Future<List<Procedure>> getProcedures(CarePlan carePlan, String authToken) async {
-    var url = "$fhirBaseUrl/Procedure?based-on=${carePlan.reference}";
-    var response = await get(url, headers: _defaultHeaders(authToken));
+  static Future<List<Procedure>> getProcedures(CarePlan carePlan, OAuthApi api) async {
+    var url = "$fhirBaseUrl/Procedure";
+    var request = new Request(HttpMethod.Get, url,
+        parameters: {"based-on": "${carePlan.reference}"}, headers: _defaultHeaders());
+    var response = await api.send<String>(request);
+//    var response = await get(url, headers: _defaultHeaders(authToken));
     var searchResultBundle = jsonDecode(response.body);
     List<Procedure> procedures = [];
     if (searchResultBundle['total'] > 0) {
@@ -109,13 +137,19 @@ class Repository {
     return procedures;
   }
 
-  static Future<List<QuestionnaireResponse>> getQuestionnaireResponses(CarePlan carePlan,
-      String authToken) async {
+  static Future<List<QuestionnaireResponse>> getQuestionnaireResponses(
+      CarePlan carePlan, api) async {
     int maxToReturn = 200;
-    var url =
-        "$fhirBaseUrl/QuestionnaireResponse?based-on=${carePlan
-        .reference}&_count=$maxToReturn&_sort=-authored";
-    var response = await get(url, headers: _defaultHeaders(authToken));
+    var url = "$fhirBaseUrl/QuestionnaireResponse";
+    var request = new Request(HttpMethod.Get, url,
+        parameters: {
+          "based-on": "${carePlan.reference}",
+          "_count": "$maxToReturn",
+          "_sort": "-authored"
+        },
+        headers: _defaultHeaders());
+    var response = await api.send<String>(request);
+//    var response = await get(url, headers: _defaultHeaders(authToken));
     var searchResultBundle = jsonDecode(response.body);
     List<QuestionnaireResponse> responses = [];
     if (searchResultBundle['total'] > 0) {
@@ -126,11 +160,10 @@ class Repository {
     return responses;
   }
 
-  static Future<List<DocumentReference>> getResourceLinks(String carePlanTemplateRef,
-      String authToken) async {
+  static Future<List<DocumentReference>> getResourceLinks(String carePlanTemplateRef, api) async {
     CarePlan carePlan;
     try {
-      carePlan = await loadCarePlan(carePlanTemplateRef, authToken);
+      carePlan = await loadCarePlan(carePlanTemplateRef, api);
     } catch (e) {}
     if (carePlan == null) return Future.error("Could not load info resource");
     List<Reference> documentReferenceReferences = [];
@@ -142,30 +175,13 @@ class Repository {
     List<DocumentReference> documentReferences = [];
     await Future.forEach(documentReferenceReferences, (Reference r) async {
       var url = "$fhirBaseUrl/${r.reference}";
-      var value = await get(url, headers: _defaultHeaders(authToken));
+      var request = new Request(HttpMethod.Get, url, headers: _defaultHeaders());
+      var response = await api.send<String>(request);
+//      var value = await get(url, headers: _defaultHeaders(authToken));
 
-      documentReferences.add(DocumentReference.fromJson(jsonDecode(value.body)));
+      documentReferences.add(DocumentReference.fromJson(jsonDecode(response.body)));
     });
     return documentReferences;
-  }
-
-  static Future<Questionnaire> getSimpleQuestionnaire(String authToken) async {
-    var url = 'http://hapi.fhir.org/baseR4/Questionnaire/11723';
-
-    var value = await get(url, headers: _defaultHeaders(authToken));
-    var q = Questionnaire.fromJson(jsonDecode(value.body));
-    await q.loadValueSets();
-    return q;
-  }
-
-  static Future<Questionnaire> getPHQ9Questionnaire(String authToken) async {
-    var url = "$fhirBaseUrl/Questionnaire/52";
-
-    var value = await get(url, headers: _defaultHeaders(authToken));
-
-    var q = Questionnaire.fromJson(jsonDecode(value.body));
-    await q.loadValueSets();
-    return q;
   }
 
   static Future<ValueSet> getValueSet(String address) async {
@@ -176,48 +192,49 @@ class Repository {
     return ValueSet.fromJson(jsonDecode(value.body));
   }
 
-  static Future<void> postCompletedSession(Procedure treatmentSession, String authToken) async {
+  static Future<void> postCompletedSession(Procedure treatmentSession, OAuthApi api) async {
     var url = "$fhirBaseUrl/Procedure";
     String body = jsonEncode(treatmentSession.toJson());
-    var headers = _defaultHeaders(authToken);
+    var headers = _defaultHeaders();
+    var request = new Request(HttpMethod.Put, url, body: body, headers: headers);
+    var response = await api.send<String>(request);
+//    Response value =
+//    await post(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
 
-    Response value =
-    await post(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
-
-    return resultFromResponse(value, "An error occurred when trying to save your responses.");
+    return resultFromResponse(response, "An error occurred when trying to save your responses.");
   }
 
-  static Future<void> postQuestionnaireResponse(
-      QuestionnaireResponse questionnaireResponse, String authToken) async {
-    var url = "$fhirBaseUrl/QuestionnaireResponse";
-    String body = jsonEncode(questionnaireResponse.toJson());
-    var headers = _defaultHeaders(authToken);
-
-    Response value =
-        await post(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
-
-    return resultFromResponse(value, "An error occurred when trying to save your responses.");
+  static Future<QuestionnaireResponse> postQuestionnaireResponse(
+      QuestionnaireResponse questionnaireResponse, OAuthApi api) async {
+    String result;
+    try {
+      result = await postResource(questionnaireResponse, api);
+    } catch (e) {
+      print('$e');
+      return Future.error("An error occurred when trying to save your responses.");
+    }
+    return QuestionnaireResponse.fromJson(jsonDecode(result));
   }
 
-  static Future<Questionnaire> getQuestionnaire(
-      String questionnaireReference, String authToken) async {
+  static Future<Questionnaire> getQuestionnaire(String questionnaireReference, OAuthApi api) async {
     var url = "$fhirBaseUrl/$questionnaireReference";
+    var request = new Request(HttpMethod.Get, url, headers: _defaultHeaders());
+    var response = await api.send<String>(request);
+//    var value = await get(url, headers: _defaultHeaders(authToken));
 
-    var value = await get(url, headers: _defaultHeaders(authToken));
-
-    var q = Questionnaire.fromJson(jsonDecode(value.body));
+    var q = Questionnaire.fromJson(jsonDecode(response.body));
     await q.loadValueSets();
     return q;
   }
 
   /// get all questionnaires instantiated by activities in this CarePlan
-  static Future<List<Questionnaire>> getQuestionnaires(CarePlan carePlan, String authToken) async {
+  static Future<List<Questionnaire>> getQuestionnaires(CarePlan carePlan, OAuthApi api) async {
     List<Questionnaire> questionnaires = [];
     await Future.forEach(carePlan.activity, (var activity) async {
       if (activity.detail.instantiatesCanonical != null) {
         for (String instantiatesReference in activity.detail.instantiatesCanonical) {
           if (instantiatesReference.startsWith("Questionnaire")) {
-            Questionnaire q = await getQuestionnaire(instantiatesReference, authToken);
+            Questionnaire q = await getQuestionnaire(instantiatesReference, api);
             questionnaires.add(q);
           }
         }
@@ -227,12 +244,18 @@ class Repository {
   }
 
   /// get all communication records which are active and pertinent
-  static Future<List<Communication>> getCommunications(Patient patient, String authToken) async {
+  static Future<List<Communication>> getCommunications(Patient patient, OAuthApi api) async {
     int maxToReturn = 200;
-    var url =
-        "$fhirBaseUrl/Communication?recipient=${patient
-        .reference}&_count=$maxToReturn&_sort=sent";
-    var response = await get(url, headers: _defaultHeaders(authToken));
+    var url = "$fhirBaseUrl/Communication";
+    var request = new Request(HttpMethod.Get, url,
+        parameters: {
+          "recipient": "${patient.reference}",
+          "_count": "$maxToReturn",
+          "_sort": "sent"
+        },
+        headers: _defaultHeaders());
+    var response = await api.send<String>(request);
+//    var response = await get(url, headers: _defaultHeaders(authToken));
     var searchResultBundle = jsonDecode(response.body);
     List<Communication> responses = [];
     if (searchResultBundle['total'] > 0) {
@@ -243,59 +266,96 @@ class Repository {
     return responses;
   }
 
-  static Future<void> updateCommunication(
-      Communication communication, String authToken) async {
-    var url = "$fhirBaseUrl/Communication/${communication.id}";
-    String body = jsonEncode(communication.toJson());
-    var headers = _defaultHeaders(authToken);
-
-    Response value =
-    await put(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
-
-    return resultFromResponse(value, "An error occurred when trying to update the communication.");
-  }
-
-  static Future postCarePlan(CarePlan plan, String authToken) async {
-    var url = "$fhirBaseUrl/CarePlan";
-    String body = jsonEncode(plan.toJson());
-    var headers = _defaultHeaders(authToken);
-
-    Response response =
-        await post(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
-    return resultFromResponse(response, "Creating care plan failed");
-  }
-
-  static Future updateCarePlan(CarePlan plan, String authToken) async {
-    var url = "$fhirBaseUrl/CarePlan/${plan.id}";
-    String body = jsonEncode(plan.toJson());
-    var headers = _defaultHeaders(authToken);
-
-    Response response =
-        await put(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
-    return resultFromResponse(response, "Updating care plan failed");
-  }
-
-  static Future postPatient(Patient patient, String authToken) async {
-    String body = jsonEncode(patient.toJson());
-    var headers = _defaultHeaders(authToken);
-
-    Response response;
-    if (patient.id != null && patient.id.length > 0) {
-      var url = "$fhirBaseUrl/Patient/${patient.id}";
-      response =
-          await put(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
+  /// reference should be of format CarePlan/123
+  static Future<CarePlan> loadCarePlan(String reference, OAuthApi api) async {
+    var url = "$fhirBaseUrl/$reference";
+    var request = new Request(HttpMethod.Get, url, headers: _defaultHeaders());
+    var response = await api.send<String>(request);
+    if (response.statusCode == 200) {
+      return CarePlan.fromJson(jsonDecode(response.body));
     } else {
-      var url = "$fhirBaseUrl/Patient";
-      response =
-          await post(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
+      print("Status code: ${response.statusCode}");
+      return Future.error("Could not load care plan");
     }
-    return resultFromResponse(response, "Saving patient failed");
   }
 
-  static Map<String, String> _defaultHeaders(String authToken) {
+  /// reference should be of format Communication/123
+  static Future<Communication> loadCommunication(String id, OAuthApi api) async {
+    var url = "$fhirBaseUrl/Communication/$id";
+    var request = new Request(HttpMethod.Get, url, headers: _defaultHeaders());
+    var response = await api.send<String>(request);
+
+//    var response = await get(url, headers: _defaultHeaders(authToken));
+    if (response.statusCode == 200) {
+//      return response.body;
+      return Communication.fromJson(jsonDecode(response.body));
+    } else {
+      print('$response');
+//      print("Status code: ${response.statusCode} ${response.reasonPhrase}");
+      return Future.error("Could not load communication");
+    }
+  }
+
+//  /// reference should be of format Communication/123
+//  static Future<Communication> loadCommunication(String reference, String authToken) async {
+//    var url = "$fhirBaseUrl/$reference";
+//    var response = await get(url, headers: _defaultHeaders(authToken));
+//    if (response.statusCode == 200) {
+//      return Communication.fromJson(jsonDecode(response.body));
+//    } else {
+//      print("Status code: ${response.statusCode} ${response.reasonPhrase}");
+//      return Future.error("Could not load communication");
+//    }
+//  }
+
+  static Future<String> postResource(Resource resource, OAuthApi api) async {
+    var url = "$fhirBaseUrl/${resource.resourceType}";
+    String body = jsonEncode(resource.toJson());
+    var headers = _defaultHeaders();
+    var request = new Request(HttpMethod.Post, url, body: body, headers: headers);
+    var response = await api.send<String>(request);
+//    Response response =
+//        await post(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
+
+    return resultFromResponse(response, "Creating ${resource.resourceType} failed");
+  }
+
+  static Future<CarePlan> postCarePlan(CarePlan carePlan, OAuthApi api) async {
+    String result = await postResource(carePlan, api);
+    return CarePlan.fromJson(jsonDecode(result));
+  }
+
+  static Future<Communication> postCommunication(Communication comm, OAuthApi api) async {
+    String result = await postResource(comm, api);
+    return Communication.fromJson(jsonDecode(result));
+  }
+
+  static Future<String> updateResource(Resource resource, OAuthApi api) async {
+    var url = "$fhirBaseUrl/${resource.resourceType}/${resource.id}";
+    String body = jsonEncode(resource.toJson());
+    var headers = _defaultHeaders();
+    var request = new Request(HttpMethod.Put, url, body: body, headers: headers);
+    var response = await api.send<String>(request);
+//    Response response =
+//        await put(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
+    return resultFromResponse(response, "Updating ${resource.reference} failed");
+  }
+
+  static Future<CarePlan> updateCarePlan(CarePlan carePlan, OAuthApi api) async {
+    String result = await updateResource(carePlan, api);
+    return CarePlan.fromJson(jsonDecode(result));
+  }
+
+  static Future<Communication> updateCommunication(Communication comm, OAuthApi api) async {
+    String result = await updateResource(comm, api);
+    return Communication.fromJson(jsonDecode(result));
+  }
+
+  static Map<String, String> _defaultHeaders() {
     return {
+      HttpHeaders.cacheControlHeader: "no-cache",
       HttpHeaders.acceptHeader: 'application/json',
-      HttpHeaders.authorizationHeader: "Bearer $authToken",
+//      HttpHeaders.authorizationHeader: "Bearer $authToken",
       HttpHeaders.contentTypeHeader: 'application/json'
     };
   }
