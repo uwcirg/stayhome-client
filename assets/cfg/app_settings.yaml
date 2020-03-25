@@ -1,13 +1,14 @@
 #fhirBaseUrl: http://lo.lo:5000/api/r4
-fhirBaseUrl: https://mapapp-dev.cirg.washington.edu/api/r4
+#fhirBaseUrl: https://mapapp-dev.cirg.washington.edu/api/r4
+fhirBaseUrl: https://stayhome-test-api.cirg.washington.edu/api/r4
 #appRootUrl: http://[::1]:8888
-appRootUrl: https://stayhome.cirg.washington.edu
+appRootUrl: https://stayhome-test.cirg.washington.edu
 
 issuerUrl: https://keycloak-dev.cirg.washington.edu/auth/realms/Stayhome
 clientId: stayhome_openid_client
 clientSecret: f80cc383-bb5b-47b7-a2bf-5b713b0b8a50
 
-deploymentType: test # prod vs. test, dev, demo, ...
-careplanTemplateId: 1058
 version: v0.6 24-Mar-2020
 
+deploymentType: test
+careplanTemplateId: 1058
