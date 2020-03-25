@@ -89,7 +89,7 @@ class MapAppPageScaffold extends StatelessWidget {
             onPressed: () {
               Navigator.of(context).pushReplacementNamed('/home');
             },
-          ) : Spacer(flex: 1),
+          ) : Container(),
         ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
           return IconButton(
             icon: Icon(Icons.refresh),
