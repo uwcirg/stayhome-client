@@ -89,6 +89,8 @@ class CarePlanModel extends Model {
 
   Future<void> _doLoad() async {
     if (hasNoUser) {
+      // (re)load resource links even if there is no user
+      loadResourceLinks();
       return Future.error("No user information. Please log in again.");
     }
 

@@ -23,7 +23,7 @@ class MapAppErrorMessage extends StatelessWidget {
     return MapAppErrorMessage(
       S.of(context).loading_error_log_in_again,
       buttonLabel: "logout",
-      onButtonPressed: () => MyApp.of(context).logout(context: context),
+      onButtonPressed: () => MyApp.of(context).logout(pushLogin: true, context: context),
     );
   }
 
@@ -34,7 +34,8 @@ class MapAppErrorMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Widget> children = [
-      Center(child: Padding(
+      Center(
+          child: Padding(
         padding: const EdgeInsets.all(Dimensions.halfMargin),
         child: Text(_message, textAlign: TextAlign.center),
       )),
@@ -66,8 +67,8 @@ class MapAppErrorMessage extends StatelessWidget {
       return MapAppErrorMessage(
         "You do not have a patient record in the FHIR database.",
         buttonLabel: "create one",
-        onButtonPressed: () =>
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreateProfilePage())),
+        onButtonPressed: () => Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => CreateProfilePage())),
       );
     }
 

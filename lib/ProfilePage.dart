@@ -66,7 +66,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void logout() {
-    MyApp.of(context).logout(context: context);
+    MyApp.of(context).logout();
   }
 }
 

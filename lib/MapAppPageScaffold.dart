@@ -93,7 +93,7 @@ class MapAppPageScaffold extends StatelessWidget {
         IconButton(
           icon: Icon(MdiIcons.logout),
           onPressed: () {
-            MyApp.of(context).logout(context: context);
+            MyApp.of(context).logout(context:context);
           },
         )
       ];
