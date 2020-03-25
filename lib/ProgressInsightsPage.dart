@@ -323,7 +323,7 @@ class _StayHomeTrendsPageState extends _ProgressInsightsPageState {
       numberOfItems = _maxChartsToShow + 1;
     }
     if (numberOfItems == 0) {
-      return Text("No data to show yet", style: Theme.of(context).textTheme.caption);
+      return Center(child: Text("No data to show yet", style: Theme.of(context).textTheme.caption));
     }
     return Expanded(
         child: ListView.builder(
