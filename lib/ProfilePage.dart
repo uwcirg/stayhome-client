@@ -304,7 +304,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
                     onTap:() {
                       DatePicker.showDatePicker(context,
                         showTitleActions: true,
-                        minTime: DateTime(1950, 1, 1),
+                        minTime: DateTime(1850, 1, 1),
                         maxTime: new DateTime.now(),
                         theme: DatePickerTheme(
                           itemStyle: TextStyle(color: Theme.of(context).primaryColor),
