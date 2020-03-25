@@ -12,3 +12,4 @@ version: v0.6 24-Mar-2020
 
 deploymentType: test
 careplanTemplateId: 1058
+newUserWelcomeMessageTemplateId: 57

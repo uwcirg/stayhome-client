@@ -76,7 +76,7 @@ class MapAppErrorMessage extends StatelessWidget {
       return MapAppErrorMessage(
         S.of(context).you_have_no_active_pelvic_floor_management_careplan,
         buttonLabel: S.of(context).add_the_default_careplan_for_me,
-        onButtonPressed: () => model.addDefaultCareplan(),
+        onButtonPressed: () => model.addDefaultCarePlan(),
       );
     }
     return null;

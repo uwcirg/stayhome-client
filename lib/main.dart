@@ -124,7 +124,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   /// provide context in order to go back to login back after logout is complete
-  logout({bool pushLogin=true, BuildContext context}) {
+  logout({bool pushLogin = true, BuildContext context}) {
     BuildContext c = context ?? this.context;
     auth.mapAppLogout().then((value) {
       logoutCompleted();
@@ -141,8 +141,7 @@ class _MyAppState extends State<MyApp> {
     if (auth.isLoggedIn) {
       auth.getUserInfo().then((value) {
         String keycloakUserId = auth.userInfo.keycloakUserId;
-        String authToken = auth.authToken();
-        ScopedModel.of<CarePlanModel>(context).setUserAndAuthToken(keycloakUserId, authToken);
+        ScopedModel.of<CarePlanModel>(context).setUserAndAuthToken(keycloakUserId, auth);
         Navigator.of(context).pushReplacementNamed('/home');
       }).catchError((error) {
         ScopedModel.of<CarePlanModel>(context).setGuestUser();

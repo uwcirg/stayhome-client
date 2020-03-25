@@ -37,6 +37,8 @@ class KeycloakAuth {
     return KeycloakAuth(other._issuer, other._clientSecret, other._clientId);
   }
 
+  simpleAuth.OAuthApi get api => _api;
+
   String authToken() {
     return _api.currentOauthAccount.token;
   }

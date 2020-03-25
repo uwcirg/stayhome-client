@@ -3,10 +3,13 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:map_app_flutter/KeycloakAuth.dart';
+import 'package:map_app_flutter/config/AppConfig.dart';
 import 'package:map_app_flutter/fhir/Exception.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
 import 'package:map_app_flutter/services/Repository.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:simple_auth/simple_auth.dart';
 
 import '../const.dart';
 
@@ -21,7 +24,8 @@ class CarePlanModel extends Model {
   TreatmentCalendar treatmentCalendar;
   Goals goals;
 
-  String _authToken;
+  KeycloakAuth _auth;
+  OAuthApi get _authToken => _auth?.api;
   String _keycloakUserId;
   String _keycloakSystem;
   String _careplanTemplateRef;
@@ -30,12 +34,18 @@ class CarePlanModel extends Model {
   List<DocumentReference> infoLinks;
 
   List<Communication> communications;
-  List<Communication> get activeCommunications => communications != null ? communications
-      .where((Communication c) => c.status == CommunicationStatus.in_progress)
-      .toList() : [];
-  List<Communication> get nonActiveCommunications => communications != null ? communications
-      .where((Communication c) => c.status != CommunicationStatus.in_progress)
-      .toList() : [];
+
+  List<Communication> get activeCommunications => communications != null
+      ? communications
+          .where((Communication c) => c.status == CommunicationStatus.in_progress)
+          .toList()
+      : [];
+
+  List<Communication> get nonActiveCommunications => communications != null
+      ? communications
+          .where((Communication c) => c.status != CommunicationStatus.in_progress)
+          .toList()
+      : [];
 
   bool get hasNoPatient => patient == null;
 
@@ -47,9 +57,9 @@ class CarePlanModel extends Model {
     goals = new Goals();
   }
 
-  void setUserAndAuthToken(String keycloakUserId, String authToken) {
+  void setUserAndAuthToken(String keycloakUserId, KeycloakAuth auth) {
     this._keycloakUserId = keycloakUserId;
-    this._authToken = authToken;
+    this._auth = auth;
     load();
   }
 
@@ -61,6 +71,7 @@ class CarePlanModel extends Model {
     return ScopedModel.of<CarePlanModel>(context);
   }
 
+  /// This method is asynchronouos and is thus reserved for the UI to call.
   void load() {
     loadThenNotifyOrError(_doLoad());
   }
@@ -77,7 +88,8 @@ class CarePlanModel extends Model {
       isLoading = false;
       notifyListeners();
     }).catchError((error, stacktrace) {
-      print(error);
+      if (error is Response) {print('${error.body}');}
+      else {print('$error');}
       if (stacktrace != null) {
         print(stacktrace);
       }
@@ -97,13 +109,46 @@ class CarePlanModel extends Model {
     this.patient = await Repository.getPatient(_keycloakSystem, _keycloakUserId, _authToken);
     if (patient != null) {
       return _loadCarePlan();
+    } else {
+      // this means there is no matching patient in the database! create one.
+      try {
+        await _addBlankPatient();
+      } catch (e) {
+        return Future.error("Failed to create patient record.");
+      }
+      // reload - this time patient should load.
+      return _doLoad();
     }
+  }
+
+  Future<String> _addBlankPatient() async {
+    if (hasNoUser) return Future.error("No user");
+    Patient patient = Patient();
+    patient.setKeycloakId(_keycloakSystem, _keycloakUserId);
+    print("Creating a new patient.");
+    return Repository.postPatient(patient, _authToken);
   }
 
   Future<void> _loadCarePlan() async {
     this.carePlan = await Repository.getCarePlan(patient, _careplanTemplateRef, _authToken);
     if (carePlan != null) {
+      print("Found careplan: ${carePlan.reference}");
       return _loadQuestionnaires();
+    } else {
+      // this means there is no matching careplan in the database! create one.
+      try {
+        await _addDefaultCarePlan();
+      } catch (e) {
+        return Future.error("Failed to create careplan record: $e");
+      }
+      // create the welcome message for new users as well.
+      try {
+        await _addNewUserWelcomeMessage();
+      } catch (e) {
+        return Future.error("Failed to create new user welcome message: $e");
+      }
+      // reload - this time careplan should load.
+      return _loadCarePlan();
     }
   }
 
@@ -149,17 +194,41 @@ class CarePlanModel extends Model {
     return Repository.postPatient(this.patient, _authToken).then((value) => load());
   }
 
-  void addDefaultCareplan() async {
-    this.isLoading = true;
-    notifyListeners();
-    Repository.loadCarePlan(_careplanTemplateRef, _authToken).then((CarePlan plan) {
-      CarePlan newPlan = CarePlan.fromTemplate(plan, patient);
-      Repository.postCarePlan(newPlan, _authToken).then((value) => load());
-    });
+  void addDefaultCarePlan() {
+    _addDefaultCarePlan().then((value) => load());
   }
 
-  void addBlankPatient() async {
-    loadThenNotifyOrError(updatePatientResource(Patient()));
+  Future<String> _addDefaultCarePlan() async {
+    if (hasNoUser) return Future.error("No user");
+    if (hasNoPatient) return Future.error("No patient");
+
+    print("Creating a new care plan from template $_careplanTemplateRef.");
+    CarePlan carePlanTemplate;
+    try {
+      carePlanTemplate = await Repository.loadCarePlan(_careplanTemplateRef, _authToken);
+    } catch (e) {
+      return Future.error("Could not load template care plan.");
+    }
+
+    CarePlan newPlan = CarePlan.fromTemplate(carePlanTemplate, patient);
+    return Repository.postResource(newPlan, _authToken);
+  }
+
+  Future<String> _addNewUserWelcomeMessage() async {
+    if (hasNoUser) return Future.error("No user");
+    if (hasNoPatient) return Future.error("No patient");
+
+    String templateId = AppConfig.newUserWelcomeMessageTemplateId;
+    print("Creating a new communication from template $templateId.");
+    Communication commTemplate;
+    try {
+      commTemplate = await Repository.loadCommunication(templateId, _authToken);
+    } catch (e) {
+      return Future.error("Could not load template communication.");
+    }
+
+    Communication newComm = Communication.fromTemplate(commTemplate, patient);
+    return Repository.postResource(newComm, _authToken);
   }
 
   Future addCompletedSession(int minutes) async {
@@ -172,17 +241,17 @@ class CarePlanModel extends Model {
   }
 
   Future updateCommunication(Communication communication) async {
-    return Repository.updateCommunication(communication, _authToken).then((value) => load());
+    return Repository.updateResource(communication, _authToken).then((value) => load());
   }
 
   void updateActivityFrequency(int activityIndex, double newFrequency) {
     carePlan.activity[activityIndex].detail.scheduledTiming.repeat.period = newFrequency;
-    Repository.updateCarePlan(carePlan, _authToken).then((value) => load());
+    Repository.updateResource(carePlan, _authToken).then((value) => load());
   }
 
   void updateActivityDuration(int activityIndex, double newDuration) {
     carePlan.activity[activityIndex].detail.scheduledTiming.repeat.duration = newDuration;
-    Repository.updateCarePlan(carePlan, _authToken).then((value) => load());
+    Repository.updateResource(carePlan, _authToken).then((value) => load());
   }
 
   QuestionnaireItem questionForLinkId(String linkId) {
