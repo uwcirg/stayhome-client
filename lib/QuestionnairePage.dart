@@ -354,7 +354,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
           child: TextFormField(
             controller: dateCtrl,
             decoration: InputDecoration(
-              hintText: "e.g. 3/22/2020 8:00 PM",
+              hintText: questionnaireItem.text
             ),
             autovalidate: true,
             validator: (value) {
