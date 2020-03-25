@@ -2,6 +2,7 @@
  * Copyright (c) 2020 CIRG. All rights reserved.
  */
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 import 'package:map_app_flutter/MapAppDrawer.dart';
 import 'package:map_app_flutter/config/AppConfig.dart';
 import 'package:map_app_flutter/const.dart';
@@ -82,6 +83,13 @@ class MapAppPageScaffold extends StatelessWidget {
     List<Widget> actions = this.actions;
     if (showStandardAppBarActions) {
       actions = <Widget>[
+        MyApp.of(context).auth.isLoggedIn && ModalRoute.of(context).settings.name != '/home' ?
+          IconButton(
+            icon: Icon(MdiIcons.home),
+            onPressed: () {
+              Navigator.of(context).pushReplacementNamed('/home');
+            },
+          ) : Spacer(flex: 1),
         ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
           return IconButton(
             icon: Icon(Icons.refresh),

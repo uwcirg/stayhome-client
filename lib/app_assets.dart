@@ -249,7 +249,7 @@ class StayHomeAppAssets extends AppAssets {
   @override
   Widget loginBanner(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 42),
+      padding: const EdgeInsets.only(top: Dimensions.extraLargeMargin),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[

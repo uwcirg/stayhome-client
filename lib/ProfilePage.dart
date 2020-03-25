@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart';
 import 'package:map_app_flutter/KeycloakAuth.dart';
@@ -10,6 +11,7 @@ import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/map_app_widgets.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:scoped_model/scoped_model.dart';
+
 
 import 'main.dart';
 
@@ -101,8 +103,16 @@ class ProfileWidget extends StatefulWidget {
 class ProfileWidgetState extends State<ProfileWidget> {
   String _formError;
   final _formKey = GlobalKey<FormState>();
+  final birthDateCtrl = TextEditingController();
 
   ProfileWidgetState();
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is removed from the widget tree.
+    birthDateCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -154,7 +164,8 @@ class ProfileWidgetState extends State<ProfileWidget> {
     ContactPointSystem preferredContactMethod = originalPatient.preferredContactMethod;
     Gender gender = originalPatient.gender;
     DateTime birthDate = originalPatient.birthDate;
-
+    birthDateCtrl.text = birthDate != null ? DateFormat.yMd().format(birthDate) : "";
+   
     return Padding(
       padding: const EdgeInsets.all(Dimensions.fullMargin),
       child: Form(
@@ -267,23 +278,45 @@ class ProfileWidgetState extends State<ProfileWidget> {
                     return null;
                   },
                 ),
-                TextFormField(
-                  decoration: InputDecoration(
-                      icon: Icon(Icons.cake),
-                      hintText: "Enter date of birth (m/d/y)",
-                      labelText: "Date of birth"),
-                  initialValue: birthDate != null ? DateFormat.yMd().format(birthDate) : "",
-                  autovalidate: true,
-                  validator: (value) {
-                    if (value.isEmpty) return null;
-                    try {
-                      birthDate = DateFormat.yMd().parse(value);
-                      print("parsed birthdate: ${birthDate.toIso8601String()}");
-                    } catch (FormatException) {
-                      return "Enter a valid date";
-                    }
-                    return null;
-                  },
+                InkWell(
+                  child: IgnorePointer(
+                    child: 
+                      TextFormField(
+                        controller: birthDateCtrl,
+                        decoration: InputDecoration(
+                            icon: Icon(Icons.cake),
+                            hintText: "Enter date of birth (m/d/y)",
+                            labelText: "Date of birth"),
+                        //initialValue: birthDate != null ? DateFormat.yMd().format(birthDate) : "",
+                        autovalidate: true,
+                        validator: (value) {
+                          if (value.isEmpty) return null;
+                          try {
+                            birthDate = DateFormat.yMd().parse(value);
+                           // print("parsed birthdate: ${birthDate.toIso8601String()}");
+                          } catch (FormatException) {
+                            return "Enter a valid date";
+                          }
+                          return null;
+                        },
+                      ), 
+                    ),
+                    onTap:() {
+                      DatePicker.showDatePicker(context,
+                        showTitleActions: true,
+                        minTime: DateTime(1950, 1, 1),
+                        maxTime: new DateTime.now(),
+                        theme: DatePickerTheme(
+                          itemStyle: TextStyle(color: Theme.of(context).primaryColor),
+                          doneStyle: TextStyle(color: Theme.of(context).primaryColor)
+                        ),
+                        onConfirm: (date) {
+                          final formattedDate = DateFormat.yMd().format(date);
+                          birthDate = DateFormat.yMd().parse(formattedDate.toString());
+                          birthDateCtrl.text = formattedDate.toString();
+                        },
+                        currentTime: DateTime.now(), locale: Localizations.localeOf(context).languageCode == 'de'? LocaleType.de : LocaleType.en);
+                    },
                 ),
                 RadioButtonFormField(
                   "Sex",
