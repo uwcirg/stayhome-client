@@ -100,7 +100,7 @@ class HomePage extends StatelessWidget {
             SpringboardTile(
               assetPath: 'assets/stayhome/Trend.png',
               text: "review calendar & history",
-              onPressed: () => MapAppDrawer.navigate(context, "/calendar_history"),
+              onPressed: () => MapAppDrawer.navigate(context, "/progress_insights"),
             ),
           ],
         ),
