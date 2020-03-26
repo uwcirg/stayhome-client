@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
+ * Copyright (c) 2020 CIRG. All rights reserved.
  */
 
 import 'dart:math' as math;
@@ -59,12 +59,12 @@ class QuestionnairePageState extends State<QuestionnairePage> {
       onWillPop: _onWillPop,
       child: new MapAppPageScaffold(
         title: _questionnaire.title,
+        showDrawer: false,
         child: QuestionListWidget(
             questions: _questionnaire.item,
             response: _response,
             onDonePressed: _onDonePressed,
             onCancelPressed: _onCancelPressed),
-        showDrawer: false,
       ),
     );
   }
