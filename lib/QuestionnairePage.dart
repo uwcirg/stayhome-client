@@ -245,8 +245,9 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
 class QuestionWidget extends StatefulWidget {
   final QuestionnaireResponse response;
   final QuestionnaireItem question;
+  final dateCtrl = TextEditingController();
 
-  const QuestionWidget(this.response, this.question);
+  QuestionWidget(this.response, this.question);
 
   @override
   State<StatefulWidget> createState() => QuestionWidgetState(this.response);
@@ -278,8 +279,6 @@ class QuestionWidgetState extends State<QuestionWidget> {
       item = _buildStringItem(questionnaireItem, context);
     } else if (questionnaireItem.type == "date") {
       item = _buildDateItem(questionnaireItem, context);
-    } else if (questionnaireItem.type == "dateTime") {
-      item = _buildDateTimeItem(questionnaireItem, context);
     } else {
       throw UnimplementedError("Not implemented: ${questionnaireItem.type}");
     }
@@ -304,9 +303,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
   }
 
   Widget _buildStringItem(QuestionnaireItem questionnaireItem, BuildContext context) {
-    return Padding(
-      padding: MapAppPadding.cardPageMargins,
-      child: TextFormField(
+    return TextFormField(
         initialValue: _response.getAnswer(questionnaireItem.linkId)?.toString() ?? "",
         decoration: InputDecoration(hintText: questionnaireItem.text),
         onChanged: (value) {
@@ -314,97 +311,40 @@ class QuestionWidgetState extends State<QuestionWidget> {
             _response.setAnswer(questionnaireItem.linkId, Answer(valueString: value));
           });
         },
-      ),
-    );
+      );
   }
-
   Widget _buildDateItem(QuestionnaireItem questionnaireItem, BuildContext context) {
-    return Padding(
-      padding: MapAppPadding.cardPageMargins,
-      child: InkWell(
-        child: IgnorePointer(
-          child: TextFormField(
-            initialValue: currentEntry ?? "",
-            decoration: InputDecoration(
-              hintText: questionnaireItem.text
-            ),
+    return InkWell(
+      child: IgnorePointer(
+        child: TextFormField(
+          controller: widget.dateCtrl,
+          decoration: InputDecoration(
+            hintText: questionnaireItem.text
           ),
         ),
-        onTap: () {
-          DatePicker.showDatePicker(context,
-              showTitleActions: true,
-              minTime: DateTime(2019, 1, 1),
-              maxTime: new DateTime.now(),
-              theme: DatePickerTheme(
-                  itemStyle: TextStyle(color: Theme.of(context).primaryColor),
-                  doneStyle: TextStyle(color: Theme.of(context).primaryColor)),
-              onConfirm: (DateTime pickerDate) {
-            final formattedDate = DateFormat.yMd().format(pickerDate);
-            DateTime date = DateFormat.yMd().parse(formattedDate.toString());
-            setState(() {
-              _response.setAnswer(questionnaireItem.linkId, Answer(valueDate: date));
-              currentEntry = formattedDate;
-            });
-          },
-              currentTime: _response.getAnswer(questionnaireItem.linkId).valueDate,
-              locale: Localizations.localeOf(context).languageCode == 'de'
-                  ? LocaleType.de
-                  : LocaleType.en);
-        },
       ),
-    );
-  }
-
-  Widget _buildDateTimeItem(QuestionnaireItem questionnaireItem, BuildContext context) {
-    DateTime date;
-    final dateCtrl = TextEditingController();
-    return Padding(
-        padding: MapAppPadding.cardPageMargins,
-        child: InkWell(
-          child: IgnorePointer(
-            child: TextFormField(
-              controller: dateCtrl,
-              decoration: InputDecoration(hintText: questionnaireItem.text),
-              autovalidate: true,
-              validator: (value) {
-                String message;
-                if (value.isEmpty) {
-                  date = null;
-                } else {
-                  try {
-                    date = DateFormat.yMd().parseStrict(value);
-                  } catch (FormatException) {
-                    try {
-                      date = DateFormat.yMd().add_jm().parseStrict(value);
-                    } catch (FormatException) {
-                      message = "Enter a valid date and time";
-                    }
-                  }
-                }
-                _response.setAnswer(questionnaireItem.linkId, Answer(valueDateTime: date));
-                return message;
-              },
-            ),
-          ),
-          onTap: () {
-            DatePicker.showDatePicker(context,
-                showTitleActions: true,
-                minTime: DateTime(2019, 1, 1, 12, 12, 0, 0),
-                maxTime: new DateTime.now(),
-                theme: DatePickerTheme(
-                    itemStyle: TextStyle(color: Theme.of(context).primaryColor),
-                    doneStyle: TextStyle(color: Theme.of(context).primaryColor)),
-                onConfirm: (pickerdate) {
-              final formattedDate = DateFormat.yMd().format(pickerdate);
-              date = DateFormat.yMd().parseStrict(formattedDate.toString());
-              dateCtrl.text = formattedDate.toString();
+      onTap: () {
+        DatePicker.showDatePicker(context,
+            showTitleActions: true,
+            minTime: DateTime(2019, 1, 1),
+            maxTime: new DateTime.now(),
+            theme: DatePickerTheme(
+                itemStyle: TextStyle(color: Theme.of(context).primaryColor),
+                doneStyle: TextStyle(color: Theme.of(context).primaryColor)),
+            onConfirm: (pickerdate) {
+              final String formattedDate = DateFormat.yMd().format(pickerdate);
+              DateTime date = DateFormat.yMd().parse(formattedDate.toString());
+              widget.dateCtrl.text = formattedDate;
+              setState(() {
+                _response.setAnswer(questionnaireItem.linkId, Answer(valueDate: date));
+              });
             },
-                currentTime: DateTime.now(),
-                locale: Localizations.localeOf(context).languageCode == 'de'
-                    ? LocaleType.de
-                    : LocaleType.en);
-          },
-        ));
+            currentTime: _response.getAnswer(questionnaireItem.linkId)?.valueDate,
+            locale: Localizations.localeOf(context).languageCode == 'de'
+                ? LocaleType.de
+                : LocaleType.en);
+      },
+    );
   }
 
   Widget _buildChoiceItem(QuestionnaireItem questionnaireItem, BuildContext context) {
@@ -416,9 +356,8 @@ class QuestionWidgetState extends State<QuestionWidget> {
   }
 
   Widget _buildDropDown(QuestionnaireItem questionnaireItem) {
-    Answer currentResponse = _response.getResponseItem(questionnaireItem.linkId) != null
-        ? _response.getResponseItem(questionnaireItem.linkId).answer[0]
-        : null;
+    Answer currentResponse = _response.getAnswer(questionnaireItem.linkId);
+
     List<ChoiceOption> choices = questionnaireItem.choiceOptions;
 
     return DropdownButton(
@@ -481,9 +420,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
   }
 
   List<Widget> _buildChoices(QuestionnaireItem questionnaireItem, BuildContext context) {
-    Answer currentResponse = _response.getResponseItem(questionnaireItem.linkId) != null
-        ? _response.getResponseItem(questionnaireItem.linkId).answer[0]
-        : null;
+    Answer currentResponse = _response.getAnswer(questionnaireItem.linkId);
 
     if (questionnaireItem.answerOption != null) {
       return _buildChoicesFromAnswerOptions(questionnaireItem, currentResponse, context);
