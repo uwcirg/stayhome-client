@@ -6,6 +6,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
@@ -63,7 +64,7 @@ class QuestionnairePageState extends State<QuestionnairePage> {
             response: _response,
             onDonePressed: _onDonePressed,
             onCancelPressed: _onCancelPressed),
-        showDrawer: false,
+            showDrawer: false,
       ),
     );
   }
@@ -296,57 +297,70 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
 
   Widget _buildDateItem(QuestionnaireItem questionnaireItem, BuildContext context) {
     DateTime date;
+    final dateCtrl = TextEditingController();
     return Padding(
       padding: MapAppPadding.cardPageMargins,
-      child: TextFormField(
-        decoration: InputDecoration(
-          hintText: "e.g. 3/22/2020",
-        ),
-        autovalidate: true,
-        validator: (value) {
-          String message;
-          if (value.isEmpty) {
-            date = null;
-          } else {
-            try {
-              date = DateFormat.yMd().parse(value);
-            } catch (FormatException) {
-              message = "Enter a valid date";
-            }
-          }
-          _response.setAnswer(questionnaireItem.linkId, Answer(valueDate: date));
-          return message;
-        },
-      ),
+      child: InkWell(
+            child: IgnorePointer(
+              child: TextFormField(
+                controller: dateCtrl,
+                decoration: InputDecoration(
+                  hintText: questionnaireItem.text,
+                ),
+              ),
+            ),
+            onTap:() {
+              DatePicker.showDatePicker(context,
+                showTitleActions: true,
+                minTime: DateTime(2019, 1, 1),
+                maxTime: new DateTime.now(),
+                theme: DatePickerTheme(
+                    itemStyle: TextStyle(color: Theme.of(context).primaryColor),
+                    doneStyle: TextStyle(color: Theme.of(context).primaryColor)
+                ),
+                onConfirm: (pickerdate) {
+                  final formattedDate = DateFormat.yMd().format(pickerdate);
+                  date = DateFormat.yMd().parse(formattedDate.toString());
+                  dateCtrl.text = formattedDate.toString();
+                  _response.setAnswer(questionnaireItem.linkId, Answer(valueDate: date));
+                },
+                currentTime: DateTime.now(), locale: Localizations.localeOf(context).languageCode == 'de'? LocaleType.de : LocaleType.en);
+            },
+          ),
     );
   }
 
   Widget _buildDateTimeItem(QuestionnaireItem questionnaireItem, BuildContext context) {
     DateTime date;
+    final dateCtrl = TextEditingController();
     return Padding(
       padding: MapAppPadding.cardPageMargins,
-      child: TextFormField(
-        decoration: InputDecoration(
-          hintText: "e.g. 3/22/2020 8:00 PM",
+      child: InkWell(
+        child: IgnorePointer(
+          child: TextFormField(
+            controller: dateCtrl,
+            decoration: InputDecoration(
+              hintText: questionnaireItem.text
+            ),
+          ),
         ),
-        autovalidate: true,
-        validator: (value) {
-          String message;
-          if (value.isEmpty) {
-            date = null;
-          } else {
-            try {
-              date = DateFormat.yMd().parseStrict(value);
-            } catch (FormatException) {
-              try {
-                date = DateFormat.yMd().add_jm().parseStrict(value);
-              } catch (FormatException) {
-                message = "Enter a valid date and time";
-              }
-            }
-          }
-          _response.setAnswer(questionnaireItem.linkId, Answer(valueDateTime: date));
-          return message;
+        onTap:() {
+          DatePicker.showDatePicker(context,
+            showTitleActions: true,
+            minTime: DateTime(2019, 1, 1, 12, 12, 0, 0),
+            maxTime: new DateTime.now(),
+            theme: DatePickerTheme (
+                itemStyle: TextStyle(color: Theme.of(context).primaryColor),
+                doneStyle: TextStyle(color: Theme.of(context).primaryColor)
+            ),
+            onConfirm: (pickerdate) {
+              final formattedDate = DateFormat.yMd().format(pickerdate);
+              date = DateFormat.yMd().parseStrict(formattedDate.toString());
+              dateCtrl.text = formattedDate.toString();
+              _response.setAnswer(questionnaireItem.linkId, Answer(valueDateTime: date));
+            },
+            //TODO make the locale population dynamic
+            currentTime: DateTime.now(), locale: Localizations.localeOf(context).languageCode == 'de'? LocaleType.de : LocaleType.en);
         },
       ),
     );
