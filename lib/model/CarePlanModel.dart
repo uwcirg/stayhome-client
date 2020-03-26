@@ -54,6 +54,8 @@ class CarePlanModel extends Model {
   bool get hasNoUser => _keycloakUserId == null;
 
   CarePlanModel(this._careplanTemplateRef, this._keycloakSystem) {
+    // default auth object - should be replaced with user action login/guest user
+    this._auth = KeycloakAuth(AppConfig.issuerUrl, AppConfig.clientSecret, AppConfig.clientId);
     goals = new Goals();
   }
 
@@ -63,7 +65,8 @@ class CarePlanModel extends Model {
     load();
   }
 
-  void setGuestUser() {
+  void setGuestUser(KeycloakAuth auth) {
+    this._auth = auth;
     loadResourceLinks();
   }
 

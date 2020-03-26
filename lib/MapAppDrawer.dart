@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
+ * Copyright (c) 2020 CIRG. All rights reserved.
  */
 
 import 'package:flutter/material.dart';
@@ -124,9 +124,11 @@ class MapAppDrawer extends Drawer {
   }
 
   ListTile constructListTile(BuildContext context, MenuItem item) {
+    String title = item.title;
+    if (!MyApp.of(context).auth.isLoggedIn && item.loggedOutTitle != null) title = item.loggedOutTitle;
     return ListTile(
       enabled: item.requiresLogin ? MyApp.of(context).auth.isLoggedIn : true,
-      title: Text(item.title),
+      title: Text(title),
       leading: item.icon,
       onTap: () => {
         if (item.exitApp) {

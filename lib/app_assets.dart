@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2020 CIRG. All rights reserved.
+ */
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:map_app_flutter/CommunicationsPage.dart';
@@ -366,8 +370,9 @@ class StayHomeAppAssets extends AppAssets {
         route: '/about',
       ),
       MenuItem(
-        requiresLogin: true,
-        title: S.of(context).logout,
+        requiresLogin: false,
+        title: "Logout",
+        loggedOutTitle: "Back to login",
         icon: Icon(MdiIcons.logout),
         exitApp: true 
       )
@@ -399,10 +404,12 @@ class StayHomeAppAssets extends AppAssets {
 
 class MenuItem {
   final String title;
+  final String loggedOutTitle;
   final Widget icon;
   final String route;
   final bool requiresLogin;
   final bool exitApp;
 
-  MenuItem({this.title = "Undefined", this.icon, this.route = "/home", this.requiresLogin = false, this.exitApp = false});
+
+  MenuItem({this.title = "Undefined", this.icon, this.route = "/home", this.requiresLogin = false, this.exitApp = false, this.loggedOutTitle});
 }
