@@ -95,8 +95,7 @@ build:docker_web:
     entrypoint: ['']
   stage: build
   before_script:
-    # override global before_script
-    - docker info
+    - cp mapapp.env.default mapapp.env
     - echo "$DOCKER_PASSWORD" | docker login --password-stdin --username "$DOCKER_USERNAME"
   script:
     - docker-compose build
