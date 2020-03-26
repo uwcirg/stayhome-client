@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2020 CIRG. All rights reserved.
- */
-
 // DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
 // This is a library that looks up messages for specific locales by
 // delegating to the appropriate library.
@@ -19,15 +15,23 @@ import 'package:intl/intl.dart';
 import 'package:intl/message_lookup_by_library.dart';
 import 'package:intl/src/intl_helpers.dart';
 
+import 'messages_de.dart' as messages_de;
+import 'messages_mn.dart' as messages_mn;
 import 'messages_en.dart' as messages_en;
 
 typedef Future<dynamic> LibraryLoader();
 Map<String, LibraryLoader> _deferredLibraries = {
+  'de': () => new Future.value(null),
+  'mn': () => new Future.value(null),
   'en': () => new Future.value(null),
 };
 
 MessageLookupByLibrary _findExact(String localeName) {
   switch (localeName) {
+    case 'de':
+      return messages_de.messages;
+    case 'mn':
+      return messages_mn.messages;
     case 'en':
       return messages_en.messages;
     default:
