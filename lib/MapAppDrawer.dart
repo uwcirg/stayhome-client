@@ -128,7 +128,13 @@ class MapAppDrawer extends Drawer {
       enabled: item.requiresLogin ? MyApp.of(context).auth.isLoggedIn : true,
       title: Text(item.title),
       leading: item.icon,
-      onTap: () => navigate(context, item.route),
+      onTap: () => {
+        if (item.exitApp) {
+          MyApp.of(context).logout(context:context)
+        } else if (item.route != null) {
+          navigate(context, item.route)
+        }
+      }
     );
   }
 }

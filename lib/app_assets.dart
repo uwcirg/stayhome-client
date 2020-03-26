@@ -197,7 +197,7 @@ class JoyluxAppAssets extends AppAssets {
         title: S.of(context).about,
         icon: Icon(Icons.people),
         route: '/about',
-      )
+      ),
     ];
   }
 
@@ -249,7 +249,7 @@ class StayHomeAppAssets extends AppAssets {
   @override
   Widget loginBanner(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 42),
+      padding: const EdgeInsets.only(top: Dimensions.extraLargeMargin),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -364,6 +364,12 @@ class StayHomeAppAssets extends AppAssets {
         title: S.of(context).about,
         icon: Icon(Icons.people),
         route: '/about',
+      ),
+      MenuItem(
+        requiresLogin: true,
+        title: S.of(context).logout,
+        icon: Icon(MdiIcons.logout),
+        exitApp: true 
       )
     ];
   }
@@ -396,6 +402,7 @@ class MenuItem {
   final Widget icon;
   final String route;
   final bool requiresLogin;
+  final bool exitApp;
 
-  MenuItem({this.title = "Undefined", this.icon, this.route = "/home", this.requiresLogin = false});
+  MenuItem({this.title = "Undefined", this.icon, this.route = "/home", this.requiresLogin = false, this.exitApp = false});
 }
