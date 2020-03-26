@@ -66,7 +66,7 @@ class MapAppPageScaffold extends StatelessWidget {
       child: Column(
         children: <Widget>[
           Text(
-            title.toLowerCase(),
+            title,
             style: Theme.of(context).textTheme.title.apply(fontWeightDelta: 1),
             textAlign: TextAlign.center,
           ),

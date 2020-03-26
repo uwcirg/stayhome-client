@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2020 CIRG. All rights reserved.
+ */
+
 // GENERATED CODE - DO NOT MODIFY BY HAND
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -526,7 +530,7 @@ class S {
 
   String get welcome {
     return Intl.message(
-      'thank you and welcome',
+      'Thank you and welcome',
       name: 'welcome',
       desc: '',
       args: [],

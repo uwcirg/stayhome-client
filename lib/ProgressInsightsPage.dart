@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
+ * Copyright (c) 2020 CIRG. All rights reserved.
  */
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
@@ -323,7 +323,7 @@ class _StayHomeTrendsPageState extends _ProgressInsightsPageState {
       numberOfItems = _maxChartsToShow + 1;
     }
     if (numberOfItems == 0) {
-      return Text("No data to show yet", style: Theme.of(context).textTheme.caption);
+      return Center(child: Text("No data to show yet", style: Theme.of(context).textTheme.caption));
     }
     return Expanded(
         child: ListView.builder(

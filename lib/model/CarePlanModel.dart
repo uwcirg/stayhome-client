@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
+ * Copyright (c) 2020 CIRG. All rights reserved.
  */
 
 import 'package:flutter/material.dart';
@@ -140,7 +140,6 @@ class CarePlanModel extends Model {
     this.carePlan = await Repository.getCarePlan(patient, _careplanTemplateRef, _api);
     if (carePlan != null) {
       print("Found careplan: ${carePlan.reference}");
-      print("Loading communications");
       await _loadCommunications();
       return _loadQuestionnaires();
     } else {
@@ -184,6 +183,7 @@ class CarePlanModel extends Model {
     List<Communication> responses = await Repository.getCommunications(patient, _api);
     if (responses != null) {
       this.communications = responses;
+      print("Loaded ${this.communications.length} communications");
     } else {
       return Future.error("Communications could not be loaded.");
     }

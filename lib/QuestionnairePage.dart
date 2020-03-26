@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
+ * Copyright (c) 2020 CIRG. All rights reserved.
  */
 
 import 'dart:math' as math;
@@ -19,7 +19,7 @@ import 'const.dart';
 class QuestionnairePage extends StatefulWidget {
   final Questionnaire _questionnaire;
 
-  CarePlanModel _carePlanModel;
+  final CarePlanModel _carePlanModel;
 
   QuestionnairePage(this._questionnaire, this._carePlanModel);
 
@@ -59,12 +59,12 @@ class QuestionnairePageState extends State<QuestionnairePage> {
       onWillPop: _onWillPop,
       child: new MapAppPageScaffold(
         title: _questionnaire.title,
+        showDrawer: false,
         child: QuestionListWidget(
             questions: _questionnaire.item,
             response: _response,
             onDonePressed: _onDonePressed,
             onCancelPressed: _onCancelPressed),
-            showDrawer: false,
       ),
     );
   }
@@ -162,12 +162,12 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
             padding: MapAppPadding.cardPageMargins,
             itemBuilder: (context, i) {
               if (i == _questions.length) {
-                return _buildSubmitButton(context);
+                return _buildButtons(context);
               }
 
               QuestionnaireItem item = _questions[i];
               if (item.isSupported()) {
-                return _buildItem(context, item);
+                return QuestionWidget(_response, item);
               } else if (item.isGroup()) {
                 return _buildGroupCard(context, item);
               } else {
@@ -176,7 +176,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
             }));
   }
 
-  Padding _buildSubmitButton(BuildContext context) {
+  Padding _buildButtons(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
           left: Dimensions.halfMargin,
@@ -240,6 +240,29 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
       ),
     ));
   }
+}
+
+class QuestionWidget extends StatefulWidget {
+  final QuestionnaireResponse response;
+  final QuestionnaireItem question;
+  final dateCtrl = TextEditingController();
+
+  QuestionWidget(this.response, this.question);
+
+  @override
+  State<StatefulWidget> createState() => QuestionWidgetState(this.response);
+}
+
+class QuestionWidgetState extends State<QuestionWidget> {
+  QuestionnaireResponse _response;
+  String currentEntry;
+
+  QuestionWidgetState(this._response);
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildItem(context, widget.question);
+  }
 
   Widget _buildItem(BuildContext context, QuestionnaireItem questionnaireItem) {
     var questionTitleStyle = Theme.of(context).textTheme.title;
@@ -256,8 +279,6 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
       item = _buildStringItem(questionnaireItem, context);
     } else if (questionnaireItem.type == "date") {
       item = _buildDateItem(questionnaireItem, context);
-    } else if (questionnaireItem.type == "dateTime") {
-      item = _buildDateTimeItem(questionnaireItem, context);
     } else {
       throw UnimplementedError("Not implemented: ${questionnaireItem.type}");
     }
@@ -282,87 +303,48 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
   }
 
   Widget _buildStringItem(QuestionnaireItem questionnaireItem, BuildContext context) {
-    return Padding(
-      padding: MapAppPadding.cardPageMargins,
-      child: TextFormField(
+    return TextFormField(
+        initialValue: _response.getAnswer(questionnaireItem.linkId)?.toString() ?? "",
         decoration: InputDecoration(hintText: questionnaireItem.text),
         onChanged: (value) {
           setState(() {
             _response.setAnswer(questionnaireItem.linkId, Answer(valueString: value));
           });
         },
-      ),
-    );
+      );
   }
 
   Widget _buildDateItem(QuestionnaireItem questionnaireItem, BuildContext context) {
-    DateTime date;
-    final dateCtrl = TextEditingController();
-    return Padding(
-      padding: MapAppPadding.cardPageMargins,
-      child: InkWell(
-            child: IgnorePointer(
-              child: TextFormField(
-                controller: dateCtrl,
-                decoration: InputDecoration(
-                  hintText: questionnaireItem.text,
-                ),
-              ),
-            ),
-            onTap:() {
-              DatePicker.showDatePicker(context,
-                showTitleActions: true,
-                minTime: DateTime(2019, 1, 1),
-                maxTime: new DateTime.now(),
-                theme: DatePickerTheme(
-                    itemStyle: TextStyle(color: Theme.of(context).primaryColor),
-                    doneStyle: TextStyle(color: Theme.of(context).primaryColor)
-                ),
-                onConfirm: (pickerdate) {
-                  final formattedDate = DateFormat.yMd().format(pickerdate);
-                  date = DateFormat.yMd().parse(formattedDate.toString());
-                  dateCtrl.text = formattedDate.toString();
-                  _response.setAnswer(questionnaireItem.linkId, Answer(valueDate: date));
-                },
-                currentTime: DateTime.now(), locale: Localizations.localeOf(context).languageCode == 'de'? LocaleType.de : LocaleType.en);
-            },
-          ),
-    );
-  }
-
-  Widget _buildDateTimeItem(QuestionnaireItem questionnaireItem, BuildContext context) {
-    DateTime date;
-    final dateCtrl = TextEditingController();
-    return Padding(
-      padding: MapAppPadding.cardPageMargins,
-      child: InkWell(
-        child: IgnorePointer(
-          child: TextFormField(
-            controller: dateCtrl,
-            decoration: InputDecoration(
-              hintText: questionnaireItem.text
-            ),
+    return InkWell(
+      child: IgnorePointer(
+        child: TextFormField(
+          controller: widget.dateCtrl,
+          decoration: InputDecoration(
+            hintText: questionnaireItem.text
           ),
         ),
-        onTap:() {
-          DatePicker.showDatePicker(context,
-            showTitleActions: true,
-            minTime: DateTime(2019, 1, 1, 12, 12, 0, 0),
-            maxTime: new DateTime.now(),
-            theme: DatePickerTheme (
-                itemStyle: TextStyle(color: Theme.of(context).primaryColor),
-                doneStyle: TextStyle(color: Theme.of(context).primaryColor)
-            ),
-            onConfirm: (pickerdate) {
-              final formattedDate = DateFormat.yMd().format(pickerdate);
-              date = DateFormat.yMd().parseStrict(formattedDate.toString());
-              dateCtrl.text = formattedDate.toString();
-              _response.setAnswer(questionnaireItem.linkId, Answer(valueDateTime: date));
-            },
-            //TODO make the locale population dynamic
-            currentTime: DateTime.now(), locale: Localizations.localeOf(context).languageCode == 'de'? LocaleType.de : LocaleType.en);
-        },
       ),
+      onTap: () {
+        DatePicker.showDatePicker(context,
+            showTitleActions: true,
+            minTime: DateTime(2019, 1, 1),
+            maxTime: new DateTime.now(),
+            theme: DatePickerTheme(
+                itemStyle: TextStyle(color: Theme.of(context).primaryColor),
+                doneStyle: TextStyle(color: Theme.of(context).primaryColor)),
+            onConfirm: (pickerdate) {
+              final String formattedDate = DateFormat.yMd().format(pickerdate);
+              DateTime date = DateFormat.yMd().parse(formattedDate.toString());
+              widget.dateCtrl.text = formattedDate;
+              setState(() {
+                _response.setAnswer(questionnaireItem.linkId, Answer(valueDate: date));
+              });
+            },
+            currentTime: _response.getAnswer(questionnaireItem.linkId)?.valueDate,
+            locale: Localizations.localeOf(context).languageCode == 'de'
+                ? LocaleType.de
+                : LocaleType.en);
+      },
     );
   }
 
@@ -375,9 +357,8 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
   }
 
   Widget _buildDropDown(QuestionnaireItem questionnaireItem) {
-    Answer currentResponse = _response.getResponseItem(questionnaireItem.linkId) != null
-        ? _response.getResponseItem(questionnaireItem.linkId).answer[0]
-        : null;
+    Answer currentResponse = _response.getAnswer(questionnaireItem.linkId);
+
     List<ChoiceOption> choices = questionnaireItem.choiceOptions;
 
     return DropdownButton(
@@ -403,10 +384,16 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
 
   Widget _buildTemperatureItem(QuestionnaireItem questionnaireItem, BuildContext context) {
     return TextFormField(
+      initialValue: currentEntry ?? "",
       decoration:
           InputDecoration(hintText: "Enter body temperature, in either °F or °C", errorMaxLines: 3),
       inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
       keyboardType: TextInputType.numberWithOptions(decimal: true),
+      onChanged: (value) {
+        setState(() {
+          currentEntry = value;
+        });
+      },
       autovalidate: true,
       validator: (value) {
         String message;
@@ -434,9 +421,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
   }
 
   List<Widget> _buildChoices(QuestionnaireItem questionnaireItem, BuildContext context) {
-    Answer currentResponse = _response.getResponseItem(questionnaireItem.linkId) != null
-        ? _response.getResponseItem(questionnaireItem.linkId).answer[0]
-        : null;
+    Answer currentResponse = _response.getAnswer(questionnaireItem.linkId);
 
     if (questionnaireItem.answerOption != null) {
       return _buildChoicesFromAnswerOptions(questionnaireItem, currentResponse, context);
@@ -485,7 +470,11 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
               selected: isSelected,
               onSelected: (bool) {
                 setState(() {
-                  _response.setAnswer(questionnaireItem.linkId, ifChosen);
+                  if (isSelected) {
+                    _response.removeAnswer(questionnaireItem.linkId);
+                  } else {
+                    _response.setAnswer(questionnaireItem.linkId, ifChosen);
+                  }
                 });
               }),
           Visibility(

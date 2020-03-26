@@ -16,23 +16,22 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
-      title: "home",
-      child: Expanded(
-          child: ListView.builder(
-            itemBuilder: (context, i) {
-              return new Padding(
-                padding: MapAppPadding.pageMargins,
-                child: ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
-                  Widget errorWidget = MapAppErrorMessage.fromModel(model, context);
-                  if (errorWidget != null) return errorWidget;
-                  return _buildPage(context, model);
-                }),
-              );
-            },
-            itemCount: 1,
-            shrinkWrap: true,
-          ))
-    );
+        title: "Home",
+        child: Expanded(
+            child: ListView.builder(
+          itemBuilder: (context, i) {
+            return new Padding(
+              padding: MapAppPadding.pageMargins,
+              child: ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
+                Widget errorWidget = MapAppErrorMessage.fromModel(model, context);
+                if (errorWidget != null) return errorWidget;
+                return _buildPage(context, model);
+              }),
+            );
+          },
+          itemCount: 1,
+          shrinkWrap: true,
+        )));
   }
 
   Column _buildPage(BuildContext context, CarePlanModel model) {
@@ -77,14 +76,16 @@ class HomePage extends StatelessWidget {
           child: Row(
             children: <Widget>[
               SpringboardTile(
-                assetPath: 'assets/stayhome/Testing.transparent.png',
+                assetPath: model.questionnaires.length > 2
+                    ? 'assets/stayhome/Testing.transparent.png'
+                    : 'assets/stayhome/Testing.gray.png',
                 text: "record COVID-19 testing",
                 onPressed: model.questionnaires.length > 2
                     ? () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) =>
-                          QuestionnairePage(model.questionnaires[2], model)));
-                }
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                QuestionnairePage(model.questionnaires[2], model)));
+                      }
                     : null,
               ),
               SpringboardTile(
@@ -100,7 +101,7 @@ class HomePage extends StatelessWidget {
             SpringboardTile(
               assetPath: 'assets/stayhome/Trend.png',
               text: "review calendar & history",
-              onPressed: () => MapAppDrawer.navigate(context, "/calendar_history"),
+              onPressed: () => MapAppDrawer.navigate(context, "/progress_insights"),
             ),
           ],
         ),

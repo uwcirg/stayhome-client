@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2020 CIRG. All rights reserved.
+ */
+
 // DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
 // This is a library that provides messages for a en locale. All the
 // messages from the main program should be duplicated here with the same
@@ -85,7 +89,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "versionString" : m6,
     "vfit_faq" : MessageLookupByLibrary.simpleMessage("vFit FAQ"),
     "visit_our_facebook_page" : MessageLookupByLibrary.simpleMessage("Visit our Facebook Page"),
-    "welcome" : MessageLookupByLibrary.simpleMessage("thank you and welcome"),
+    "welcome" : MessageLookupByLibrary.simpleMessage("Thank you and welcome"),
     "what_is_your_email_address" : MessageLookupByLibrary.simpleMessage("What is your email address?"),
     "what_is_your_name" : MessageLookupByLibrary.simpleMessage("What is your name?"),
     "what_is_your_patient_resource_id" : MessageLookupByLibrary.simpleMessage("What is your Patient Resource ID?"),

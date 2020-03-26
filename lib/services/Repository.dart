@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
+ * Copyright (c) 2020 CIRG. All rights reserved.
  */
 import 'dart:convert';
 import 'dart:io' show HttpHeaders;
@@ -213,7 +213,9 @@ class Repository {
       print('$e');
       return Future.error("An error occurred when trying to save your responses.");
     }
-    return QuestionnaireResponse.fromJson(jsonDecode(result));
+    QuestionnaireResponse postedResponse = QuestionnaireResponse.fromJson(jsonDecode(result));
+    print("Created ${postedResponse.reference}");
+    return postedResponse;
   }
 
   static Future<Questionnaire> getQuestionnaire(String questionnaireReference, OAuthApi api) async {

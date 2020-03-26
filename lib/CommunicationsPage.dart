@@ -23,7 +23,7 @@ class CommunicationsPage extends StatelessWidget {
         },
         rebuildOnChange: true,
       ),
-      title: "communications",
+      title: "Communications",
     );
   }
 

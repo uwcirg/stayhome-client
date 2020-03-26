@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
+ * Copyright (c) 2020 CIRG. All rights reserved.
  */
 import 'package:map_app_flutter/services/Repository.dart';
 import "package:simple_auth/simple_auth.dart" show JsonSerializable;
@@ -110,6 +110,7 @@ class Communication extends Resource implements JsonSerializable {
   factory Communication.fromJson(Map<String, dynamic> json) {
     return Communication._fromJson(json);
   }
+
   Communication._fromJson(Map<String, dynamic> json) {
     resourceType = json['resourceType'];
     id = json['id'];
@@ -1695,8 +1696,7 @@ class QuestionnaireItem {
         type == "decimal" ||
         type == "string" ||
         type == "display" ||
-        type == "date" ||
-        type == "dateTime";
+        type == "date";
   }
 
   bool isTemperature() {
@@ -1927,6 +1927,13 @@ class QuestionnaireResponse extends Resource {
     return data;
   }
 
+  void removeAnswer(String linkId) {
+    var responseItem = getResponseItem(linkId);
+    if (responseItem != null) {
+      responseItem.answer = null;
+    }
+  }
+
   void setAnswer(String linkId, Answer answer) {
     var responseItem = getResponseItem(linkId);
     if (responseItem != null) {
@@ -1934,6 +1941,12 @@ class QuestionnaireResponse extends Resource {
     } else {
       this.item.add(new QuestionnaireResponseItem(linkId: linkId, answer: [answer]));
     }
+  }
+
+  Answer getAnswer(String linkId) {
+    List<Answer> answers = getResponseItem(linkId)?.answer;
+    if (answers != null && answers.length > 0) return answers[0];
+    return null;
   }
 
   QuestionnaireResponseItem getResponseItem(String linkId) {

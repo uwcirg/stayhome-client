@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2020 CIRG. All rights reserved.
+ */
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
@@ -76,7 +80,7 @@ class CreateProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
-      title: "create profile",
+      title: "Create Profile",
       showDrawer: false,
       child: Expanded(
         child: ListView.builder(
@@ -165,7 +169,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
     Gender gender = originalPatient.gender;
     DateTime birthDate = originalPatient.birthDate;
     birthDateCtrl.text = birthDate != null ? DateFormat.yMd().format(birthDate) : "";
-   
+
     return Padding(
       padding: const EdgeInsets.all(Dimensions.fullMargin),
       child: Form(
@@ -280,15 +284,15 @@ class ProfileWidgetState extends State<ProfileWidget> {
                 ),
                 InkWell(
                   child: IgnorePointer(
-                        child: 
-                        TextFormField(
-                          controller: birthDateCtrl,
-                          decoration: InputDecoration(
-                              icon: Icon(Icons.cake),
-                              hintText: "Enter date of birth (m/d/y)",
-                              labelText: "Date of birth")
-                          //initialValue: birthDate != null ? DateFormat.yMd().format(birthDate) : "",
-                        ), 
+                    child:
+                      TextFormField(
+                        controller: birthDateCtrl,
+                        decoration: InputDecoration(
+                            icon: Icon(Icons.cake),
+                            hintText: "Enter date of birth (m/d/y)",
+                            labelText: "Date of birth"),
+                        //initialValue: birthDate != null ? DateFormat.yMd().format(birthDate) : "",
+                      ),
                     ),
                     onTap:() {
                       DatePicker.showDatePicker(context,
@@ -308,15 +312,15 @@ class ProfileWidgetState extends State<ProfileWidget> {
                     },
                 ),
                 FlatButton(
-                    padding: EdgeInsets.symmetric(vertical: Dimensions.fullMargin, horizontal: Dimensions.extraLargeMargin),
-                    child: Text(
+                  padding: EdgeInsets.symmetric(vertical: Dimensions.fullMargin, horizontal: Dimensions.extraLargeMargin),
+                  child: Text(
                       'clear date of birth',
                       style: TextStyle(decoration: TextDecoration.underline)
-                    ),
-                    onPressed: () {
-                      birthDate = null;
-                      birthDateCtrl.text = "";
-                    },
+                  ),
+                  onPressed: () {
+                    birthDate = null;
+                    birthDateCtrl.text = "";
+                  },
                 ),
                 RadioButtonFormField(
                   "Sex",

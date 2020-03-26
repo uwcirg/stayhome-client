@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
+ * Copyright (c) 2020 CIRG. All rights reserved.
  */
 
 import 'dart:async';
@@ -42,7 +42,7 @@ class _HelpPageState extends State<HelpPage> {
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
       child: _buildScreen(context),
-      title: "about",
+      title: "About",
     );
   }
 
