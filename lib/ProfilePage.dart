@@ -76,7 +76,7 @@ class CreateProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
-      title: "create profile",
+      title: "Create Profile",
       showDrawer: false,
       child: Expanded(
         child: ListView.builder(

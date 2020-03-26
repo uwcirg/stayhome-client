@@ -526,7 +526,7 @@ class S {
 
   String get welcome {
     return Intl.message(
-      'thank you and welcome',
+      'Thank you and welcome',
       name: 'welcome',
       desc: '',
       args: [],
