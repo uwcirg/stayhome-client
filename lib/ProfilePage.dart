@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:configurable_expansion_tile/configurable_expansion_tile.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart';
@@ -43,7 +44,10 @@ class _ProfilePageState extends State<ProfilePage> {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  ProfileWidget(popWhenDone: false),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: Dimensions.extraLargeMargin),
+                    child: ProfileWidget(popWhenDone: false),
+                  )
                   // Divider(),
                   // Padding(
                   //   padding: const EdgeInsets.only(top: Dimensions.largeMargin),
@@ -80,7 +84,7 @@ class CreateProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
-      title: "Create Profile",
+      title: "Create profile",
       showDrawer: false,
       child: Expanded(
         child: ListView.builder(
@@ -178,8 +182,8 @@ class ProfileWidgetState extends State<ProfileWidget> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                _buildInfoTextSection(S.of(context).profile_introduction_help_text),
                 _buildSectionHeader("Location"),
+                _buildCollapsibleInfoTile("Click to learn how Location information is used", S.of(context).profile_location_help_text),
                 TextFormField(
                   decoration: InputDecoration(
                       icon: Icon(Icons.contact_mail),
@@ -213,8 +217,19 @@ class ProfileWidgetState extends State<ProfileWidget> {
                     return null;
                   },
                 ),
-                _buildInfoTextSection(S.of(context).profile_location_help_text),
-                _buildSectionHeader("Contact information"),
+                //add space to present consistent spacing between sections here
+                Container(
+                  margin: EdgeInsets.only(
+                    top: Dimensions.halfMargin,
+                    left: Dimensions.fullMargin,
+                    right: Dimensions.fullMargin,
+                    bottom: Dimensions.fullMargin
+                  ),
+                  child: Container(),
+                ),
+                Divider(),
+                _buildSectionHeader("Contact Information"),
+                _buildCollapsibleInfoTile("Click to learn how Contact Information is used", S.of(context).profile_contact_info_help_text),
                 TextFormField(
                   decoration: InputDecoration(
                       icon: Icon(Icons.email),
@@ -249,15 +264,16 @@ class ProfileWidgetState extends State<ProfileWidget> {
                 ),
                 RadioButtonFormField(
                     "Preferred contact method",
-                    [ContactPointSystem.email, ContactPointSystem.phone, ContactPointSystem.sms],
+                    [ContactPointSystem.email, ContactPointSystem.sms, ContactPointSystem.phone],
                     preferredContactMethod, (value) {
                   preferredContactMethod = value;
                 }, displayOverrides: {
-                  ContactPointSystem.phone: "call",
+                  ContactPointSystem.phone: "voice call",
                   ContactPointSystem.sms: "text"
                 }),
-                _buildInfoTextSection(S.of(context).profile_contact_info_help_text),
-                _buildSectionHeader("Identifying Information"),
+                Divider(),
+                _buildSectionHeader("About You"),
+                _buildCollapsibleInfoTile("Click to learn how About You information is used", S.of(context).profile_identifying_info_help_text),
                 TextFormField(
                   decoration: InputDecoration(
                       icon: Icon(Icons.person),
@@ -331,7 +347,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
                   },
                   displayOverrides: {Gender.unknown: "decline to state"},
                 ),
-                _buildInfoTextSection(S.of(context).profile_identifying_info_help_text),
+                Divider(),
                 Padding(
                   padding: const EdgeInsets.only(top: Dimensions.largeMargin),
                   child: Center(
@@ -374,15 +390,70 @@ class ProfileWidgetState extends State<ProfileWidget> {
 
   _buildSectionHeader(String text) {
     return Padding(
-      padding: const EdgeInsets.only(top: Dimensions.fullMargin),
+      padding: const EdgeInsets.only(top: Dimensions.largeMargin, bottom: 4),
       child: Text(text, style: Theme.of(context).textTheme.headline6),
     );
   }
 
-  _buildInfoTextSection(String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
-      child: MarkdownBody(data: text),
+  _buildCollapsibleInfoTile(String header, String content) {
+    return ConfigurableExpansionTile(
+      headerExpanded: Flexible(child:
+        Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Icon(
+              Icons.help_outline,
+              color: Colors.grey[700],
+              size: IconSize.small,
+              semanticLabel: header,
+            ),
+            Container(
+              padding: EdgeInsets.only(left: 4, right: 8),
+              child: Text(header, style: TextStyle(color: Colors.grey[700])),
+            ),
+            Icon(
+              Icons.keyboard_arrow_up,
+              color: Theme.of(context).primaryColor,
+              size: IconSize.small,
+              semanticLabel: header,
+            ),
+          ])
+      ),
+      header: Flexible(
+        child:
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Icon(
+              Icons.help_outline,
+              size: 16.0,
+              semanticLabel: header,
+              color: Colors.grey[700]
+            ),
+            Container(
+              padding: EdgeInsets.only(left:4, right: 8),
+              child: Text(header, style: TextStyle(color: Colors.grey[700])),
+            ),
+            Icon(
+              Icons.keyboard_arrow_down,
+              color: Theme.of(context).primaryColor,
+              size: 16.0,
+              semanticLabel: header,
+            ),
+          ])
+      ),
+      children: [
+        Container(
+          margin: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(color: Theme.of(context).highlightColor),
+          child: MarkdownBody(data: content),
+        ),
+        // + more params, see example !!
+      ],
     );
   }
 
