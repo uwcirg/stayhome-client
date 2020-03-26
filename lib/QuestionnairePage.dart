@@ -319,32 +319,15 @@ class QuestionWidgetState extends State<QuestionWidget> {
   }
 
   Widget _buildDateItem(QuestionnaireItem questionnaireItem, BuildContext context) {
-    DateTime date;
-    final dateCtrl = TextEditingController();
     return Padding(
       padding: MapAppPadding.cardPageMargins,
       child: InkWell(
         child: IgnorePointer(
           child: TextFormField(
-            controller: dateCtrl,
+            initialValue: currentEntry,
             decoration: InputDecoration(
-              hintText: questionnaireItem.text,
+              hintText: questionnaireItem.text
             ),
-            autovalidate: true,
-            validator: (value) {
-              String message;
-              if (value.isEmpty) {
-                date = null;
-              } else {
-                try {
-                  date = DateFormat.yMd().parse(value);
-                } catch (FormatException) {
-                  message = "Enter a valid date";
-                }
-              }
-              _response.setAnswer(questionnaireItem.linkId, Answer(valueDate: date));
-              return message;
-            },
           ),
         ),
         onTap: () {
@@ -355,12 +338,15 @@ class QuestionWidgetState extends State<QuestionWidget> {
               theme: DatePickerTheme(
                   itemStyle: TextStyle(color: Theme.of(context).primaryColor),
                   doneStyle: TextStyle(color: Theme.of(context).primaryColor)),
-              onConfirm: (pickerdate) {
-            final formattedDate = DateFormat.yMd().format(pickerdate);
-            date = DateFormat.yMd().parse(formattedDate.toString());
-            dateCtrl.text = formattedDate.toString();
+              onConfirm: (DateTime pickerDate) {
+            final formattedDate = DateFormat.yMd().format(pickerDate);
+            DateTime date = DateFormat.yMd().parse(formattedDate.toString());
+            setState(() {
+              _response.setAnswer(questionnaireItem.linkId, Answer(valueDate: date));
+              currentEntry = formattedDate;
+            });
           },
-              currentTime: DateTime.now(),
+              currentTime: _response.getAnswer(questionnaireItem.linkId).valueDate,
               locale: Localizations.localeOf(context).languageCode == 'de'
                   ? LocaleType.de
                   : LocaleType.en);
