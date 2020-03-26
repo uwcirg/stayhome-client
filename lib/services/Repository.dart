@@ -213,7 +213,9 @@ class Repository {
       print('$e');
       return Future.error("An error occurred when trying to save your responses.");
     }
-    return QuestionnaireResponse.fromJson(jsonDecode(result));
+    QuestionnaireResponse postedResponse = QuestionnaireResponse.fromJson(jsonDecode(result));
+    print("Created ${postedResponse.reference}");
+    return postedResponse;
   }
 
   static Future<Questionnaire> getQuestionnaire(String questionnaireReference, OAuthApi api) async {
