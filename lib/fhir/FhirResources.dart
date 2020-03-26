@@ -110,6 +110,7 @@ class Communication extends Resource implements JsonSerializable {
   factory Communication.fromJson(Map<String, dynamic> json) {
     return Communication._fromJson(json);
   }
+
   Communication._fromJson(Map<String, dynamic> json) {
     resourceType = json['resourceType'];
     id = json['id'];
@@ -1927,6 +1928,13 @@ class QuestionnaireResponse extends Resource {
     return data;
   }
 
+  void removeAnswer(String linkId) {
+    var responseItem = getResponseItem(linkId);
+    if (responseItem != null) {
+      responseItem.answer = null;
+    }
+  }
+
   void setAnswer(String linkId, Answer answer) {
     var responseItem = getResponseItem(linkId);
     if (responseItem != null) {
@@ -1934,6 +1942,12 @@ class QuestionnaireResponse extends Resource {
     } else {
       this.item.add(new QuestionnaireResponseItem(linkId: linkId, answer: [answer]));
     }
+  }
+
+  Answer getAnswer(String linkId) {
+    var answers = getResponseItem(linkId)?.answer;
+    if (answers != null && answers.length > 0) return answers[0];
+    return null;
   }
 
   QuestionnaireResponseItem getResponseItem(String linkId) {
