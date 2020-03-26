@@ -7,5 +7,5 @@ services:
     image: "uwcirg/map-app-client:${DOCKER_IMAGE_TAG:-latest}"
     ports:
       - ${EXTERNAL_PORT:-8010}:${PORT:-80}
-    volumes:
-      - "./assets/cfg/app_settings.yaml:/usr/share/nginx/html/assets/assets/cfg/app_settings.yaml"
+    env_file:
+      - mapapp.env
