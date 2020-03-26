@@ -307,7 +307,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
     return Padding(
       padding: MapAppPadding.cardPageMargins,
       child: TextFormField(
-        initialValue: _response.getAnswer(questionnaireItem.linkId).toString(),
+        initialValue: _response.getAnswer(questionnaireItem.linkId)?.toString() ?? "",
         decoration: InputDecoration(hintText: questionnaireItem.text),
         onChanged: (value) {
           setState(() {
@@ -324,7 +324,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
       child: InkWell(
         child: IgnorePointer(
           child: TextFormField(
-            initialValue: currentEntry,
+            initialValue: currentEntry ?? "",
             decoration: InputDecoration(
               hintText: questionnaireItem.text
             ),
