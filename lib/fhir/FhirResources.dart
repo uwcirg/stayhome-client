@@ -1696,8 +1696,7 @@ class QuestionnaireItem {
         type == "decimal" ||
         type == "string" ||
         type == "display" ||
-        type == "date" ||
-        type == "dateTime";
+        type == "date";
   }
 
   bool isTemperature() {
@@ -1945,7 +1944,7 @@ class QuestionnaireResponse extends Resource {
   }
 
   Answer getAnswer(String linkId) {
-    var answers = getResponseItem(linkId)?.answer;
+    List<Answer> answers = getResponseItem(linkId)?.answer;
     if (answers != null && answers.length > 0) return answers[0];
     return null;
   }
