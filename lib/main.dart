@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2020 CIRG. All rights reserved.
+ */
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -144,13 +148,13 @@ class _MyAppState extends State<MyApp> {
         ScopedModel.of<CarePlanModel>(context).setUserAndAuthToken(keycloakUserId, auth);
         Navigator.of(context).pushReplacementNamed('/home');
       }).catchError((error) {
-        ScopedModel.of<CarePlanModel>(context).setGuestUser();
+        ScopedModel.of<CarePlanModel>(context).setGuestUser(auth);
         Navigator.of(context).pushReplacementNamed('/guestHome');
       });
     } else {
       // clear credentials from browser by calling log out
       logout(pushLogin: false);
-      ScopedModel.of<CarePlanModel>(context).setGuestUser();
+      ScopedModel.of<CarePlanModel>(context).setGuestUser(auth);
       Navigator.of(context).pushReplacementNamed('/guestHome');
     }
   }

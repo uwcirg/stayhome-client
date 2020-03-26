@@ -163,8 +163,11 @@ class Repository {
   static Future<List<DocumentReference>> getResourceLinks(String carePlanTemplateRef, api) async {
     CarePlan carePlan;
     try {
-      carePlan = await loadCarePlan(carePlanTemplateRef, api);
-    } catch (e) {}
+      carePlan = await loadCarePlan(carePlanTemplateRef, api, authenticated: false);
+    } catch (e) {
+      print('$e');
+      return Future.error("Could not load info resource: $e");
+    }
     if (carePlan == null) return Future.error("Could not load info resource");
     List<Reference> documentReferenceReferences = [];
     for (Activity activity in carePlan.activity) {
@@ -175,7 +178,7 @@ class Repository {
     List<DocumentReference> documentReferences = [];
     await Future.forEach(documentReferenceReferences, (Reference r) async {
       var url = "$fhirBaseUrl/${r.reference}";
-      var request = new Request(HttpMethod.Get, url, headers: _defaultHeaders());
+      var request = new Request(HttpMethod.Get, url, headers: _defaultHeaders(), authenticated: false);
       var response = await api.send<String>(request);
 //      var value = await get(url, headers: _defaultHeaders(authToken));
 
@@ -269,11 +272,12 @@ class Repository {
   }
 
   /// reference should be of format CarePlan/123
-  static Future<CarePlan> loadCarePlan(String reference, OAuthApi api) async {
+  static Future<CarePlan> loadCarePlan(String reference, OAuthApi api, {bool authenticated=true}) async {
     var url = "$fhirBaseUrl/$reference";
-    var request = new Request(HttpMethod.Get, url, headers: _defaultHeaders());
+    var request = new Request(HttpMethod.Get, url, headers: _defaultHeaders(), authenticated: authenticated);
     var response = await api.send<String>(request);
     if (response.statusCode == 200) {
+      print("Loaded careplan");
       return CarePlan.fromJson(jsonDecode(response.body));
     } else {
       print("Status code: ${response.statusCode}");

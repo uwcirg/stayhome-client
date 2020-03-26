@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
+ * Copyright (c) 2020 CIRG. All rights reserved.
  */
 
 import 'dart:ui' as ui;
@@ -20,15 +20,17 @@ import 'main.dart';
 abstract class LearningCenterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    bool triedLoading = false;
     return MapAppPageScaffold(
       title: MyApp.of(context).appAssets.learningCenterPageTitle(context),
       child: ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
         if (model.isLoading) return Center(child: CircularProgressIndicator());
-        if (model.infoLinks == null) {
+        if (model.infoLinks == null && !triedLoading) {
           model.loadResourceLinks();
+          triedLoading = true;
           return Center(child: CircularProgressIndicator());
         }
-        if (!model.hasNoUser && model.error != null) {
+        if (model.error != null) {
           print("Error loading resource links: ${model.error}");
           return MapAppErrorMessage.modelError(model);
         }
