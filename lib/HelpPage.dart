@@ -14,32 +14,7 @@ import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
 import 'package:map_app_flutter/platform_stub.dart';
 
-class HelpPage extends StatefulWidget {
-  @override
-  State createState() {
-    return new _HelpPageState();
-  }
-}
-
-class _HelpPageState extends State<HelpPage> {
-  int _timeLeftInSeconds;
-
-  @override
-  void initState() {
-    super.initState();
-    const oneSec = const Duration(seconds: 1);
-    new Timer.periodic(oneSec, (Timer t) => _updateTimeLeft());
-  }
-
-  void _updateTimeLeft() {
-    DateTime tokenExpDate = MyApp.of(context).auth.accessTokenExpirationDateTime;
-    if (tokenExpDate != null) {
-      setState(() {
-        _timeLeftInSeconds = tokenExpDate.difference(new DateTime.now()).inSeconds;
-      });
-    }
-  }
-
+class HelpPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
@@ -92,9 +67,7 @@ class _HelpPageState extends State<HelpPage> {
           ),
           Text(S.of(context).developedByCIRG),
           Text(""),
-          Text(S.of(context).versionString("0.0")),
-          Text(""),
-          Text(S.of(context).time_left_until_token_expiration('$_timeLeftInSeconds')),
+          Text(S.of(context).versionString(AppConfig.version)),
         ],
         crossAxisAlignment: CrossAxisAlignment.stretch,
       ),
@@ -103,13 +76,6 @@ class _HelpPageState extends State<HelpPage> {
 }
 
 class StayHomeHelpPage extends HelpPage {
-  @override
-  State createState() {
-    return new _StayHomeHelpPageState();
-  }
-}
-
-class _StayHomeHelpPageState extends _HelpPageState {
   @override
   Widget _buildAboutPageContent(BuildContext context) {
     return Padding(
@@ -152,6 +118,7 @@ class _StayHomeHelpPageState extends _HelpPageState {
                               left: Dimensions.halfMargin),
                           actions: <Widget>[
                             new OutlineButton(
+                              //TODO: This crashes (?) on iOS
                               onPressed: () => Clipboard.setData(new ClipboardData(text: terms))
                                   .then((value) => snack("Copied!", context))
                                   .catchError((error) => snack("Copying failed: $e", context)),
