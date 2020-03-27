@@ -397,56 +397,41 @@ class ProfileWidgetState extends State<ProfileWidget> {
     );
   }
 
-  _buildCollapsibleInfoTile(String header, String content) {
-    return ConfigurableExpansionTile(
-      headerExpanded: Flexible(child:
-        Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Icon(
-              Icons.help_outline,
-              color: Colors.grey[700],
-              size: IconSize.small,
-              semanticLabel: header,
-            ),
-            Container(
-              padding: EdgeInsets.only(left: 4, right: 8),
-              child: Text(header, style: TextStyle(color: Colors.grey[700])),
-            ),
-            Icon(
-              Icons.keyboard_arrow_up,
-              color: Theme.of(context).primaryColor,
-              size: IconSize.small,
-              semanticLabel: header,
-            ),
-          ])
-      ),
-      header: Flexible(
+  _buildCollapsibleInfoLabel(String header, bool expanded) {
+    
+    return Flexible(
         child:
         Row(
+          mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Icon(
               Icons.help_outline,
-              size: 16.0,
+              size: IconSize.small,
               semanticLabel: header,
               color: Colors.grey[700]
             ),
-            Container(
-              padding: EdgeInsets.only(left:4, right: 8),
-              child: Text(header, style: TextStyle(color: Colors.grey[700])),
-            ),
+            Flexible(
+              child:
+              Container(
+                padding: EdgeInsets.only(left:4, right: 8),
+                child: Text(header, style: TextStyle(color: Colors.grey[700])),
+              ),),
             Icon(
-              Icons.keyboard_arrow_down,
+              expanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_up,
               color: Theme.of(context).primaryColor,
-              size: 16.0,
+              size: IconSize.small,
               semanticLabel: header,
             ),
           ])
-      ),
+      );
+  }
+
+  _buildCollapsibleInfoTile(String header, String content) {
+    return ConfigurableExpansionTile(
+      headerExpanded: _buildCollapsibleInfoLabel(header, false),
+      header: _buildCollapsibleInfoLabel(header, true),
       children: [
         Container(
           margin: const EdgeInsets.all(16.0),
