@@ -476,7 +476,7 @@ class S {
 
   String get profile_introduction_help_text {
     return Intl.message(
-      'If you create a profile and add certain types of information, you can see information more relevant to you, and you can convey information to public health that may help your community, or help you personally.\n\nBut remember, everything on this profile is optional.  We’re more interested in having you able to use the system than in having you worry about us collecting information, or keeping it safe.  That said, each item on this page has a use, and you can always come back and update it later.',
+      'If you create a profile and add certain types of information, you can see information more relevant to you, and you can convey information to public health that may help your community, or help you personally.\n\nBut remember, everything on this profile is optional. We’re more interested in having you able to use the system than in having you worry about us collecting information, or keeping it safe. That said, each item on this page has a use, and you can always come back and update it later.',
       name: 'profile_introduction_help_text',
       desc: '',
       args: [],
@@ -485,7 +485,7 @@ class S {
 
   String get profile_location_help_text {
     return Intl.message(
-      'If you give us location information, we may make your symptom temperature and testing information available anonymously (no identifying information) to public health agencies responsible for those zip codes.  You can provide a real location, even if you register with a fake email address.  But, that information (level of illness, location) may be useful for public health planning even if you can not be contacted.  \n\nIf we have your location we can also personalize the information we give you about COVID-19 resources.',
+      'If you give us location information, we may make symptom temperature and COVID-19 testing information available anonymously (no identifying information) to public health agencies responsible for those zip codes. You can provide a real location, even if you register with a fake email address and provide no other information. But that information (level of illness, location) may be useful for public health planning even if you can not be contacted.\n\nIf you enter your location, we can also personalize the information we give you about COVID-19 resources.',
       name: 'profile_location_help_text',
       desc: '',
       args: [],
@@ -494,7 +494,7 @@ class S {
 
   String get profile_contact_info_help_text {
     return Intl.message(
-      'If you set up your account with a fake email, you can provide us a real one here.  It won’t change your username, but **if you also verify your email or phone or both**, you agree that we, or a public health jurisdiction responsible for your location, can contact you if there is a specific need that we, or they, believe to be in your interest.',
+      'If you provide your email, phone, or both, then we can make that info available to the public health agency responsible for your area, and we or they can contact you if needed. You will only be contacted if there is a specific reason to do so, one that we or the public health agency(s) believe to be in your best interest.\n\nIf you chose to set up your account with a fake email, you may provide us with a real one here, so we may contact you. But, doing so will not change your username. Likewise, if you used one email as a username when setting up your account, but would prefer a different email as your contact email, you can enter it here, but it will not change your username.',
       name: 'profile_contact_info_help_text',
       desc: '',
       args: [],
@@ -503,7 +503,7 @@ class S {
 
   String get profile_identifying_info_help_text {
     return Intl.message(
-      'If you **are willing** to provide a verified email and/or phone number, we’d like to know who we’re speaking with if we do have a need to contact you.  Similarly, if you provide information about who you are, we’d appreciate it if you’d include sex and date of birth as those are standard ways of ensuring someone’s medical information gets attached to the correct clinic, testing, or hospital records.\n\nIf you don’t provide contact, location, or identifying information, we’d like you to provide us with your sex and as much of your date of birth as you’re willing to share.  Patterns of illness by age, sex, and location can be critical in helping public health shape an effective response.',
+      'If you **do provide** an email and/or phone number, we\'d like to know who we are speaking with, if we do have a need to contact you. We’d also appreciate it if you\'d include sex and date of birth as those are standard ways of ensuring that the right person\'s medication information gets attached to the correct clinic, testing, or hospital records.\n\nIf you **have not provided** location or contact information, it would still be helpful if you could let us know your sex, the year, and perhaps the month of your birth (you can enter a fake day, or month, if you want). Patterns of illness by age, sex, and location can be critical in helping public health shape an effective response.',
       name: 'profile_identifying_info_help_text',
       desc: '',
       args: [],
