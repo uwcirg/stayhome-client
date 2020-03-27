@@ -25,7 +25,7 @@ upsert_yaml_setting() {
 
     # append and exit if not present
     if ! grep --quiet "$setting_name" "$settings_file"; then
-        echo "${setting_name}: ${setting_value} " >> "$settings_file"
+        echo "${setting_name}: ${setting_value}" >> "$settings_file"
         return
     fi
 
