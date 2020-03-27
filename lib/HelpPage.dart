@@ -3,8 +3,10 @@
  */
 
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/config/AppConfig.dart';
 import 'package:map_app_flutter/const.dart';
@@ -133,7 +135,37 @@ class _StayHomeHelpPageState extends _HelpPageState {
                   onPressed: () => PlatformDefs().launchUrl(WhatInfo.cirgLink, newTab: true),
                   child: Text("Read More")),
             ),
-            Text(""),
+            Divider(),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: Dimensions.fullMargin),
+              child: OutlineButton(
+                  onPressed: () => showDialog(
+                      context: context,
+                      builder: (context) {
+                        var terms = S.of(context).terms_of_use;
+                        return new AlertDialog(
+                          title: new Text(S.of(context).terms_of_use_title),
+                          content: SingleChildScrollView(child: Text(terms)),
+                          actionsPadding: EdgeInsets.only(
+                              right: Dimensions.halfMargin,
+                              bottom: Dimensions.halfMargin,
+                              left: Dimensions.halfMargin),
+                          actions: <Widget>[
+                            new OutlineButton(
+                              onPressed: () => Clipboard.setData(new ClipboardData(text: terms))
+                                  .then((value) => snack("Copied!", context))
+                                  .catchError((error) => snack("Copying failed: $e", context)),
+                              child: Text('copy to clipboard'),
+                            ),
+                            new OutlineButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: new Text('done'),
+                            ),
+                          ],
+                        );
+                      }),
+                  child: Text("Review ${S.of(context).terms_of_use_title}")),
+            ),
             Text(S.of(context).versionString(AppConfig.version)),
           ]),
     );
@@ -150,7 +182,7 @@ class SectionTitle extends StatelessWidget {
     var sectionTitleStyle = Theme.of(context).textTheme.title;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: Dimensions.fullMargin,top:Dimensions.largeMargin),
+      padding: const EdgeInsets.only(bottom: Dimensions.fullMargin, top: Dimensions.largeMargin),
       child: Text(
         text,
         style: sectionTitleStyle,
