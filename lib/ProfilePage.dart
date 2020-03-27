@@ -9,6 +9,7 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart';
 import 'package:map_app_flutter/KeycloakAuth.dart';
+import 'package:map_app_flutter/MapAppDrawer.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
@@ -144,7 +145,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
         Navigator.of(context).pop();
       } else {
         snack("Profile updates saved", context);
-        Navigator.of(context).pushReplacementNamed('/home');
+        MapAppDrawer.navigate(context, '/home');
       }
     }).catchError((error) {
       setState(() {

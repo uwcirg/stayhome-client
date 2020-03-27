@@ -78,7 +78,7 @@ class MapAppDrawer extends Drawer {
         ...MyApp.of(context)
             .appAssets
             .navItems(context)
-            .map((MenuItem item) => constructListTile(context, item)),
+            .map((MenuItem item) => constructDrawerMenuItem(context, item)),
         Divider(),
         ListTile(
           trailing: Icon(Icons.language),
@@ -112,18 +112,22 @@ class MapAppDrawer extends Drawer {
 
   void profileOrLogin(BuildContext context) {
     if (MyApp.of(context).auth.isLoggedIn) {
-      navigate(context, "/profile");
+      _navigateFromDrawer(context, "/profile");
     } else {
-      Navigator.of(context).pushNamed("/login");
+      Navigator.of(context).pushReplacementNamed('/login');
     }
   }
 
-  static void navigate(BuildContext context, String activity) {
-    Navigator.pop(context);
+  static void _navigateFromDrawer(BuildContext context, String activity) {
+    navigate(context, activity, fromDrawer: true);
+  }
+
+  static void navigate(BuildContext context, String activity, {bool fromDrawer=false}) {
+    if (fromDrawer) Navigator.pop(context); // close the drawer
     Navigator.pushNamed(context, activity);
   }
 
-  ListTile constructListTile(BuildContext context, MenuItem item) {
+  ListTile constructDrawerMenuItem(BuildContext context, MenuItem item) {
     String title = item.title;
     if (!MyApp.of(context).auth.isLoggedIn && item.loggedOutTitle != null) title = item.loggedOutTitle;
     return ListTile(
@@ -134,7 +138,7 @@ class MapAppDrawer extends Drawer {
         if (item.exitApp) {
           MyApp.of(context).logout(context:context)
         } else if (item.route != null) {
-          navigate(context, item.route)
+          _navigateFromDrawer(context, item.route)
         }
       }
     );

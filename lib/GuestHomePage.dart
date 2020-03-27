@@ -1,7 +1,8 @@
 /*
- * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
+ * Copyright (c) 2020 CIRG. All rights reserved.
  */
 import 'package:flutter/material.dart';
+import 'package:map_app_flutter/MapAppDrawer.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
@@ -47,7 +48,7 @@ class GuestHomeState extends State<GuestHomePage> {
                             style: TextStyle(color: Theme.of(context).primaryColor)
                             ),
                             onPressed: () {
-                              Navigator.of(context).pushReplacementNamed('/learning_center');
+                              MapAppDrawer.navigate(context, '/learning_center');
                             }
                         ),
                       ),
