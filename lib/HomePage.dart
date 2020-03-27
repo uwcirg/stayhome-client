@@ -16,7 +16,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
-        title: "Home",
+        title: null,
         child: Expanded(
             child: ListView.builder(
           itemBuilder: (context, i) {
@@ -89,8 +89,24 @@ class HomePage extends StatelessWidget {
                     : null,
               ),
               SpringboardTile(
+                assetPath: 'assets/stayhome/Resource.png',
+                text: "COVID-19 information & resources",
+                onPressed: () => MapAppDrawer.navigate(context, "/learning_center"),
+              ),
+            ],
+          ),
+        ),
+        IntrinsicHeight(
+          child: Row(
+            children: <Widget>[
+              SpringboardTile(
+                assetPath: 'assets/stayhome/Pregnant.gray.png',
+                text: "enter pregnancy status",
+                onPressed: null,
+              ),
+              SpringboardTile(
                 assetPath: 'assets/stayhome/profile_icon.png',
-                text: "update profile or sharing",
+                text: "update profile & permissions",
                 onPressed: () => MapAppDrawer.navigate(context, "/profile"),
               ),
             ],
@@ -134,7 +150,11 @@ class SpringboardTile extends StatelessWidget {
         child: Card(
             color: cardColor,
             child: Padding(
-              padding: MapAppPadding.pageMargins,
+              padding: const EdgeInsets.only(
+                  top: Dimensions.quarterMargin,
+                  bottom: Dimensions.halfMargin,
+                  right: Dimensions.halfMargin,
+                  left: Dimensions.halfMargin),
               child: Column(
                 children: <Widget>[
                   Image.asset(this.assetPath,
