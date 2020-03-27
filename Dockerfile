@@ -2,8 +2,6 @@
 #Stage 1 - Install dependencies and build the app
 FROM debian:latest AS build-env
 
-
-
 # Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends xz-utils git ca-certificates unzip && apt-get clean
 
@@ -37,5 +35,10 @@ RUN /usr/local/flutter/bin/flutter build web
 FROM nginx
 COPY --from=build-env /usr/local/stayhome/build/web /usr/share/nginx/html
 COPY docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
+ARG COMMIT_SHA
+ENV MAPAPP_COMMIT_SHA=$COMMIT_SHA
+
+# write mappapp-controlled environment variables to config file and start
 ENTRYPOINT ["/usr/bin/docker-entrypoint.sh"]
+
 CMD ["nginx","-g","daemon off;"]
