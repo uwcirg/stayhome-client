@@ -67,7 +67,7 @@ class GuestHomeState extends State<GuestHomePage> {
                 Center(
                   child: Padding(
                       padding: EdgeInsets.symmetric(vertical: Dimensions.fullMargin, horizontal: titleInsets),
-                      child: Text('StayHome includes a resource directory that gives you direct access to trusted information sources to support your need for accurate information about how to maintain physical, financial, and personal wellbeing during the COVID-19 outbreak.'),
+                      child: Text('StayHome includes a list of resources that gives you direct access to information sources that we believe to be accurate. We hope these sources will help you maintain your health, safety, and wellbeing during the COVID-19 outbreak.'),
                   )
                 ),
                 Center(
@@ -78,24 +78,28 @@ class GuestHomeState extends State<GuestHomePage> {
                     children: <Widget>[
                       Padding(
                         padding: EdgeInsets.only(top: Dimensions.halfMargin, left: sideInsets, right: sideInsets, bottom: Dimensions.fullMargin),
-                        child: Text('You can browse these sources or create an account to:')
+                        child: Text('Without an account, you can “continue” below to browse these sources, and follow the links they contain.')
                       ),
                       Padding(
                         padding: EdgeInsets.only(top: Dimensions.halfMargin, left: sideInsets, right: sideInsets, bottom: Dimensions.fullMargin),
-                        child: Text('-  track your own symptoms')
+                        child: Text('If you do decide to create an account, now or later, you can:')
                       ),
                       Padding(
                         padding: EdgeInsets.only(top: Dimensions.halfMargin, left: sideInsets, right: sideInsets, bottom: Dimensions.fullMargin),
-                        child: Text('-  track your travel and exposure risks'),
+                        child: Text('-  track your own symptoms and temperature')
                       ),
                       Padding(
                         padding: EdgeInsets.only(top: Dimensions.halfMargin, left: sideInsets, right: sideInsets, bottom: Dimensions.fullMargin),
-                        child: Text('-  record COVID-19 testing results'),
+                        child: Text('-  track travel and/or times you may have been exposed'),
                       ),
                       Padding(
-                        padding: EdgeInsets.only(top: Dimensions.halfMargin, left: sideInsets, right: sideInsets, bottom: Dimensions.largeMargin),
-                        child: Text('Without an account, you will not be able to access these tools'),
+                        padding: EdgeInsets.only(top: Dimensions.halfMargin, left: sideInsets, right: sideInsets, bottom: Dimensions.fullMargin),
+                        child: Text('-  record COVID-19 testing, which can help public health match your results with a way to contact you'),
                       ),
+                      Padding(
+                        padding: EdgeInsets.only(top: Dimensions.halfMargin, left: sideInsets, right: sideInsets, bottom: Dimensions.fullMargin),
+                        child: Text('-  record other information such as pregnancy and occupation that may help public health identify specific programs or protections for you.'),
+                      )
                     ]
                   ),
                 ),
