@@ -144,6 +144,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
         Navigator.of(context).pop();
       } else {
         snack("Profile updates saved", context);
+        Navigator.of(context).pushReplacementNamed('/home');
       }
     }).catchError((error) {
       setState(() {
