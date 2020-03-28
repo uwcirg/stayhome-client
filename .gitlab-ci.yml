@@ -88,7 +88,7 @@ build:web:
 build:docker_web:
   variables:
     # pass GitLab CI var as build arg
-    MAPAPP_COMMIT_SHA: "$CI_COMMIT_SHA"
+    COMMIT_SHA: "$CI_COMMIT_SHA"
   image:
     name: docker/compose:1.24.0
     # unset `docker-compose` as default Entrypoint
