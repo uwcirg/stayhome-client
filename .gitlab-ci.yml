@@ -87,10 +87,8 @@ build:web:
 
 build:docker_web:
   variables:
-    # use git tag, or git branch for docker image tag
-    DOCKER_IMAGE_TAG: "${CI_COMMIT_TAG:-$CI_COMMIT_BRANCH}"
     # pass GitLab CI var as build arg
-    MAPAPP_COMMIT_SHA: "$CI_COMMIT_SHA"
+    COMMIT_SHA: "$CI_COMMIT_SHA"
   image:
     name: docker/compose:1.24.0
     # unset `docker-compose` as default Entrypoint
@@ -100,8 +98,17 @@ build:docker_web:
     - cp mapapp.env.default mapapp.env
     - echo "$DOCKER_PASSWORD" | docker login --password-stdin --username "$DOCKER_USERNAME"
   script:
+    # remove slashes from docker image name
+    - export _COMMIT_BRANCH="$(echo $CI_COMMIT_BRANCH | tr / _)"
+    # use git tag, or git branch for docker image tag
+    - export DOCKER_IMAGE_TAG="${CI_COMMIT_TAG:-$_COMMIT_BRANCH}"
     - docker-compose build
   after_script:
+    # remove slashes from docker image name
+    - export _COMMIT_BRANCH="$(echo $CI_COMMIT_BRANCH | tr / _)"
+    # use git tag, or git branch for docker image tag
+    - export DOCKER_IMAGE_TAG="${CI_COMMIT_TAG:-$_COMMIT_BRANCH}"
+
     # todo: move to separate stage; use gitlab ci `only` syntax (and push to GitLab image registry to persist between stages)
     # only push docker images on master branch or tags
     - if [ "$CI_COMMIT_BRANCH" = master ] || [ "$CI_COMMIT_BRANCH" = develop ] || [ -n "$CI_COMMIT_TAG" ]; then docker-compose push; fi
