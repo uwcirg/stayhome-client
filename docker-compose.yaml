@@ -6,7 +6,8 @@ services:
       context: .
       args:
         # set build arg from env var with same name
-        COMMIT_SHA: $COMMIT_SHA
+        # add default to squelch warnings
+        COMMIT_SHA: ${COMMIT_SHA:-local}
     image: "uwcirg/map-app-client:${DOCKER_IMAGE_TAG:-latest}"
     ports:
       - ${EXTERNAL_PORT:-8010}:${PORT:-80}
