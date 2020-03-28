@@ -54,6 +54,6 @@
   "profile_identifying_info_help_text": "If you **do provide** an email and/or phone number, we'd like to know who we are speaking with, if we do have a need to contact you. We’d also appreciate it if you'd include sex and date of birth as those are standard ways of ensuring that the right person's medication information gets attached to the correct clinic, testing, or hospital records.\n\nIf you **have not provided** location or contact information, it would still be helpful if you could let us know your sex, the year, and perhaps the month of your birth (you can enter a fake day, or month, if you want). Patterns of illness by age, sex, and location can be critical in helping public health shape an effective response.",
   "loading_error_log_in_again": "Loading error. Try logging out and in again.",
   "my_goals": "My goals",
-  "welcome": "Thank you and welcome"
-
+  "welcome": "Thank you and welcome",
+"guest_home_text": "StayHome includes a list of resources that gives you direct access to information sources that we believe to be accurate. We hope these sources will help you maintain your health, safety, and well-being during the COVID-19 outbreak.\n\nWithout an account, you can “continue” below to browse these sources, and follow the links they contain.\n\nIf you do decide to create an account, now or later, you can:\n\n- track your own symptoms and temperature\n- track travel and/or times you may have been exposed\n- record COVID-19 testing, which can help public health match your results with a way to contact you\n- record other information such as pregnancy and occupation that may help public health identify specific programs or protections for you."
 }

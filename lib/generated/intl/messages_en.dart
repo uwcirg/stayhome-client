@@ -55,6 +55,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "forget" : MessageLookupByLibrary.simpleMessage("Forget"),
     "frequency" : MessageLookupByLibrary.simpleMessage("Frequency:"),
     "frequency_with_contents" : m3,
+    "guest_home_text" : MessageLookupByLibrary.simpleMessage("StayHome includes a list of resources that gives you direct access to information sources that we believe to be accurate. We hope these sources will help you maintain your health, safety, and well-being during the COVID-19 outbreak.\n\nWithout an account, you can “continue” below to browse these sources, and follow the links they contain.\n\nIf you do decide to create an account, now or later, you can:\n\n- track your own symptoms and temperature\n- track travel and/or times you may have been exposed\n- record COVID-19 testing, which can help public health match your results with a way to contact you\n- record other information such as pregnancy and occupation that may help public health identify specific programs or protections for you."),
     "hello" : MessageLookupByLibrary.simpleMessage("Hello!"),
     "help" : MessageLookupByLibrary.simpleMessage("Help"),
     "language" : MessageLookupByLibrary.simpleMessage("Language"),
