@@ -69,6 +69,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "my_goals" : MessageLookupByLibrary.simpleMessage("My goals"),
     "my_treatment_plan" : MessageLookupByLibrary.simpleMessage("My Treatment Plan"),
     "name" : MessageLookupByLibrary.simpleMessage("Name"),
+    "name_not_entered" : MessageLookupByLibrary.simpleMessage("(name not entered)"),
     "not_now" : MessageLookupByLibrary.simpleMessage("continue without logging in"),
     "patient_resource_id" : MessageLookupByLibrary.simpleMessage("Patient Resource ID"),
     "plan" : MessageLookupByLibrary.simpleMessage("Calendar"),
