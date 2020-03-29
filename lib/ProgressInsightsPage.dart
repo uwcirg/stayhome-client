@@ -28,24 +28,33 @@ class _ProgressInsightsPageState extends State<ProgressInsightsPage> {
               height: 0,
             );
 
-          List<QuestionnaireItem> questionChoices = [];
-
-          for (QuestionnaireResponse q in model.questionnaireResponses) {
-            if (q.item != null) {
-              for (QuestionnaireResponseItem i in q.item) {
-                var questionForLinkId = model.questionForLinkId(i.linkId);
-                if (questionForLinkId != null) questionChoices.add(questionForLinkId);
-              }
-            }
-          }
-          questionChoices = questionChoices.toSet().toList();
+          List<QuestionnaireItem> questionChoices = questionsToShow(model);
 
           return _buildChartPage(questionChoices, model, context);
         }));
   }
 
-  Widget _buildChartPage(List<QuestionnaireItem> questionChoices, CarePlanModel model,
-      BuildContext context) {
+  List<QuestionnaireItem> questionsToShow(CarePlanModel model) {
+    return allQuestionsWithAnswers(model);
+  }
+
+  List<QuestionnaireItem> allQuestionsWithAnswers(CarePlanModel model) {
+    List<QuestionnaireItem> questionChoices = [];
+
+    for (QuestionnaireResponse q in model.questionnaireResponses) {
+      if (q.item != null) {
+        for (QuestionnaireResponseItem i in q.item) {
+          var questionForLinkId = model.questionForLinkId(i.linkId);
+          if (questionForLinkId != null) questionChoices.add(questionForLinkId);
+        }
+      }
+    }
+    questionChoices = questionChoices.toSet().toList();
+    return questionChoices;
+  }
+
+  Widget _buildChartPage(
+      List<QuestionnaireItem> questionChoices, CarePlanModel model, BuildContext context) {
     return Column(
       children: <Widget>[
         Padding(
@@ -54,7 +63,7 @@ class _ProgressInsightsPageState extends State<ProgressInsightsPage> {
             isExpanded: true,
             items: questionChoices
                 .map((QuestionnaireItem question) =>
-                DropdownMenuItem(value: question.linkId, child: Text(question.text)))
+                    DropdownMenuItem(value: question.linkId, child: Text(question.text)))
                 .toList(),
             onChanged: (String selectedLinkId) =>
                 setState(() => this._selectedLinkId = selectedLinkId),
@@ -114,13 +123,10 @@ class ChartWidgetState extends State<ChartWidget> {
         children: <Widget>[
           Padding(
             padding:
-            const EdgeInsets.only(bottom: Dimensions.halfMargin, top: Dimensions.fullMargin),
+                const EdgeInsets.only(bottom: Dimensions.halfMargin, top: Dimensions.fullMargin),
             child: Text(
               question.text,
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .title,
+              style: Theme.of(context).textTheme.title,
             ),
           ),
           Stack(
@@ -131,10 +137,7 @@ class ChartWidgetState extends State<ChartWidget> {
                   child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                     Text(
                       selectedDate,
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .caption,
+                      style: Theme.of(context).textTheme.caption,
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -148,8 +151,8 @@ class ChartWidgetState extends State<ChartWidget> {
     );
   }
 
-  Widget _chart(List<charts.Series<AnswerTimeSeries, DateTime>> timeSeries,
-      var displayMappingSpec) {
+  Widget _chart(
+      List<charts.Series<AnswerTimeSeries, DateTime>> timeSeries, var displayMappingSpec) {
     return new charts.TimeSeriesChart(
       timeSeries,
       animate: widget.animate,
@@ -167,8 +170,8 @@ class ChartWidgetState extends State<ChartWidget> {
     );
   }
 
-  Widget _temperatureChart(List<charts.Series<AnswerTimeSeries, DateTime>> timeSeries,
-      var displayMappingSpec) {
+  Widget _temperatureChart(
+      List<charts.Series<AnswerTimeSeries, DateTime>> timeSeries, var displayMappingSpec) {
     return charts.TimeSeriesChart(
       timeSeries,
       animate: widget.animate,
@@ -178,9 +181,7 @@ class ChartWidgetState extends State<ChartWidget> {
         new charts.RangeAnnotation([
           new charts.RangeAnnotationSegment(97, 99, charts.RangeAnnotationAxisType.measure,
               labelAnchor: charts.AnnotationLabelAnchor.end,
-              color: charts.ColorUtil.fromDartColor(Theme
-                  .of(context)
-                  .accentColor))
+              color: charts.ColorUtil.fromDartColor(Theme.of(context).accentColor))
         ], defaultLabelPosition: charts.AnnotationLabelPosition.margin),
         new charts.InitialSelection(
             selectedDataConfig: [new charts.SeriesDatumConfig('Answers', _time)])
@@ -222,7 +223,7 @@ class ChartWidgetState extends State<ChartWidget> {
     var displayMappings = _displayMappings(model, linkId);
     return new charts.NumericAxisSpec(
         tickFormatterSpec: charts.BasicNumericTickFormatterSpec(
-                (num measure) => displayMappings != null ? displayMappings[measure] : '$measure'));
+            (num measure) => displayMappings != null ? displayMappings[measure] : '$measure'));
   }
 
   static Map<num, String> _displayMappings(CarePlanModel model, String linkId) {
@@ -245,8 +246,8 @@ class ChartWidgetState extends State<ChartWidget> {
     return displayMappings;
   }
 
-  static List<charts.Series<AnswerTimeSeries, DateTime>> _createTimeSeries(CarePlanModel model,
-      String linkId, BuildContext context) {
+  static List<charts.Series<AnswerTimeSeries, DateTime>> _createTimeSeries(
+      CarePlanModel model, String linkId, BuildContext context) {
     if (linkId == null) return [];
     List<QuestionnaireResponse> responses = model.questionnaireResponses;
     QuestionnaireItem questionnaireItem = model.questionForLinkId(linkId);
@@ -255,7 +256,7 @@ class ChartWidgetState extends State<ChartWidget> {
     for (QuestionnaireResponse response in responses) {
       if (response.item != null) {
         var answers =
-        response.item.where((QuestionnaireResponseItem r) => r.linkId == linkId).toList();
+            response.item.where((QuestionnaireResponseItem r) => r.linkId == linkId).toList();
         if (answers.length > 0 && answers[0].answer != null && answers[0].answer.length > 0) {
           Answer answer = answers[0].answer[0];
           double answerValue = answer.valueDecimal;
@@ -283,15 +284,9 @@ class ChartWidgetState extends State<ChartWidget> {
     return [
       new charts.Series<AnswerTimeSeries, DateTime>(
         id: 'Answers',
-        colorFn: (_, __) =>
-            charts.ColorUtil.fromDartColor(Theme
-                .of(context)
-                .primaryColor),
+        colorFn: (_, __) => charts.ColorUtil.fromDartColor(Theme.of(context).primaryColor),
         areaColorFn: (_, __) =>
-            charts.ColorUtil.fromDartColor(Theme
-                .of(context)
-                .highlightColor
-                .withAlpha(150)),
+            charts.ColorUtil.fromDartColor(Theme.of(context).highlightColor.withAlpha(150)),
         domainFn: (AnswerTimeSeries series, _) => series.time,
         measureFn: (AnswerTimeSeries series, _) => series.displayValue,
         data: data,
@@ -309,15 +304,8 @@ class _StayHomeTrendsPageState extends _ProgressInsightsPageState {
   final int _maxChartsToShow = 8;
 
   @override
-  Widget _buildChartPage(List<QuestionnaireItem> questionChoices, CarePlanModel model,
-      BuildContext context) {
-
-    //TODO: handle this better than to hardcode which charts to show...
-    questionChoices = questionChoices
-        .where((QuestionnaireItem i) =>
-        ['/70442-9', '/70305-8', '/70421-3', '/8310-5'].contains(i.linkId))
-        .toList();
-
+  Widget _buildChartPage(
+      List<QuestionnaireItem> questionChoices, CarePlanModel model, BuildContext context) {
     int numberOfItems = questionChoices.length;
     if (numberOfItems > _maxChartsToShow) {
       numberOfItems = _maxChartsToShow + 1;
@@ -327,15 +315,30 @@ class _StayHomeTrendsPageState extends _ProgressInsightsPageState {
     }
     return Expanded(
         child: ListView.builder(
-          itemBuilder: (context, i) {
-            if (i >= _maxChartsToShow) {
-              return Text("There are more children which aren't shown.");
-            }
-            return ChartWidget(questionChoices[i].linkId, model);
-          },
-          itemCount: numberOfItems,
-          shrinkWrap: true,
-        ));
+      itemBuilder: (context, i) {
+        if (i >= _maxChartsToShow) {
+          return Text("There are more children which aren't shown.");
+        }
+        return ChartWidget(questionChoices[i].linkId, model);
+      },
+      itemCount: numberOfItems,
+      shrinkWrap: true,
+    ));
+  }
+
+  @override
+  List<QuestionnaireItem> questionsToShow(CarePlanModel model) {
+    List<QuestionnaireItem> questionChoices = allQuestionsWithAnswers(model);
+
+    // only show questions from the first questionnaire and only if the type is choice or number
+    questionChoices = questionChoices
+        .where((QuestionnaireItem i) =>
+            model.questionnaires[0].item.contains(i) &&
+            (i.type == QuestionType.choice ||
+                i.type == QuestionType.decimal ||
+                i.type == QuestionType.integer))
+        .toList();
+    return questionChoices;
   }
 }
 
