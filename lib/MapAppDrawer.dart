@@ -41,13 +41,7 @@ class MapAppDrawer extends Drawer {
                           child: ScopedModelDescendant<CarePlanModel>(
                               builder: (context, child, model) {
                             return Text(
-                              MyApp.of(context).auth.isLoggedIn
-                                  ? (model != null &&
-                                          model.patient != null &&
-                                          model.patient.firstName != null
-                                      ? model.patient.firstName
-                                      : "")
-                                  : S.of(context).sign_up_or_log_in_to_access_all_functions,
+                              nameDisplay(model, context),
                               softWrap: true,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -122,25 +116,35 @@ class MapAppDrawer extends Drawer {
     navigate(context, activity, fromDrawer: true);
   }
 
-  static void navigate(BuildContext context, String activity, {bool fromDrawer=false}) {
+  static void navigate(BuildContext context, String activity, {bool fromDrawer = false}) {
     if (fromDrawer) Navigator.pop(context); // close the drawer
     Navigator.pushNamed(context, activity);
   }
 
   ListTile constructDrawerMenuItem(BuildContext context, MenuItem item) {
     String title = item.title;
-    if (!MyApp.of(context).auth.isLoggedIn && item.loggedOutTitle != null) title = item.loggedOutTitle;
+    if (!MyApp.of(context).auth.isLoggedIn && item.loggedOutTitle != null)
+      title = item.loggedOutTitle;
     return ListTile(
-      enabled: item.requiresLogin ? MyApp.of(context).auth.isLoggedIn : true,
-      title: Text(title),
-      leading: item.icon,
-      onTap: () => {
-        if (item.exitApp) {
-          MyApp.of(context).logout(context:context)
-        } else if (item.route != null) {
-          _navigateFromDrawer(context, item.route)
-        }
-      }
-    );
+        enabled: item.requiresLogin ? MyApp.of(context).auth.isLoggedIn : true,
+        title: Text(title),
+        leading: item.icon,
+        onTap: () => {
+              if (item.exitApp)
+                {MyApp.of(context).logout(context: context)}
+              else if (item.route != null)
+                {_navigateFromDrawer(context, item.route)}
+            });
+  }
+
+  String nameDisplay(CarePlanModel model, BuildContext context) {
+    if (!MyApp.of(context).auth.isLoggedIn) {
+      return S.of(context).sign_up_or_log_in_to_access_all_functions;
+    }
+    String nameDisplay = model?.patient?.fullNameDisplay;
+    if (nameDisplay != null && nameDisplay.isNotEmpty) {
+      return nameDisplay;
+    }
+    return S.of(context).name_not_entered;
   }
 }
