@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
+ * Copyright (c) 2020 CIRG. All rights reserved.
  */
 
 import 'package:flutter/material.dart';
@@ -27,23 +27,9 @@ class PlanPage extends StatefulWidget {
 }
 
 class _PlanPageState extends State<PlanPage> {
-  CalendarController _calendarController;
   String _selectedChip;
 
   _PlanPageState();
-
-  @override
-  void initState() {
-    super.initState();
-    _calendarController = CalendarController();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _calendarController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +104,7 @@ class _PlanPageState extends State<PlanPage> {
       _buildCareplanInfoSection(context, model),
       _buildQuestionnaireButtonSection(context, model),
       !model.hasNoCarePlan
-          ? _buildTreatmentCalendarWidget(_calendarController, model)
+          ? _buildTreatmentCalendarWidget(model)
           : Container(
               height: 0,
             ),
@@ -395,17 +381,35 @@ class _PlanPageState extends State<PlanPage> {
     );
   }
 
-  _buildTreatmentCalendarWidget(CalendarController calendarController, CarePlanModel model) {
-    return TreatmentCalendarWidget(_calendarController, model);
+  _buildTreatmentCalendarWidget(CarePlanModel model) {
+    return TreatmentCalendarWidget(model);
   }
 }
 
-class TreatmentCalendarWidget extends StatelessWidget {
-  final CalendarController _calendarController;
+class TreatmentCalendarWidget extends StatefulWidget {
   final CarePlanModel _model;
-  static final _scheduledEventColor = Colors.grey[500];
+  final _scheduledEventColor = Colors.grey[500];
 
-  TreatmentCalendarWidget(this._calendarController, this._model);
+  TreatmentCalendarWidget(this._model);
+
+  @override
+  State<StatefulWidget> createState() => TreatmentCalendarWidgetState();
+}
+class TreatmentCalendarWidgetState extends State<TreatmentCalendarWidget> {
+  CalendarController _calendarController;
+
+  @override
+  void initState() {
+    super.initState();
+    _calendarController = CalendarController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _calendarController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -441,7 +445,7 @@ class TreatmentCalendarWidget extends StatelessWidget {
           weekdayStyle: Theme.of(context).textTheme.caption.apply(fontWeightDelta: 2),
           weekendStyle: Theme.of(context).textTheme.caption.apply(fontWeightDelta: 2)),
       calendarController: _calendarController,
-      events: _model.treatmentCalendar.events,
+      events: widget._model.treatmentCalendar.events,
       builders: CalendarBuilders(
           markersBuilder: _buildMarkers,
           dayBuilder: _buildDay,
@@ -554,7 +558,7 @@ class TreatmentCalendarWidget extends StatelessWidget {
     if (event.status == Status.Completed) {
       color = MyApp.of(context).appAssets.completedCalendarItemColor;
     } else if (event.status == Status.Scheduled) {
-      color = _scheduledEventColor;
+      color = widget._scheduledEventColor;
     } else {
       color = Theme.of(context).accentColor;
     }
@@ -571,9 +575,13 @@ class TreatmentCalendarWidget extends StatelessWidget {
 }
 
 class StayHomeTreatmentCalendarWidget extends TreatmentCalendarWidget {
-  StayHomeTreatmentCalendarWidget(CalendarController calendarController, CarePlanModel model)
-      : super(calendarController, model);
+  StayHomeTreatmentCalendarWidget(CarePlanModel model)
+      : super(model);
+  @override
+  State<StatefulWidget> createState() => StayHomeTreatmentCalendarWidgetState();
+}
 
+class StayHomeTreatmentCalendarWidgetState extends TreatmentCalendarWidgetState {
   @override
   Widget build(BuildContext context) {
     var textStyle = Theme.of(context).textTheme.caption;
@@ -616,7 +624,7 @@ class StayHomeTreatmentCalendarWidget extends TreatmentCalendarWidget {
           weekdayStyle: Theme.of(context).textTheme.caption.apply(fontWeightDelta: 2),
           weekendStyle: Theme.of(context).textTheme.caption.apply(fontWeightDelta: 2)),
       calendarController: _calendarController,
-      events: _model.treatmentCalendar.events,
+      events: widget._model.treatmentCalendar.events,
       builders: CalendarBuilders(
 //        singleMarkerBuilder: _buildSingleMarker,
         markersBuilder: _buildMarkers,
@@ -652,7 +660,7 @@ class StayHomeTreatmentCalendarWidget extends TreatmentCalendarWidget {
       Widget completedBubble = _buildNumberBubble('$numCompleted', Theme.of(context).primaryColor,
           Theme.of(context).primaryTextTheme.caption);
       Widget incompleteBubble = _buildNumberBubble('$numIncomplete',
-          TreatmentCalendarWidget._scheduledEventColor, Theme.of(context).primaryTextTheme.caption);
+          widget._scheduledEventColor, Theme.of(context).primaryTextTheme.caption);
       if (numIncomplete == 0) {
         child = completedBubble;
       } else if (numCompleted == 0) {
@@ -698,7 +706,7 @@ class _StayHomePlanPageState extends _PlanPageState {
   List<Widget> _buildCalendarPageChildren(BuildContext context, CarePlanModel model) {
     return <Widget>[
       _buildQuestionnaireButtonSection(context, model),
-      _buildTreatmentCalendarWidget(_calendarController, model),
+      _buildTreatmentCalendarWidget(model),
 //      Padding(
 //        padding: const EdgeInsets.only(top: 8.0),
 //        child: OutlineButton(
@@ -710,8 +718,8 @@ class _StayHomePlanPageState extends _PlanPageState {
   }
 
   @override
-  _buildTreatmentCalendarWidget(CalendarController calendarController, CarePlanModel model) {
-    return StayHomeTreatmentCalendarWidget(_calendarController, model);
+  _buildTreatmentCalendarWidget(CarePlanModel model) {
+    return StayHomeTreatmentCalendarWidget(model);
   }
 
   Future<String> _showChangeDialogForActivity(

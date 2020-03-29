@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2020 CIRG. All rights reserved.
  */
+import 'package:intl/intl.dart';
 import 'package:map_app_flutter/services/Repository.dart';
 import "package:simple_auth/simple_auth.dart" show JsonSerializable;
 
@@ -2141,6 +2142,11 @@ class QuestionnaireResponseItem {
     }
   }
 
+  String get answerDisplay {
+    if (answer == null || answer.isEmpty) return "";
+    return answer.map((e) => e.displayString).join(",");
+  }
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['linkId'] = this.linkId;
@@ -2174,6 +2180,16 @@ class Answer {
       this.valueString,
       this.valueDate,
       this.valueDateTime});
+
+  String get displayString {
+    if (this.valueDate != null) {
+      return DateFormat.yMd().format(this.valueDate);
+    }
+    if (this.valueDateTime != null) {
+      return DateFormat.yMd().add_jm().format(this.valueDateTime);
+    }
+    return this.toString();
+  }
 
   bool operator ==(dynamic o) {
     if (o is Answer) {

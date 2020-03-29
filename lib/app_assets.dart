@@ -343,13 +343,7 @@ class StayHomeAppAssets extends AppAssets {
       ),
       MenuItem(
         requiresLogin: true,
-        title: S.of(context).plan,
-        icon: Icon(Icons.calendar_today),
-        route: '/calendar_history',
-      ),
-      MenuItem(
-        requiresLogin: true,
-        title: "Trends",
+        title: "Calendar & History",
         icon: Icon(Icons.show_chart),
         route: '/progress_insights',
       ),
@@ -384,7 +378,6 @@ class StayHomeAppAssets extends AppAssets {
     var learningCenter = (BuildContext context) => StayHomeLearningCenterPage();
     return <String, WidgetBuilder>{
       "/home": (BuildContext context) => HomePage(),
-      "/calendar_history": (BuildContext context) => StayHomePlanPage(),
       "/guestHome": (BuildContext context) => new GuestHomePage(),
       "/profile": (BuildContext context) => ProfilePage(),
       "/progress_insights": (BuildContext context) => StayHomeTrendsPage(),

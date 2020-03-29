@@ -95,7 +95,7 @@ class NotificationsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (communications == null || communications.isEmpty) {
-      return Text("Nothing here", style: Theme.of(context).textTheme.caption);
+      return NoDataWidget(text: "Nothing here");
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
