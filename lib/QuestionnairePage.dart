@@ -462,6 +462,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
       helpLabel = null;
     }
     return Flexible(
+      fit: FlexFit.tight,
       child: Column(
         children: <Widget>[
           ChoiceChip(
