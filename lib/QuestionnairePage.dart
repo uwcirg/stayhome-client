@@ -60,6 +60,7 @@ class QuestionnairePageState extends State<QuestionnairePage> {
       child: new MapAppPageScaffold(
         title: _questionnaire.title,
         showDrawer: false,
+        showStandardAppBarActions: false,
         child: QuestionListWidget(
             questions: _questionnaire.item,
             response: _response,
