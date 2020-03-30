@@ -17,20 +17,49 @@ class MapAppPageScaffold extends StatelessWidget {
   final String title;
   final bool showDrawer;
   final bool showStandardAppBarActions;
+  final Widget appBarBottom;
+
+  // tabbed
+  final int length;
+  final List<Tab> tabs;
+  final List<Widget> tabViews;
+  final List<String> tabPageTitles;
 
   final Color backgroundColor;
 
   final List<Widget> actions;
 
-  MapAppPageScaffold(
+  MapAppPageScaffold._(
       {Key key,
       this.child,
       this.title,
       this.showDrawer = true,
       this.backgroundColor,
       this.actions,
-      this.showStandardAppBarActions = true})
+      this.showStandardAppBarActions = true,
+      this.appBarBottom,
+      this.length,
+      this.tabs,
+      this.tabViews,
+      this.tabPageTitles})
       : super(key: key);
+
+  MapAppPageScaffold(
+      {Key key,
+      child,
+      title,
+      showDrawer = true,
+      backgroundColor,
+      actions,
+      showStandardAppBarActions = true})
+      : this._(
+            key: key,
+            child: child,
+            title: title,
+            showDrawer: showDrawer,
+            backgroundColor: backgroundColor,
+            actions: actions,
+            showStandardAppBarActions: showStandardAppBarActions);
 
   @override
   Widget build(BuildContext context) {
@@ -42,19 +71,56 @@ class MapAppPageScaffold extends StatelessWidget {
           centerTitle: true,
           title: MyApp.of(context).appAssets.appBarTitle(),
           actions: actions,
+          bottom: appBarBottom,
         ),
         drawer: showDrawer ? MapAppDrawer() : null,
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            DemoVersionWarningBanner(),
-            _pageTitle(context),
-            child,
-          ],
-        ));
+        body: tabViews == null ? _body(context) : _tabbedBody(context));
   }
 
-  Widget _pageTitle(BuildContext context) {
+  Widget _body(BuildContext context) {
+    return _withDemoVersionBannerAndPageTitle(child, this.title, context);
+  }
+
+  Widget _tabbedBody(BuildContext context) {
+    List<Widget> children = [];
+    for (int i = 0; i < tabViews.length; i++) {
+      children.add(_withDemoVersionBannerAndPageTitle(tabViews[i], tabPageTitles[i], context));
+    }
+    return TabBarView(
+      children: children,
+    );
+  }
+
+  MapAppPageScaffold.tabbed(
+      {showDrawer = true,
+      backgroundColor,
+      actions,
+      showStandardAppBarActions = true,
+      @required List<Tab> tabs,
+      @required List<Widget> tabViews,
+      List<String> tabPageTitles})
+      : this._(
+            showDrawer: showDrawer,
+            backgroundColor: backgroundColor,
+            actions: actions,
+            showStandardAppBarActions: showStandardAppBarActions,
+            appBarBottom: TabBar(tabs: tabs),
+            tabViews: tabViews,
+            tabPageTitles: tabPageTitles);
+
+  /// wrap the given widget with demo version banner on top
+  Widget _withDemoVersionBannerAndPageTitle(Widget w, String title, context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        DemoVersionWarningBanner(),
+        pageTitle(title, context),
+        w,
+      ],
+    );
+  }
+
+  Widget pageTitle(String title, BuildContext context) {
     if (title == null) {
       return Container(
         height: 0,
@@ -83,13 +149,14 @@ class MapAppPageScaffold extends StatelessWidget {
     List<Widget> actions = this.actions;
     if (showStandardAppBarActions) {
       actions = <Widget>[
-        MyApp.of(context).auth.isLoggedIn && ModalRoute.of(context).settings.name != '/home' ?
-          IconButton(
-            icon: Icon(MdiIcons.home),
-            onPressed: () {
-              Navigator.of(context).pushReplacementNamed('/home');
-            },
-          ) : Container(),
+        MyApp.of(context).auth.isLoggedIn && ModalRoute.of(context).settings.name != '/home'
+            ? IconButton(
+                icon: Icon(MdiIcons.home),
+                onPressed: () {
+                  MapAppDrawer.navigate(context, '/home');
+                },
+              )
+            : Container(),
         ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
           return IconButton(
             icon: Icon(Icons.refresh),

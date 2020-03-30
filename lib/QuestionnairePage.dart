@@ -60,6 +60,7 @@ class QuestionnairePageState extends State<QuestionnairePage> {
       child: new MapAppPageScaffold(
         title: _questionnaire.title,
         showDrawer: false,
+        showStandardAppBarActions: false,
         child: QuestionListWidget(
             questions: _questionnaire.item,
             response: _response,
@@ -269,15 +270,15 @@ class QuestionWidgetState extends State<QuestionWidget> {
     Widget item;
     if (questionnaireItem.isTemperature()) {
       item = _buildTemperatureItem(questionnaireItem, context);
-    } else if (questionnaireItem.type == "choice") {
+    } else if (questionnaireItem.type == QuestionType.choice) {
       item = _buildChoiceItem(questionnaireItem, context);
-    } else if (questionnaireItem.type == "display") {
+    } else if (questionnaireItem.type == QuestionType.display) {
       item = Container();
       questionTitleStyle =
           questionTitleStyle.apply(color: Theme.of(context).primaryColor, fontWeightDelta: 2);
-    } else if (questionnaireItem.type == "string") {
+    } else if (questionnaireItem.type == QuestionType.string) {
       item = _buildStringItem(questionnaireItem, context);
-    } else if (questionnaireItem.type == "date") {
+    } else if (questionnaireItem.type == QuestionType.date) {
       item = _buildDateItem(questionnaireItem, context);
     } else {
       throw UnimplementedError("Not implemented: ${questionnaireItem.type}");
@@ -462,6 +463,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
       helpLabel = null;
     }
     return Flexible(
+      fit: FlexFit.tight,
       child: Column(
         children: <Widget>[
           ChoiceChip(

@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2020 CIRG. All rights reserved.
  */
+import 'package:intl/intl.dart';
 import 'package:map_app_flutter/services/Repository.dart';
 import "package:simple_auth/simple_auth.dart" show JsonSerializable;
 
@@ -253,6 +254,13 @@ class Patient extends Resource {
           this.name[0].given.length > 0
       ? this.name[0].given[0]
       : null;
+
+  String get fullNameDisplay {
+    List<String> names = [];
+    if (firstName != null && firstName.isNotEmpty) names.add(firstName);
+    if (lastName != null && lastName.isNotEmpty) names.add(lastName);
+    return names.join(" ");
+  }
 
   setKeycloakId(String keycloakIdentifierSystemName, String keycloakId) {
     identifier ??= [];
@@ -1667,11 +1675,62 @@ class ValueExpression {
   }
 }
 
+class QuestionType {
+  final _value;
+
+  const QuestionType._(this._value);
+
+  toString() => _value;
+
+  static fromJson(String key) {
+    return _vals.firstWhere((v) => v._value == key,
+        orElse: () => throw ArgumentError("Key does not match any QuestionType"));
+  }
+
+  static const group = const QuestionType._('group');
+  static const display = const QuestionType._('display');
+
+  // question types
+  static const boolean = const QuestionType._('boolean');
+  static const decimal = const QuestionType._('decimal');
+  static const integer = const QuestionType._('integer');
+  static const date = const QuestionType._('date');
+  static const dateTime = const QuestionType._('dateTime');
+  static const time = const QuestionType._('time');
+  static const string = const QuestionType._('string');
+  static const text = const QuestionType._('text');
+  static const url = const QuestionType._('url');
+  static const choice = const QuestionType._('choice');
+  static const open_choice = const QuestionType._('open-choice');
+  static const attachment = const QuestionType._('attachment');
+  static const reference = const QuestionType._('reference');
+  static const quantity = const QuestionType._('quantity');
+
+  static const _vals = [
+    group,
+    display,
+    boolean,
+    decimal,
+    integer,
+    date,
+    dateTime,
+    time,
+    string,
+    text,
+    url,
+    choice,
+    open_choice,
+    attachment,
+    reference,
+    quantity
+  ];
+}
+
 class QuestionnaireItem {
   String linkId;
   String text;
   bool required;
-  String type;
+  QuestionType type;
   List<Coding> code;
   List<AnswerOption> answerOption;
   String answerValueSetAddress;
@@ -1692,11 +1751,11 @@ class QuestionnaireItem {
       this.item});
 
   bool isSupported() {
-    return type == "choice" ||
-        type == "decimal" ||
-        type == "string" ||
-        type == "display" ||
-        type == "date";
+    return type == QuestionType.choice ||
+        type == QuestionType.decimal ||
+        type == QuestionType.string ||
+        type == QuestionType.display ||
+        type == QuestionType.date;
   }
 
   bool isTemperature() {
@@ -1736,7 +1795,7 @@ class QuestionnaireItem {
     linkId = json['linkId'];
     text = json['text'];
     required = json['required'];
-    type = json['type'];
+    if (json['type'] != null) type = QuestionType.fromJson(json['type']);
 
     if (json['answerOption'] != null) {
       answerOption = new List<AnswerOption>();
@@ -1776,7 +1835,7 @@ class QuestionnaireItem {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['type'] = this.type;
+    if (this.type != null) data['type'] = this.type.toString();
     data['linkId'] = this.linkId;
     data['text'] = this.text;
     data['required'] = this.required;
@@ -1797,7 +1856,7 @@ class QuestionnaireItem {
   }
 
   bool isGroup() {
-    return type == "group";
+    return type == QuestionType.group;
   }
 }
 
@@ -2083,6 +2142,11 @@ class QuestionnaireResponseItem {
     }
   }
 
+  String get answerDisplay {
+    if (answer == null || answer.isEmpty) return "";
+    return answer.map((e) => e.displayString).join(",");
+  }
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['linkId'] = this.linkId;
@@ -2116,6 +2180,16 @@ class Answer {
       this.valueString,
       this.valueDate,
       this.valueDateTime});
+
+  String get displayString {
+    if (this.valueDate != null) {
+      return DateFormat.yMd().format(this.valueDate);
+    }
+    if (this.valueDateTime != null) {
+      return DateFormat.yMd().add_jm().format(this.valueDateTime);
+    }
+    return this.toString();
+  }
 
   bool operator ==(dynamic o) {
     if (o is Answer) {

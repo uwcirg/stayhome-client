@@ -25,6 +25,7 @@ class CarePlanModel extends Model {
   Goals goals;
 
   KeycloakAuth _auth;
+
   OAuthApi get _api => _auth?.api;
   String _keycloakUserId;
   String _keycloakSystem;
@@ -152,7 +153,11 @@ class CarePlanModel extends Model {
         this.carePlan = await _addDefaultCarePlan();
       } catch (e) {
         var error;
-        if (e is Response) {error = e.body;} else {error=e;}
+        if (e is Response) {
+          error = e.body;
+        } else {
+          error = e;
+        }
         return Future.error("Failed to create careplan record: $error}");
       }
 
@@ -318,6 +323,12 @@ class CarePlanModel extends Model {
         _addQuestionnaireItemAndItsChildren(nestedQuestion);
       }
     }
+  }
+
+  Questionnaire questionnaireForResponse(QuestionnaireResponse response) {
+    return questionnaires?.firstWhere(
+        (element) => element.id == response.questionnaireReference.split("/")[1],
+        orElse: () => null);
   }
 }
 

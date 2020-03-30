@@ -82,3 +82,23 @@ class MapAppErrorMessage extends StatelessWidget {
     return null;
   }
 }
+
+class NoDataWidget extends StatelessWidget {
+  final String text;
+
+  const NoDataWidget(
+      {this.text = "No data to show yet. Start tracking and your data will show here."});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+        child: Padding(
+      padding: MapAppPadding.pageMargins,
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.caption,
+        textAlign: TextAlign.center,
+      ),
+    ));
+  }
+}

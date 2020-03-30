@@ -563,6 +563,15 @@ class S {
       args: [],
     );
   }
+
+  String get name_not_entered {
+    return Intl.message(
+      '(name not entered)',
+      name: 'name_not_entered',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
