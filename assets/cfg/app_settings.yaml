@@ -8,7 +8,7 @@ issuerUrl: https://keycloak-dev.cirg.washington.edu/auth/realms/Stayhome
 clientId: stayhome_openid_client
 clientSecret: f80cc383-bb5b-47b7-a2bf-5b713b0b8a50
 
-version: v1.0 27-Mar-2020
+version: v1.1 29-Mar-2020
 
 deploymentType: test
 careplanTemplateId: 1058
