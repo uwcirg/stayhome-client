@@ -8,6 +8,8 @@ import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
+import 'package:map_app_flutter/model/CarePlanModel.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class GuestHomePage extends StatelessWidget {
   @override
@@ -39,14 +41,15 @@ class GuestHomePage extends StatelessWidget {
             MarkdownBody(data: S.of(context).guest_home_text),
             Center(
               child: Padding(
-                padding: const EdgeInsets.only(top:Dimensions.fullMargin),
+                padding: const EdgeInsets.only(top: Dimensions.fullMargin),
                 child: Wrap(children: <Widget>[
                   _button(context,
                       title: "back to login/register",
                       onPressed: () => MyApp.of(context).logout(context: context)),
-                  _button(context,
-                      title: "continue to resources",
-                      onPressed: () => MapAppDrawer.navigate(context, '/learning_center')),
+                  ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
+                    return _button(context,
+                        title: "continue to resources", onPressed: () => launchResourceUrl(model));
+                  }),
                 ]),
               ),
             )

@@ -113,45 +113,6 @@ class JoyluxLearningCenterPage extends LearningCenterPage {
   }
 }
 
-class StayHomeLearningCenterPage extends LearningCenterPage {
-  @override
-  Widget _buildItem(BuildContext context, int i, CarePlanModel model) {
-    if (model.infoLinks[i].isGroup()) {
-      return _buildLearningCenterListGroup(context, model.infoLinks[i]);
-    }
-    return _buildLearningCenterListItem(context, model.infoLinks[i].description,
-        onTap: () => _onUrlTap(model.infoLinks[i].url, context));
-  }
-
-  @override
-  int _itemCount(CarePlanModel model) {
-    return model != null && model.infoLinks != null ? model.infoLinks.length : 0;
-  }
-
-  Widget _buildLearningCenterListGroup(BuildContext context, DocumentReference infoLink) {
-    List<Widget> children = infoLink.content.map((Content c) {
-      return _buildLearningCenterListItem(context, c.attachment.title,
-          onTap: () => _onUrlTap(c.attachment.url, context));
-    }).toList();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        _buildLearningCenterListSectionHeader(context, infoLink.description),
-        ...children
-      ],
-    );
-  }
-
-  _onUrlTap(String url, context) {
-    if (url.isEmpty) {
-      snack("No content", context);
-    } else {
-      PlatformDefs().launchUrl(url, newTab: true);
-    }
-  }
-}
-
 class Testimonial {
   final String quote;
   final String name;

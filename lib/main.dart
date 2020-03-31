@@ -8,8 +8,10 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:map_app_flutter/LoginPage.dart';
 import 'package:map_app_flutter/app_assets.dart';
 import 'package:map_app_flutter/config/AppConfig.dart';
+import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
+import 'package:map_app_flutter/platform_stub.dart';
 import 'package:map_app_flutter/services/Repository.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:toast/toast.dart';
@@ -164,4 +166,8 @@ void snack(String text, context) {
   //Scaffold.of(context).showSnackBar(new SnackBar(content: new Text(text)));
   print(text);
   Toast.show(text, context, duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
+}
+
+void launchResourceUrl(CarePlanModel model) {
+  PlatformDefs().launchUrl(WhatInfo.resourceLinkWithZip(model?.patient?.homeZip), newTab: true);
 }
