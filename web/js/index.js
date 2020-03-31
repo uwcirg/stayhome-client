@@ -1,6 +1,6 @@
 /* register service worker */
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/js/service-worker.js');
+  navigator.serviceWorker.register('/service-worker.js');
 }
 
 /* prompt to add to homescreen */

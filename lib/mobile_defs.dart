@@ -30,6 +30,17 @@ class MobileDefs implements PlatformDefs {
   Widget getAuthCallbackPage() {
     return Container();
   }
+
+  @override
+  addToHomeScreen(Function onBeforeInstallPrompt) {
+  }
+
+  @override
+  onAddToHomeScreenButtonPressed(deferredPrompt) {
+  }
+
+
+
 }
 
 

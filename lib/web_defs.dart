@@ -39,6 +39,35 @@ class WebDefs implements PlatformDefs {
   Widget getAuthCallbackPage() {
     return AuthCallbackPage();
   }
+
+  @override
+  addToHomeScreen(Function onBeforeInstallPrompt) {
+    var deferredPrompt;
+
+
+    window.addEventListener('beforeinstallprompt', (prompt) {
+      // Prevent Chrome 67 and earlier from automatically showing the prompt
+      prompt.preventDefault();
+      // Stash the event so it can be triggered later.
+      onBeforeInstallPrompt(prompt);
+    });
+  }
+
+  onAddToHomeScreenButtonPressed(deferredPrompt) {
+    // hide our user interface that shows our A2HS button
+
+    // Show the prompt
+    deferredPrompt.prompt();
+    // Wait for the user to respond to the prompt
+    deferredPrompt.userChoice.then((choiceResult) {
+      if (choiceResult.outcome == 'accepted') {
+        print('User accepted the A2HS prompt');
+      } else {
+        print('User dismissed the A2HS prompt');
+      }
+      deferredPrompt = null;
+    });
+  }
 }
 
 class AuthCallbackPage extends StatelessWidget {

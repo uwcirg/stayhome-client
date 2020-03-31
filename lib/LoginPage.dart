@@ -18,6 +18,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class LoginPageState extends State<LoginPage> {
+  var _deferredPrompt;
+
   @override
   void initState() {
     super.initState();
@@ -29,6 +31,14 @@ class LoginPageState extends State<LoginPage> {
     MediaQueryData deviceInfo = MediaQuery.of(context);
     double buttonContainerInsets = deviceInfo.size.width > MediaQueryConstants.minDesktopWidth ? deviceInfo.size.width / 4.5 : 12;
     double scaleFactor = deviceInfo.size.width > MediaQueryConstants.minTabletWidth ? 1: 0.9;
+
+    var addButtonClickListener = PlatformDefs().addToHomeScreen((deferredPrompt) {
+      setState(() {
+        _deferredPrompt = deferredPrompt;
+      });
+    });
+
+
     return Scaffold(
         body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: MyApp.of(context).appAssets.systemUiOverlayStyle,
@@ -42,6 +52,16 @@ class LoginPageState extends State<LoginPage> {
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
+                  Visibility(
+                      visible: _deferredPrompt != null,
+                      child: OutlineButton(
+                          child: Text("Add to homescreen"),
+                          onPressed: () {
+                            if (_deferredPrompt!= null) {
+                              PlatformDefs().onAddToHomeScreenButtonPressed(_deferredPrompt);
+                            }
+                          }),
+                  ),
                   MyApp.of(context).appAssets.loginBanner(context),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: buttonContainerInsets),
@@ -102,7 +122,7 @@ class LoginPageState extends State<LoginPage> {
                             ),
                             Expanded(
                               flex: 1,
-                              child: 
+                              child:
                                 Padding(
                                   padding: EdgeInsets.only(top: 10, bottom: 10),
                                   child: FlatButton(
@@ -116,7 +136,7 @@ class LoginPageState extends State<LoginPage> {
                                                   decoration: TextDecoration.underline)))),
                                 )
                             ,)
-                            
+
 //                          FlatButton(
 //                              onPressed: () => MyApp.of(context).toggleAppMode(),
 //                              child: Text("Toggle app mode",
