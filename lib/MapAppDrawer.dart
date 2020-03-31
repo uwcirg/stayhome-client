@@ -9,6 +9,8 @@ import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
+import 'package:map_app_flutter/platform_stub.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class MapAppDrawer extends Drawer {
@@ -74,33 +76,54 @@ class MapAppDrawer extends Drawer {
             .navItems(context)
             .map((MenuItem item) => constructDrawerMenuItem(context, item)),
         Divider(),
-        ListTile(
-          trailing: Icon(Icons.language),
-          title: DropdownButton(
-            isExpanded: true,
-            hint: Text(
-              S.of(context).languageName,
-              style: TextStyle(
-                  fontSize: Theme.of(context).textTheme.subtitle.fontSize,
-                  color: Theme.of(context).textTheme.subtitle.color),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            underline: Container(
-              height: 0,
-            ),
-            items: S.delegate.supportedLocales.map((locale) {
-              return new DropdownMenuItem<String>(
-                child: Text(locale.languageCode),
-                value: locale.languageCode,
-              );
-            }).toList(),
-            onChanged: (item) {
-              MyApp.of(context).onChangeLanguage(item);
-            },
-          ),
-        ),
+        _buildLogoutListTile(context),
+        _buildContactUsListTile(context),
+        Divider(),
+        _buildLanguageListTile(context),
       ])),
+    );
+  }
+
+  Widget _buildLogoutListTile(BuildContext context) {
+    return ListTile(
+        title: Text(MyApp.of(context).auth.isLoggedIn ? "Logout" : "Back to login"),
+        leading: Icon(MdiIcons.logout),
+        onTap: () => MyApp.of(context).logout(context: context));
+  }
+
+  Widget _buildContactUsListTile(BuildContext context) {
+    return ListTile(
+        title: Text("Contact us/submit feedback"),
+        leading: Icon(Icons.feedback),
+        onTap: () => PlatformDefs().launchUrl(WhatInfo.contactLink, newTab: true));
+  }
+
+  Widget _buildLanguageListTile(BuildContext context) {
+    return ListTile(
+      trailing: Icon(Icons.language),
+      title: DropdownButton(
+        isExpanded: true,
+        hint: Text(
+          S.of(context).languageName,
+          style: TextStyle(
+              fontSize: Theme.of(context).textTheme.subtitle.fontSize,
+              color: Theme.of(context).textTheme.subtitle.color),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        underline: Container(
+          height: 0,
+        ),
+        items: S.delegate.supportedLocales.map((locale) {
+          return new DropdownMenuItem<String>(
+            child: Text(locale.languageCode),
+            value: locale.languageCode,
+          );
+        }).toList(),
+        onChanged: (item) {
+          MyApp.of(context).onChangeLanguage(item);
+        },
+      ),
     );
   }
 
@@ -121,20 +144,32 @@ class MapAppDrawer extends Drawer {
     Navigator.pushNamed(context, activity);
   }
 
-  ListTile constructDrawerMenuItem(BuildContext context, MenuItem item) {
+  Widget constructDrawerMenuItem(BuildContext context, MenuItem item) {
     String title = item.title;
     if (!MyApp.of(context).auth.isLoggedIn && item.loggedOutTitle != null)
       title = item.loggedOutTitle;
-    return ListTile(
-        enabled: item.requiresLogin ? MyApp.of(context).auth.isLoggedIn : true,
-        title: Text(title),
-        leading: item.icon,
-        onTap: () => {
-              if (item.exitApp)
-                {MyApp.of(context).logout(context: context)}
-              else if (item.route != null)
-                {_navigateFromDrawer(context, item.route)}
-            });
+
+    var enabled = item.requiresLogin ? MyApp.of(context).auth.isLoggedIn : true;
+    var titleWidget = Text(title);
+    var leading = item.icon;
+
+    if (item.onPress == null) {
+      return ListTile(
+          enabled: enabled,
+          title: titleWidget,
+          leading: leading,
+          onTap: () => _navigateFromDrawer(context, item.route));
+    }
+
+    return ScopedModelDescendant<CarePlanModel>(
+      builder: (context, child, model) {
+        return ListTile(
+            enabled: enabled,
+            title: titleWidget,
+            leading: leading,
+            onTap: () => item.onPress(context, model));
+      },
+    );
   }
 
   String nameDisplay(CarePlanModel model, BuildContext context) {

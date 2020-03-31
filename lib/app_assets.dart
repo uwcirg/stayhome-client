@@ -21,6 +21,8 @@ import 'package:map_app_flutter/SessionPage.dart';
 import 'package:map_app_flutter/color_palette.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
+import 'package:map_app_flutter/main.dart';
+import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:map_app_flutter/platform_stub.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
@@ -356,32 +358,24 @@ class StayHomeAppAssets extends AppAssets {
       MenuItem(
         title: learningCenterPageTitle(context),
         icon: Icon(Icons.lightbulb_outline),
-        route: '/learning_center',
+        onPress: (context, model) => launchResourceUrl(model),
       ),
       MenuItem(
         title: S.of(context).about,
-        icon: Icon(Icons.people),
+        icon: Icon(Icons.help),
         route: '/about',
-      ),
-      MenuItem(
-        requiresLogin: false,
-        title: "Logout",
-        loggedOutTitle: "Back to login",
-        icon: Icon(MdiIcons.logout),
-        exitApp: true 
       )
+
     ];
   }
 
   @override
   Map<String, WidgetBuilder> navRoutes(BuildContext context) {
-    var learningCenter = (BuildContext context) => StayHomeLearningCenterPage();
     return <String, WidgetBuilder>{
       "/home": (BuildContext context) => HomePage(),
       "/guestHome": (BuildContext context) => new GuestHomePage(),
       "/profile": (BuildContext context) => ProfilePage(),
       "/progress_insights": (BuildContext context) => StayHomeTrendsPage(),
-      "/learning_center": learningCenter,
       "/about": (BuildContext context) => StayHomeHelpPage(),
       "/login": (BuildContext context) => LoginPage(),
       "/authCallback": (BuildContext context) => PlatformDefs().getAuthCallbackPage(),
@@ -401,8 +395,7 @@ class MenuItem {
   final Widget icon;
   final String route;
   final bool requiresLogin;
-  final bool exitApp;
+  final Function(BuildContext, CarePlanModel) onPress;
 
-
-  MenuItem({this.title = "Undefined", this.icon, this.route = "/home", this.requiresLogin = false, this.exitApp = false, this.loggedOutTitle});
+  MenuItem({this.title = "Undefined", this.icon, this.route = "/home", this.requiresLogin = false, this.onPress, this.loggedOutTitle});
 }
