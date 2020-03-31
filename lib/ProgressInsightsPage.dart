@@ -40,10 +40,17 @@ class _ProgressInsightsPageState extends State<ProgressInsightsPage> {
     return ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
       Widget errorWidget = MapAppErrorMessage.fromModel(model, context);
       if (errorWidget != null) return errorWidget;
-      return Padding(
-        padding: const EdgeInsets.all(Dimensions.halfMargin),
-        child: StayHomeTreatmentCalendarWidget(model),
-      );
+      return Expanded(
+            child: ListView.builder(
+              itemBuilder: (context, i) {
+                return Padding(
+                  padding: const EdgeInsets.all(Dimensions.halfMargin),
+                  child: StayHomeTreatmentCalendarWidget(model),
+                );
+              },
+              itemCount: 1,
+              shrinkWrap: true,
+            ));
     });
   }
 

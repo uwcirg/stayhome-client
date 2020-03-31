@@ -326,7 +326,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
                           birthDate = DateFormat.yMd().parse(formattedDate.toString());
                           birthDateCtrl.text = formattedDate.toString();
                         },
-                        currentTime: DateTime.now(), locale: Localizations.localeOf(context).languageCode == 'de'? LocaleType.de : LocaleType.en);
+                        currentTime: birthDate??DateTime.now(), locale: Localizations.localeOf(context).languageCode == 'de'? LocaleType.de : LocaleType.en);
                     },
                 ),
                 FlatButton(
@@ -353,29 +353,39 @@ class ProfileWidgetState extends State<ProfileWidget> {
                 Padding(
                   padding: const EdgeInsets.only(top: Dimensions.largeMargin),
                   child: Center(
-                    child: OutlineButton(
-                      child: Text("save"),
-                      onPressed: () {
-                        if (_formKey.currentState.validate()) {
-                          _onPressed(
-                              Patient.fromNewPatientForm(originalPatient,
-                                  firstName: firstName,
-                                  lastName: lastName,
-                                  phoneNumber: phone,
-                                  emailAddress: email,
-                                  homeZip: homeZip,
-                                  secondZip: secondZip,
-                                  preferredContactMethod: preferredContactMethod,
-                                  gender: gender,
-                                  birthDate: birthDate),
-                              model);
-                        } else {
-                          setState(() {
-                            _formError = "Form has errors. Please scroll up and fix your entries.";
-                          });
-                        }
-                      },
-                    ),
+                    child: Wrap(
+                      spacing: Dimensions.halfMargin,
+                      runSpacing: Dimensions.fullMargin,
+                      children: <Widget>[
+                        OutlineButton(
+                          child: Text("save"),
+                          onPressed: () {
+                            if (_formKey.currentState.validate()) {
+                              _onPressed(
+                                  Patient.fromNewPatientForm(originalPatient,
+                                      firstName: firstName,
+                                      lastName: lastName,
+                                      phoneNumber: phone,
+                                      emailAddress: email,
+                                      homeZip: homeZip,
+                                      secondZip: secondZip,
+                                      preferredContactMethod: preferredContactMethod,
+                                      gender: gender,
+                                      birthDate: birthDate),
+                                  model);
+                            } else {
+                              setState(() {
+                                _formError = "Form has errors. Please scroll up and fix your entries.";
+                              });
+                            }
+                          },
+                        ),
+                        OutlineButton(
+                          child: Text(S.of(context).cancel),
+                          onPressed: () => MapAppDrawer.navigate(context, '/home'),
+                        )
+                      ],
+                    )
                   ),
                 ),
                 Visibility(

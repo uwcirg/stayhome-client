@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2020 CIRG. All rights reserved.
- */
-
 // DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
 // This is a library that provides messages for a en locale. All the
 // messages from the main program should be duplicated here with the same
@@ -44,6 +40,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "add_the_default_careplan_for_me" : MessageLookupByLibrary.simpleMessage("add the default care plan for me"),
     "battery_level" : m0,
     "buttonPushText" : MessageLookupByLibrary.simpleMessage("You have pushed the button this many times:"),
+    "cancel" : MessageLookupByLibrary.simpleMessage("cancel"),
     "change" : MessageLookupByLibrary.simpleMessage("Change"),
     "contact__community" : MessageLookupByLibrary.simpleMessage("Contact"),
     "demoVersionBannerText" : m1,
@@ -98,6 +95,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "what_is_your_name" : MessageLookupByLibrary.simpleMessage("What is your name?"),
     "what_is_your_patient_resource_id" : MessageLookupByLibrary.simpleMessage("What is your Patient Resource ID?"),
     "womens_health_resources" : MessageLookupByLibrary.simpleMessage("Women\'s Health Resources"),
-    "you_have_no_active_pelvic_floor_management_careplan" : MessageLookupByLibrary.simpleMessage("You have no active care plan.")
+    "you_have_no_active_pelvic_floor_management_careplan" : MessageLookupByLibrary.simpleMessage("You have no active care plan."),
+    "cancel" : MessageLookupByLibrary.simpleMessage("cancel")
   };
 }
