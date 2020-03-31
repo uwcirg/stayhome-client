@@ -4,9 +4,26 @@
   <meta charset="UTF-8">
   <title>StayHome.app</title>
   <link rel="stylesheet" href="css/index.css" />
+
+  <!--  for iOS - should be square (corners will be rounded off by OS)-->
+  <link rel="apple-touch-icon" sizes="180x180" href="images/icons/icon-180x180.png">
+  <!--  round?-->
+  <link rel="icon" href="favicon.ico">
+  <link rel="icon" type="image/png" href="images/icons/icon-192x192.png" sizes="192x192">
+
   <link rel="manifest" href="manifest.json">
+
+  <meta name="apple-mobile-web-app-title" content="StayHome">
+  <meta name="application-name" content="StayHome">
+  <!--  for windows desktop apps (I think)-->
+  <meta name="msapplication-TileColor" content="#4b2e83">
+  <meta name="msapplication-TileImage" content="images/icon-144x144.png">
+
+  <meta name="theme-color" content="#4b2e83">
+
 </head>
 <body>
+  <button class="add-button">Add to home screen</button>
   <div class="loading">
     <div class="loader"></div>
   </div>
