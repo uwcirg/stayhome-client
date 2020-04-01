@@ -70,7 +70,7 @@ class _ProfilePageState extends State<ProfilePage> {
     if (_error != null) {
       return MapAppPageScaffold(
         title: title,
-        child: Text(_error),
+        child: MapAppErrorMessage.loadingErrorWithLogoutButton(context),
       );
     }
     return MapAppPageScaffold(title: title, child: new CircularProgressIndicator());
