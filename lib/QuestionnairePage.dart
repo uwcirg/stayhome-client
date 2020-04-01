@@ -407,12 +407,14 @@ class QuestionWidgetState extends State<QuestionWidget> {
             message = "Please enter a valid decimal";
           } else {
             if (!isValidTempF(result) && !isValidTempC(result)) {
+              result = null;
               message = "Enter a value between ${QuestionnaireConstants.minF} and "
                   "${QuestionnaireConstants.maxF} (°F) or ${QuestionnaireConstants.minC} and "
                   "${QuestionnaireConstants.maxC} (°C). This value will not be saved.";
+            } else {
+              // restrict to 2 decimals
+              if (!isValidTempF(result)) result = double.parse(cToF(result).toStringAsFixed(2));
             }
-            // restrict to 2 decimals
-            if (!isValidTempF(result)) result = double.parse(cToF(result).toStringAsFixed(2));
           }
         }
         _response.setAnswer(questionnaireItem.linkId, Answer(valueDecimal: result));
@@ -472,11 +474,8 @@ class QuestionWidgetState extends State<QuestionWidget> {
               selected: isSelected,
               onSelected: (bool) {
                 setState(() {
-                  if (isSelected) {
-                    _response.removeAnswer(questionnaireItem.linkId);
-                  } else {
-                    _response.setAnswer(questionnaireItem.linkId, ifChosen);
-                  }
+                  // set answer to null if it was already selected
+                  _response.setAnswer(questionnaireItem.linkId, isSelected ? null : ifChosen);
                 });
               }),
           Visibility(
