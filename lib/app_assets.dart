@@ -37,15 +37,18 @@ abstract class AppAssets {
   final careplanTemplateRef;
 
   String get appName;
+
   String get whatLinkTitle;
+
   String get whatLink;
 
-
   get issuer;
-  get clientSecret;
-  get clientId;
-  get keycloakIdentifierSystemName => issuer;
 
+  get clientSecret;
+
+  get clientId;
+
+  get keycloakIdentifierSystemName => issuer;
 
   AppAssets(
       this.primarySwatch, this.accentColor, this.highlightColor, this.completedCalendarItemColor,
@@ -53,7 +56,6 @@ abstract class AppAssets {
       this.systemUiOverlayStyle = SystemUiOverlayStyle.light,
       this.textTheme,
       this.careplanTemplateRef});
-
 
   TextTheme textThemeOverride(TextTheme textTheme) {
     return textTheme;
@@ -78,16 +80,19 @@ abstract class AppAssets {
 
 class JoyluxAppAssets extends AppAssets {
   get issuer => 'https://poc-ohtn-keycloak.cirg.washington.edu/auth/realms/mapapp';
+
   get clientSecret => 'b284cf4f-17e7-4464-987e-3c320b22cfac';
+
   get clientId => 'map-app-client';
 
   @override
   String get appName => "Joylux";
+
   @override
   String get whatLinkTitle => "What’s vFit?";
+
   @override
   String get whatLink => "https://joylux.com/";
-
 
   JoyluxAppAssets()
       : super(MapAppColors.vFitPrimary, MapAppColors.vFitAccent, MapAppColors.vFitHighlight,
@@ -237,13 +242,17 @@ class JoyluxAppAssets extends AppAssets {
 
 class StayHomeAppAssets extends AppAssets {
   get issuer => AppConfig.issuerUrl;
+
   get clientSecret => AppConfig.clientSecret;
+
   get clientId => AppConfig.clientId;
 
   @override
   String get appName => "StayHome";
+
   @override
   String get whatLinkTitle => "What’s StayHome?";
+
   @override
   String get whatLink => WhatInfo.link;
 
@@ -254,55 +263,59 @@ class StayHomeAppAssets extends AppAssets {
 
   @override
   Widget loginBanner(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: Dimensions.extraLargeMargin),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-           Padding(
-              padding: EdgeInsets.only(left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, top: Dimensions.fullMargin, bottom: 12),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Padding(
+            padding: EdgeInsets.only(
+                left: Dimensions.quarterMargin,
+                right: Dimensions.quarterMargin,
+                bottom: 12),
+            child: Image.asset(
+              'assets/stayhome/icon_white.png',
+              height: 70,
+            )),
+        Text(
+          this.appName,
+          style: Theme.of(context)
+              .primaryTextTheme
+              .headline2
+              .apply(color: Colors.white, fontWeightDelta: 2),
+        ),
+        Padding(
+          padding: EdgeInsets.only(
+              left: Dimensions.quarterMargin,
+              right: Dimensions.quarterMargin,
+              top: 10,
+              bottom: Dimensions.fullMargin),
+          child: Text('Support during COVID-19',
+              style: Theme.of(context).primaryTextTheme.headline5.apply(color: Colors.white)),
+        ),
+        Padding(
+            padding: EdgeInsets.all(Dimensions.fullMargin),
+            child: Image.asset(
+              'assets/stayhome/Signature_Left_White.png',
+              height: 20,
+            )),
+        Padding(
+            padding: EdgeInsets.only(
+                left: Dimensions.quarterMargin,
+                right: Dimensions.quarterMargin,
+                bottom: 2),
+            child: InkWell(
+              onTap: () => PlatformDefs().launchUrl(WhatInfo.cirgLink, newTab: true),
               child: Image.asset(
-                'assets/stayhome/icon_white.png',
-                height: 70,
-              )),
-          Text(
-            this.appName,
-            style: Theme.of(context)
-                .primaryTextTheme
-                .headline2
-                .apply(color: Colors.white, fontWeightDelta: 2),
-          ),
-          Padding(
-            padding: EdgeInsets.only(left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, top: 10, bottom: Dimensions.fullMargin),
-            child: Text(
-              'Support during COVID-19',
-              style: Theme.of(context)
-                    .primaryTextTheme
-                    .headline5
-                    .apply(color: Colors.white)
-            ),
-          ),
-          Padding(
-              padding: EdgeInsets.all(Dimensions.fullMargin),
-              child: Image.asset(
-                'assets/stayhome/Signature_Left_White.png',
-                height: 20,
-              )),
-          Padding(
-              padding: EdgeInsets.only(left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, top: 2, bottom: Dimensions.largeMargin),
-              child: InkWell(
-                onTap: () => PlatformDefs().launchUrl(WhatInfo.cirgLink, newTab: true),
-                child: Image.asset(
-                  'assets/stayhome/CIRG_logo_white.png',
-                  height: 48,
-                ),
-              )),
-        ],
-      ),
+                'assets/stayhome/CIRG_logo_white.png',
+                height: 48,
+              ),
+            )),
+      ],
     );
   }
+
   TextTheme textThemeOverride(TextTheme textTheme) {
-    return textTheme.copyWith(button: textTheme.subhead.apply(color: this.primarySwatch, fontWeightDelta: 2));
+    return textTheme.copyWith(
+        button: textTheme.subhead.apply(color: this.primarySwatch, fontWeightDelta: 2));
   }
 
   @override
@@ -339,7 +352,7 @@ class StayHomeAppAssets extends AppAssets {
     return [
       MenuItem(
         requiresLogin: true,
-        title:"Home",
+        title: "Home",
         icon: Icon(Icons.home),
         route: '/home',
       ),
@@ -365,7 +378,6 @@ class StayHomeAppAssets extends AppAssets {
         icon: Icon(Icons.help),
         route: '/about',
       )
-
     ];
   }
 
@@ -397,5 +409,11 @@ class MenuItem {
   final bool requiresLogin;
   final Function(BuildContext, CarePlanModel) onPress;
 
-  MenuItem({this.title = "Undefined", this.icon, this.route = "/home", this.requiresLogin = false, this.onPress, this.loggedOutTitle});
+  MenuItem(
+      {this.title = "Undefined",
+      this.icon,
+      this.route = "/home",
+      this.requiresLogin = false,
+      this.onPress,
+      this.loggedOutTitle});
 }

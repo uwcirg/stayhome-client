@@ -1986,19 +1986,16 @@ class QuestionnaireResponse extends Resource {
     return data;
   }
 
-  void removeAnswer(String linkId) {
-    var responseItem = getResponseItem(linkId);
-    if (responseItem != null) {
-      responseItem.answer = null;
-    }
-  }
-
   void setAnswer(String linkId, Answer answer) {
-    var responseItem = getResponseItem(linkId);
-    if (responseItem != null) {
-      responseItem.answer = [answer]; // single response
+    if (answer == null || answer.isEmpty) {
+      removeResponseItem(linkId);
     } else {
-      this.item.add(new QuestionnaireResponseItem(linkId: linkId, answer: [answer]));
+      var responseItem = getResponseItem(linkId);
+      if (responseItem != null) {
+        responseItem.answer = [answer]; // single response
+      } else {
+        this.item.add(new QuestionnaireResponseItem(linkId: linkId, answer: [answer]));
+      }
     }
   }
 
@@ -2006,6 +2003,12 @@ class QuestionnaireResponse extends Resource {
     List<Answer> answers = getResponseItem(linkId)?.answer;
     if (answers != null && answers.length > 0) return answers[0];
     return null;
+  }
+
+  void removeResponseItem(String linkId) {
+    if (item != null) {
+      item.removeWhere((QuestionnaireResponseItem element) => element.linkId == linkId);
+    }
   }
 
   QuestionnaireResponseItem getResponseItem(String linkId) {

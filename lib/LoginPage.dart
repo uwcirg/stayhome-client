@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Hannah Burkhardt. All rights reserved.
+ * Copyright (c) 2020 CIRG. All rights reserved.
  */
 
 import 'package:flutter/cupertino.dart';
@@ -99,7 +99,8 @@ class LoginPageState extends State<LoginPage> {
                               child: Padding(
                                   padding: EdgeInsets.symmetric(vertical: 12),
                                   child: Text(S.of(context).not_now,
-                                      style: Theme.of(context).primaryTextTheme.title))),
+                                      style: Theme.of(context).primaryTextTheme.title,
+                                  textAlign: TextAlign.center,))),
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,

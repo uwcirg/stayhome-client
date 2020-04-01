@@ -36,17 +36,20 @@ class HistoryLineListingWidget extends StatelessWidget {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Text(response.authored != null ?
-              DateFormat.yMd().add_jm().format(response.authored) : "No date",
+            Text(
+              response.authored != null
+                  ? DateFormat.yMd().add_jm().format(response.authored)
+                  : "No date",
               style: Theme.of(context).textTheme.caption,
             ),
             Text(model.questionnaireForResponse(response).title)
           ],
         ),
         children: response.item
-            .map((QuestionnaireResponseItem responseItem) =>
-                _buildQuestionnaireResponseItemView(context, responseItem))
-            .toList(),
+                ?.map((QuestionnaireResponseItem responseItem) =>
+                    _buildQuestionnaireResponseItemView(context, responseItem))
+                ?.toList() ??
+            [NoDataWidget(text: "No data")],
       ),
     );
   }
