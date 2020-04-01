@@ -297,7 +297,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
               visible: questionnaireItem.helpText != null && questionnaireItem.helpText.isNotEmpty,
               child: Text(
                 questionnaireItem.helpText ?? "",
-                style: Theme.of(context).textTheme.caption,
+                style: Theme.of(context).textTheme.subtitle1.apply(color: Theme.of(context).textTheme.caption.color),
               )),
           item
         ]));
@@ -388,8 +388,8 @@ class QuestionWidgetState extends State<QuestionWidget> {
       initialValue: currentEntry ?? "",
       decoration:
           InputDecoration(hintText: "Enter body temperature, in either °F or °C", errorMaxLines: 3),
-      inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
-      keyboardType: TextInputType.numberWithOptions(decimal: true),
+//      inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
+//      keyboardType: TextInputType.numberWithOptions(decimal: true),
       onChanged: (value) {
         setState(() {
           currentEntry = value;
