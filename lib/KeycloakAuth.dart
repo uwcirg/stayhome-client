@@ -9,6 +9,7 @@ import 'package:http/http.dart' show Response, post, Client;
 import 'package:map_app_flutter/platform_stub.dart';
 import 'package:simple_auth/simple_auth.dart' as simpleAuth;
 import 'package:simple_auth_flutter/simple_auth_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class KeycloakAuth {
   String _issuer;
@@ -24,8 +25,11 @@ class KeycloakAuth {
 
   bool refreshTokenExpired = false;
 
+  final String keycloakKey = "keycloak";
+
   KeycloakAuth(this._issuer, this._clientSecret, this._clientId) {
     if (kIsWeb) {
+      _setInitialLoginState();
       _api = new KeycloakApi(_issuer, _clientId, _clientSecret, _redirectUrl,
           scopes: ["openid"], authStorage: MapAppWebAuthStorage());
     } else {
@@ -83,18 +87,21 @@ class KeycloakAuth {
           return await _completeWithLocalLogout();
         } else {
           //for Web platform, launching the logout url directly after local logout to clear Keycloak session if encounter error?
-          if (kIsWeb) {
-            PlatformDefs().launchUrl(url);
-          }
+           _completeWebLogout(url);
           return Future.error("Log out not completed: ${value.statusCode}");
         }
       }
     } catch (error) {
       //for Web platform, launching the logout url directly after local logout to clear Keycloak session if encounter error?
-      if (kIsWeb) {
-        PlatformDefs().launchUrl(url);
-      }
+       _completeWebLogout(url);
       return Future.error("Log out error: $error");
+    }
+  }
+
+  _completeWebLogout(url) {
+    if (kIsWeb) {
+        _clearWebLocalStorage();
+        PlatformDefs().launchUrl(url);
     }
   }
 
@@ -102,11 +109,31 @@ class KeycloakAuth {
     isLoggedIn = false;
     accessTokenExpirationDateTime = null;
     userInfo = null;
+    _clearWebLocalStorage();
     try {
       await _api.logOut();
       return Future.value("Logged out");
     } catch (e) {
       return Future.error("Logged out, but local logout failed: $e");
+    }
+  }
+
+  _clearWebLocalStorage() async {
+    if (kIsWeb) {
+      final prefs = await SharedPreferences.getInstance();
+      prefs.remove(keycloakKey);
+    }
+  }
+
+  _setInitialLoginState() async {
+    /*
+     * has authentication information stored in localstorage
+     */
+    if (kIsWeb) {
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.getString(keycloakKey) != null) {
+        isLoggedIn = true;
+      }
     }
   }
 
@@ -127,6 +154,7 @@ class KeycloakAuth {
         _api.currentOauthAccount.token == null) {
       print("_api.currentOauthAccount.token not set");
       print(StackTrace.current);
+      _clearWebLocalStorage();
       return Future.error("Error getting user info. Please log in again.");
     }
     return post(url, headers: {
@@ -230,14 +258,15 @@ class UserInfo {
 
 class MapAppWebAuthStorage implements simpleAuth.AuthStorage {
   @override
-  Future<String> read({String key}) {
-    // TODO: implement read (using cookies)
-    return null;
+  Future<String> read({String key}) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(key);
   }
 
   @override
-  Future<void> write({String key, String value}) {
-    // TODO: implement write (using cookies)
+  Future<void> write({String key, String value}) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString(key, value);
   }
 }
 

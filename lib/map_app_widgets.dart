@@ -20,10 +20,20 @@ class MapAppErrorMessage extends StatelessWidget {
         _onPressed = onButtonPressed;
 
   factory MapAppErrorMessage.loadingErrorWithLogoutButton(BuildContext context) {
+    /*
+     * if loading error and user is logged in, attempts to log in again
+     */
+    var action = MyApp.of(context).auth.isLoggedIn ? MyApp.of(context)
+                                .auth
+                                .mapAppLogin()
+                                .then((value) => MyApp.of(context).dismissLoginScreen(context))
+                                .catchError((error) => snack("$error", context)) : MyApp.of(context).logout(pushLogin: true, context: context);
+    var buttonLabel = MyApp.of(context).auth.isLoggedIn ? null : "logout";
+    var message = MyApp.of(context).auth.isLoggedIn ? "Attempt to log in...": S.of(context).loading_error_log_in_again;
     return MapAppErrorMessage(
-      S.of(context).loading_error_log_in_again,
-      buttonLabel: "logout",
-      onButtonPressed: () => MyApp.of(context).logout(pushLogin: true, context: context),
+      message,
+      buttonLabel: buttonLabel,
+      onButtonPressed: () => action,
     );
   }
 
