@@ -132,6 +132,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
       if (model.error != null) {
         return MapAppErrorMessage.modelError(model);
       }
+      model.isFirstTimeUser = false;
       return _buildForm(model);
     });
   }

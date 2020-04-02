@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:map_app_flutter/CommunicationsPage.dart';
 import 'package:map_app_flutter/MapAppDrawer.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
+import 'package:map_app_flutter/ProfilePage.dart';
 import 'package:map_app_flutter/QuestionnairePage.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/main.dart';
@@ -26,6 +27,14 @@ class HomePage extends StatelessWidget {
               child: ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
                 Widget errorWidget = MapAppErrorMessage.fromModel(model, context);
                 if (errorWidget != null) return errorWidget;
+
+                if (model.isFirstTimeUser) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) async {
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (context) => CreateProfilePage()));
+                  });
+                }
+
                 return _buildPage(context, model);
               }),
             );

@@ -26,6 +26,8 @@ class CarePlanModel extends Model {
 
   KeycloakAuth _auth;
 
+  bool isFirstTimeUser;
+
   OAuthApi get _api => _auth?.api;
   String _keycloakUserId;
   String _keycloakSystem;
@@ -115,6 +117,7 @@ class CarePlanModel extends Model {
 
     this.patient = await Repository.getPatient(_keycloakSystem, _keycloakUserId, _api);
     if (patient != null) {
+      isFirstTimeUser = false;
       return _loadCarePlan();
     } else {
       // this means there is no matching patient in the database! create one.
@@ -125,6 +128,7 @@ class CarePlanModel extends Model {
       }
       if (patient != null) {
         print("Successfully created ${patient.reference}");
+        isFirstTimeUser = true;
         return _loadCarePlan();
       } else {
         return Future.error("Returned patient was null");
