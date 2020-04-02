@@ -358,7 +358,12 @@ class ProfileWidgetState extends State<ProfileWidget> {
                       runSpacing: Dimensions.fullMargin,
                       children: <Widget>[
                         OutlineButton(
-                          child: Text("save"),
+                          child: Text(S.of(context).cancel),
+                          onPressed: () => MapAppDrawer.navigate(context, '/home'),
+                        ),
+                        RaisedButton(
+                          padding: MapAppPadding.largeButtonPadding,
+                          child: Text("save", style: Theme.of(context).textTheme.button),
                           onPressed: () {
                             if (_formKey.currentState.validate()) {
                               _onPressed(
@@ -379,10 +384,6 @@ class ProfileWidgetState extends State<ProfileWidget> {
                               });
                             }
                           },
-                        ),
-                        OutlineButton(
-                          child: Text(S.of(context).cancel),
-                          onPressed: () => MapAppDrawer.navigate(context, '/home'),
                         )
                       ],
                     )
