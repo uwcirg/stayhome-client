@@ -204,7 +204,7 @@ class Repository {
 //    Response value =
 //    await post(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
 
-    return resultFromResponse(response, "An error occurred when trying to save your responses.  Try logging in again.");
+    return resultFromResponse(response, "An error occurred when trying to save your responses. Please try logging in again.");
   }
 
   static Future<QuestionnaireResponse> postQuestionnaireResponse(
@@ -214,7 +214,7 @@ class Repository {
       result = await postResource(questionnaireResponse, api);
     } catch (e) {
       print('$e');
-      return Future.error("An error occurred when trying to save your responses. Try logging in again.");
+      return Future.error("An error occurred when trying to save your responses. Please try logging in again.");
     }
     QuestionnaireResponse postedResponse = QuestionnaireResponse.fromJson(jsonDecode(result));
     print("Created ${postedResponse.reference}");
