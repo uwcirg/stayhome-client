@@ -184,25 +184,24 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
           right: Dimensions.halfMargin,
           top: Dimensions.halfMargin,
           bottom: 200),
-      child: Row(
-        children: <Widget>[
-          OutlineButton(
-            padding: MapAppPadding.largeButtonPadding,
-            child: Text("cancel"),
-            onPressed: _onCancelPressed,
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(left: Dimensions.fullMargin),
-              child: RaisedButton(
-                padding: MapAppPadding.largeButtonPadding,
-                child: Text("save", style: Theme.of(context).textTheme.button),
-                onPressed: _onDonePressed,
-              ),
+      child: Center(
+        child: Wrap(
+          spacing: Dimensions.halfMargin,
+          runSpacing: Dimensions.fullMargin,
+          children: <Widget>[
+            OutlineButton(
+              padding: MapAppPadding.largeButtonPadding,
+              child: Text("cancel"),
+              onPressed: _onCancelPressed,
             ),
-          ),
-        ],
-      ),
+            RaisedButton(
+              padding: MapAppPadding.largeButtonPadding,
+              child: Text("save", style: Theme.of(context).textTheme.button),
+              onPressed: _onDonePressed,
+            ),
+          ],
+        ),
+      )
     );
   }
 
