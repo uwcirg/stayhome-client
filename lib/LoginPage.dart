@@ -32,9 +32,8 @@ class LoginPageState extends State<LoginPage> {
     double buttonContainerInsets = deviceInfo.size.width > MediaQueryConstants.minDesktopWidth
         ? deviceInfo.size.width / 4.5
         : 12;
-    double scaleFactor = deviceInfo.size.width > MediaQueryConstants.minTabletWidth ? 1 : 0.9;
 
-    var addButtonClickListener = PlatformDefs().addToHomeScreen((deferredPrompt) {
+    PlatformDefs().addToHomeScreen((deferredPrompt) {
       setState(() {
         _deferredPrompt = deferredPrompt;
       });
@@ -53,99 +52,22 @@ class LoginPageState extends State<LoginPage> {
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Visibility(
-                    visible: _deferredPrompt != null,
-                    child: OutlineButton(
-                        child: Text("Add to homescreen"),
-                        onPressed: () {
-                          if (_deferredPrompt != null) {
-                            PlatformDefs().onAddToHomeScreenButtonPressed(_deferredPrompt);
-                          }
-                        }),
-                  ),
-                  MyApp.of(context).appAssets.loginBanner(context),
+                  _buildAddToHomeScreenButton(),
+                  Expanded(child: MyApp.of(context).appAssets.loginBanner(context)),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: buttonContainerInsets),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
-                        Visibility(
-                          visible: MyApp.of(context).auth.refreshTokenExpired,
-                          child: Text(S.of(context).session_expired_please_log_in_again),
-                        ),
-                        RaisedButton(
-                            color: Colors.white,
-                            elevation: 0,
-                            onPressed: () => MyApp.of(context)
-                                .auth
-                                .mapAppLogin()
-                                .then((value) => MyApp.of(context).dismissLoginScreen(context))
-                                .catchError((error) => snack("$error", context)),
-                            child: Padding(
-                                padding: EdgeInsets.symmetric(vertical: 12),
-                                child: Text(
-                                  S.of(context).login,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .title
-                                      .apply(color: Theme.of(context).primaryColor),
-                                  textAlign: TextAlign.center,
-                                ))),
+                        _buildSessionExpiredMessage(context),
+                        _buildWhatLink(),
+                        _buildLoginButton(context),
                         ...MyApp.of(context).appAssets.additionalLoginPageViews(context),
                         Padding(
                           padding: const EdgeInsets.only(top: 12),
-                          child: OutlineButton(
-                              onPressed: () => MyApp.of(context).dismissLoginScreen(context),
-                              borderSide: BorderSide(color: Colors.white, width: 6),
-                              highlightElevation: 0,
-                              child: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 12),
-                                  child: Text(
-                                    S.of(context).not_now,
-                                    style: Theme.of(context).primaryTextTheme.title,
-                                    textAlign: TextAlign.center,
-                                  ))),
+                          child: _buildNotNowButton(context),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Expanded(
-                              flex: 1,
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(vertical: 10),
-                                child: FlatButton(
-                                    onPressed: () => PlatformDefs()
-                                        .launchUrl(MyApp.of(context).appAssets.whatLink),
-                                    child: Padding(
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: Dimensions.fullMargin),
-                                        child: Text(MyApp.of(context).appAssets.whatLinkTitle,
-                                            textScaleFactor: scaleFactor,
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                decoration: TextDecoration.underline)))),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: Padding(
-                                padding: EdgeInsets.only(top: 10, bottom: 10),
-                                child: FlatButton(
-                                    onPressed: () =>
-                                        PlatformDefs().launchUrl(WhatInfo.changelogLink),
-                                    child: Padding(
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: Dimensions.fullMargin),
-                                        child: Text(AppConfig.version,
-                                            textScaleFactor: scaleFactor,
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                decoration: TextDecoration.underline)))),
-                              ),
-                            )
-                          ],
-                        ),
+                        _buildVersionLink(),
                       ],
                     ),
                   ),
@@ -154,5 +76,86 @@ class LoginPageState extends State<LoginPage> {
             ),
           )),
     ));
+  }
+
+  Widget _buildAddToHomeScreenButton() {
+    return Visibility(
+      visible: _deferredPrompt != null,
+      child: OutlineButton(
+          child: Text("Add to homescreen"),
+          onPressed: () {
+            if (_deferredPrompt != null) {
+              PlatformDefs().onAddToHomeScreenButtonPressed(_deferredPrompt);
+            }
+          }),
+    );
+  }
+
+  Widget _buildSessionExpiredMessage(BuildContext context) {
+    return Visibility(
+      visible: MyApp.of(context).auth.refreshTokenExpired,
+      child: Text(S.of(context).session_expired_please_log_in_again),
+    );
+  }
+
+  Widget _buildLoginButton(BuildContext context) {
+    return RaisedButton(
+        color: Colors.white,
+        elevation: 0,
+        onPressed: () => MyApp.of(context)
+            .auth
+            .mapAppLogin()
+            .then((value) => MyApp.of(context).dismissLoginScreen(context))
+            .catchError((error) => snack("$error", context)),
+        child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: Text(
+              S.of(context).login,
+              style: Theme.of(context).textTheme.title.apply(color: Theme.of(context).primaryColor),
+              textAlign: TextAlign.center,
+            )));
+  }
+
+  Widget _buildNotNowButton(BuildContext context) {
+    return OutlineButton(
+        onPressed: () => MyApp.of(context).dismissLoginScreen(context),
+        borderSide: BorderSide(color: Colors.white, width: 6),
+        highlightElevation: 0,
+        child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: Text(
+              S.of(context).not_now,
+              style: Theme.of(context).primaryTextTheme.title,
+              textAlign: TextAlign.center,
+            )));
+  }
+
+  Widget _buildVersionLink() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: _buildTextLink(AppConfig.version, WhatInfo.changelogLink),
+    );
+  }
+
+  Widget _buildWhatLink() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: _buildTextLink(
+          MyApp.of(context).appAssets.whatLinkTitle, MyApp.of(context).appAssets.whatLink,
+          large: true),
+    );
+  }
+
+  Widget _buildTextLink(String linkName, String url, {bool large = false}) {
+    var style = large
+        ? Theme.of(context).primaryTextTheme.headline6
+        : Theme.of(context).primaryTextTheme.bodyText1;
+
+    style = style.apply(decoration: TextDecoration.underline);
+    return FlatButton(
+        onPressed: () => PlatformDefs().launchUrl(url),
+        child: Padding(
+            padding: EdgeInsets.symmetric(vertical: Dimensions.fullMargin),
+            child: Text(linkName, style: style)));
   }
 }
