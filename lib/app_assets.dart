@@ -2,6 +2,7 @@
  * Copyright (c) 2020 CIRG. All rights reserved.
  */
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:map_app_flutter/CommunicationsPage.dart';
@@ -95,53 +96,78 @@ class StayHomeAppAssets extends AppAssets {
   @override
   Widget loginBanner(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Padding(
-            padding: EdgeInsets.only(
-                left: Dimensions.quarterMargin,
-                right: Dimensions.quarterMargin,
-                bottom: 12),
-            child: Image.asset(
-              'assets/stayhome/icon_white.png',
-              height: 70,
-            )),
-        Text(
-          this.appName,
-          style: Theme.of(context)
-              .primaryTextTheme
-              .headline2
-              .apply(color: Colors.white, fontWeightDelta: 2),
+        Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [_buildCirgLogo(), _buildUWLogo()]),
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              _buildAppLogo(),
+              _buildAppName(context),
+              _buildSlogan(context),
+            ],
+          ),
         ),
-        Padding(
-          padding: EdgeInsets.only(
-              left: Dimensions.quarterMargin,
-              right: Dimensions.quarterMargin,
-              top: 10,
-              bottom: Dimensions.fullMargin),
-          child: Text('Support during COVID-19',
-              style: Theme.of(context).primaryTextTheme.headline5.apply(color: Colors.white)),
-        ),
-        Padding(
-            padding: EdgeInsets.all(Dimensions.fullMargin),
-            child: Image.asset(
-              'assets/stayhome/Signature_Left_White.png',
-              height: 20,
-            )),
-        Padding(
-            padding: EdgeInsets.only(
-                left: Dimensions.quarterMargin,
-                right: Dimensions.quarterMargin,
-                bottom: 2),
-            child: InkWell(
-              onTap: () => PlatformDefs().launchUrl(WhatInfo.cirgLink, newTab: true),
-              child: Image.asset(
-                'assets/stayhome/CIRG_logo_white.png',
-                height: 48,
-              ),
-            )),
       ],
     );
+  }
+
+  Widget _buildUWLogo() {
+    return Padding(
+        padding: EdgeInsets.only(
+          left: Dimensions.fullMargin,
+          top: Dimensions.fullMargin,
+          right: Dimensions.fullMargin,
+        ),
+        child: Image.asset(
+          'assets/stayhome/Signature_Stacked_White.png',
+          height: 48,
+        ));
+  }
+
+  Widget _buildSlogan(BuildContext context) {
+    return Padding(
+      padding:
+          EdgeInsets.only(left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, top: 10),
+      child: Text('Support during COVID-19',
+          style: Theme.of(context).primaryTextTheme.headline5.apply(color: Colors.white)),
+    );
+  }
+
+  Widget _buildAppName(BuildContext context) {
+    return Text(
+      this.appName,
+      style: Theme.of(context)
+          .primaryTextTheme
+          .headline2
+          .apply(color: Colors.white, fontWeightDelta: 2),
+    );
+  }
+
+  Widget _buildCirgLogo() {
+    return Padding(
+        padding: EdgeInsets.only(
+            top: Dimensions.fullMargin, left: Dimensions.fullMargin, right: Dimensions.fullMargin),
+        child: InkWell(
+          onTap: () => PlatformDefs().launchUrl(WhatInfo.cirgLink, newTab: true),
+          child: Image.asset(
+            'assets/stayhome/CIRG_logo_white.png',
+            height: 48,
+          ),
+        ));
+  }
+
+  Widget _buildAppLogo() {
+    return Padding(
+        padding: EdgeInsets.only(
+            left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, bottom: 12),
+        child: Image.asset(
+          'assets/stayhome/icon_white.png',
+          height: 70,
+        ));
   }
 
   TextTheme textThemeOverride(TextTheme textTheme) {
