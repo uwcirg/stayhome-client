@@ -50,7 +50,7 @@ class CDCSymptomCheckerInfoPage extends StatelessWidget {
                     return _button(context,
                         title: "continue to CDC.gov",
                         onPressed: () => PlatformDefs()
-                            .launchUrl(WhatInfo.cdcSymptomSelfCheckerLink, newTab: true, targetBlank: false));
+                            .launchUrl(WhatInfo.cdcSymptomSelfCheckerLink, newTab: true));
                   }),
                 ]),
               ),

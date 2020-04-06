@@ -170,5 +170,5 @@ void snack(String text, context) {
 }
 
 void launchResourceUrl(CarePlanModel model) {
-  PlatformDefs().launchUrl(WhatInfo.resourceLinkWithZip(model?.patient?.homeZip), newTab: true, targetBlank: true);
+  PlatformDefs().launchUrl(WhatInfo.resourceLinkWithZip(model?.patient?.homeZip), newTab: true);
 }

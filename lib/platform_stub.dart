@@ -14,7 +14,7 @@ abstract class PlatformDefs {
   addToHomeScreen(Function onBeforeInstallPrompt);
   onAddToHomeScreenButtonPressed(deferredPrompt);
 
-  Future launchUrl(String url, {bool newTab = false, bool targetBlank});
+  Future launchUrl(String url, {bool newTab = false});
 
   Widget getAuthCallbackPage();
 
