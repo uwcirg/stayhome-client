@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2020 CIRG. All rights reserved.
- */
-
 // GENERATED CODE - DO NOT MODIFY BY HAND
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -235,15 +231,6 @@ class S {
     return Intl.message(
       'Loading error. Try logging out and in again.',
       name: 'loading_error_log_in_again',
-      desc: '',
-      args: [],
-    );
-  }
-
-  String get my_goals {
-    return Intl.message(
-      'My goals',
-      name: 'my_goals',
       desc: '',
       args: [],
     );

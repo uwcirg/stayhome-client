@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2020 CIRG. All rights reserved.
- */
-
 // DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
 // This is a library that looks up messages for specific locales by
 // delegating to the appropriate library.

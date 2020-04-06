@@ -14,11 +14,7 @@
   "frequency_with_contents": "Once every {number} {unit}",
   "duration_duration_durationunit": "{duration} {durationUnit}",
   "duration": "Duration:",
-
-
   "add_the_default_careplan_for_me": "add the default care plan for me",
-
-
   "what_is_your_name": "What is your name?",
   "what_is_your_email_address": "What is your email address?",
   "profile_introduction_help_text" : "If you create a profile and add certain types of information, you can see information more relevant to you, and you can convey information to public health that may help your community, or help you personally.\n\nBut remember, everything on this profile is optional. We’re more interested in having you able to use the system than in having you worry about us collecting information, or keeping it safe. That said, each item on this page has a use, and you can always come back and update it later.",
@@ -26,7 +22,6 @@
   "profile_contact_info_help_text" : "If you provide your email, phone, or both, then we can make that info available to the public health agency responsible for your area, and we or they can contact you if needed. You will only be contacted if there is a specific reason to do so, one that we or the public health agency(s) believe to be in your best interest.\n\nIf you chose to set up your account with a fake email, you may provide us with a real one here, so we may contact you. But, doing so will not change your username. Likewise, if you used one email as a username when setting up your account, but would prefer a different email as your contact email, you can enter it here, but it will not change your username.",
   "profile_identifying_info_help_text": "If you **do provide** an email and/or phone number, we'd like to know who we are speaking with, if we do have a need to contact you. We’d also appreciate it if you'd include sex and date of birth as those are standard ways of ensuring that the right person's medication information gets attached to the correct clinic, testing, or hospital records.\n\nIf you **have not provided** location or contact information, it would still be helpful if you could let us know your sex, the year, and perhaps the month of your birth (you can enter a fake day, or month, if you want). Patterns of illness by age, sex, and location can be critical in helping public health shape an effective response.",
   "loading_error_log_in_again": "Loading error. Try logging out and in again.",
-  "my_goals": "My goals",
   "welcome": "Thank you and welcome",
   "guest_home_text": "StayHome includes a list of resources that gives you direct access to information sources that we believe to be accurate. We hope these sources will help you maintain your health, safety, and well-being during the COVID-19 outbreak.\n\nWithout an account, you can “continue” below to browse these sources, and follow the links they contain.\n\nIf you do decide to create an account, now or later, you can:\n\n- track your own symptoms and temperature\n- track travel and/or times you may have been exposed\n- record COVID-19 testing, which can help public health match your results with a way to contact you\n- record other information such as pregnancy and occupation that may help public health identify specific programs or protections for you.",
   "terms_of_use_title": "Terms of Use",
