@@ -44,7 +44,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "languageName" : MessageLookupByLibrary.simpleMessage("English (EN)"),
     "loading_error_log_in_again" : MessageLookupByLibrary.simpleMessage("Loading error. Try logging out and in again."),
     "login" : MessageLookupByLibrary.simpleMessage("login / register"),
-    "my_goals" : MessageLookupByLibrary.simpleMessage("My goals"),
     "name_not_entered" : MessageLookupByLibrary.simpleMessage("(name not entered)"),
     "not_now" : MessageLookupByLibrary.simpleMessage("continue without logging in"),
     "profile" : MessageLookupByLibrary.simpleMessage("Profile"),
