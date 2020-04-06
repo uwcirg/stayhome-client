@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2020 CIRG. All rights reserved.
+ */
+
 // DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
 // This is a library that provides messages for a en locale. All the
 // messages from the main program should be duplicated here with the same
@@ -32,6 +36,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "about" : MessageLookupByLibrary.simpleMessage("About"),
     "add_the_default_careplan_for_me" : MessageLookupByLibrary.simpleMessage("add the default care plan for me"),
     "cancel" : MessageLookupByLibrary.simpleMessage("cancel"),
+    "cdc_symptom_checker_info_text" : MessageLookupByLibrary.simpleMessage("The CDC\'s Self-Checker is an interactive tool to help you make decisions and seek appropriate medical care for COVID-19.\\n\\nCurrently you need to enter your symptoms again when using Self-Checker, but a future version of StayHome will be able to send Self-Checker the symptoms you’ve already recorded (with your permission)."),
     "demoVersionBannerText" : m0,
     "developedByCIRG" : MessageLookupByLibrary.simpleMessage("Developed by the Clinical Informatics Research Group (CIRG) at University of Washington, 2019-2020."),
     "duration" : MessageLookupByLibrary.simpleMessage("Duration:"),

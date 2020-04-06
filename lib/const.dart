@@ -23,7 +23,7 @@ class MapAppPadding {
   static const buttonIconEdgeInsets = const EdgeInsets.only(right: Dimensions.halfMargin);
   static const cardPageMargins = const EdgeInsets.all(Dimensions.halfMargin);
   static const pageMargins = const EdgeInsets.all(Dimensions.fullMargin);
-  static const largeButtonPadding = const EdgeInsets.all(10);
+  static const largeButtonPadding = const EdgeInsets.symmetric(vertical: 10, horizontal: Dimensions.largeMargin);
 
   MapAppPadding._();
 }
@@ -40,17 +40,21 @@ class IconSize {
 
 class WhatInfo {
   static const String link = "https://uwcirg.github.io/stayhomelanding/";
-  static String changelogLink = "https://uwcirg.github.io/stayhomelanding/?return_uri="+Uri.encodeComponent(PlatformDefs().rootUrl())+"#change-log";
-  static String cirgLink = "https://www.cirg.washington.edu/";
-  static String resourceLink = "https://tiny.cc/covidlinks";
-  static String _resourceLinkZipPrefix = "https://tiny.cc/covidlinks?zip=";
-  static String contactLink = "mailto:help@stayhome-app.on.spiceworks.com";
+  static String changelogLink = "https://uwcirg.github.io/stayhomelanding/?return_uri=" +
+      Uri.encodeComponent(PlatformDefs().rootUrl()) +
+      "#change-log";
+  static const String cirgLink = "https://www.cirg.washington.edu/";
+  static const String resourceLink = "https://tiny.cc/covidlinks";
+  static const String _resourceLinkZipPrefix = "https://tiny.cc/covidlinks?zip=";
+  static const String contactLink = "mailto:help@stayhome-app.on.spiceworks.com";
+  static const String cdcSymptomSelfCheckerLink =
+      "https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/index.html";
+
   static String resourceLinkWithZip(String zip) {
     if (_resourceLinkZipPrefix == null || zip == null) return resourceLink;
     // append the zip code string
     return _resourceLinkZipPrefix + zip;
   }
-
 }
 
 class QuestionnaireConstants {
@@ -58,8 +62,8 @@ class QuestionnaireConstants {
   static const double maxF = 115;
   static const double minC = 32;
   static const double maxC = 46;
-
 }
+
 /*
  * media query constants to allow setting breakpoints for responsiveness 
  */
