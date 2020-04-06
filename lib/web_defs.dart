@@ -21,7 +21,7 @@ class WebDefs implements PlatformDefs {
   }
 
   @override
-  Future launchUrl(String url, {bool newTab = false, bool targetBlank}) async {
+  Future launchUrl(String url, {bool newTab = false, bool targetBlank = false}) async {
     if (await canLaunch(url).catchError((error) => print("Error: $error"))) {
       if (targetBlank) {
         window.open(url, "_blank");
