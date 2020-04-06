@@ -178,60 +178,32 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
             }));
   }
 
-
   Widget _buildButtons(BuildContext context) {
-    return 
-      Column(children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(
-              left: Dimensions.halfMargin,
-              right: Dimensions.halfMargin,
-              top: Dimensions.halfMargin,
-              bottom: Dimensions.largeMargin),
-          child: Center(
-            child: Wrap(
-              spacing: Dimensions.halfMargin,
-              runSpacing: Dimensions.fullMargin,
-              children: <Widget>[
-                OutlineButton(
-                  padding: MapAppPadding.largeButtonPadding,
-                  child: Text("cancel"),
-                  onPressed: _onCancelPressed,
-                ),
-                RaisedButton(
-                  padding: MapAppPadding.largeButtonPadding,
-                  child: Text("save", style: Theme.of(context).textTheme.button),
-                  onPressed: _onDonePressed,
-                ),
-              ],
-            ),
-          )
-        ),
-        //TODO, move this text for translation, S.of(context) doesn't work here, scope issue ?
-        Container(
-          padding: EdgeInsets.only(top: Dimensions.halfMargin, bottom: Dimensions.fullMargin, left: Dimensions.largeMargin, right: Dimensions.largeMargin),
-          child:  Center(
-            child: Text("First save your data. You can come back here and then go to CDC's Self-Checker, a guide to help you make decisions and seek appropriate medical care for COVID-19.")
-          ),),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: Dimensions.largeMargin),
-          child:Center(
-            child: Text("Currently you need to re-enter your symptoms but we're intending to automate that process.")
-          ),
-        ),
-        Container(
-          padding: EdgeInsets.only(top: Dimensions.largeMargin, bottom: 100, left: Dimensions.fullMargin, right: Dimensions.fullMargin),
-          child: 
-          Center(
-              child: 
+    return Padding(
+        padding: const EdgeInsets.only(
+            left: Dimensions.halfMargin,
+            right: Dimensions.halfMargin,
+            top: Dimensions.halfMargin,
+            bottom: 200),
+        child: Center(
+          child: Wrap(
+            spacing: Dimensions.halfMargin,
+            runSpacing: Dimensions.fullMargin,
+            children: <Widget>[
               OutlineButton(
-                padding: EdgeInsets.symmetric(vertical: Dimensions.halfMargin, horizontal: Dimensions.fullMargin),
-                child: Text("Go to CDC Self-Checker"),
-                onPressed: () => PlatformDefs().launchUrl("https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/index.html", newTab: true),
+                padding: MapAppPadding.largeButtonPadding,
+                child: Text("cancel"),
+                onPressed: _onCancelPressed,
               ),
+              RaisedButton(
+                padding: MapAppPadding.largeButtonPadding,
+                child: Text("save", style: Theme.of(context).textTheme.button),
+                onPressed: _onDonePressed,
+              ),
+            ],
           ),
         )
-      ],);
+      );
   }
 
   Widget _buildGroupCard(BuildContext context, QuestionnaireItem item) {
@@ -327,8 +299,28 @@ class QuestionWidgetState extends State<QuestionWidget> {
                 questionnaireItem.helpText ?? "",
                 style: Theme.of(context).textTheme.subtitle1.apply(color: Theme.of(context).textTheme.caption.color),
               )),
+          Visibility(
+              visible: questionnaireItem.supportLink != null,
+              child: _buildSupportLink(questionnaireItem.supportLink, context)
+          ),
           item
         ]));
+  }
+
+  Widget _buildSupportLink(SupportLink link, BuildContext context) {
+    if (link == null) return Container();
+    return Padding(
+      padding: const EdgeInsets.all(Dimensions.largeMargin),
+      child:
+      Center(
+        child:
+        OutlineButton(
+          padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin, horizontal: Dimensions.fullMargin),
+          child: Text(link.title ?? ""),
+          onPressed: () => PlatformDefs().launchUrl(link.url ?? "", newTab: true),
+        ),
+      ),
+    );
   }
 
   Widget _buildStringItem(QuestionnaireItem questionnaireItem, BuildContext context) {

@@ -2,7 +2,10 @@
  * Copyright (c) 2020 CIRG. All rights reserved.
  */
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:map_app_flutter/CDCSymptomCheckerInfoPage.dart';
 import 'package:map_app_flutter/CommunicationsPage.dart';
 import 'package:map_app_flutter/MapAppDrawer.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
@@ -44,7 +47,7 @@ class HomePage extends StatelessWidget {
         )));
   }
 
-  Column _buildPage(BuildContext context, CarePlanModel model) {
+  Widget _buildPage(BuildContext context, CarePlanModel model) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
@@ -55,84 +58,94 @@ class HomePage extends StatelessWidget {
             child: ActiveNotificationsWidget(model),
           ),
         ),
-        // TODO: Dynamically add a tile for each questionnaire in the questionnaire list.
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              SpringboardTile(
-                assetPath: 'assets/stayhome/Track.png',
-                text: "record symptoms & temp",
-                onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => QuestionnairePage(model.questionnaires[0], model)));
-                },
-              ),
-              SpringboardTile(
-                assetPath: 'assets/stayhome/Risk.transparent.png',
-                text: "enter exposure or travel",
-                onPressed: model.questionnaires.length > 1
-                    ? () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) =>
-                                QuestionnairePage(model.questionnaires[1], model)));
-                      }
-                    : null,
-              ),
-            ],
-          ),
-        ),
-        IntrinsicHeight(
-          child: Row(
-            children: <Widget>[
-              SpringboardTile(
-                assetPath: model.questionnaires.length > 2
-                    ? 'assets/stayhome/Testing.transparent.png'
-                    : 'assets/stayhome/Testing.gray.png',
-                text: "record COVID-19 testing",
-                onPressed: model.questionnaires.length > 2
-                    ? () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) =>
-                                QuestionnairePage(model.questionnaires[2], model)));
-                      }
-                    : null,
-              ),
-              SpringboardTile(
-                assetPath: 'assets/stayhome/Resource.png',
-                text: "COVID-19 information & resources",
-                onPressed: () => launchResourceUrl(model),
-              ),
-            ],
-          ),
-        ),
-        IntrinsicHeight(
-          child: Row(
-            children: <Widget>[
-              SpringboardTile(
-                assetPath: 'assets/stayhome/Pregnant.gray.png',
-                text: "enter pregnancy status",
-                onPressed: null,
-              ),
-              SpringboardTile(
-                assetPath: 'assets/stayhome/profile_icon.png',
-                text: "update profile & permissions",
-                onPressed: () => MapAppDrawer.navigate(context, "/profile"),
-              ),
-            ],
-          ),
-        ),
-        Row(
-          children: <Widget>[
-            SpringboardTile(
-              assetPath: 'assets/stayhome/Trend.png',
-              text: "review calendar & history",
-              onPressed: () => MapAppDrawer.navigate(context, "/progress_insights"),
-            ),
-          ],
-        ),
+        SpringBoardWidget(model),
       ],
     );
+  }
+}
+
+class SpringBoardWidget extends StatelessWidget {
+  final CarePlanModel model;
+
+  const SpringBoardWidget(this.model);
+
+  @override
+  Widget build(BuildContext context) {
+    List<SpringboardTile> tiles = _springboardTiles(context);
+    List<List<SpringboardTile>> tilesByRow = [];
+    for (int i = 0; i < tiles.length; i += 2) {
+      tilesByRow.add(tiles.sublist(i, min(i + 2, tiles.length)));
+    }
+    List<Widget> rows = tilesByRow.map((List<SpringboardTile> e) {
+      return IntrinsicHeight(
+        child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: e),
+      );
+    }).toList();
+
+    return Column(children: rows);
+  }
+
+  List<SpringboardTile> _springboardTiles(context) {
+    return [
+      SpringboardTile(
+        assetPath: 'assets/stayhome/Track.png',
+        text: "record symptoms & temp",
+        onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => QuestionnairePage(model.questionnaires[0], model)));
+        },
+      ),
+      SpringboardTile(
+        assetPath: 'assets/stayhome/cdc.png',
+        text: "CDC symptom self-checker",
+        onPressed: () {
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => CDCSymptomCheckerInfoPage()));
+        },
+      ),
+      SpringboardTile(
+        assetPath: 'assets/stayhome/Risk.transparent.png',
+        text: "enter exposure or travel",
+        onPressed: model.questionnaires.length > 1
+            ? () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => QuestionnairePage(model.questionnaires[1], model)));
+              }
+            : null,
+      ),
+      SpringboardTile(
+        assetPath: model.questionnaires.length > 2
+            ? 'assets/stayhome/Testing.transparent.png'
+            : 'assets/stayhome/Testing.gray.png',
+        text: "record COVID-19 testing",
+        onPressed: model.questionnaires.length > 2
+            ? () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => QuestionnairePage(model.questionnaires[2], model)));
+              }
+            : null,
+      ),
+      SpringboardTile(
+        assetPath: 'assets/stayhome/Resource.png',
+        text: "COVID-19 information & resources",
+        onPressed: () => launchResourceUrl(model),
+      ),
+      SpringboardTile(
+        assetPath: 'assets/stayhome/Pregnant.gray.png',
+        text: "enter pregnancy status",
+        onPressed: null,
+      ),
+      SpringboardTile(
+        assetPath: 'assets/stayhome/profile_icon.png',
+        text: "update profile & permissions",
+        onPressed: () => MapAppDrawer.navigate(context, "/profile"),
+      ),
+      SpringboardTile(
+        assetPath: 'assets/stayhome/Trend.png',
+        text: "review calendar & history",
+        onPressed: () => MapAppDrawer.navigate(context, "/progress_insights"),
+      ),
+    ];
   }
 }
 
@@ -142,23 +155,16 @@ class SpringboardTile extends StatelessWidget {
   final String assetPath;
 
   final String text;
+  final bool enabled;
 
-  const SpringboardTile({this.onPressed, this.assetPath, this.text});
+  const SpringboardTile({this.onPressed, this.assetPath, this.text}) : enabled = onPressed != null;
 
   @override
   Widget build(BuildContext context) {
-    bool enabled = onPressed != null;
-    var cardColor = enabled ? Theme.of(context).accentColor : Colors.grey[300];
-    var textStyle = Theme.of(context).textTheme.title;
-    if (enabled) {
-      textStyle = textStyle.apply(color: Theme.of(context).primaryColor);
-    } else {
-      textStyle = textStyle.apply(color: Theme.of(context).disabledColor);
-    }
     return Expanded(
       child: InkWell(
         child: Card(
-            color: cardColor,
+            color: _cardColor(context),
             child: Padding(
               padding: const EdgeInsets.only(
                   top: Dimensions.quarterMargin,
@@ -167,13 +173,16 @@ class SpringboardTile extends StatelessWidget {
                   left: Dimensions.halfMargin),
               child: Column(
                 children: <Widget>[
-                  Image.asset(this.assetPath,
-                      height: 80, color: enabled ? null : Theme.of(context).disabledColor),
-                  Text(
-                    this.text,
-                    textAlign: TextAlign.center,
-                    maxLines: 3,
-                    style: textStyle,
+                  _image(context) ?? Container(),
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        this.text,
+                        textAlign: TextAlign.center,
+                        maxLines: 3,
+                        style: _textStyle(context),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -181,5 +190,24 @@ class SpringboardTile extends StatelessWidget {
         onTap: this.onPressed,
       ),
     );
+  }
+
+  Widget _image(BuildContext context) {
+    if (this.assetPath != null) {
+      return Image.asset(this.assetPath,
+          height: 80, color: enabled ? null : Theme.of(context).disabledColor);
+    }
+    return null;
+  }
+
+  TextStyle _textStyle(BuildContext context) {
+    TextStyle textStyle = Theme.of(context).textTheme.title;
+    if (enabled) return textStyle.apply(color: Theme.of(context).primaryColor);
+    return textStyle.apply(color: Theme.of(context).disabledColor);
+  }
+
+  _cardColor(BuildContext context) {
+    if (enabled) return Theme.of(context).accentColor;
+    return Colors.grey[300];
   }
 }

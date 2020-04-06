@@ -1608,6 +1608,7 @@ class Extension {
   Coding valueCoding;
   String valueString;
   int valueDecimal;
+  String valueUri;
 
   Extension(
       {this.valueString,
@@ -1617,7 +1618,8 @@ class Extension {
       this.valueExpression,
       this.valueCodeableConcept,
       this.valueCoding,
-      this.valueAddress});
+      this.valueAddress,
+      this.valueUri});
 
   Extension.fromJson(Map<String, dynamic> json) {
     url = json['url'];
@@ -1632,6 +1634,7 @@ class Extension {
     valueCoding = json['valueCoding'] != null ? new Coding.fromJson(json['valueCoding']) : null;
     valueString = json['valueString'];
     valueDecimal = json['valueDecimal'];
+    valueUri = json['valueUri'];
   }
 
   Map<String, dynamic> toJson() {
@@ -1652,6 +1655,7 @@ class Extension {
     }
     data['valueString'] = this.valueString;
     data['valueDecimal'] = this.valueDecimal;
+    data['valueUri'] = this.valueUri;
     return data;
   }
 }
@@ -1791,6 +1795,20 @@ class QuestionnaireItem {
     return helpTextSubItem?.text;
   }
 
+  SupportLink get supportLink {
+    String supportLinkExtName = "http://hl7.org/fhir/StructureDefinition/questionnaire-supportLink";
+    // find the first sub item that has a supportLink type extension
+    QuestionnaireItem supportLinkSubItem = item?.firstWhere((QuestionnaireItem subItem) =>
+        subItem.extension != null &&
+        subItem.extension.any(
+            (Extension extension) => extension.url != null && extension.url == supportLinkExtName), orElse: ()=>null);
+    if (supportLinkSubItem == null) return null;
+    // find the supportLink extension value
+    Extension supportLinkExt = supportLinkSubItem.extension.firstWhere(
+        (Extension extension) => extension.url != null && extension.url == supportLinkExtName);
+    return SupportLink(title: supportLinkSubItem.text, url: supportLinkExt.valueUri);
+  }
+
   QuestionnaireItem.fromJson(Map<String, dynamic> json) {
     linkId = json['linkId'];
     text = json['text'];
@@ -1858,6 +1876,13 @@ class QuestionnaireItem {
   bool isGroup() {
     return type == QuestionType.group;
   }
+}
+
+class SupportLink {
+  final String title;
+  final String url;
+
+  SupportLink({this.title, this.url});
 }
 
 abstract class ChoiceOption {
