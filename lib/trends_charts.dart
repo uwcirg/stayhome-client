@@ -95,7 +95,8 @@ class ChartWidgetState extends State<ChartWidget> {
       ],
       behaviors: [
         new charts.InitialSelection(
-            selectedDataConfig: [new charts.SeriesDatumConfig('Answers', _time)])
+            selectedDataConfig: [new charts.SeriesDatumConfig('Answers', _time)]),
+        new charts.PanAndZoomBehavior()
       ],
     );
   }
@@ -151,9 +152,22 @@ class ChartWidgetState extends State<ChartWidget> {
 
   static charts.NumericAxisSpec _displayMappingSpec(CarePlanModel model, String linkId) {
     var displayMappings = _displayMappings(model, linkId);
+
+    List<num> keys = displayMappings?.keys?.toList();
+    keys?.sort();
+    num minVal = keys?.first;
+    num maxVal = keys?.last;
+
     return new charts.NumericAxisSpec(
         tickFormatterSpec: charts.BasicNumericTickFormatterSpec(
-                (num measure) => displayMappings != null ? displayMappings[measure] : '$measure'));
+                (num measure) {
+                  if (displayMappings == null) return '$measure';
+                  var displayName = displayMappings[measure];
+                  if (displayName == null) return "";
+                  return displayName;
+                }),
+        viewport: displayMappings != null ? new charts.NumericExtents(minVal, maxVal) : null,
+    );
   }
 
   static Map<num, String> _displayMappings(CarePlanModel model, String linkId) {
