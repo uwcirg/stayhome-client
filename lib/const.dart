@@ -48,7 +48,7 @@ class WhatInfo {
   static const String _resourceLinkZipPrefix = "https://tiny.cc/covidlinks?zip=";
   static const String contactLink = "mailto:help@stayhome-app.on.spiceworks.com";
   static const String cdcSymptomSelfCheckerLink =
-      "https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/index.html";
+      "https://covid19healthbot.cdc.gov/index.html";
 
   static String resourceLinkWithZip(String zip) {
     if (_resourceLinkZipPrefix == null || zip == null) return resourceLink;
