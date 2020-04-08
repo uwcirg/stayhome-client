@@ -5,7 +5,6 @@
 import 'package:configurable_expansion_tile/configurable_expansion_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart';
 import 'package:map_app_flutter/KeycloakAuth.dart';
@@ -303,20 +302,20 @@ class ProfileWidgetState extends State<ProfileWidget> {
                       ),
                     ),
                     onTap:() {
-                      DatePicker.showDatePicker(context,
-                        showTitleActions: true,
-                        minTime: DateTime(1850, 1, 1),
-                        maxTime: new DateTime.now(),
-                        theme: DatePickerTheme(
-                          itemStyle: TextStyle(color: Theme.of(context).primaryColor),
-                          doneStyle: TextStyle(color: Theme.of(context).primaryColor)
-                        ),
-                        onConfirm: (date) {
-                          final formattedDate = DateFormat.yMd().format(date);
-                          birthDate = DateFormat.yMd().parse(formattedDate.toString());
-                          birthDateCtrl.text = formattedDate.toString();
-                        },
-                        currentTime: birthDate??DateTime.now(), locale: Localizations.localeOf(context).languageCode == 'de'? LocaleType.de : LocaleType.en);
+                      showDatePicker(
+                        context: context,
+                        initialDate: birthDate??DateTime.now(),
+                        firstDate: DateTime(1850, 1, 1),
+                        lastDate: new DateTime.now(),
+                        locale: Locale(Localizations.localeOf(context).languageCode, '')
+                      )
+                      .then((DateTime pickerdate) {
+                          if (pickerdate != null) {
+                            final formattedDate = DateFormat.yMd().format(pickerdate);
+                            birthDate = DateFormat.yMd().parse(formattedDate.toString());
+                            birthDateCtrl.text = formattedDate.toString();
+                          }
+                      });
                     },
                 ),
                 FlatButton(
