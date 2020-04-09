@@ -141,7 +141,7 @@ class LoginPageState extends State<LoginPage> {
   Widget _buildCommitShaText() {
     String commitSha = AppConfig.commitSha;
     return Visibility(
-        visible: commitSha != null,
+        visible: commitSha != null && !AppConfig.isProd,
         child: Text(
           commitSha ?? "",
           style: Theme.of(context).primaryTextTheme.caption,
