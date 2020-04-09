@@ -17,70 +17,89 @@ class MapAppDrawer extends Drawer {
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark,
-      child: Drawer(
-          child: ListView(padding: const EdgeInsets.all(0.0), children: [
-        Container(
-          child: DrawerHeader(
-              padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+      value: MyApp.of(context).appAssets.systemUiOverlayStyle,
+      child: Container(
+        width: 260,
+        child: Drawer(
+            child: ListView(
+          padding: const EdgeInsets.all(0.0),
+          children: [
+            _buildHeader(context),
+            ...MyApp.of(context)
+                .appAssets
+                .navItems(context)
+                .map((MenuItem item) => constructDrawerMenuItem(context, item)),
+            Divider(),
+            _buildLogoutListTile(context),
+            _buildContactUsListTile(context),
+            Divider(),
+            _buildLanguageListTile(context),
+          ],
+        )),
+      ),
+    );
+  }
+
+  Container _buildHeader(BuildContext context) {
+    return Container(
+      child: DrawerHeader(
+        decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+        padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            MyApp.of(context).appAssets.drawerBanner(context),
+            InkWell(
+              onTap: () => profileOrLogin(context),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  MyApp.of(context).appAssets.drawerBanner(context),
-                  Stack(alignment: AlignmentDirectional.bottomCenter, children: <Widget>[
-                    Column(
-                      children: <Widget>[
-                        IconButton(
-                            iconSize: Dimensions.profileImageSize,
-                            icon: Icon(
-                              Icons.account_circle,
-                              color: Theme.of(context).iconTheme.color,
-                            ),
-                            onPressed: () => profileOrLogin(context)),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: IconSize.large),
-                          child: ScopedModelDescendant<CarePlanModel>(
-                              builder: (context, child, model) {
-                            return Text(
-                              nameDisplay(model, context),
-                              softWrap: true,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .body1
-                                  .apply(color: Theme.of(context).iconTheme.color),
-                              textAlign: TextAlign.center,
-                            );
-                          }),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        IconButton(
-                          icon: Icon(Icons.settings, color: Theme.of(context).iconTheme.color),
-                          onPressed: () => profileOrLogin(context),
-                        ),
-                      ],
-                    )
-                  ])
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  _buildProfileIcon(context),
+                  _buildName(),
                 ],
               ),
-              decoration: BoxDecoration(color: Theme.of(context).highlightColor)),
+            )
+          ],
         ),
-        ...MyApp.of(context)
-            .appAssets
-            .navItems(context)
-            .map((MenuItem item) => constructDrawerMenuItem(context, item)),
-        Divider(),
-        _buildLogoutListTile(context),
-        _buildContactUsListTile(context),
-        Divider(),
-        _buildLanguageListTile(context),
-      ])),
+      ),
+    );
+  }
+
+  Widget _buildProfileIcon(BuildContext context) {
+    return Stack(alignment: AlignmentDirectional.bottomEnd,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(5),
+            child: Icon(
+              Icons.account_circle,
+              color: Theme.of(context).primaryIconTheme.color,
+              size: Dimensions.profileImageSize,
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(1),
+            decoration: ShapeDecoration(
+                color: Theme.of(context).primaryColor,
+                shape: CircleBorder()
+            ),
+            child:  Icon(Icons.settings, color: Theme.of(context).primaryIconTheme.color),
+          )
+    ]);
+  }
+
+  Flexible _buildName() {
+    return Flexible(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: IconSize.large),
+        child: ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
+          return Text(
+            nameDisplay(model, context),
+            style: Theme.of(context).primaryTextTheme.bodyText1,
+            textAlign: TextAlign.center,
+          );
+        }),
+      ),
     );
   }
 
