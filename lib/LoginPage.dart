@@ -145,6 +145,7 @@ class LoginPageState extends State<LoginPage> {
         child: Text(
           commitSha ?? "",
           style: Theme.of(context).primaryTextTheme.caption,
+          textAlign: TextAlign.center,
         ));
   }
 
