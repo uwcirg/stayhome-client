@@ -68,6 +68,7 @@ class LoginPageState extends State<LoginPage> {
                           child: _buildNotNowButton(context),
                         ),
                         _buildVersionLink(),
+                        _buildCommitShaText(),
                       ],
                     ),
                   ),
@@ -135,6 +136,16 @@ class LoginPageState extends State<LoginPage> {
       padding: const EdgeInsets.only(top: 10),
       child: _buildTextLink(AppConfig.version, WhatInfo.changelogLink),
     );
+  }
+
+  Widget _buildCommitShaText() {
+    String commitSha = AppConfig.commitSha;
+    return Visibility(
+        visible: commitSha != null,
+        child: Text(
+          commitSha ?? "",
+          style: Theme.of(context).primaryTextTheme.caption,
+        ));
   }
 
   Widget _buildWhatLink() {

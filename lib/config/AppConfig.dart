@@ -35,4 +35,6 @@ class AppConfig {
 
   static String get deploymentType => GlobalConfiguration().get("deploymentType")?.toString();
   static bool get isProd => deploymentType != null && deploymentType == "prod";
+
+  static String get commitSha => GlobalConfiguration().get("COMMIT_SHA")?.toString();
 }
