@@ -67,25 +67,25 @@ class MapAppDrawer extends Drawer {
   }
 
   Widget _buildProfileIcon(BuildContext context) {
-    return Stack(alignment: AlignmentDirectional.bottomEnd,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(5),
-            child: Icon(
+    return Padding(
+      padding: const EdgeInsets.all(Dimensions.halfMargin),
+      child: Stack(alignment: AlignmentDirectional.bottomEnd,
+          children: [
+            Icon(
               Icons.account_circle,
               color: Theme.of(context).primaryIconTheme.color,
               size: Dimensions.profileImageSize,
             ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(1),
-            decoration: ShapeDecoration(
-                color: Theme.of(context).primaryColor,
-                shape: CircleBorder()
-            ),
-            child:  Icon(Icons.settings, color: Theme.of(context).primaryIconTheme.color),
-          )
-    ]);
+            Container(
+              padding: const EdgeInsets.all(1),
+              decoration: ShapeDecoration(
+                  color: Theme.of(context).primaryColor,
+                  shape: CircleBorder()
+              ),
+              child:  Icon(Icons.settings, color: Theme.of(context).primaryIconTheme.color),
+            )
+      ]),
+    );
   }
 
   Flexible _buildName() {
