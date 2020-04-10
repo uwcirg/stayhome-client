@@ -90,7 +90,7 @@ class SpringBoardWidget extends StatelessWidget {
     return [
       SpringboardTile(
         assetPath: 'assets/stayhome/Track.png',
-        text: S.of(context).record_symptoms_and_temp,
+        text: S.of(context).springboard_record_symptom_text,
         onPressed: () {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => QuestionnairePage(model.questionnaires[0], model)));
@@ -98,7 +98,7 @@ class SpringBoardWidget extends StatelessWidget {
       ),
       SpringboardTile(
         assetPath: 'assets/stayhome/cdc.png',
-        text: S.of(context).cdc_symptom_checker,
+        text: S.of(context).springboard_cdc_symptom_checker_text,
         onPressed: () {
           Navigator.of(context)
               .push(MaterialPageRoute(builder: (context) => CDCSymptomCheckerInfoPage()));
@@ -106,7 +106,7 @@ class SpringBoardWidget extends StatelessWidget {
       ),
       SpringboardTile(
         assetPath: 'assets/stayhome/Risk.transparent.png',
-        text: "enter exposure or travel",
+        text: S.of(context).springboard_enter_travel_exposure_text,
         onPressed: model.questionnaires.length > 1
             ? () {
                 Navigator.of(context).push(MaterialPageRoute(
@@ -118,7 +118,7 @@ class SpringBoardWidget extends StatelessWidget {
         assetPath: model.questionnaires.length > 2
             ? 'assets/stayhome/Testing.transparent.png'
             : 'assets/stayhome/Testing.gray.png',
-        text: "record COVID-19 testing",
+        text: S.of(context).springboard_record_COVID19_text,
         onPressed: model.questionnaires.length > 2
             ? () {
                 Navigator.of(context).push(MaterialPageRoute(
@@ -128,22 +128,22 @@ class SpringBoardWidget extends StatelessWidget {
       ),
       SpringboardTile(
         assetPath: 'assets/stayhome/Resource.png',
-        text: "COVID-19 information & resources",
+        text: S.of(context).springboard_COVID19_resources_text,
         onPressed: () => launchResourceUrl(model),
       ),
       SpringboardTile(
         assetPath: 'assets/stayhome/Pregnant.gray.png',
-        text: "enter pregnancy status",
+        text: S.of(context).springboard_enter_pregnancy_text,
         onPressed: null,
       ),
       SpringboardTile(
         assetPath: 'assets/stayhome/profile_icon.png',
-        text: "update profile & permissions",
+        text: S.of(context).springboard_update_profile_text,
         onPressed: () => MapAppDrawer.navigate(context, "/profile"),
       ),
       SpringboardTile(
         assetPath: 'assets/stayhome/Trend.png',
-        text: "review calendar & history",
+        text: S.of(context).springboard_review_calendar_history_text,
         onPressed: () => MapAppDrawer.navigate(context, "/progress_insights"),
       ),
     ];

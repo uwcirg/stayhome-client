@@ -7,6 +7,7 @@ import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/PlanPage.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
+import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/map_app_widgets.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:map_app_flutter/trends_charts.dart';
@@ -32,7 +33,7 @@ class _ProgressInsightsPageState extends State<ProgressInsightsPage> {
         _calendarTabView(),
         _chartTabView(),
         _listTabView(),
-      ], tabPageTitles: ["Calendar","My Trends", "History"]),
+      ], tabPageTitles: [S.of(context).calendar,S.of(context).my_trends, S.of(context).history]),
     );
   }
 
@@ -105,7 +106,7 @@ class _ProgressInsightsPageState extends State<ProgressInsightsPage> {
             onChanged: (String selectedLinkId) =>
                 setState(() => this._selectedLinkId = selectedLinkId),
             value: this._selectedLinkId,
-            hint: Text("Select a question to see trends"),
+            hint: Text(S.of(context).select_trend_text),
           ),
         ),
         Visibility(
@@ -139,7 +140,7 @@ class _StayHomeTrendsPageState extends _ProgressInsightsPageState {
         child: ListView.builder(
       itemBuilder: (context, i) {
         if (i >= _maxChartsToShow) {
-          return Text("There are more charts which aren't shown.");
+          return Text(S.of(context).more_charts_text);
         }
         return ChartWidget(questionChoices[i].linkId, model);
       },

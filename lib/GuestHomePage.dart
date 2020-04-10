@@ -43,11 +43,11 @@ class GuestHomePage extends StatelessWidget {
                 padding: const EdgeInsets.only(top: Dimensions.fullMargin),
                 child: Wrap(children: <Widget>[
                   _button(context,
-                      title: "back to login/register",
+                      title: S.of(context).back_to_login_register,
                       onPressed: () => MyApp.of(context).logout(context: context)),
                   ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
                     return _button(context,
-                        title: "continue to resources", onPressed: () => launchResourceUrl(model));
+                        title: S.of(context).continue_to_resources, onPressed: () => launchResourceUrl(model));
                   }),
                 ]),
               ),

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
+import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/map_app_widgets.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 
@@ -39,7 +40,7 @@ class HistoryLineListingWidget extends StatelessWidget {
             Text(
               response.authored != null
                   ? DateFormat.yMd().add_jm().format(response.authored)
-                  : "No date",
+                  : S.of(context).no_date,
               style: Theme.of(context).textTheme.caption,
             ),
             Text(model.questionnaireForResponse(response).title)
@@ -49,7 +50,7 @@ class HistoryLineListingWidget extends StatelessWidget {
                 ?.map((QuestionnaireResponseItem responseItem) =>
                     _buildQuestionnaireResponseItemView(context, responseItem))
                 ?.toList() ??
-            [NoDataWidget(text: "No data")],
+            [NoDataWidget(text: S.of(context).no_data)],
       ),
     );
   }
