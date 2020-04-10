@@ -91,7 +91,7 @@ class StayHomeHelpPage extends HelpPage {
                           ],
                         );
                       }),
-                  child: Text("${S.of(context).review} ${S.of(context).terms_of_use_title}")),
+                  child: Text("${S.of(context).review_terms_of_use_title}")),
             ),
             Text(S.of(context).versionString(AppConfig.version)),
           ]),
