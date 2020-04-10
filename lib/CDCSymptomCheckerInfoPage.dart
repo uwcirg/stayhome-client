@@ -17,7 +17,7 @@ class CDCSymptomCheckerInfoPage extends StatelessWidget {
       child: _buildScreen(context),
       showDrawer: false,
       showStandardAppBarActions: false,
-      title: "CDC Symptom Self-Checker",
+      title: S.of(context).cdc_symptom_checker_title_text,
     );
   }
 
@@ -48,7 +48,7 @@ class CDCSymptomCheckerInfoPage extends StatelessWidget {
                       primary: false, title: "back", onPressed: () => Navigator.of(context).pop()),
                   ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
                     return _button(context,
-                        title: "continue to CDC.gov",
+                        title: S.of(context).cdc_symptom_checker_continue_text,
                         onPressed: () => PlatformDefs()
                             .launchUrl(WhatInfo.cdcSymptomSelfCheckerLink, newTab: true));
                   }),

@@ -105,14 +105,14 @@ class MapAppDrawer extends Drawer {
 
   Widget _buildLogoutListTile(BuildContext context) {
     return ListTile(
-        title: Text(MyApp.of(context).auth.isLoggedIn ? "Logout" : "Back to login"),
+        title: Text(MyApp.of(context).auth.isLoggedIn ? S.of(context).logout : S.of(context).back_to_login),
         leading: Icon(MdiIcons.logout),
         onTap: () => MyApp.of(context).logout(context: context));
   }
 
   Widget _buildContactUsListTile(BuildContext context) {
     return ListTile(
-        title: Text("Contact us/submit feedback"),
+        title: Text(S.of(context).contact_us),
         leading: Icon(Icons.feedback),
         onTap: () => PlatformDefs().launchUrl(WhatInfo.contactLink, newTab: true));
   }
