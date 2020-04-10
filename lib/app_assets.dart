@@ -180,7 +180,7 @@ class StayHomeAppAssets extends AppAssets {
     return Center(
         child: Text(
       this.appName,
-      style: Theme.of(context).textTheme.title,
+      style: Theme.of(context).primaryTextTheme.headline6.apply(fontWeightDelta: 2),
     ));
   }
 

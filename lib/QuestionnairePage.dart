@@ -6,7 +6,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
@@ -346,25 +345,23 @@ class QuestionWidgetState extends State<QuestionWidget> {
         ),
       ),
       onTap: () {
-        DatePicker.showDatePicker(context,
-            showTitleActions: true,
-            minTime: DateTime(2019, 1, 1),
-            maxTime: new DateTime.now(),
-            theme: DatePickerTheme(
-                itemStyle: TextStyle(color: Theme.of(context).primaryColor),
-                doneStyle: TextStyle(color: Theme.of(context).primaryColor)),
-            onConfirm: (pickerdate) {
+        showDatePicker(
+          context: context,
+          initialDate: _response.getAnswer(questionnaireItem.linkId)?.valueDate??new DateTime.now(),
+          firstDate: DateTime(2019, 1, 1),
+          lastDate: new DateTime.now(),
+          locale: Locale(Localizations.localeOf(context).languageCode, '')
+        )
+        .then((DateTime pickerdate) {
+            if (pickerdate != null) {
               final String formattedDate = DateFormat.yMd().format(pickerdate);
               DateTime date = DateFormat.yMd().parse(formattedDate.toString());
               widget.dateCtrl.text = formattedDate;
               setState(() {
                 _response.setAnswer(questionnaireItem.linkId, Answer(valueDate: date));
               });
-            },
-            currentTime: _response.getAnswer(questionnaireItem.linkId)?.valueDate,
-            locale: Localizations.localeOf(context).languageCode == 'de'
-                ? LocaleType.de
-                : LocaleType.en);
+            }
+        });
       },
     );
   }
