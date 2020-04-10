@@ -426,9 +426,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
           } else {
             if (!isValidTempF(result) && !isValidTempC(result)) {
               result = null;
-              message = "${S.of(context).enter_value_between_text} ${QuestionnaireConstants.minF} ${S.of(context).and} "
-                  "${QuestionnaireConstants.maxF} (°F) ${S.of(context).or} ${QuestionnaireConstants.minC} ${S.of(context).and} "
-                  "${QuestionnaireConstants.maxC} (°C). ${S.of(context).value_not_saved_text}";
+              message = S.of(context).temperatureErrorMessage(QuestionnaireConstants.minF, QuestionnaireConstants.maxF, QuestionnaireConstants.minC, QuestionnaireConstants.maxC);
             } else {
               // restrict to 2 decimals
               if (!isValidTempF(result)) result = double.parse(cToF(result).toStringAsFixed(2));
