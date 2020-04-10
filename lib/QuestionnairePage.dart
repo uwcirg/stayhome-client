@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
+import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:map_app_flutter/platform_stub.dart';
@@ -77,22 +78,22 @@ class QuestionnairePageState extends State<QuestionnairePage> {
     return (await showDialog(
           context: context,
           builder: (context) => new AlertDialog(
-            title: new Text("You have unsaved responses"),
-            content: new Text('What do you want to do?'),
+            title: new Text(S.of(context).un_saved_alert_text),
+            content: new Text(S.of(context).what_do_you_want_to_do),
             actions: <Widget>[
               new FlatButton(
                 onPressed: () {
                   Navigator.of(context).pop(false); //dismiss dialog with result
                   _onCancelPressed();
                 },
-                child: new Text('discard'),
+                child: new Text(S.of(context).discard),
               ),
               new FlatButton(
                 onPressed: () {
                   Navigator.of(context).pop(false); //dismiss dialog with result
                   _onDonePressed();
                 },
-                child: new Text('save'),
+                child: new Text(S.of(context).save),
               ),
             ],
           ),
@@ -191,12 +192,12 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
             children: <Widget>[
               OutlineButton(
                 padding: MapAppPadding.largeButtonPadding,
-                child: Text("cancel"),
+                child: Text(S.of(context).cancel),
                 onPressed: _onCancelPressed,
               ),
               RaisedButton(
                 padding: MapAppPadding.largeButtonPadding,
-                child: Text("save", style: Theme.of(context).textTheme.button),
+                child: Text(S.of(context).save, style: Theme.of(context).textTheme.button),
                 onPressed: _onDonePressed,
               ),
             ],
@@ -404,7 +405,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
     return TextFormField(
       initialValue: currentEntry ?? "",
       decoration:
-          InputDecoration(hintText: "Enter body temperature, in either °F or °C", errorMaxLines: 3),
+          InputDecoration(hintText: S.of(context).enter_temperature_text, errorMaxLines: 3),
 //      inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
 //      keyboardType: TextInputType.numberWithOptions(decimal: true),
       onChanged: (value) {
@@ -421,13 +422,11 @@ class QuestionWidgetState extends State<QuestionWidget> {
         } else {
           result = double.tryParse(value);
           if (result == null) {
-            message = "Please enter a valid decimal";
+            message = S.of(context).decline_to_state;
           } else {
             if (!isValidTempF(result) && !isValidTempC(result)) {
               result = null;
-              message = "Enter a value between ${QuestionnaireConstants.minF} and "
-                  "${QuestionnaireConstants.maxF} (°F) or ${QuestionnaireConstants.minC} and "
-                  "${QuestionnaireConstants.maxC} (°C). This value will not be saved.";
+              message = S.of(context).temperatureErrorMessage(QuestionnaireConstants.minF, QuestionnaireConstants.maxF, QuestionnaireConstants.minC, QuestionnaireConstants.maxC);
             } else {
               // restrict to 2 decimals
               if (!isValidTempF(result)) result = double.parse(cToF(result).toStringAsFixed(2));

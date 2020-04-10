@@ -8,6 +8,7 @@ import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/QuestionnairePage.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/map_app_widgets.dart';
+import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -28,7 +29,7 @@ abstract class _PlanPageState extends State<PlanPage> {
   @override
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
-        title: "Calendar",
+        title: S.of(context).calendar,
         child: Expanded(
             child: ListView.builder(
           itemBuilder: (context, i) {
@@ -463,7 +464,7 @@ class _StayHomePlanPageState extends _PlanPageState {
   TreatmentCalendarWidget _buildTreatmentCalendarWidget(CarePlanModel model) {
     return StayHomeTreatmentCalendarWidget(model);
   }
-
+  
   Future<String> _showChangeDialogForActivity(
       BuildContext context, CarePlanModel model, int activityIndex) async {
     Activity activity = model.carePlan.activity[activityIndex];

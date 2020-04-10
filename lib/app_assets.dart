@@ -132,7 +132,7 @@ class StayHomeAppAssets extends AppAssets {
     return Padding(
       padding:
           EdgeInsets.only(left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, top: 10),
-      child: Text('Support during COVID-19',
+      child: Text(S.of(context).support_COVID19,
           style: Theme.of(context).primaryTextTheme.headline5.apply(color: Colors.white)),
     );
   }
@@ -209,19 +209,19 @@ class StayHomeAppAssets extends AppAssets {
     return [
       MenuItem(
         requiresLogin: true,
-        title: "Home",
+        title: S.of(context).home,
         icon: Icon(Icons.home),
         route: '/home',
       ),
       MenuItem(
         requiresLogin: true,
-        title: "Calendar & History",
+        title: S.of(context).calender_history,
         icon: Icon(Icons.show_chart),
         route: '/progress_insights',
       ),
       MenuItem(
         requiresLogin: true,
-        title: "Communications",
+        title: S.of(context).communications,
         icon: Icon(Icons.chat_bubble),
         route: '/communications',
       ),
@@ -254,7 +254,7 @@ class StayHomeAppAssets extends AppAssets {
 
   @override
   String learningCenterPageTitle(BuildContext context) {
-    return "Information & Resources";
+    return S.of(context).info_resource;
   }
 }
 
