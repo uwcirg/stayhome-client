@@ -45,6 +45,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "loading_error_log_in_again" : MessageLookupByLibrary.simpleMessage("Loading error. Try logging out and in again."),
     "login" : MessageLookupByLibrary.simpleMessage("login / register"),
     "name_not_entered" : MessageLookupByLibrary.simpleMessage("(name not entered)"),
+    "no_content" : MessageLookupByLibrary.simpleMessage("<no content>"),
     "not_now" : MessageLookupByLibrary.simpleMessage("continue without logging in"),
     "profile" : MessageLookupByLibrary.simpleMessage("Profile"),
     "profile_contact_info_help_text" : MessageLookupByLibrary.simpleMessage("If you provide your email, phone, or both, then we can make that info available to the public health agency responsible for your area, and we or they can contact you if needed. You will only be contacted if there is a specific reason to do so, one that we or the public health agency(s) believe to be in your best interest.\n\nIf you chose to set up your account with a fake email, you may provide us with a real one here, so we may contact you. But, doing so will not change your username. Likewise, if you used one email as a username when setting up your account, but would prefer a different email as your contact email, you can enter it here, but it will not change your username."),

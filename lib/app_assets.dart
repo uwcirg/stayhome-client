@@ -55,6 +55,7 @@ abstract class AppAssets {
     return textTheme;
   }
 
+  Widget topLogos(BuildContext context);
   Widget loginBanner(BuildContext context);
 
   Widget drawerBanner(BuildContext context);
@@ -94,23 +95,21 @@ class StayHomeAppAssets extends AppAssets {
             careplanTemplateRef: "CarePlan/${AppConfig.careplanTemplateId}");
 
   @override
+  Widget topLogos(BuildContext context) {
+    return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [_buildCirgLogo(), _buildUWLogo()]);
+  }
+
+  @override
   Widget loginBanner(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [_buildCirgLogo(), _buildUWLogo()]),
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              _buildAppLogo(),
-              _buildAppName(context),
-              _buildSlogan(context),
-            ],
-          ),
-        ),
+        _buildAppLogo(),
+        _buildAppName(context),
+        _buildSlogan(context),
       ],
     );
   }
