@@ -30,8 +30,8 @@ class MapAppDrawer extends Drawer {
                 .navItems(context)
                 .map((MenuItem item) => constructDrawerMenuItem(context, item)),
             Divider(),
-            _buildLogoutListTile(context),
             _buildContactUsListTile(context),
+            _buildLogoutListTile(context),
             Divider(),
             _buildLanguageListTile(context),
           ],
