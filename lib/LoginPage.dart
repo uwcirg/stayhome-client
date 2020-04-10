@@ -165,9 +165,16 @@ class LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildVersionLink() {
+    String commitSha = AppConfig.commitSha;
+    if (commitSha != null && commitSha.length > 8) {
+      commitSha = commitSha.substring(0, 8);
+    }
+    String versionString = AppConfig.version;
+    if (commitSha != null && !AppConfig.isProd) versionString += ' / $commitSha';
+
     return Padding(
       padding: const EdgeInsets.only(top: 10),
-      child: _buildTextLink(AppConfig.version, WhatInfo.changelogLink),
+      child: _buildTextLink(versionString, WhatInfo.changelogLink),
     );
   }
 
