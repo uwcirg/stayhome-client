@@ -12,6 +12,7 @@ import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/ProfilePage.dart';
 import 'package:map_app_flutter/QuestionnairePage.dart';
 import 'package:map_app_flutter/const.dart';
+import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
 import 'package:map_app_flutter/map_app_widgets.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
@@ -89,7 +90,7 @@ class SpringBoardWidget extends StatelessWidget {
     return [
       SpringboardTile(
         assetPath: 'assets/stayhome/Track.png',
-        text: "record symptoms & temp",
+        text: S.of(context).record_symptoms_and_temp,
         onPressed: () {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => QuestionnairePage(model.questionnaires[0], model)));
@@ -97,7 +98,7 @@ class SpringBoardWidget extends StatelessWidget {
       ),
       SpringboardTile(
         assetPath: 'assets/stayhome/cdc.png',
-        text: "CDC symptom self-checker",
+        text: S.of(context).cdc_symptom_checker,
         onPressed: () {
           Navigator.of(context)
               .push(MaterialPageRoute(builder: (context) => CDCSymptomCheckerInfoPage()));

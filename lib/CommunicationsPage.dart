@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
+import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/map_app_widgets.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -23,7 +24,7 @@ class CommunicationsPage extends StatelessWidget {
         },
         rebuildOnChange: true,
       ),
-      title: "Communications",
+      title: S.of(context).communications,
     );
   }
 
@@ -38,7 +39,7 @@ class CommunicationsPage extends StatelessWidget {
           data: Theme.of(context).copyWith(accentColor: Theme.of(context).primaryColor),
           child: ExpansionTile(
             initiallyExpanded: true,
-            title: Text(i == 0 ? "Active" : "Completed"),
+            title: Text(i == 0 ? S.of(context).active : S.of(context).completed),
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(
@@ -95,12 +96,12 @@ class NotificationsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (communications == null || communications.isEmpty) {
-      return NoDataWidget(text: "Nothing here");
+      return NoDataWidget(text: S.of(context).nothing_here);
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: communications.map((Communication c) {
-        String text = c.payload[0]?.contentString ?? "<no content>";
+        String text = c.payload[0]?.contentString ?? S.of(context).no_content;
         return Card(
           color: _colorForPriority(c.priority),
           child: Padding(
@@ -111,7 +112,7 @@ class NotificationsWidget extends StatelessWidget {
                 Text(
                   c.sent != null
                       ? "${DateFormat.MEd().format(c.sent)} ${DateFormat.jm().format(c.sent)}"
-                      : "No date",
+                      : S.of(context).no_date,
                   style: Theme.of(context).textTheme.caption,
                 ),
                 Text(text),
@@ -120,7 +121,7 @@ class NotificationsWidget extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
-                      OutlineButton(child: Text("Dismiss"), onPressed: () => onButtonPress(c)),
+                      OutlineButton(child: Text(S.of(context).dismiss), onPressed: () => onButtonPress(c)),
                     ],
                   ),
                 )
