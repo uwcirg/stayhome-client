@@ -104,6 +104,7 @@
   "springboard_review_calendar_history_text": "review calendar & history",
   "loading_error_log_in_again": "Loading error. Try logging out and in again.",
   "form_error_text": "Form has errors. Please scroll up and fix your entries.",
+  "enter_temperature_text": "Enter body temperature, in either °F or °C",
   "temperatureErrorMessage": "Enter a value between {minF} and {maxF} (°F) or {minC} and {maxC} (°C). This value will not be saved.",
   "decimal_validation_text": "Please enter a valid decimal",
   "welcome": "Thank you and welcome",
