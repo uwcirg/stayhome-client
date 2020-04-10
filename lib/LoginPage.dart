@@ -67,8 +67,7 @@ class LoginPageState extends State<LoginPage> {
                           padding: const EdgeInsets.only(top: 12),
                           child: _buildNotNowButton(context),
                         ),
-                        _buildVersionLink(),
-                        _buildCommitShaText(),
+                        _buildVersionLink()
                       ],
                     ),
                   ),
@@ -132,21 +131,17 @@ class LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildVersionLink() {
+    String commitSha = AppConfig.commitSha;
+    if (commitSha != null && commitSha.length > 8) {
+      commitSha = commitSha.substring(0, 8);
+    }
+    String versionString = AppConfig.version;
+    if (commitSha != null && !AppConfig.isProd) versionString += ' / $commitSha';
+
     return Padding(
       padding: const EdgeInsets.only(top: 10),
-      child: _buildTextLink(AppConfig.version, WhatInfo.changelogLink),
+      child: _buildTextLink(versionString, WhatInfo.changelogLink),
     );
-  }
-
-  Widget _buildCommitShaText() {
-    String commitSha = AppConfig.commitSha;
-    return Visibility(
-        visible: commitSha != null && !AppConfig.isProd,
-        child: Text(
-          commitSha ?? "",
-          style: Theme.of(context).primaryTextTheme.caption,
-          textAlign: TextAlign.center,
-        ));
   }
 
   Widget _buildWhatLink() {
