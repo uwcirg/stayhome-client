@@ -1606,12 +1606,6 @@ class Coding implements ChoiceOption {
   int get hashCode => system.hashCode ^ code.hashCode;
 }
 
-class CommunicationCategory extends Coding {
-  CommunicationCategory._(String system, String code) : super(system: system, code: code);
-  static CommunicationCategory systemAnnouncement = CommunicationCategory._(
-      "https://stayhome.app/CodeSystem/communication-category", "system-announcement");
-}
-
 class Extension {
   Address valueAddress;
 
