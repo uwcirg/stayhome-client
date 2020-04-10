@@ -6,6 +6,7 @@ import 'dart:io' show HttpHeaders;
 
 import 'package:http/http.dart' show get;
 import 'package:map_app_flutter/fhir/FhirResources.dart';
+import 'package:map_app_flutter/map_app_code_system.dart';
 import 'package:simple_auth/simple_auth.dart' show HttpMethod, OAuthApi, Request, Response;
 
 class Repository {
@@ -271,6 +272,28 @@ class Repository {
     return responses;
   }
 
+  static Future<Communication> getSystemAnnouncement(OAuthApi api) async {
+    var url = "$fhirBaseUrl/Communication";
+    var request = new Request(HttpMethod.Get, url,
+        parameters: {
+          "status": "in-progress",
+          "category": CommunicationCategory.systemAnnouncement.identifierString(),
+          "_sort": "-sent",
+          "_count": 1,
+        },
+        headers: _defaultHeaders(),
+        authenticated: false);
+
+    var response = await api.send<String>(request);
+    var searchResultBundle = jsonDecode(response.body);
+    if (searchResultBundle['total'] == 0) {
+      return null;
+    }
+    Communication announcement = Communication.fromJson(searchResultBundle['entry'][0]['resource']);
+    print("Loaded system announcement ${announcement.reference}");
+    return announcement;
+  }
+
   /// reference should be of format CarePlan/123
   static Future<CarePlan> loadCarePlan(String reference, OAuthApi api, {bool authenticated=true}) async {
     var url = "$fhirBaseUrl/$reference";
@@ -302,16 +325,6 @@ class Repository {
     }
   }
 
-//  /// reference should be of format Communication/123
-//  static Future<Communication> loadCommunication(String reference, String authToken) async {
-//    var url = "$fhirBaseUrl/$reference";
-//    var response = await get(url, headers: _defaultHeaders(authToken));
-//    if (response.statusCode == 200) {
-//      return Communication.fromJson(jsonDecode(response.body));
-//    } else {
-//      print("Status code: ${response.statusCode} ${response.reasonPhrase}");
-//      return Future.error("Could not load communication");
-//    }
 //  }
 
   static Future<String> postResource(Resource resource, OAuthApi api) async {

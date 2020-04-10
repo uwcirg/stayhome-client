@@ -1088,6 +1088,15 @@ class S {
       args: [],
     );
   }
+
+  String get no_content {
+    return Intl.message(
+      '<no content>',
+      name: 'no_content',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

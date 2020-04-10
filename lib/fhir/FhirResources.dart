@@ -2,6 +2,7 @@
  * Copyright (c) 2020 CIRG. All rights reserved.
  */
 import 'package:intl/intl.dart';
+import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/services/Repository.dart';
 import "package:simple_auth/simple_auth.dart" show JsonSerializable;
 
@@ -138,6 +139,10 @@ class Communication extends Resource implements JsonSerializable {
       });
     }
     if (json['sent'] != null) sent = DateTime.parse(json['sent']);
+  }
+
+  String displayText(context) {
+    return payload[0]?.contentString ?? S.of(context).no_content;
   }
 
   Map<String, dynamic> toJson() {
@@ -1568,9 +1573,12 @@ class Coding implements ChoiceOption {
 
   Coding({this.system, this.code, this.display});
 
+
   @override
-  String toString() {
-    return display;
+  String toString() => display;
+
+  String identifierString() {
+    return "$system|$code";
   }
 
   Coding.fromJson(Map<String, dynamic> json) {
@@ -1798,10 +1806,12 @@ class QuestionnaireItem {
   SupportLink get supportLink {
     String supportLinkExtName = "http://hl7.org/fhir/StructureDefinition/questionnaire-supportLink";
     // find the first sub item that has a supportLink type extension
-    QuestionnaireItem supportLinkSubItem = item?.firstWhere((QuestionnaireItem subItem) =>
-        subItem.extension != null &&
-        subItem.extension.any(
-            (Extension extension) => extension.url != null && extension.url == supportLinkExtName), orElse: ()=>null);
+    QuestionnaireItem supportLinkSubItem = item?.firstWhere(
+        (QuestionnaireItem subItem) =>
+            subItem.extension != null &&
+            subItem.extension.any((Extension extension) =>
+                extension.url != null && extension.url == supportLinkExtName),
+        orElse: () => null);
     if (supportLinkSubItem == null) return null;
     // find the supportLink extension value
     Extension supportLinkExt = supportLinkSubItem.extension.firstWhere(

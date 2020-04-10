@@ -5,11 +5,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:map_app_flutter/config/AppConfig.dart';
 import 'package:map_app_flutter/const.dart';
+import 'package:map_app_flutter/fhir/FhirResources.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
 import 'package:map_app_flutter/platform_stub.dart';
+import 'package:map_app_flutter/services/Repository.dart';
 import 'package:simple_auth_flutter/simple_auth_flutter.dart';
 
 class LoginPage extends StatefulWidget {
@@ -19,11 +22,22 @@ class LoginPage extends StatefulWidget {
 
 class LoginPageState extends State<LoginPage> {
   var _deferredPrompt;
+  Communication _systemAnnouncement;
 
   @override
   void initState() {
     super.initState();
     SimpleAuthFlutter.init(context);
+    Repository.getSystemAnnouncement(MyApp.of(context).auth.api).then((Communication c) {
+      setState(() {
+        _systemAnnouncement = c;
+      });
+    }).catchError((error) {
+      print("Loading system announcement failed: $error");
+      setState(() {
+        snack("Error loading system announcement", context);
+      });
+    });
   }
 
   @override
@@ -53,7 +67,14 @@ class LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   _buildAddToHomeScreenButton(),
-                  Expanded(child: MyApp.of(context).appAssets.loginBanner(context)),
+                  MyApp.of(context).appAssets.topLogos(context),
+                  Expanded(
+                    child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                      MyApp.of(context).appAssets.loginBanner(context),
+                      _buildSystemAnnouncement(context),
+                    ]),
+                  ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: buttonContainerInsets),
                     child: Column(
@@ -67,7 +88,7 @@ class LoginPageState extends State<LoginPage> {
                           padding: const EdgeInsets.only(top: 12),
                           child: _buildNotNowButton(context),
                         ),
-                        _buildVersionLink()
+                        _buildVersionLink(),
                       ],
                     ),
                   ),
@@ -96,6 +117,19 @@ class LoginPageState extends State<LoginPage> {
       visible: MyApp.of(context).auth.refreshTokenExpired,
       child: Text(S.of(context).session_expired_please_log_in_again),
     );
+  }
+
+  Widget _buildSystemAnnouncement(BuildContext context) {
+    if (_systemAnnouncement == null) return Container();
+    return Column(children: [
+            Text("System Announcement ${DateFormat.yMd().format(_systemAnnouncement.sent)}",
+                style: Theme.of(context).primaryTextTheme.caption),
+            Text(
+              _systemAnnouncement.displayText(context),
+              style: Theme.of(context).primaryTextTheme.bodyText1,
+              textAlign: TextAlign.center,
+            )
+          ]);
   }
 
   Widget _buildLoginButton(BuildContext context) {
@@ -131,16 +165,9 @@ class LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildVersionLink() {
-    String commitSha = AppConfig.commitSha;
-    if (commitSha != null && commitSha.length > 8) {
-      commitSha = commitSha.substring(0, 8);
-    }
-    String versionString = AppConfig.version;
-    if (commitSha != null && !AppConfig.isProd) versionString += ' / $commitSha';
-
     return Padding(
       padding: const EdgeInsets.only(top: 10),
-      child: _buildTextLink(versionString, WhatInfo.changelogLink),
+      child: _buildTextLink(AppConfig.version, WhatInfo.changelogLink),
     );
   }
 
