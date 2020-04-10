@@ -298,7 +298,6 @@ class ProfileWidgetState extends State<ProfileWidget> {
                             icon: Icon(Icons.cake),
                             hintText: S.of(context).birthdate_hint_text,
                             labelText: S.of(context).birthdate),
-                        //initialValue: birthDate != null ? DateFormat.yMd().format(birthDate) : "",
                       ),
                     ),
                     onTap:() {

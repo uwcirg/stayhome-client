@@ -45,7 +45,7 @@ class CDCSymptomCheckerInfoPage extends StatelessWidget {
                 padding: const EdgeInsets.only(top: Dimensions.fullMargin),
                 child: Wrap(alignment: WrapAlignment.center, children: <Widget>[
                   _button(context,
-                      primary: false, title: "back", onPressed: () => Navigator.of(context).pop()),
+                      primary: false, title: S.of(context).back, onPressed: () => Navigator.of(context).pop()),
                   ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
                     return _button(context,
                         title: S.of(context).cdc_symptom_checker_continue_text,
