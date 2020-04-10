@@ -73,7 +73,7 @@ class CreateProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
-      title: S.of(context).profile_create_text,
+      title: "Create profile",
       showDrawer: false,
       child: Expanded(
         child: ListView.builder(
@@ -133,14 +133,14 @@ class ProfileWidgetState extends State<ProfileWidget> {
       if (widget.popWhenDone) {
         Navigator.of(context).pop();
       } else {
-        snack(S.of(context).profile_updated_text, context);
+        snack("Profile updates saved", context);
         MapAppDrawer.navigate(context, '/home');
       }
     }).catchError((error) {
       setState(() {
-        _formError = S.of(context).profile_updated_text;
+        _formError = "There has been an error while saving profile updates. Please try again.";
       });
-      snack(S.of(context).profile_save_error_text, context);
+      snack("Error saving profile updates", context);
     });
   }
 
@@ -173,19 +173,19 @@ class ProfileWidgetState extends State<ProfileWidget> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                _buildSectionHeader(S.of(context).profile_location_title_text),
-                _buildCollapsibleInfoTile(S.of(context).profile_info_prompt_text, S.of(context).profile_location_help_text),
+                _buildSectionHeader("Location"),
+                _buildCollapsibleInfoTile("Click to learn how Location information is used", S.of(context).profile_location_help_text),
                 TextFormField(
                   decoration: InputDecoration(
                       icon: Icon(Icons.contact_mail),
-                      hintText: S.of(context).profile_zipcode_hint_text,
-                      labelText: S.of(context).profile_home_zipcode_label_text),
+                      hintText: "Where you spend most of your time",
+                      labelText: "Home zip code"),
                   initialValue: homeZip,
                   autovalidate: true,
                   validator: (value) {
                     // empty zip code is allowed
                     if (value.isNotEmpty && !isValid("zip", value)) {
-                      return S.of(context).profile_zipcode_validation_error_text;
+                      return "Leave blank or enter a valid zip code";
                     }
                     homeZip = value;
                     return null;
@@ -195,14 +195,14 @@ class ProfileWidgetState extends State<ProfileWidget> {
                   decoration: InputDecoration(
                       icon: Icon(null),
                       hintText:
-                          S.of(context).profile_secondary_zipcode_hint_text,
-                      labelText: S.of(context).profile_secondary_zipcode_label_text),
+                          "if you spend a lot of time in a different location (work, school, family, etc.)",
+                      labelText: "Second zip code"),
                   initialValue: secondZip,
                   autovalidate: true,
                   validator: (value) {
                     // empty zip code is allowed
                     if (value.isNotEmpty && !isValid("zip", value)) {
-                      return S.of(context).profile_zipcode_validation_error_text;
+                      return "Leave blank or enter a valid zip code";
                     }
                     secondZip = value;
                     return null;
@@ -219,8 +219,8 @@ class ProfileWidgetState extends State<ProfileWidget> {
                   child: Container(),
                 ),
                 Divider(),
-                _buildSectionHeader(S.of(context).profile_contact_title_text),
-                _buildCollapsibleInfoTile(S.of(context).profile_contact_info_prompt_text, S.of(context).profile_contact_info_help_text),
+                _buildSectionHeader("Contact Information"),
+                _buildCollapsibleInfoTile("Click to learn how Contact Information is used", S.of(context).profile_contact_info_help_text),
                 TextFormField(
                   decoration: InputDecoration(
                       icon: Icon(Icons.email),
@@ -231,7 +231,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
                   validator: (value) {
                     // empty email is allowed
                     if (value.isNotEmpty && !isValid("email", value)) {
-                      return S.of(context).profile_email_validation_error_text;
+                      return "Leave blank or enter a valid email address";
                     }
                     email = value;
                     return null;
@@ -240,36 +240,36 @@ class ProfileWidgetState extends State<ProfileWidget> {
                 TextFormField(
                   decoration: InputDecoration(
                       icon: Icon(Icons.phone),
-                      hintText: S.of(context).profile_phone_hint_text,
-                      labelText: S.of(context).profile_phone_label_text),
+                      hintText: "What is your phone number?",
+                      labelText: "Cell/mobile Phone"),
                   initialValue: phone,
                   autovalidate: true,
                   validator: (value) {
                     // empty phone is allowed
                     if (value.isNotEmpty && !isValid("phone", value)) {
-                      return S.of(context).profile_phone_validation_error_text;
+                      return "Leave blank or enter a valid phone number";
                     }
                     phone = value;
                     return null;
                   },
                 ),
                 RadioButtonFormField(
-                    S.of(context).profile_preferred_contact_text,
+                    "Preferred contact method",
                     [ContactPointSystem.email, ContactPointSystem.sms, ContactPointSystem.phone],
                     preferredContactMethod, (value) {
                   preferredContactMethod = value;
                 }, displayOverrides: {
-                  ContactPointSystem.phone: S.of(context).profile_preferred_contact_voicecall_text,
-                  ContactPointSystem.sms: S.of(context).profile_preferred_contact_sms_text
+                  ContactPointSystem.phone: "voice call",
+                  ContactPointSystem.sms: "text"
                 }),
                 Divider(),
-                _buildSectionHeader(S.of(context).profile_about_you_title_text),
-                _buildCollapsibleInfoTile(S.of(context).profile_about_your_info_prompt_text, S.of(context).profile_identifying_info_help_text),
+                _buildSectionHeader("About You"),
+                _buildCollapsibleInfoTile("Click to learn how About You information is used", S.of(context).profile_identifying_info_help_text),
                 TextFormField(
                   decoration: InputDecoration(
                       icon: Icon(Icons.person),
                       hintText: S.of(context).what_is_your_name,
-                      labelText: S.of(context).firstname),
+                      labelText: "First name"),
                   initialValue: firstName,
                   autovalidate: true,
                   validator: (value) {
@@ -281,7 +281,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
                   decoration: InputDecoration(
                       icon: Icon(null),
                       hintText: S.of(context).what_is_your_name,
-                      labelText: S.of(context).lastname),
+                      labelText: "Last name"),
                   initialValue: lastName,
                   autovalidate: true,
                   validator: (value) {
@@ -296,8 +296,8 @@ class ProfileWidgetState extends State<ProfileWidget> {
                         controller: birthDateCtrl,
                         decoration: InputDecoration(
                             icon: Icon(Icons.cake),
-                            hintText: S.of(context).birthdate_hint_text,
-                            labelText: S.of(context).birthdate),
+                            hintText: "Enter date of birth (m/d/y)",
+                            labelText: "Date of birth"),
                         //initialValue: birthDate != null ? DateFormat.yMd().format(birthDate) : "",
                       ),
                     ),
@@ -321,7 +321,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
                 FlatButton(
                   padding: EdgeInsets.symmetric(vertical: Dimensions.fullMargin, horizontal: Dimensions.extraLargeMargin),
                   child: Text(
-                      S.of(context).clear_birthdate_text,
+                      'clear date of birth',
                       style: TextStyle(decoration: TextDecoration.underline)
                   ),
                   onPressed: () {
@@ -330,13 +330,13 @@ class ProfileWidgetState extends State<ProfileWidget> {
                   },
                 ),
                 RadioButtonFormField(
-                  S.of(context).gender,
+                  "Sex",
                   [Gender.female, Gender.male, Gender.other, Gender.unknown],
                   gender,
                   (value) {
                     gender = value;
                   },
-                  displayOverrides: {Gender.unknown: S.of(context).decline_to_state},
+                  displayOverrides: {Gender.unknown: "decline to state"},
                 ),
                 Divider(),
                 Padding(
@@ -352,7 +352,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
                         ),
                         RaisedButton(
                           padding: MapAppPadding.largeButtonPadding,
-                          child: Text(S.of(context).save, style: Theme.of(context).textTheme.button),
+                          child: Text("save", style: Theme.of(context).textTheme.button),
                           onPressed: () {
                             if (_formKey.currentState.validate()) {
                               _onPressed(
@@ -369,7 +369,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
                                   model);
                             } else {
                               setState(() {
-                                _formError = S.of(context).form_error_text;
+                                _formError = "Form has errors. Please scroll up and fix your entries.";
                               });
                             }
                           },

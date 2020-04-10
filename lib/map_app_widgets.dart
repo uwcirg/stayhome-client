@@ -28,8 +28,8 @@ class MapAppErrorMessage extends StatelessWidget {
                                 .mapAppLogin()
                                 .then((value) => MyApp.of(context).dismissLoginScreen(context))
                                 .catchError((error) => snack("$error", context)) : MyApp.of(context).logout(pushLogin: true, context: context);
-    var buttonLabel = MyApp.of(context).auth.isLoggedIn ? null : S.of(context).logout;
-    var message = MyApp.of(context).auth.isLoggedIn ? S.of(context).attempt_login_text: S.of(context).loading_error_log_in_again;
+    var buttonLabel = MyApp.of(context).auth.isLoggedIn ? null : "logout";
+    var message = MyApp.of(context).auth.isLoggedIn ? "Attempt to log in...": S.of(context).loading_error_log_in_again;
     return MapAppErrorMessage(
       message,
       buttonLabel: buttonLabel,
@@ -75,8 +75,8 @@ class MapAppErrorMessage extends StatelessWidget {
 
     if (model.hasNoPatient) {
       return MapAppErrorMessage(
-        S.of(context).no_FHIR_patient_record_text,
-        buttonLabel: S.of(context).create_one,
+        "You do not have a patient record in the FHIR database.",
+        buttonLabel: "create one",
         onButtonPressed: () => Navigator.of(context)
             .push(MaterialPageRoute(builder: (context) => CreateProfilePage())),
       );
@@ -84,7 +84,7 @@ class MapAppErrorMessage extends StatelessWidget {
 
     if (model.hasNoCarePlan) {
       return MapAppErrorMessage(
-        S.of(context).no_active_careplan_text,
+        "You have no active care plan.",
         buttonLabel: S.of(context).add_the_default_careplan_for_me,
         onButtonPressed: () => model.addDefaultCarePlan(),
       );

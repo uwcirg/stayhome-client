@@ -45,21 +45,22 @@ class StayHomeHelpPage extends HelpPage {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SectionTitle(S.of(context).about_stayhome),
-            Text(S.of(context).about_stayhome_info_text),
+            SectionTitle("About StayHome"),
+            Text(
+                "The COVID-19 pandemic is straining existing public health processes and workflows. Many community members may be concerned about developing COVD-19. To meet this need we have developed StayHome, an app to help people who are staying home to minimize any risk they might present to others do things like track their symptoms and temperature, connect with relevant information and resources, and maintain a diary of people with whom they have had contact. We hope the app might also help people and public health connect more easily, when needed, in a situation where public health resources may be stretched thin."),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: Dimensions.fullMargin),
               child: OutlineButton(
                   onPressed: () => PlatformDefs().launchUrl(WhatInfo.link, newTab: true),
-                  child: Text(S.of(context).read_more)),
+                  child: Text("Read More")),
             ),
-            SectionTitle(S.of(context).about_CIRG),
+            SectionTitle("About CIRG"),
             Text(S.of(context).developedByCIRG),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: Dimensions.fullMargin),
               child: OutlineButton(
                   onPressed: () => PlatformDefs().launchUrl(WhatInfo.cirgLink, newTab: true),
-                  child: Text(S.of(context).read_more)),
+                  child: Text("Read More")),
             ),
             Divider(),
             Padding(
@@ -80,13 +81,13 @@ class StayHomeHelpPage extends HelpPage {
                             new OutlineButton(
                               //TODO: This crashes (?) on iOS
                               onPressed: () => Clipboard.setData(new ClipboardData(text: terms))
-                                  .then((value) => snack(S.of(context).copied, context))
+                                  .then((value) => snack("Copied!", context))
                                   .catchError((error) => snack("Copying failed: $e", context)),
-                              child: Text(S.of(context).copy_to_clipboard),
+                              child: Text('copy to clipboard'),
                             ),
                             new OutlineButton(
                               onPressed: () => Navigator.of(context).pop(),
-                              child: new Text(S.of(context).done),
+                              child: new Text('done'),
                             ),
                           ],
                         );
