@@ -132,9 +132,16 @@ class SpringBoardWidget extends StatelessWidget {
         onPressed: () => launchResourceUrl(model),
       ),
       SpringboardTile(
-        assetPath: 'assets/stayhome/Pregnant.gray.png',
+        assetPath: model.questionnaires.length > 3
+        ? 'assets/stayhome/Pregnant.png'
+        : 'assets/stayhome/Pregnant.gray.png',
         text: S.of(context).springboard_enter_pregnancy_text,
-        onPressed: null,
+        onPressed: model.questionnaires.length > 3
+            ? () {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => QuestionnairePage(model.questionnaires[3], model)));
+        }
+            : null,
       ),
       SpringboardTile(
         assetPath: 'assets/stayhome/profile_icon.png',

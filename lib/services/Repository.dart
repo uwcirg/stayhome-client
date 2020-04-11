@@ -22,7 +22,6 @@ class Repository {
     var request = new Request(HttpMethod.Get, patientSearchUrl,
         headers: _defaultHeaders(), parameters: {"identifier": "$system|$identifier"});
     var response = await api.send<String>(request);
-//    var response = await get(patientSearchUrl, headers: _defaultHeaders(authToken));
 
     if (response.statusCode == 200) {
       var searchResultBundle = jsonDecode(response.body);
@@ -60,14 +59,10 @@ class Repository {
       var url = "$fhirBaseUrl/Patient/${patient.id}";
       var request = new Request(HttpMethod.Put, url, body: body, headers: headers);
       response = await api.send<String>(request);
-//      response =
-//      await put(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
     } else {
       var url = "$fhirBaseUrl/Patient";
       var request = new Request(HttpMethod.Post, url, body: body, headers: headers);
       response = await api.send<String>(request);
-//      response =
-//      await post(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
     }
     String result = await resultFromResponse(response, "Saving patient failed");
     return Patient.fromJson(jsonDecode(result));
@@ -101,7 +96,6 @@ class Repository {
     var request = new Request(HttpMethod.Get, url,
         parameters: {"subject": "${patient.reference}"}, headers: _defaultHeaders());
     var response = await api.send<String>(request);
-//    var response = await get(url, headers: _defaultHeaders(authToken));
     var searchResultBundle = jsonDecode(response.body);
     if (searchResultBundle["total"] == 0) {
       return null;
@@ -127,7 +121,6 @@ class Repository {
     var request = new Request(HttpMethod.Get, url,
         parameters: {"based-on": "${carePlan.reference}"}, headers: _defaultHeaders());
     var response = await api.send<String>(request);
-//    var response = await get(url, headers: _defaultHeaders(authToken));
     var searchResultBundle = jsonDecode(response.body);
     List<Procedure> procedures = [];
     if (searchResultBundle['total'] > 0) {
@@ -150,7 +143,6 @@ class Repository {
         },
         headers: _defaultHeaders());
     var response = await api.send<String>(request);
-//    var response = await get(url, headers: _defaultHeaders(authToken));
     var searchResultBundle = jsonDecode(response.body);
     List<QuestionnaireResponse> responses = [];
     if (searchResultBundle['total'] > 0) {
@@ -181,7 +173,6 @@ class Repository {
       var url = "$fhirBaseUrl/${r.reference}";
       var request = new Request(HttpMethod.Get, url, headers: _defaultHeaders(), authenticated: false);
       var response = await api.send<String>(request);
-//      var value = await get(url, headers: _defaultHeaders(authToken));
 
       documentReferences.add(DocumentReference.fromJson(jsonDecode(response.body)));
     });
@@ -202,8 +193,6 @@ class Repository {
     var headers = _defaultHeaders();
     var request = new Request(HttpMethod.Put, url, body: body, headers: headers);
     var response = await api.send<String>(request);
-//    Response value =
-//    await post(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
 
     return resultFromResponse(response, "An error occurred when trying to save your responses. Please try logging in again.");
   }
@@ -226,7 +215,6 @@ class Repository {
     var url = "$fhirBaseUrl/$questionnaireReference";
     var request = new Request(HttpMethod.Get, url, headers: _defaultHeaders());
     var response = await api.send<String>(request);
-//    var value = await get(url, headers: _defaultHeaders(authToken));
 
     var q = Questionnaire.fromJson(jsonDecode(response.body));
     await q.loadValueSets();
@@ -261,7 +249,6 @@ class Repository {
         },
         headers: _defaultHeaders());
     var response = await api.send<String>(request);
-//    var response = await get(url, headers: _defaultHeaders(authToken));
     var searchResultBundle = jsonDecode(response.body);
     List<Communication> responses = [];
     if (searchResultBundle['total'] > 0) {
@@ -314,18 +301,14 @@ class Repository {
     var request = new Request(HttpMethod.Get, url, headers: _defaultHeaders());
     var response = await api.send<String>(request);
 
-//    var response = await get(url, headers: _defaultHeaders(authToken));
     if (response.statusCode == 200) {
-//      return response.body;
       return Communication.fromJson(jsonDecode(response.body));
     } else {
       print('$response');
-//      print("Status code: ${response.statusCode} ${response.reasonPhrase}");
       return Future.error("Could not load communication");
     }
   }
 
-//  }
 
   static Future<String> postResource(Resource resource, OAuthApi api) async {
     var url = "$fhirBaseUrl/${resource.resourceType}";
@@ -333,8 +316,6 @@ class Repository {
     var headers = _defaultHeaders();
     var request = new Request(HttpMethod.Post, url, body: body, headers: headers);
     var response = await api.send<String>(request);
-//    Response response =
-//        await post(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
 
     return resultFromResponse(response, "Creating ${resource.resourceType} failed");
   }
@@ -355,8 +336,6 @@ class Repository {
     var headers = _defaultHeaders();
     var request = new Request(HttpMethod.Put, url, body: body, headers: headers);
     var response = await api.send<String>(request);
-//    Response response =
-//        await put(url, headers: headers, body: body, encoding: Encoding.getByName("UTF-8"));
     return resultFromResponse(response, "Updating ${resource.reference} failed");
   }
 
@@ -374,7 +353,6 @@ class Repository {
     return {
       HttpHeaders.cacheControlHeader: "no-cache",
       HttpHeaders.acceptHeader: 'application/json',
-//      HttpHeaders.authorizationHeader: "Bearer $authToken",
       HttpHeaders.contentTypeHeader: 'application/json'
     };
   }
