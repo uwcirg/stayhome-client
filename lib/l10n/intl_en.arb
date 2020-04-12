@@ -99,7 +99,7 @@
   "springboard_enter_travel_exposure_text": "enter exposure or travel",
   "springboard_record_COVID19_text": "record COVID-19 testing",
   "springboard_COVID19_resources_text": "COVID-19 information & resources",
-  "springboard_enter_pregnancy_text": "enter pregnancy status",
+  "springboard_enter_pregnancy_text": "identify at-risk conditions",
   "springboard_update_profile_text": "update profile & permissions",
   "springboard_review_calendar_history_text": "review calendar & history",
   "loading_error_log_in_again": "Loading error. Try logging out and in again.",
@@ -116,6 +116,5 @@
   "cdc_symptom_checker": "CDC symptom self-checker",
   "cdc_symptom_checker_title_text": "CDC Symptom Self-Checker",
   "cdc_symptom_checker_continue_text": "continue to CDC.gov",
-  "cdc_symptom_checker_info_text": "The CDC's Self-Checker is an interactive tool to help you make decisions and seek appropriate medical care for COVID-19.\n\nCurrently you need to enter your symptoms again when using Self-Checker, but a future version of StayHome will be able to send Self-Checker the symptoms you’ve already recorded (with your permission).",
-  "no_content": "<no content>"
+  "cdc_symptom_checker_info_text": "The CDC's Self-Checker is an interactive tool to help you make decisions and seek appropriate medical care for COVID-19.\n\nCurrently you need to enter your symptoms again when using Self-Checker, but a future version of StayHome will be able to send Self-Checker the symptoms you’ve already recorded (with your permission)."
 }
