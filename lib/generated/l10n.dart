@@ -9,17 +9,17 @@ import 'intl/messages_all.dart';
 // **************************************************************************
 
 class S {
-  S(this.localeName);
+  S();
   
   static const AppLocalizationDelegate delegate =
     AppLocalizationDelegate();
 
   static Future<S> load(Locale locale) {
-    final String name = locale.countryCode.isEmpty ? locale.languageCode : locale.toString();
+    final String name = (locale.countryCode?.isEmpty ?? false) ? locale.languageCode : locale.toString();
     final String localeName = Intl.canonicalizedLocale(name);
     return initializeMessages(localeName).then((_) {
       Intl.defaultLocale = localeName;
-      return S(localeName);
+      return S();
     });
   } 
 
@@ -27,9 +27,7 @@ class S {
     return Localizations.of<S>(context, S);
   }
 
-  final String localeName;
-
-  String demoVersionBannerText(dynamic deploymentType) {
+  String demoVersionBannerText(Object deploymentType) {
     return Intl.message(
       'This is a $deploymentType system - not for real data.',
       name: 'demoVersionBannerText',
@@ -38,7 +36,7 @@ class S {
     );
   }
 
-  String versionString(dynamic version) {
+  String versionString(Object version) {
     return Intl.message(
       'Version $version',
       name: 'versionString',
@@ -76,7 +74,7 @@ class S {
 
   String get about_stayhome_info_text {
     return Intl.message(
-      'The COVID-19 pandemic is straining existing public health processes and workflows. Many community members may be concerned about developing COVD-19. To meet this need we have developed StayHome, an app to help people who are staying home to minimize any risk they might present to others do things like track their symptoms and temperature, connect with relevant information and resources, and maintain a diary of people with whom they have had contact. We hope the app might also help people and public health connect more easily, when needed, in a situation where public health resources may be stretched thin.',
+      'The COVID-19 pandemic is straining existing public health processes and workflows. Many community members may be concerned about developing COVID-19. To meet this need we have developed StayHome, an app to help people who are staying home to minimize any risk they might present to others do things like track their symptoms and temperature, connect with relevant information and resources, and maintain a diary of people with whom they have had contact. We hope the app might also help people and public health connect more easily, when needed, in a situation where public health resources may be stretched thin.',
       name: 'about_stayhome_info_text',
       desc: '',
       args: [],
@@ -416,7 +414,7 @@ class S {
     );
   }
 
-  String frequency_with_contents(dynamic number, dynamic unit) {
+  String frequency_with_contents(Object number, Object unit) {
     return Intl.message(
       'Once every $number $unit',
       name: 'frequency_with_contents',
@@ -425,7 +423,7 @@ class S {
     );
   }
 
-  String duration_duration_durationunit(dynamic duration, dynamic durationUnit) {
+  String duration_duration_durationunit(Object duration, Object durationUnit) {
     return Intl.message(
       '$duration $durationUnit',
       name: 'duration_duration_durationunit',
@@ -983,7 +981,7 @@ class S {
     );
   }
 
-  String temperatureErrorMessage(dynamic minF, dynamic maxF, dynamic minC, dynamic maxC) {
+  String temperatureErrorMessage(Object minF, Object maxF, Object minC, Object maxC) {
     return Intl.message(
       'Enter a value between $minF and $maxF (°F) or $minC and $maxC (°C). This value will not be saved.',
       name: 'temperatureErrorMessage',
@@ -1097,7 +1095,7 @@ class AppLocalizationDelegate extends LocalizationsDelegate<S> {
 
   List<Locale> get supportedLocales {
     return const <Locale>[
-      Locale('de', ''), Locale('mn', ''), Locale('en', ''),
+      Locale.fromSubtags(languageCode: 'en'), Locale.fromSubtags(languageCode: 'de'), Locale.fromSubtags(languageCode: 'mn'),
     ];
   }
 
