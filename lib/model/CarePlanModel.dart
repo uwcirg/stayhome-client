@@ -7,6 +7,7 @@ import 'package:map_app_flutter/KeycloakAuth.dart';
 import 'package:map_app_flutter/config/AppConfig.dart';
 import 'package:map_app_flutter/fhir/Exception.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
+import 'package:map_app_flutter/map_app_code_system.dart';
 import 'package:map_app_flutter/services/Repository.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:simple_auth/simple_auth.dart';
@@ -20,6 +21,7 @@ class CarePlanModel extends Model {
   bool isLoading = false;
   Patient patient;
   TreatmentCalendar treatmentCalendar;
+  DataSharingConsents consents;
 
   KeycloakAuth _auth;
 
@@ -213,6 +215,10 @@ class CarePlanModel extends Model {
       Repository.getResourceLinks(_careplanTemplateRef, _api)
           .then((List<DocumentReference> responses) {
         this.infoLinks = responses;
+      }),
+      Repository.getConsents(patient, _api)
+          .then((List<Consent> responses) {
+        this.consents = DataSharingConsents.from(responses);
       }),
     ];
     return Future.wait(futures).then((value) => rebuildTreatmentPlan());
@@ -436,8 +442,8 @@ class TreatmentCalendar {
     } else if (plan.period != null && plan.period.start != null && plan.period.end != null) {
       scheduledPeriod = plan.period;
     } else {
-      throw MalformedFhirResourceException(plan,
-          "${plan.reference} must have period start and end");
+      throw MalformedFhirResourceException(
+          plan, "${plan.reference} must have period start and end");
     }
     return scheduledPeriod;
   }
@@ -540,3 +546,24 @@ class TreatmentEvent {
 
 enum EventType { Assessment, Treatment }
 enum Status { Scheduled, Completed, Missed }
+
+class DataSharingConsents {
+  Consent locationConsent;
+  Consent aboutYouConsent;
+  Consent contactInfoConsent;
+
+  DataSharingConsents.from(List<Consent> consents) {
+    consents.sort((Consent a, Consent b) {
+      return a.provision.period.start.compareTo(b.provision.period.start);
+    });
+    locationConsent = consents.firstWhere((Consent consent) {
+      return consent.hasCategory(ConsentContentClass.location);
+    });
+    aboutYouConsent = consents.firstWhere((Consent consent) {
+      return consent.hasCategory(ConsentContentClass.aboutYou);
+    });
+    contactInfoConsent = consents.firstWhere((Consent consent) {
+      return consent.hasCategory(ConsentContentClass.contactInformation);
+    });
+  }
+}

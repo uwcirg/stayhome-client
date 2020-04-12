@@ -171,7 +171,8 @@ class Repository {
     List<DocumentReference> documentReferences = [];
     await Future.forEach(documentReferenceReferences, (Reference r) async {
       var url = "$fhirBaseUrl/${r.reference}";
-      var request = new Request(HttpMethod.Get, url, headers: _defaultHeaders(), authenticated: false);
+      var request =
+          new Request(HttpMethod.Get, url, headers: _defaultHeaders(), authenticated: false);
       var response = await api.send<String>(request);
 
       documentReferences.add(DocumentReference.fromJson(jsonDecode(response.body)));
@@ -194,7 +195,8 @@ class Repository {
     var request = new Request(HttpMethod.Put, url, body: body, headers: headers);
     var response = await api.send<String>(request);
 
-    return resultFromResponse(response, "An error occurred when trying to save your responses. Please try logging in again.");
+    return resultFromResponse(response,
+        "An error occurred when trying to save your responses. Please try logging in again.");
   }
 
   static Future<QuestionnaireResponse> postQuestionnaireResponse(
@@ -204,7 +206,8 @@ class Repository {
       result = await postResource(questionnaireResponse, api);
     } catch (e) {
       print('$e');
-      return Future.error("An error occurred when trying to save your responses. Please try logging in again.");
+      return Future.error(
+          "An error occurred when trying to save your responses. Please try logging in again.");
     }
     QuestionnaireResponse postedResponse = QuestionnaireResponse.fromJson(jsonDecode(result));
     print("Created ${postedResponse.reference}");
@@ -259,6 +262,34 @@ class Repository {
     return responses;
   }
 
+  /// get all consent records which are active and pertinent
+  static Future<List<Consent>> getConsents(Patient patient, OAuthApi api) async {
+    var url = "$fhirBaseUrl/Consent";
+    String categorySearchString = [
+      ConsentContentClass.location,
+      ConsentContentClass.contactInformation,
+      ConsentContentClass.aboutYou
+    ].map((c) => c.identifierString()).toList().join(',');
+    var request = new Request(HttpMethod.Get, url,
+        parameters: {
+          "patient": "${patient.reference}",
+          "status": "active",
+          "category": categorySearchString, // has any of these codes ("OR" clause)
+          "_sort": "-period",
+          "_count": 1 // returns 1 result per "OR" clause
+        },
+        headers: _defaultHeaders());
+    var response = await api.send<String>(request);
+    List<Consent> responses  = [];
+    var searchResultBundle = jsonDecode(response.body);
+    if (searchResultBundle['total'] > 0) {
+      await Future.forEach(searchResultBundle['entry'], (var entry) async {
+        responses.add(Consent.fromJson(entry['resource']));
+      });
+    }
+    return responses;
+  }
+
   static Future<Communication> getSystemAnnouncement(OAuthApi api) async {
     var url = "$fhirBaseUrl/Communication";
     var request = new Request(HttpMethod.Get, url,
@@ -282,9 +313,11 @@ class Repository {
   }
 
   /// reference should be of format CarePlan/123
-  static Future<CarePlan> loadCarePlan(String reference, OAuthApi api, {bool authenticated=true}) async {
+  static Future<CarePlan> loadCarePlan(String reference, OAuthApi api,
+      {bool authenticated = true}) async {
     var url = "$fhirBaseUrl/$reference";
-    var request = new Request(HttpMethod.Get, url, headers: _defaultHeaders(), authenticated: authenticated);
+    var request =
+        new Request(HttpMethod.Get, url, headers: _defaultHeaders(), authenticated: authenticated);
     var response = await api.send<String>(request);
     if (response.statusCode == 200) {
       print("Loaded careplan");
@@ -308,7 +341,6 @@ class Repository {
       return Future.error("Could not load communication");
     }
   }
-
 
   static Future<String> postResource(Resource resource, OAuthApi api) async {
     var url = "$fhirBaseUrl/${resource.resourceType}";

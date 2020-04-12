@@ -11,3 +11,13 @@ class CommunicationCategory extends Coding {
 
   static CommunicationCategory systemAnnouncement = CommunicationCategory._("system-announcement");
 }
+
+class ConsentContentClass extends Coding {
+  static const _system = "https://stayhome.app/CodeSystem/consent-content-class";
+
+  ConsentContentClass._(String code) : super(system: _system, code: code);
+
+  static ConsentContentClass location = ConsentContentClass._("location");
+  static ConsentContentClass contactInformation = ConsentContentClass._("contact-information");
+  static ConsentContentClass aboutYou = ConsentContentClass._("demographics");
+}
