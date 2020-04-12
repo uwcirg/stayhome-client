@@ -74,7 +74,7 @@ class S {
 
   String get about_stayhome_info_text {
     return Intl.message(
-      'The COVID-19 pandemic is straining existing public health processes and workflows. Many community members may be concerned about developing COVD-19. To meet this need we have developed StayHome, an app to help people who are staying home to minimize any risk they might present to others do things like track their symptoms and temperature, connect with relevant information and resources, and maintain a diary of people with whom they have had contact. We hope the app might also help people and public health connect more easily, when needed, in a situation where public health resources may be stretched thin.',
+      'The COVID-19 pandemic is straining existing public health processes and workflows. Many community members may be concerned about developing COVID-19. To meet this need we have developed StayHome, an app to help people who are staying home to minimize any risk they might present to others do things like track their symptoms and temperature, connect with relevant information and resources, and maintain a diary of people with whom they have had contact. We hope the app might also help people and public health connect more easily, when needed, in a situation where public health resources may be stretched thin.',
       name: 'about_stayhome_info_text',
       desc: '',
       args: [],
@@ -1084,15 +1084,6 @@ class S {
     return Intl.message(
       'The CDC\'s Self-Checker is an interactive tool to help you make decisions and seek appropriate medical care for COVID-19.\n\nCurrently you need to enter your symptoms again when using Self-Checker, but a future version of StayHome will be able to send Self-Checker the symptoms you’ve already recorded (with your permission).',
       name: 'cdc_symptom_checker_info_text',
-      desc: '',
-      args: [],
-    );
-  }
-
-  String get no_content {
-    return Intl.message(
-      '<no content>',
-      name: 'no_content',
       desc: '',
       args: [],
     );
