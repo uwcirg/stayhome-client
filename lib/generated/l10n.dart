@@ -9,17 +9,17 @@ import 'intl/messages_all.dart';
 // **************************************************************************
 
 class S {
-  S();
+  S(this.localeName);
   
   static const AppLocalizationDelegate delegate =
     AppLocalizationDelegate();
 
   static Future<S> load(Locale locale) {
-    final String name = (locale.countryCode?.isEmpty ?? false) ? locale.languageCode : locale.toString();
+    final String name = locale.countryCode.isEmpty ? locale.languageCode : locale.toString();
     final String localeName = Intl.canonicalizedLocale(name);
     return initializeMessages(localeName).then((_) {
       Intl.defaultLocale = localeName;
-      return S();
+      return S(localeName);
     });
   } 
 
@@ -27,7 +27,9 @@ class S {
     return Localizations.of<S>(context, S);
   }
 
-  String demoVersionBannerText(Object deploymentType) {
+  final String localeName;
+
+  String demoVersionBannerText(dynamic deploymentType) {
     return Intl.message(
       'This is a $deploymentType system - not for real data.',
       name: 'demoVersionBannerText',
@@ -36,7 +38,7 @@ class S {
     );
   }
 
-  String versionString(Object version) {
+  String versionString(dynamic version) {
     return Intl.message(
       'Version $version',
       name: 'versionString',
@@ -414,7 +416,7 @@ class S {
     );
   }
 
-  String frequency_with_contents(Object number, Object unit) {
+  String frequency_with_contents(dynamic number, dynamic unit) {
     return Intl.message(
       'Once every $number $unit',
       name: 'frequency_with_contents',
@@ -423,7 +425,7 @@ class S {
     );
   }
 
-  String duration_duration_durationunit(Object duration, Object durationUnit) {
+  String duration_duration_durationunit(dynamic duration, dynamic durationUnit) {
     return Intl.message(
       '$duration $durationUnit',
       name: 'duration_duration_durationunit',
@@ -981,7 +983,7 @@ class S {
     );
   }
 
-  String temperatureErrorMessage(Object minF, Object maxF, Object minC, Object maxC) {
+  String temperatureErrorMessage(dynamic minF, dynamic maxF, dynamic minC, dynamic maxC) {
     return Intl.message(
       'Enter a value between $minF and $maxF (°F) or $minC and $maxC (°C). This value will not be saved.',
       name: 'temperatureErrorMessage',
@@ -1095,7 +1097,7 @@ class AppLocalizationDelegate extends LocalizationsDelegate<S> {
 
   List<Locale> get supportedLocales {
     return const <Locale>[
-      Locale.fromSubtags(languageCode: 'en'), Locale.fromSubtags(languageCode: 'de'), Locale.fromSubtags(languageCode: 'mn'),
+      Locale('de', ''), Locale('mn', ''), Locale('en', ''),
     ];
   }
 
