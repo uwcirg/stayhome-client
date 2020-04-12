@@ -158,7 +158,7 @@ class Repository {
     try {
       carePlan = await loadCarePlan(carePlanTemplateRef, api, authenticated: false);
     } catch (e) {
-      print('$e');
+      printError(e);
       return Future.error("Could not load info resource: $e");
     }
     if (carePlan == null) return Future.error("Could not load info resource");
@@ -205,7 +205,7 @@ class Repository {
     try {
       result = await postResource(questionnaireResponse, api);
     } catch (e) {
-      print('$e');
+      printError(e);
       return Future.error(
           "An error occurred when trying to save your responses. Please try logging in again.");
     }
@@ -219,7 +219,7 @@ class Repository {
     try {
       result = await postResource(consent, api);
     } catch (e) {
-      print('$e');
+      printError(e);
       return Future.error(
           "An error occurred when trying to update sharing permissions. Please try logging in again.");
     }
@@ -401,5 +401,13 @@ class Repository {
       HttpHeaders.acceptHeader: 'application/json',
       HttpHeaders.contentTypeHeader: 'application/json'
     };
+  }
+
+  static void printError(error) {
+    if (error is Response) {
+      print('${error.body}');
+    } else {
+      print('$error');
+    }
   }
 }

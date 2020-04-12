@@ -92,7 +92,7 @@
   "profile_about_you_title_text": "About You",
   "profile_about_your_info_prompt_text": "Click to learn how About You information is used",
   "profile_updated_text": "Profile updates saved",
-  "profile_save_error_text": "Error saving profile updates",
+  "profile_save_error_text": "An error occurred when saving profile updates. Some or all changes may not have been saved.",
   "profile_form_error_text": "There has been an error while saving profile updates. Please try again.",
   "springboard_record_symptom_text": "record symptoms & temp",
   "springboard_cdc_symptom_checker_text": "CDC symptom self-checker",

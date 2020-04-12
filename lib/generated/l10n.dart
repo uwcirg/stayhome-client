@@ -868,7 +868,7 @@ class S {
 
   String get profile_save_error_text {
     return Intl.message(
-      'Error saving profile updates',
+      'An error occurred when saving profile updates. Some or all changes may not have been saved.',
       name: 'profile_save_error_text',
       desc: '',
       args: [],

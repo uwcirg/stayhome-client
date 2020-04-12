@@ -131,7 +131,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
       model.updateConsents(
           location: shareLocation, contactInfo: shareContactInfo, aboutYou: shareAboutYou),
       model.updatePatientResource(patient)
-    ]).then((value) {
+    ], eagerError: true).then((value) {
       setState(() {
         _formError = null;
       });
@@ -142,7 +142,6 @@ class ProfileWidgetState extends State<ProfileWidget> {
         MapAppDrawer.navigate(context, '/home');
       }
     }).catchError((error) {
-      print('$error');
       setState(() {
         _formError = S.of(context).profile_save_error_text;
       });
@@ -403,7 +402,8 @@ class ProfileWidgetState extends State<ProfileWidget> {
                         style: Theme.of(context)
                             .textTheme
                             .caption
-                            .apply(color: Theme.of(context).errorColor)),
+                            .apply(color: Theme.of(context).errorColor),
+                    textAlign: TextAlign.center,),
                   ),
                 )
               ])),

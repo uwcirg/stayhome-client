@@ -200,8 +200,7 @@ class CarePlanModel extends Model {
   }
 
   Future<void> _loadConsents() {
-    return Repository.getConsents(patient, _api)
-        .then((List<Consent> responses) {
+    return Repository.getConsents(patient, _api).then((List<Consent> responses) {
       this.consents = DataSharingConsents.from(responses);
     });
   }
@@ -342,11 +341,12 @@ class CarePlanModel extends Model {
   }
 
   Future<void> updateConsents({bool location, bool contactInfo, bool aboutYou}) async {
-    Future.wait([
+    return Future.wait([
       Consent.from(patient, ConsentContentClass.location, location),
       Consent.from(patient, ConsentContentClass.contactInformation, contactInfo),
       Consent.from(patient, ConsentContentClass.aboutYou, aboutYou),
-    ].map((Consent c) => Repository.postConsent(c, _api)).toList()).then((value) => _loadConsents());
+    ].map((Consent c) => Repository.postConsent(c, _api)).toList())
+        .then((value) => _loadConsents());
   }
 }
 
@@ -565,17 +565,18 @@ class DataSharingConsents {
   Consent contactInfoConsent;
 
   DataSharingConsents.from(List<Consent> consents) {
+    if (consents == null) return;
     consents.sort((Consent a, Consent b) {
       return a.provision.period.start.compareTo(b.provision.period.start);
     });
     locationConsent = consents.firstWhere((Consent consent) {
       return consent.hasCategory(ConsentContentClass.location);
-    });
+    }, orElse: () => null);
     aboutYouConsent = consents.firstWhere((Consent consent) {
       return consent.hasCategory(ConsentContentClass.aboutYou);
-    });
+    }, orElse: () => null);
     contactInfoConsent = consents.firstWhere((Consent consent) {
       return consent.hasCategory(ConsentContentClass.contactInformation);
-    });
+    }, orElse: () => null);
   }
 }

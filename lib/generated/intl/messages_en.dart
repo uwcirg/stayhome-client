@@ -117,7 +117,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "profile_preferred_contact_sms_text" : MessageLookupByLibrary.simpleMessage("text"),
     "profile_preferred_contact_text" : MessageLookupByLibrary.simpleMessage("Preferred contact method"),
     "profile_preferred_contact_voicecall_text" : MessageLookupByLibrary.simpleMessage("voice call"),
-    "profile_save_error_text" : MessageLookupByLibrary.simpleMessage("Error saving profile updates"),
+    "profile_save_error_text" : MessageLookupByLibrary.simpleMessage("An error occurred when saving profile updates. Some or all changes may not have been saved."),
     "profile_secondary_zipcode_hint_text" : MessageLookupByLibrary.simpleMessage("If you spend a lot of time in a different location (work, school, family, etc.)"),
     "profile_secondary_zipcode_label_text" : MessageLookupByLibrary.simpleMessage("Second zip code"),
     "profile_updated_text" : MessageLookupByLibrary.simpleMessage("Profile updates saved"),
