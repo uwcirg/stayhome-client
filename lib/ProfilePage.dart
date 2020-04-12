@@ -125,8 +125,13 @@ class ProfileWidgetState extends State<ProfileWidget> {
     });
   }
 
-  void _onPressed(Patient patient, CarePlanModel model) {
-    model.updatePatientResource(patient).then((value) {
+  void _onPressed({Patient patient, bool shareLocation, bool shareContactInfo, bool shareAboutYou,
+    CarePlanModel model}) {
+    Future.wait([
+      model.updateConsents(
+          location: shareLocation, contactInfo: shareContactInfo, aboutYou: shareAboutYou),
+      model.updatePatientResource(patient)
+    ]).then((value) {
       setState(() {
         _formError = null;
       });
@@ -137,11 +142,13 @@ class ProfileWidgetState extends State<ProfileWidget> {
         MapAppDrawer.navigate(context, '/home');
       }
     }).catchError((error) {
+      print('$error');
       setState(() {
-        _formError = S.of(context).profile_updated_text;
+        _formError = S.of(context).profile_save_error_text;
       });
       snack(S.of(context).profile_save_error_text, context);
     });
+
   }
 
   _buildForm(CarePlanModel model) {
@@ -162,6 +169,9 @@ class ProfileWidgetState extends State<ProfileWidget> {
     String secondZip = originalPatient.secondZip;
     ContactPointSystem preferredContactMethod = originalPatient.preferredContactMethod;
     Gender gender = originalPatient.gender;
+    bool shareLocation = model.consents?.locationConsent?.isConsented ?? false;
+    bool shareContactInfo = model.consents?.contactInfoConsent?.isConsented ?? false;
+    bool shareAboutYou = model.consents?.aboutYouConsent?.isConsented ?? false;
     DateTime birthDate = originalPatient.birthDate;
     birthDateCtrl.text = birthDate != null ? DateFormat.yMd().format(birthDate) : "";
 
@@ -174,7 +184,11 @@ class ProfileWidgetState extends State<ProfileWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 _buildSectionHeader(S.of(context).profile_location_title_text),
-                _buildCollapsibleInfoTile(S.of(context).profile_info_prompt_text, S.of(context).profile_location_help_text),
+                _buildCollapsibleInfoTile(S.of(context).profile_info_prompt_text,
+                    S.of(context).profile_location_help_text),
+                SwitchFormField("Share this data with the StayHome team", shareLocation, (value) {
+                  shareLocation = value;
+                }),
                 TextFormField(
                   decoration: InputDecoration(
                       icon: Icon(Icons.contact_mail),
@@ -194,8 +208,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
                 TextFormField(
                   decoration: InputDecoration(
                       icon: Icon(null),
-                      hintText:
-                          S.of(context).profile_secondary_zipcode_hint_text,
+                      hintText: S.of(context).profile_secondary_zipcode_hint_text,
                       labelText: S.of(context).profile_secondary_zipcode_label_text),
                   initialValue: secondZip,
                   autovalidate: true,
@@ -211,16 +224,19 @@ class ProfileWidgetState extends State<ProfileWidget> {
                 //add space to present consistent spacing between sections here
                 Container(
                   margin: EdgeInsets.only(
-                    top: Dimensions.halfMargin,
-                    left: Dimensions.fullMargin,
-                    right: Dimensions.fullMargin,
-                    bottom: Dimensions.fullMargin
-                  ),
+                      top: Dimensions.halfMargin,
+                      left: Dimensions.fullMargin,
+                      right: Dimensions.fullMargin,
+                      bottom: Dimensions.fullMargin),
                   child: Container(),
                 ),
                 Divider(),
                 _buildSectionHeader(S.of(context).profile_contact_title_text),
-                _buildCollapsibleInfoTile(S.of(context).profile_contact_info_prompt_text, S.of(context).profile_contact_info_help_text),
+                _buildCollapsibleInfoTile(S.of(context).profile_contact_info_prompt_text,
+                    S.of(context).profile_contact_info_help_text),
+                SwitchFormField("Share this data with the StayHome team", shareContactInfo, (value) {
+                  shareContactInfo = value;
+                }),
                 TextFormField(
                   decoration: InputDecoration(
                       icon: Icon(Icons.email),
@@ -264,7 +280,11 @@ class ProfileWidgetState extends State<ProfileWidget> {
                 }),
                 Divider(),
                 _buildSectionHeader(S.of(context).profile_about_you_title_text),
-                _buildCollapsibleInfoTile(S.of(context).profile_about_your_info_prompt_text, S.of(context).profile_identifying_info_help_text),
+                _buildCollapsibleInfoTile(S.of(context).profile_about_your_info_prompt_text,
+                    S.of(context).profile_identifying_info_help_text),
+                SwitchFormField("Share this data with the StayHome team", shareAboutYou, (value) {
+                  shareAboutYou = value;
+                }),
                 TextFormField(
                   decoration: InputDecoration(
                       icon: Icon(Icons.person),
@@ -291,38 +311,35 @@ class ProfileWidgetState extends State<ProfileWidget> {
                 ),
                 InkWell(
                   child: IgnorePointer(
-                    child:
-                      TextFormField(
-                        controller: birthDateCtrl,
-                        decoration: InputDecoration(
-                            icon: Icon(Icons.cake),
-                            hintText: S.of(context).birthdate_hint_text,
-                            labelText: S.of(context).birthdate),
-                      ),
+                    child: TextFormField(
+                      controller: birthDateCtrl,
+                      decoration: InputDecoration(
+                          icon: Icon(Icons.cake),
+                          hintText: S.of(context).birthdate_hint_text,
+                          labelText: S.of(context).birthdate),
                     ),
-                    onTap:() {
-                      showDatePicker(
-                        context: context,
-                        initialDate: birthDate??DateTime.now(),
-                        firstDate: DateTime(1850, 1, 1),
-                        lastDate: new DateTime.now(),
-                        locale: Locale(Localizations.localeOf(context).languageCode, '')
-                      )
-                      .then((DateTime pickerdate) {
-                          if (pickerdate != null) {
-                            final formattedDate = DateFormat.yMd().format(pickerdate);
-                            birthDate = DateFormat.yMd().parse(formattedDate.toString());
-                            birthDateCtrl.text = formattedDate.toString();
-                          }
-                      });
-                    },
+                  ),
+                  onTap: () {
+                    showDatePicker(
+                            context: context,
+                            initialDate: birthDate ?? DateTime.now(),
+                            firstDate: DateTime(1850, 1, 1),
+                            lastDate: new DateTime.now(),
+                            locale: Locale(Localizations.localeOf(context).languageCode, ''))
+                        .then((DateTime pickerdate) {
+                      if (pickerdate != null) {
+                        final formattedDate = DateFormat.yMd().format(pickerdate);
+                        birthDate = DateFormat.yMd().parse(formattedDate.toString());
+                        birthDateCtrl.text = formattedDate.toString();
+                      }
+                    });
+                  },
                 ),
                 FlatButton(
-                  padding: EdgeInsets.symmetric(vertical: Dimensions.fullMargin, horizontal: Dimensions.extraLargeMargin),
-                  child: Text(
-                      S.of(context).clear_birthdate_text,
-                      style: TextStyle(decoration: TextDecoration.underline)
-                  ),
+                  padding: EdgeInsets.symmetric(
+                      vertical: Dimensions.fullMargin, horizontal: Dimensions.extraLargeMargin),
+                  child: Text(S.of(context).clear_birthdate_text,
+                      style: TextStyle(decoration: TextDecoration.underline)),
                   onPressed: () {
                     birthDate = null;
                     birthDateCtrl.text = "";
@@ -341,49 +358,53 @@ class ProfileWidgetState extends State<ProfileWidget> {
                 Padding(
                   padding: const EdgeInsets.only(top: Dimensions.largeMargin),
                   child: Center(
-                    child: Wrap(
-                      spacing: Dimensions.halfMargin,
-                      runSpacing: Dimensions.fullMargin,
-                      children: <Widget>[
-                        OutlineButton(
-                          child: Text(S.of(context).cancel),
-                          onPressed: () => MapAppDrawer.navigate(context, '/home'),
-                        ),
-                        RaisedButton(
-                          padding: MapAppPadding.largeButtonPadding,
-                          child: Text(S.of(context).save, style: Theme.of(context).textTheme.button),
-                          onPressed: () {
-                            if (_formKey.currentState.validate()) {
-                              _onPressed(
-                                  Patient.fromNewPatientForm(originalPatient,
-                                      firstName: firstName,
-                                      lastName: lastName,
-                                      phoneNumber: phone,
-                                      emailAddress: email,
-                                      homeZip: homeZip,
-                                      secondZip: secondZip,
-                                      preferredContactMethod: preferredContactMethod,
-                                      gender: gender,
-                                      birthDate: birthDate),
-                                  model);
-                            } else {
-                              setState(() {
-                                _formError = S.of(context).form_error_text;
-                              });
-                            }
-                          },
-                        )
-                      ],
-                    )
-                  ),
+                      child: Wrap(
+                    spacing: Dimensions.halfMargin,
+                    runSpacing: Dimensions.fullMargin,
+                    children: <Widget>[
+                      OutlineButton(
+                        child: Text(S.of(context).cancel),
+                        onPressed: () => MapAppDrawer.navigate(context, '/home'),
+                      ),
+                      RaisedButton(
+                        padding: MapAppPadding.largeButtonPadding,
+                        child: Text(S.of(context).save, style: Theme.of(context).textTheme.button),
+                        onPressed: () {
+                          if (_formKey.currentState.validate()) {
+                            _onPressed(
+                                patient: Patient.fromNewPatientForm(originalPatient,
+                                    firstName: firstName,
+                                    lastName: lastName,
+                                    phoneNumber: phone,
+                                    emailAddress: email,
+                                    homeZip: homeZip,
+                                    secondZip: secondZip,
+                                    preferredContactMethod: preferredContactMethod,
+                                    gender: gender,
+                                    birthDate: birthDate),
+                                model: model,
+                                shareAboutYou: shareAboutYou,
+                                shareLocation: shareLocation,
+                                shareContactInfo: shareContactInfo);
+                          } else {
+                            setState(() {
+                              _formError = S.of(context).form_error_text;
+                            });
+                          }
+                        },
+                      )
+                    ],
+                  )),
                 ),
                 Visibility(
                   visible: _formError != null,
-                  child: Text(_formError != null ? _formError : "",
-                      style: Theme.of(context)
-                          .textTheme
-                          .caption
-                          .apply(color: Theme.of(context).errorColor)),
+                  child: Center(
+                    child: Text(_formError != null ? _formError : "",
+                        style: Theme.of(context)
+                            .textTheme
+                            .caption
+                            .apply(color: Theme.of(context).errorColor)),
+                  ),
                 )
               ])),
     );
@@ -397,34 +418,27 @@ class ProfileWidgetState extends State<ProfileWidget> {
   }
 
   _buildCollapsibleInfoLabel(String header, bool expanded) {
-    
     return Flexible(
-        child:
-        Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Icon(
-              Icons.help_outline,
-              size: IconSize.small,
-              semanticLabel: header,
-              color: Colors.grey[700]
+        child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+          Icon(Icons.help_outline,
+              size: IconSize.small, semanticLabel: header, color: Colors.grey[700]),
+          Flexible(
+            child: Container(
+              padding: EdgeInsets.only(left: 4, right: 8),
+              child: Text(header, style: TextStyle(color: Colors.grey[700])),
             ),
-            Flexible(
-              child:
-              Container(
-                padding: EdgeInsets.only(left:4, right: 8),
-                child: Text(header, style: TextStyle(color: Colors.grey[700])),
-              ),),
-            Icon(
-              expanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_up,
-              color: Theme.of(context).primaryColor,
-              size: IconSize.small,
-              semanticLabel: header,
-            ),
-          ])
-      );
+          ),
+          Icon(
+            expanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_up,
+            color: Theme.of(context).primaryColor,
+            size: IconSize.small,
+            semanticLabel: header,
+          ),
+        ]));
   }
 
   _buildCollapsibleInfoTile(String header, String content) {
@@ -460,6 +474,40 @@ class ProfileWidgetState extends State<ProfileWidget> {
         throw ArgumentError("No such type");
     }
     return RegExp(source).hasMatch(toValidate);
+  }
+}
+
+class SwitchFormField extends StatefulWidget {
+  final String _title;
+  final _initialValue;
+  final Function(bool) _onChanged;
+
+  const SwitchFormField(this._title, this._initialValue, this._onChanged);
+
+  @override
+  State<StatefulWidget> createState() => SwitchFormFieldState(_initialValue);
+}
+
+class SwitchFormFieldState extends State<SwitchFormField> {
+  bool _selectedValue;
+  SwitchFormFieldState(this._selectedValue);
+
+  @override
+  Widget build(BuildContext context) {
+    return SwitchListTile(
+      contentPadding: const EdgeInsets.all(0.0),
+        title: Text(widget._title ?? "", style: Theme.of(context).textTheme.body1,),
+        value: _selectedValue,
+        onChanged: (value){
+          setState(() {
+            _selectedValue = !_selectedValue;
+          });
+          widget._onChanged(_selectedValue);
+        },
+        activeColor: Theme
+            .of(context)
+            .primaryColor
+    );
   }
 }
 
@@ -508,11 +556,13 @@ class RadioButtonFormFieldState extends State<RadioButtonFormField> {
       return InkWell(
         onTap: () => onChanged(option),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Radio(
-            value: option,
-            groupValue: _selectedValue,
-            activeColor: Theme.of(context).primaryColor,
-            onChanged: null,
+          AbsorbPointer(
+            child: Radio(
+              value: option,
+              groupValue: _selectedValue,
+              activeColor: Theme.of(context).primaryColor,
+              onChanged: (value) {} ,
+            ),
           ),
           Text(displayString(option)),
         ]),

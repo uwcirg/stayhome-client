@@ -214,6 +214,20 @@ class Repository {
     return postedResponse;
   }
 
+  static Future<Consent> postConsent(Consent consent, OAuthApi api) async {
+    String result;
+    try {
+      result = await postResource(consent, api);
+    } catch (e) {
+      print('$e');
+      return Future.error(
+          "An error occurred when trying to update sharing permissions. Please try logging in again.");
+    }
+    Consent postedResponse = Consent.fromJson(jsonDecode(result));
+    print("Created ${postedResponse.reference}");
+    return postedResponse;
+  }
+
   static Future<Questionnaire> getQuestionnaire(String questionnaireReference, OAuthApi api) async {
     var url = "$fhirBaseUrl/$questionnaireReference";
     var request = new Request(HttpMethod.Get, url, headers: _defaultHeaders());

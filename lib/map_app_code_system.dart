@@ -21,3 +21,9 @@ class ConsentContentClass extends Coding {
   static ConsentContentClass contactInformation = ConsentContentClass._("contact-information");
   static ConsentContentClass aboutYou = ConsentContentClass._("demographics");
 }
+
+class ConsentScope extends Coding {
+  ConsentScope._(String code) : super(system: _system, code: code);
+  static const _system = "http://terminology.hl7.org/CodeSystem/consentscope";
+  static ConsentScope patientPrivacy = ConsentScope._("patient-privacy");
+}

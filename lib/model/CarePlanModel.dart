@@ -199,6 +199,13 @@ class CarePlanModel extends Model {
     }
   }
 
+  Future<void> _loadConsents() {
+    return Repository.getConsents(patient, _api)
+        .then((List<Consent> responses) {
+      this.consents = DataSharingConsents.from(responses);
+    });
+  }
+
   Future<void> _loadQuestionnaires() async {
     List<Future> futures = [
       Repository.getQuestionnaires(this.carePlan, _api).then((var questionnaires) {
@@ -216,10 +223,7 @@ class CarePlanModel extends Model {
           .then((List<DocumentReference> responses) {
         this.infoLinks = responses;
       }),
-      Repository.getConsents(patient, _api)
-          .then((List<Consent> responses) {
-        this.consents = DataSharingConsents.from(responses);
-      }),
+      _loadConsents()
     ];
     return Future.wait(futures).then((value) => rebuildTreatmentPlan());
   }
@@ -335,6 +339,14 @@ class CarePlanModel extends Model {
     return questionnaires?.firstWhere(
         (element) => element.id == response.questionnaireReference.split("/")[1],
         orElse: () => null);
+  }
+
+  Future<void> updateConsents({bool location, bool contactInfo, bool aboutYou}) async {
+    Future.wait([
+      Consent.from(patient, ConsentContentClass.location, location),
+      Consent.from(patient, ConsentContentClass.contactInformation, contactInfo),
+      Consent.from(patient, ConsentContentClass.aboutYou, aboutYou),
+    ].map((Consent c) => Repository.postConsent(c, _api)).toList()).then((value) => _loadConsents());
   }
 }
 

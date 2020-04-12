@@ -116,6 +116,5 @@
   "cdc_symptom_checker": "CDC symptom self-checker",
   "cdc_symptom_checker_title_text": "CDC Symptom Self-Checker",
   "cdc_symptom_checker_continue_text": "continue to CDC.gov",
-  "cdc_symptom_checker_info_text": "The CDC's Self-Checker is an interactive tool to help you make decisions and seek appropriate medical care for COVID-19.\n\nCurrently you need to enter your symptoms again when using Self-Checker, but a future version of StayHome will be able to send Self-Checker the symptoms you’ve already recorded (with your permission).",
-  "no_content": "<no content>"
+  "cdc_symptom_checker_info_text": "The CDC's Self-Checker is an interactive tool to help you make decisions and seek appropriate medical care for COVID-19.\n\nCurrently you need to enter your symptoms again when using Self-Checker, but a future version of StayHome will be able to send Self-Checker the symptoms you’ve already recorded (with your permission)."
 }

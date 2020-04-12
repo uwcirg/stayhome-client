@@ -3,6 +3,7 @@
  */
 import 'package:intl/intl.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
+import 'package:map_app_flutter/map_app_code_system.dart';
 import 'package:map_app_flutter/services/Repository.dart';
 import "package:simple_auth/simple_auth.dart" show JsonSerializable;
 
@@ -12,7 +13,7 @@ abstract class Resource implements JsonSerializable {
 
   Resource({this.resourceType, this.id});
 
-  get reference => "$resourceType/$id";
+  String get reference => "$resourceType/$id";
 }
 
 class Gender {
@@ -141,6 +142,19 @@ class Consent extends Resource {
   bool hasCategory(Coding category) => this.category.any(
             (CodeableConcept concept) =>
             concept.coding.any((element) => element == category));
+
+  bool get isConsented => provision.type.isPermitted;
+
+  factory Consent.from(Patient patient, ConsentContentClass contentClass, bool permit) {
+    return Consent(
+        status: ConsentStatus.active,
+        scope: CodeableConcept(coding: [ConsentScope.patientPrivacy]),
+        category: [CodeableConcept(coding: [contentClass])],
+        patient: Reference(reference: patient.reference),
+        provision: Provision(
+            type: permit ? ProvisionType.permit : ProvisionType.deny,
+            period: Period(start: DateTime.now())));
+  }
 }
 
 class ConsentStatus {
@@ -167,26 +181,27 @@ class ConsentStatus {
 
 class Provision implements JsonSerializable {
   ProvisionType type;
-  List<Coding> provisionClass;
+//  List<Coding> provisionClass;
   Period period;
 
-  Provision({this.type, this.provisionClass, this.period});
+//  Provision({this.type, this.provisionClass, this.period});
+  Provision({this.type, this.period});
 
   Provision.fromJson(Map<String, dynamic> json) {
     if (json['type'] != null) type = ProvisionType.fromJson(json['type']);
-    if (json['class'] != null) {
-      provisionClass = new List<Coding>();
-      json['class'].forEach((v) {
-        provisionClass.add(new Coding.fromJson(v));
-      });
-    }
+//    if (json['class'] != null) {
+//      provisionClass = new List<Coding>();
+//      json['class'].forEach((v) {
+//        provisionClass.add(new Coding.fromJson(v));
+//      });
+//    }
     if (json['period'] != null) period = Period.fromJson(json['period']);
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.type != null) data['type'] = this.type.toString();
-    if (this.provisionClass != null) data['class'] = this.provisionClass.map((v) => v.toJson()).toList();
+//    if (this.provisionClass != null) data['class'] = this.provisionClass.map((v) => v.toJson()).toList();
     if (this.period != null) data['period'] = this.period.toJson();
     return data;
   }
@@ -1221,8 +1236,8 @@ class Period {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['start'] = this.start.toIso8601String();
-    data['end'] = this.end.toIso8601String();
+    if (this.start != null) data['start'] = this.start.toIso8601String();
+    if (this.end != null) data['end'] = this.end.toIso8601String();
     return data;
   }
 }
