@@ -341,11 +341,18 @@ class CarePlanModel extends Model {
   }
 
   Future<void> updateConsents({bool location, bool contactInfo, bool aboutYou}) async {
-    return Future.wait([
-      Consent.from(patient, ConsentContentClass.location, location),
-      Consent.from(patient, ConsentContentClass.contactInformation, contactInfo),
-      Consent.from(patient, ConsentContentClass.aboutYou, aboutYou),
-    ].map((Consent c) => Repository.postConsent(c, _api)).toList())
+    List<Consent> newConsents = [];
+    if (location != consents?.locationConsent?.isConsented ?? false) {
+      newConsents.add(Consent.from(patient, ConsentContentClass.location, location));
+    }
+    if (contactInfo != consents?.contactInfoConsent?.isConsented ?? false) {
+      newConsents.add(Consent.from(patient, ConsentContentClass.contactInformation, contactInfo));
+    }
+    if (aboutYou != consents?.aboutYouConsent?.isConsented ?? false) {
+      newConsents.add(Consent.from(patient, ConsentContentClass.aboutYou, aboutYou));
+    }
+
+    return Future.wait(newConsents.map((Consent c) => Repository.postConsent(c, _api)).toList())
         .then((value) => _loadConsents());
   }
 }

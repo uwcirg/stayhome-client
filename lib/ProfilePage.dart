@@ -142,6 +142,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
         MapAppDrawer.navigate(context, '/home');
       }
     }).catchError((error) {
+      print('$error');
       setState(() {
         _formError = S.of(context).profile_save_error_text;
       });

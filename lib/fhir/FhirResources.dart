@@ -132,6 +132,7 @@ class Consent extends Resource {
     if (this.resourceType != null) data['resourceType'] = resourceType;
     if (this.meta != null) data['meta'] = meta.toJson();
     if (this.scope != null) data['scope'] = scope.toJson();
+    if (this.status != null) data['status'] = status.toString();
     if (this.category != null) data['category'] = this.category.map((v) => v.toJson()).toList();
     if (this.patient != null) data['patient'] = patient.toJson();
     if (this.provision != null) data['provision'] = provision.toJson();
