@@ -132,7 +132,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "sign_up_or_log_in_to_access_all_functions" : MessageLookupByLibrary.simpleMessage("Log in to access all functions"),
     "springboard_COVID19_resources_text" : MessageLookupByLibrary.simpleMessage("COVID-19 information & resources"),
     "springboard_cdc_symptom_checker_text" : MessageLookupByLibrary.simpleMessage("CDC symptom self-checker"),
-    "springboard_enter_pregnancy_text" : MessageLookupByLibrary.simpleMessage("identify at-risk conditions"),
+    "springboard_enter_pregnancy_text" : MessageLookupByLibrary.simpleMessage("enter pregnancy, occupation, & possible risks"),
     "springboard_enter_travel_exposure_text" : MessageLookupByLibrary.simpleMessage("enter exposure or travel"),
     "springboard_record_COVID19_text" : MessageLookupByLibrary.simpleMessage("record COVID-19 testing"),
     "springboard_record_symptom_text" : MessageLookupByLibrary.simpleMessage("record symptoms & temp"),

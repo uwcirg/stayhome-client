@@ -9,17 +9,17 @@ import 'intl/messages_all.dart';
 // **************************************************************************
 
 class S {
-  S(this.localeName);
+  S();
   
   static const AppLocalizationDelegate delegate =
     AppLocalizationDelegate();
 
   static Future<S> load(Locale locale) {
-    final String name = locale.countryCode.isEmpty ? locale.languageCode : locale.toString();
+    final String name = (locale.countryCode?.isEmpty ?? false) ? locale.languageCode : locale.toString();
     final String localeName = Intl.canonicalizedLocale(name);
     return initializeMessages(localeName).then((_) {
       Intl.defaultLocale = localeName;
-      return S(localeName);
+      return S();
     });
   } 
 
@@ -27,9 +27,7 @@ class S {
     return Localizations.of<S>(context, S);
   }
 
-  final String localeName;
-
-  String demoVersionBannerText(dynamic deploymentType) {
+  String demoVersionBannerText(Object deploymentType) {
     return Intl.message(
       'This is a $deploymentType system - not for real data.',
       name: 'demoVersionBannerText',
@@ -38,7 +36,7 @@ class S {
     );
   }
 
-  String versionString(dynamic version) {
+  String versionString(Object version) {
     return Intl.message(
       'Version $version',
       name: 'versionString',
@@ -416,7 +414,7 @@ class S {
     );
   }
 
-  String frequency_with_contents(dynamic number, dynamic unit) {
+  String frequency_with_contents(Object number, Object unit) {
     return Intl.message(
       'Once every $number $unit',
       name: 'frequency_with_contents',
@@ -425,7 +423,7 @@ class S {
     );
   }
 
-  String duration_duration_durationunit(dynamic duration, dynamic durationUnit) {
+  String duration_duration_durationunit(Object duration, Object durationUnit) {
     return Intl.message(
       '$duration $durationUnit',
       name: 'duration_duration_durationunit',
@@ -931,7 +929,7 @@ class S {
 
   String get springboard_enter_pregnancy_text {
     return Intl.message(
-      'identify at-risk conditions',
+      'enter pregnancy, occupation, & possible risks',
       name: 'springboard_enter_pregnancy_text',
       desc: '',
       args: [],
@@ -983,7 +981,7 @@ class S {
     );
   }
 
-  String temperatureErrorMessage(dynamic minF, dynamic maxF, dynamic minC, dynamic maxC) {
+  String temperatureErrorMessage(Object minF, Object maxF, Object minC, Object maxC) {
     return Intl.message(
       'Enter a value between $minF and $maxF (°F) or $minC and $maxC (°C). This value will not be saved.',
       name: 'temperatureErrorMessage',
@@ -1097,7 +1095,7 @@ class AppLocalizationDelegate extends LocalizationsDelegate<S> {
 
   List<Locale> get supportedLocales {
     return const <Locale>[
-      Locale('de', ''), Locale('mn', ''), Locale('en', ''),
+      Locale.fromSubtags(languageCode: 'en'), Locale.fromSubtags(languageCode: 'de'), Locale.fromSubtags(languageCode: 'mn'),
     ];
   }
 
