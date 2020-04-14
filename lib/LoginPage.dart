@@ -122,7 +122,7 @@ class LoginPageState extends State<LoginPage> {
   Widget _buildSystemAnnouncement(BuildContext context) {
     if (_systemAnnouncement == null) return Container();
     return Column(children: [
-            Text("System Announcement ${DateFormat.yMd().format(_systemAnnouncement.sent)}",
+            Text(S.of(context).system_announcement(DateFormat.yMd().format(_systemAnnouncement.sent)),
                 style: Theme.of(context).primaryTextTheme.caption),
             Text(
               _systemAnnouncement.displayText(context),

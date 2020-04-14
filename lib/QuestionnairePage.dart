@@ -383,7 +383,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
     return DropdownButton(
       isExpanded: true,
       hint: Text(
-        currentResponse != null ? currentResponse.toString() : "Select",
+        currentResponse != null ? currentResponse.toString() : S.of(context).select,
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
       ),
