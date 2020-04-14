@@ -929,7 +929,7 @@ class S {
 
   String get springboard_enter_pregnancy_text {
     return Intl.message(
-      'identify at-risk conditions',
+      'enter pregnancy, occupation, & possible risks',
       name: 'springboard_enter_pregnancy_text',
       desc: '',
       args: [],
