@@ -999,6 +999,24 @@ class S {
     );
   }
 
+  String get select {
+    return Intl.message(
+      'Select',
+      name: 'select',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String system_announcement(Object text) {
+    return Intl.message(
+      'System Announcement $text',
+      name: 'system_announcement',
+      desc: '',
+      args: [text],
+    );
+  }
+
   String get welcome {
     return Intl.message(
       'Thank you and welcome',

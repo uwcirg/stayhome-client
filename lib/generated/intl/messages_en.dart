@@ -25,7 +25,9 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m2(number, unit) => "Once every ${number} ${unit}";
 
-  static m4(minF, maxF, minC, maxC) => "Enter a value between ${minF} and ${maxF} (°F) or ${minC} and ${maxC} (°C). This value will not be saved.";
+  static m4(text) => "System Announcement ${text}";
+
+  static m5(minF, maxF, minC, maxC) => "Enter a value between ${minF} and ${maxF} (°F) or ${minC} and ${maxC} (°C). This value will not be saved.";
 
   static m3(version) => "Version ${version}";
 
@@ -127,6 +129,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "record_symptoms_and_temp" : MessageLookupByLibrary.simpleMessage("record symptoms & temp"),
     "review_terms_of_use_title" : MessageLookupByLibrary.simpleMessage("Review Terms of Use"),
     "save" : MessageLookupByLibrary.simpleMessage("save"),
+    "select" : MessageLookupByLibrary.simpleMessage("Select"),
     "select_trend_text" : MessageLookupByLibrary.simpleMessage("Select a question to see trends"),
     "session_expired_please_log_in_again" : MessageLookupByLibrary.simpleMessage("Session expired, please log in again."),
     "sign_up_or_log_in_to_access_all_functions" : MessageLookupByLibrary.simpleMessage("Log in to access all functions"),
@@ -139,7 +142,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "springboard_review_calendar_history_text" : MessageLookupByLibrary.simpleMessage("review calendar & history"),
     "springboard_update_profile_text" : MessageLookupByLibrary.simpleMessage("update profile & permissions"),
     "support_COVID19" : MessageLookupByLibrary.simpleMessage("Support during COVID-19"),
-    "temperatureErrorMessage" : m4,
+    "system_announcement" : m4,
+    "temperatureErrorMessage" : m5,
     "terms_of_use" : MessageLookupByLibrary.simpleMessage("This app was built by the Clinical Informatics Research Group (CIRG), at the University of Washington, in order to benefit people, like you, who may be concerned about infection with Coronavirus (COVID-19). Or, who simply want to know how best to \"stay home\". Faculty, students, and staff at CIRG are doing this work to help people in our university, local, regional, state, national, and global communities.\n\nThe University of Washington (UW) is not responsible or liable for the accuracy or security of the information in the app. The UW did not develop the system, does not operate it, and has not endorsed it.\n\nThe privacy of your information is important to us. We do our best to keep our clinical information systems private and secure, but we are offering this application without any assurance or warranty.\n\nWe do not track GPS location information from your phone. We do not link your IP address to your information. We do use standard web analytic software (Matomo) to understand user patterns and will look at access logs if we suspect an attempt to compromise the security of our systems.\n\nYou can use this app without entering any personal information by skipping the prompts that ask for it. The system will be less able to personalize to your needs, but that\'s OK with us. We want you to use this app however you feel most comfortable doing so.\n\nThe Resources section of the app is available to anyone. You are welcome to use that feature without creating an account or logging in.\n\nIf you choose to create an account you will need to give us an email address, but you are welcome to use a fake email address. If your email is fake, you will not be able to recover your password, but everything else in the app will work the same. You can update your email address later, but you can\'t change your username.\n\nPlease look carefully at the Profile page. We explain on that page the uses of your personal information, such as an email address, a cell phone number, a zip code/postal code, etc. We ask that you either use accurate information in the profile, so we can personalize the app for you, or that you leave these fields blank."),
     "terms_of_use_title" : MessageLookupByLibrary.simpleMessage("Terms of Use"),
     "un_saved_alert_text" : MessageLookupByLibrary.simpleMessage("You have unsaved responses"),
