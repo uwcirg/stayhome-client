@@ -173,7 +173,7 @@ class S {
 
   String get profile {
     return Intl.message(
-      'Profile',
+      'Profile and Information Sharing',
       name: 'profile',
       desc: '',
       args: [],
