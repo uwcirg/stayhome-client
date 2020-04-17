@@ -107,7 +107,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "not_now" : MessageLookupByLibrary.simpleMessage("continue without logging in"),
     "nothing_here" : MessageLookupByLibrary.simpleMessage("Nothing here"),
     "or" : MessageLookupByLibrary.simpleMessage("or"),
-    "profile" : MessageLookupByLibrary.simpleMessage("Profile"),
+    "profile" : MessageLookupByLibrary.simpleMessage("Profile and Information Sharing"),
     "profile_about_you_title_text" : MessageLookupByLibrary.simpleMessage("About You"),
     "profile_about_your_info_prompt_text" : MessageLookupByLibrary.simpleMessage("Click to learn how About You information is used"),
     "profile_contact_info_prompt_text" : MessageLookupByLibrary.simpleMessage("Click to learn how Contact Information is used"),
