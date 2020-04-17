@@ -318,7 +318,12 @@ class Repository {
                 c.organization.contains(org) &&
                 c.provision.provisionClass.contains(contentClass),
             orElse: () => null);
-        if (consent != null) relevantResponses.add(consent);
+        if (consent != null) {
+          relevantResponses.add(consent);
+        } else {
+          // add a blank (default) consent for this entry
+          relevantResponses.add(Consent.from(patient, org, contentClass, ProvisionType.deny));
+        }
       });
     });
 
@@ -335,7 +340,12 @@ class Repository {
                 c.organization.contains(org) &&
                 c.provision.provisionClass.contains(contentClass),
             orElse: () => null);
-        if (consent != null) relevantResponses.add(consent);
+        if (consent != null) {
+          relevantResponses.add(consent);
+        } else {
+          // add a blank (default) consent for this entry
+          relevantResponses.add(Consent.from(patient, org, contentClass, ProvisionType.deny));
+        }
       });
     });
     return relevantResponses;
