@@ -279,29 +279,66 @@ class Repository {
   /// get all consent records which are active and pertinent
   static Future<List<Consent>> getConsents(Patient patient, OAuthApi api) async {
     var url = "$fhirBaseUrl/Consent";
-    String categorySearchString = [
-      ConsentContentClass.location,
-      ConsentContentClass.contactInformation,
-      ConsentContentClass.aboutYou
-    ].map((c) => c.identifierString()).toList().join(',');
+    String organizationSearchString = [
+      OrganizationReference.scan,
+      OrganizationReference.fiuNeighborhoodHelp,
+      OrganizationReference.fiu,
+      OrganizationReference.researchers,
+      OrganizationReference.publicHealthAgencies
+    ].map((c) => c.reference).toList().join(',');
     var request = new Request(HttpMethod.Get, url,
         parameters: {
           "patient": "${patient.reference}",
           "status": "active",
-          "category": categorySearchString, // has any of these codes ("OR" clause)
+          "organization": organizationSearchString, // has any of these codes ("OR" clause)
           "_sort": "-period",
-          "_count": 1 // returns 1 result per "OR" clause
+          "_count": 10000
         },
         headers: _defaultHeaders());
     var response = await api.send<String>(request);
-    List<Consent> responses  = [];
+    List<Consent> responses = [];
     var searchResultBundle = jsonDecode(response.body);
     if (searchResultBundle['total'] > 0) {
       await Future.forEach(searchResultBundle['entry'], (var entry) async {
         responses.add(Consent.fromJson(entry['resource']));
       });
     }
-    return responses;
+    List<Consent> relevantResponses = [];
+    [
+      ConsentContentClass.location,
+      ConsentContentClass.symptomsTestingConditions,
+      ConsentContentClass.contactInformation
+    ].forEach((Coding contentClass) {
+      [
+        OrganizationReference.publicHealthAgencies,
+        OrganizationReference.researchers,
+      ].forEach((Reference org) {
+        Consent consent = responses.firstWhere(
+            (Consent c) =>
+                c.organization.contains(org) &&
+                c.provision.provisionClass.contains(contentClass),
+            orElse: () => null);
+        if (consent != null) relevantResponses.add(consent);
+      });
+    });
+
+    [
+      ConsentContentClass.all,
+    ].forEach((Coding contentClass) {
+      [
+        OrganizationReference.scan,
+        OrganizationReference.fiu,
+        OrganizationReference.fiuNeighborhoodHelp
+      ].forEach((Reference org) {
+        var consent = responses.firstWhere(
+            (Consent c) =>
+                c.organization.contains(org) &&
+                c.provision.provisionClass.contains(contentClass),
+            orElse: () => null);
+        if (consent != null) relevantResponses.add(consent);
+      });
+    });
+    return relevantResponses;
   }
 
   static Future<Communication> getSystemAnnouncement(OAuthApi api) async {

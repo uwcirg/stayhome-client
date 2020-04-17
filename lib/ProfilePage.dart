@@ -13,8 +13,10 @@ import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
+import 'package:map_app_flutter/map_app_code_system.dart';
 import 'package:map_app_flutter/map_app_widgets.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
+import 'package:map_app_flutter/permissions_widgets.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import 'main.dart';
@@ -113,25 +115,24 @@ class ProfileWidgetState extends State<ProfileWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
-      if (model == null) {
-        return MapAppErrorMessage.loadingErrorWithLogoutButton(context);
-      }
-      if (model.error != null) {
-        return MapAppErrorMessage.modelError(model);
-      }
-      model.isFirstTimeUser = false;
-      return _buildForm(model);
-    });
+    return ScopedModelDescendant<CarePlanModel>(
+      builder: (context, child, model) {
+        if (model == null) {
+          return MapAppErrorMessage.loadingErrorWithLogoutButton(context);
+        }
+        if (model.error != null) {
+          return MapAppErrorMessage.modelError(model);
+        }
+        model.isFirstTimeUser = false;
+        return _buildForm(model);
+      },
+      rebuildOnChange: true,
+    );
   }
 
-  void _onPressed({Patient patient, bool shareLocation, bool shareContactInfo, bool shareAboutYou,
-    CarePlanModel model}) {
-    Future.wait([
-      model.updateConsents(
-          location: shareLocation, contactInfo: shareContactInfo, aboutYou: shareAboutYou),
-      model.updatePatientResource(patient)
-    ], eagerError: true).then((value) {
+  void _onPressed({Patient patient, CarePlanModel model}) {
+    Future.wait([model.updateConsents(), model.updatePatientResource(patient)], eagerError: true)
+        .then((value) {
       setState(() {
         _formError = null;
       });
@@ -148,7 +149,6 @@ class ProfileWidgetState extends State<ProfileWidget> {
       });
       snack(S.of(context).profile_save_error_text, context);
     });
-
   }
 
   _buildForm(CarePlanModel model) {
@@ -169,9 +169,6 @@ class ProfileWidgetState extends State<ProfileWidget> {
     String secondZip = originalPatient.secondZip;
     ContactPointSystem preferredContactMethod = originalPatient.preferredContactMethod;
     Gender gender = originalPatient.gender;
-    bool shareLocation = model.consents?.locationConsent?.isConsented ?? false;
-    bool shareContactInfo = model.consents?.contactInfoConsent?.isConsented ?? false;
-    bool shareAboutYou = model.consents?.aboutYouConsent?.isConsented ?? false;
     DateTime birthDate = originalPatient.birthDate;
     birthDateCtrl.text = birthDate != null ? DateFormat.yMd().format(birthDate) : "";
 
@@ -183,12 +180,9 @@ class ProfileWidgetState extends State<ProfileWidget> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                _buildSectionHeader(S.of(context).profile_location_title_text),
-                _buildCollapsibleInfoTile(S.of(context).profile_info_prompt_text,
-                    S.of(context).profile_location_help_text),
-                SwitchFormField("Share this data with the StayHome team", shareLocation, (value) {
-                  shareLocation = value;
-                }),
+                Text(
+                    "We won’t share any of the information in your profile, unless you allow us to by selecting specific programs, in the “Information Sharing” options below."),
+                buildSectionHeader(S.of(context).profile_location_title_text, context),
                 TextFormField(
                   decoration: InputDecoration(
                       icon: Icon(Icons.contact_mail),
@@ -231,12 +225,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
                   child: Container(),
                 ),
                 Divider(),
-                _buildSectionHeader(S.of(context).profile_contact_title_text),
-                _buildCollapsibleInfoTile(S.of(context).profile_contact_info_prompt_text,
-                    S.of(context).profile_contact_info_help_text),
-                SwitchFormField("Share this data with the StayHome team", shareContactInfo, (value) {
-                  shareContactInfo = value;
-                }),
+                buildSectionHeader(S.of(context).profile_contact_title_text, context),
                 TextFormField(
                   decoration: InputDecoration(
                       icon: Icon(Icons.email),
@@ -279,12 +268,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
                   ContactPointSystem.sms: S.of(context).profile_preferred_contact_sms_text
                 }),
                 Divider(),
-                _buildSectionHeader(S.of(context).profile_about_you_title_text),
-                _buildCollapsibleInfoTile(S.of(context).profile_about_your_info_prompt_text,
-                    S.of(context).profile_identifying_info_help_text),
-                SwitchFormField("Share this data with the StayHome team", shareAboutYou, (value) {
-                  shareAboutYou = value;
-                }),
+                buildSectionHeader(S.of(context).profile_about_you_title_text, context),
                 TextFormField(
                   decoration: InputDecoration(
                       icon: Icon(Icons.person),
@@ -355,107 +339,92 @@ class ProfileWidgetState extends State<ProfileWidget> {
                   displayOverrides: {Gender.unknown: S.of(context).decline_to_state},
                 ),
                 Divider(),
-                Padding(
-                  padding: const EdgeInsets.only(top: Dimensions.largeMargin),
-                  child: Center(
-                      child: Wrap(
-                    spacing: Dimensions.halfMargin,
-                    runSpacing: Dimensions.fullMargin,
-                    children: <Widget>[
-                      OutlineButton(
-                        child: Text(S.of(context).cancel),
-                        onPressed: () => MapAppDrawer.navigate(context, '/home'),
-                      ),
-                      RaisedButton(
-                        padding: MapAppPadding.largeButtonPadding,
-                        child: Text(S.of(context).save, style: Theme.of(context).textTheme.button),
-                        onPressed: () {
-                          if (_formKey.currentState.validate()) {
-                            _onPressed(
-                                patient: Patient.fromNewPatientForm(originalPatient,
-                                    firstName: firstName,
-                                    lastName: lastName,
-                                    phoneNumber: phone,
-                                    emailAddress: email,
-                                    homeZip: homeZip,
-                                    secondZip: secondZip,
-                                    preferredContactMethod: preferredContactMethod,
-                                    gender: gender,
-                                    birthDate: birthDate),
-                                model: model,
-                                shareAboutYou: shareAboutYou,
-                                shareLocation: shareLocation,
-                                shareContactInfo: shareContactInfo);
-                          } else {
-                            setState(() {
-                              _formError = S.of(context).form_error_text;
-                            });
-                          }
-                        },
-                      )
-                    ],
-                  )),
+                ..._permissionsPageContent(model),
+                SaveAndCancelBar(
+                  onCancel: () {
+                    model.consents.reset();
+                    _formKey.currentState.reset();
+                    MapAppDrawer.navigate(context, '/home');
+                  },
+                  onSave: () {
+                    if (_formKey.currentState.validate()) {
+                      _onPressed(
+                          patient: Patient.fromNewPatientForm(originalPatient,
+                              firstName: firstName,
+                              lastName: lastName,
+                              phoneNumber: phone,
+                              emailAddress: email,
+                              homeZip: homeZip,
+                              secondZip: secondZip,
+                              preferredContactMethod: preferredContactMethod,
+                              gender: gender,
+                              birthDate: birthDate),
+                          model: model);
+                    } else {
+                      setState(() {
+                        _formError = S.of(context).form_error_text;
+                      });
+                    }
+                  },
                 ),
                 Visibility(
                   visible: _formError != null,
                   child: Center(
-                    child: Text(_formError != null ? _formError : "",
-                        style: Theme.of(context)
-                            .textTheme
-                            .caption
-                            .apply(color: Theme.of(context).errorColor),
-                    textAlign: TextAlign.center,),
+                    child: Text(
+                      _formError != null ? _formError : "",
+                      style: Theme.of(context)
+                          .textTheme
+                          .caption
+                          .apply(color: Theme.of(context).errorColor),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 )
               ])),
     );
   }
 
-  _buildSectionHeader(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(top: Dimensions.largeMargin, bottom: 4),
-      child: Text(text, style: Theme.of(context).textTheme.headline6),
-    );
-  }
-
-  _buildCollapsibleInfoLabel(String header, bool expanded) {
-    return Flexible(
-        child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-          Icon(Icons.help_outline,
-              size: IconSize.small, semanticLabel: header, color: Colors.grey[700]),
-          Flexible(
-            child: Container(
-              padding: EdgeInsets.only(left: 4, right: 8),
-              child: Text(header, style: TextStyle(color: Colors.grey[700])),
-            ),
-          ),
-          Icon(
-            expanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_up,
-            color: Theme.of(context).primaryColor,
-            size: IconSize.small,
-            semanticLabel: header,
-          ),
-        ]));
-  }
-
-  _buildCollapsibleInfoTile(String header, String content) {
-    return ConfigurableExpansionTile(
-      headerExpanded: _buildCollapsibleInfoLabel(header, false),
-      header: _buildCollapsibleInfoLabel(header, true),
-      children: [
-        Container(
-          margin: const EdgeInsets.all(16.0),
-          padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(color: Theme.of(context).highlightColor),
-          child: MarkdownBody(data: content),
+  List<Widget> _permissionsPageContent(CarePlanModel model) {
+    return [
+      buildSectionHeader(S.of(context).information_sharing, context),
+      paragraph(S.of(context).information_sharing_info),
+      paragraph(S.of(context).public_health_information_sharing_info),
+      paragraph(S.of(context).public_health_information_sharing_question),
+      ConsentGroupWidget(
+        consentGroupRef: OrganizationReference.publicHealthAgencies,
+      ),
+      Divider(),
+      paragraph(S.of(context).research_information_sharing_info),
+      paragraph(S.of(context).research_information_sharing_question),
+      ConsentGroupWidget(
+        consentGroupRef: OrganizationReference.researchers,
+      ),
+      Divider(),
+      padded(
+        Text(
+          S.of(context).member_program_question,
+          style: Theme.of(context).textTheme.subtitle1,
         ),
-        // + more params, see example !!
-      ],
-    );
+      ),
+      ProgramConsentWidget(
+        programTitle: S.of(context).fiu_title,
+        consentGroupRef: OrganizationReference.fiu,
+        expandedTextMarkdown: S.of(context).fiu_body,
+        shareItemLabel: S.of(context).fiu_toggle,
+      ),
+      ProgramConsentWidget(
+        programTitle: S.of(context).fiuNH_title,
+        consentGroupRef: OrganizationReference.fiuNeighborhoodHelp,
+        expandedTextMarkdown: S.of(context).fiuNH_body,
+        shareItemLabel: S.of(context).fiuNH_toggle,
+      ),
+      ProgramConsentWidget(
+        programTitle: S.of(context).scan_title,
+        consentGroupRef: OrganizationReference.scan,
+        expandedTextMarkdown: S.of(context).scan_body,
+        shareItemLabel: S.of(context).scan_toggle,
+      )
+    ];
   }
 
   isValid(String type, String toValidate) {
@@ -475,40 +444,6 @@ class ProfileWidgetState extends State<ProfileWidget> {
         throw ArgumentError("No such type");
     }
     return RegExp(source).hasMatch(toValidate);
-  }
-}
-
-class SwitchFormField extends StatefulWidget {
-  final String _title;
-  final _initialValue;
-  final Function(bool) _onChanged;
-
-  const SwitchFormField(this._title, this._initialValue, this._onChanged);
-
-  @override
-  State<StatefulWidget> createState() => SwitchFormFieldState(_initialValue);
-}
-
-class SwitchFormFieldState extends State<SwitchFormField> {
-  bool _selectedValue;
-  SwitchFormFieldState(this._selectedValue);
-
-  @override
-  Widget build(BuildContext context) {
-    return SwitchListTile(
-      contentPadding: const EdgeInsets.all(0.0),
-        title: Text(widget._title ?? "", style: Theme.of(context).textTheme.body1,),
-        value: _selectedValue,
-        onChanged: (value){
-          setState(() {
-            _selectedValue = !_selectedValue;
-          });
-          widget._onChanged(_selectedValue);
-        },
-        activeColor: Theme
-            .of(context)
-            .primaryColor
-    );
   }
 }
 
@@ -562,7 +497,7 @@ class RadioButtonFormFieldState extends State<RadioButtonFormField> {
               value: option,
               groupValue: _selectedValue,
               activeColor: Theme.of(context).primaryColor,
-              onChanged: (value) {} ,
+              onChanged: (value) {},
             ),
           ),
           Text(displayString(option)),

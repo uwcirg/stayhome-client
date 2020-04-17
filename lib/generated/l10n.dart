@@ -693,42 +693,6 @@ class S {
     );
   }
 
-  String get profile_introduction_help_text {
-    return Intl.message(
-      'If you create a profile and add certain types of information, you can see information more relevant to you, and you can convey information to public health that may help your community, or help you personally.\n\nBut remember, everything on this profile is optional. We’re more interested in having you able to use the system than in having you worry about us collecting information, or keeping it safe. That said, each item on this page has a use, and you can always come back and update it later.',
-      name: 'profile_introduction_help_text',
-      desc: '',
-      args: [],
-    );
-  }
-
-  String get profile_location_help_text {
-    return Intl.message(
-      'If you give us location information, we may make symptom, temperature and COVID-19 testing information available anonymously (no identifying information) to public health agencies responsible for those zip codes. You can provide a real location, even if you register with a fake email address and provide no other information. But that information (level of illness, location) may be useful for public health planning even if you can not be contacted.\n\nIf you enter your location, we can also personalize the information we give you about COVID-19 resources.',
-      name: 'profile_location_help_text',
-      desc: '',
-      args: [],
-    );
-  }
-
-  String get profile_contact_info_help_text {
-    return Intl.message(
-      'If you provide your email, phone, or both, then we can make that info available to the public health agency responsible for your area, and we or they can contact you if needed. You will only be contacted if there is a specific reason to do so, one that we or the public health agency(s) believe to be in your best interest.\n\nIf you chose to set up your account with a fake email, you may provide us with a real one here, so we may contact you. But, doing so will not change your username. Likewise, if you used one email as a username when setting up your account, but would prefer a different email as your contact email, you can enter it here, but it will not change your username.',
-      name: 'profile_contact_info_help_text',
-      desc: '',
-      args: [],
-    );
-  }
-
-  String get profile_identifying_info_help_text {
-    return Intl.message(
-      'If you **do provide** an email and/or phone number, we\'d like to know who we are speaking with, if we do have a need to contact you. We’d also appreciate it if you\'d include sex and date of birth as those are standard ways of ensuring that the right person\'s medication information gets attached to the correct clinic, testing, or hospital records.\n\nIf you **have not provided** location or contact information, it would still be helpful if you could let us know your sex, the year, and perhaps the month of your birth (you can enter a fake day, or month, if you want). Patterns of illness by age, sex, and location can be critical in helping public health shape an effective response.',
-      name: 'profile_identifying_info_help_text',
-      desc: '',
-      args: [],
-    );
-  }
-
   String get profile_location_title_text {
     return Intl.message(
       'Location',
@@ -1084,6 +1048,150 @@ class S {
     return Intl.message(
       'The CDC\'s Self-Checker is an interactive tool to help you make decisions and seek appropriate medical care for COVID-19.\n\nCurrently you need to enter your symptoms again when using Self-Checker, but a future version of StayHome will be able to send Self-Checker the symptoms you’ve already recorded (with your permission).',
       name: 'cdc_symptom_checker_info_text',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get information_sharing {
+    return Intl.message(
+      'Information Sharing',
+      name: 'information_sharing',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get information_sharing_info {
+    return Intl.message(
+      'We encourage you to share some or all of your information with public health agencies and researchers, but you do not have to.',
+      name: 'information_sharing_info',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get public_health_information_sharing_info {
+    return Intl.message(
+      'If you choose to share information with public health agencies it will help them know how to plan for and address the COVID-19 outbreak in your area. If you share your name and contact information they may also contact you if they think you need help.',
+      name: 'public_health_information_sharing_info',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get public_health_information_sharing_question {
+    return Intl.message(
+      'Which information do you choose to share with **public health agencies** in your area?',
+      name: 'public_health_information_sharing_question',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get research_information_sharing_info {
+    return Intl.message(
+      'If you choose to share information with researchers it will help them learn more about the COVID-19 outbreak and how to help people like you. If you share your name and contact information they may also contact you to ask if you would like to participate in COVID-19 research studies',
+      name: 'research_information_sharing_info',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get research_information_sharing_question {
+    return Intl.message(
+      'Which information do you choose to share with **researchers** interested in learning about COVID-19?',
+      name: 'research_information_sharing_question',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get member_program_question {
+    return Intl.message(
+      'Are you a participant or member of any of the following programs?',
+      name: 'member_program_question',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get fiu_title {
+    return Intl.message(
+      'Florida International University: student, faculty, or staff',
+      name: 'fiu_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get fiu_body {
+    return Intl.message(
+      'You can choose to share your information directly with FIU. This will help them plan for and track COVID-related wellbeing and needs of the FIU community. If you share information with FIU they will have access to:\n- Your symptoms, testing, and health condition information,\n- Your general location information (zip code), AND\n- Your name and contact information (email and/or phone number).',
+      name: 'fiu_body',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get fiu_toggle {
+    return Intl.message(
+      'Share my information with Florida International University',
+      name: 'fiu_toggle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get fiuNH_title {
+    return Intl.message(
+      'FIU NeighborhoodHELP program',
+      name: 'fiuNH_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get fiuNH_body {
+    return Intl.message(
+      'You can choose to share your information directly with the NeighborhoodHELP program. If you do they will know if you might be sick from COVID-19, and what kind of help you or your family might need. If you share information with NeighborhoodHLEP they will have access to:\n- Your symptoms, testing, and health condition information,\n- Your general location information (zip code), AND\n- Your name and contact information (email and/or phone number).',
+      name: 'fiuNH_body',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get fiuNH_toggle {
+    return Intl.message(
+      'Share my information with FIU NeighborhoodHELP',
+      name: 'fiuNH_toggle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get scan_title {
+    return Intl.message(
+      'Seattle Coronavirus Assessment Network (SCAN)',
+      name: 'scan_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get scan_body {
+    return Intl.message(
+      'You can choose to share your information directly with the Seattle Coronavirus Assessment Network (SCAN). If you do they will be able to link your information from StayHome with the information in their system. If you share information with SCAN they will have access to:\n- Your symptoms, testing, and health condition information,\n- Your general location information (zip code), AND\n- Your name and contact information (email and/or phone number).',
+      name: 'scan_body',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get scan_toggle {
+    return Intl.message(
+      'Share my information with the Seattle Coronavirus Assessment Network (SCAN)',
+      name: 'scan_toggle',
       desc: '',
       args: [],
     );

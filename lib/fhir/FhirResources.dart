@@ -96,16 +96,18 @@ class Consent extends Resource {
   List<CodeableConcept> category;
   Reference patient;
   Provision provision;
+  List<Reference> organization;
 
   Consent(
       {resourceType,
-        id,
-        this.meta,
-        this.status,
-        this.scope,
-        this.category,
-        this.patient,
-        this.provision})
+      id,
+      this.meta,
+      this.status,
+      this.scope,
+      this.category,
+      this.patient,
+      this.provision,
+      this.organization})
       : super(resourceType: "Consent", id: id);
 
   Consent.fromJson(Map<String, dynamic> json) {
@@ -121,6 +123,12 @@ class Consent extends Resource {
         category.add(new CodeableConcept.fromJson(v));
       });
     }
+    if (json['organization'] != null) {
+      organization = new List<Reference>();
+      json['organization'].forEach((v) {
+        organization.add(new Reference.fromJson(v));
+      });
+    }
     if (json['patient'] != null) patient = Reference.fromJson(json['patient']);
     if (json['provision'] != null) provision = Provision.fromJson(json['provision']);
   }
@@ -134,27 +142,32 @@ class Consent extends Resource {
     if (this.scope != null) data['scope'] = scope.toJson();
     if (this.status != null) data['status'] = status.toString();
     if (this.category != null) data['category'] = this.category.map((v) => v.toJson()).toList();
+    if (this.organization != null)
+      data['organization'] = this.organization.map((v) => v.toJson()).toList();
     if (this.patient != null) data['patient'] = patient.toJson();
     if (this.provision != null) data['provision'] = provision.toJson();
 
     return data;
   }
 
-  bool hasCategory(Coding category) => this.category.any(
-            (CodeableConcept concept) =>
-            concept.coding.any((element) => element == category));
+  bool hasCategory(Coding category) => this
+      .category
+      .any((CodeableConcept concept) => concept.coding.any((element) => element == category));
 
   bool get isConsented => provision.type.isPermitted;
 
-  factory Consent.from(Patient patient, ConsentContentClass contentClass, bool permit) {
+  factory Consent.from(Patient patient, Reference organization, Coding contentClass,
+      ProvisionType type) {
     return Consent(
         status: ConsentStatus.active,
         scope: CodeableConcept(coding: [ConsentScope.patientPrivacy]),
-        category: [CodeableConcept(coding: [contentClass])],
+        category: [
+          CodeableConcept(coding: [ConsentCategory.patientConsent])
+        ],
         patient: Reference(reference: patient.reference),
+        organization: [organization],
         provision: Provision(
-            type: permit ? ProvisionType.permit : ProvisionType.deny,
-            period: Period(start: DateTime.now())));
+            provisionClass: [contentClass], type: type, period: Period(start: DateTime.now())));
   }
 }
 
@@ -182,31 +195,30 @@ class ConsentStatus {
 
 class Provision implements JsonSerializable {
   ProvisionType type;
-//  List<Coding> provisionClass;
+  List<Coding> provisionClass;
   Period period;
 
-//  Provision({this.type, this.provisionClass, this.period});
-  Provision({this.type, this.period});
+  Provision({this.type, this.provisionClass, this.period});
 
   Provision.fromJson(Map<String, dynamic> json) {
     if (json['type'] != null) type = ProvisionType.fromJson(json['type']);
-//    if (json['class'] != null) {
-//      provisionClass = new List<Coding>();
-//      json['class'].forEach((v) {
-//        provisionClass.add(new Coding.fromJson(v));
-//      });
-//    }
+    if (json['class'] != null) {
+      provisionClass = new List<Coding>();
+      json['class'].forEach((v) {
+        provisionClass.add(new Coding.fromJson(v));
+      });
+    }
     if (json['period'] != null) period = Period.fromJson(json['period']);
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.type != null) data['type'] = this.type.toString();
-//    if (this.provisionClass != null) data['class'] = this.provisionClass.map((v) => v.toJson()).toList();
+    if (this.provisionClass != null)
+      data['class'] = this.provisionClass.map((v) => v.toJson()).toList();
     if (this.period != null) data['period'] = this.period.toJson();
     return data;
   }
-
 }
 
 class ProvisionType {
@@ -228,7 +240,6 @@ class ProvisionType {
 
   bool get isPermitted => this == permit;
 }
-
 
 class Communication extends Resource {
   Meta meta;
@@ -1715,7 +1726,6 @@ class Coding implements ChoiceOption {
 
   Coding({this.system, this.code, this.display});
 
-
   @override
   String toString() => display;
 
@@ -2302,6 +2312,18 @@ class Reference {
   }
 
   Reference.from(Patient patient) : this(reference: patient.reference);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is Reference &&
+              reference == other.reference;
+
+  @override
+  int get hashCode => reference.hashCode;
+
+
+
 }
 
 class QuestionnaireResponseItem {

@@ -4,6 +4,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:map_app_flutter/ProfilePage.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
@@ -112,3 +113,46 @@ class NoDataWidget extends StatelessWidget {
     ));
   }
 }
+
+class SaveAndCancelBar extends StatelessWidget {
+  final Function onCancel;
+  final Function onSave;
+
+  SaveAndCancelBar({this.onCancel, this.onSave});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: Dimensions.largeMargin),
+      child: Center(
+          child: Wrap(
+            spacing: Dimensions.halfMargin,
+            runSpacing: Dimensions.fullMargin,
+            children: <Widget>[
+              OutlineButton(
+                child: Text(S.of(context).cancel),
+                onPressed: onCancel,
+              ),
+              RaisedButton(
+                padding: MapAppPadding.largeButtonPadding,
+                child: Text(S.of(context).save, style: Theme.of(context).textTheme.button),
+                onPressed: onSave,
+              )
+            ],
+          )),
+    );
+  }
+}
+buildSectionHeader(String text, BuildContext context) {
+  return Padding(
+    padding: const EdgeInsets.only(top: Dimensions.largeMargin, bottom: 4),
+    child: Text(text, style: Theme.of(context).textTheme.headline6),
+  );
+}
+
+Widget paragraph(String text) => padded(MarkdownBody(data: text));
+
+Widget padded(Widget w) => Padding(
+  padding: const EdgeInsets.symmetric(vertical: Dimensions.quarterMargin),
+  child: w,
+);

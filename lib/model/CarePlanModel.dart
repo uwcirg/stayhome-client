@@ -2,6 +2,8 @@
  * Copyright (c) 2020 CIRG. All rights reserved.
  */
 
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/KeycloakAuth.dart';
 import 'package:map_app_flutter/config/AppConfig.dart';
@@ -340,17 +342,8 @@ class CarePlanModel extends Model {
         orElse: () => null);
   }
 
-  Future<void> updateConsents({bool location, bool contactInfo, bool aboutYou}) async {
-    List<Consent> newConsents = [];
-    if (location != consents?.locationConsent?.isConsented ?? false) {
-      newConsents.add(Consent.from(patient, ConsentContentClass.location, location));
-    }
-    if (contactInfo != consents?.contactInfoConsent?.isConsented ?? false) {
-      newConsents.add(Consent.from(patient, ConsentContentClass.contactInformation, contactInfo));
-    }
-    if (aboutYou != consents?.aboutYouConsent?.isConsented ?? false) {
-      newConsents.add(Consent.from(patient, ConsentContentClass.aboutYou, aboutYou));
-    }
+  Future<void> updateConsents() async {
+    List<Consent> newConsents = consents.generateNewConsents(patient);
 
     return Future.wait(newConsents.map((Consent c) => Repository.postConsent(c, _api)).toList())
         .then((value) => _loadConsents());
@@ -566,24 +559,109 @@ class TreatmentEvent {
 enum EventType { Assessment, Treatment }
 enum Status { Scheduled, Completed, Missed }
 
-class DataSharingConsents {
-  Consent locationConsent;
-  Consent aboutYouConsent;
-  Consent contactInfoConsent;
+class ConsentGroup with MapMixin<Coding, ProvisionType> {
+  Map<Coding, ProvisionType> _consents = Map();
 
-  DataSharingConsents.from(List<Consent> consents) {
+  bool get shareSymptoms =>
+      _consents[ConsentContentClass.symptomsTestingConditions] == ProvisionType.permit;
+
+  set shareSymptoms(bool permit) => _consents[ConsentContentClass.symptomsTestingConditions] =
+      permit ? ProvisionType.permit : ProvisionType.deny;
+
+  bool get shareLocation => _consents[ConsentContentClass.location] == ProvisionType.permit;
+
+  set shareLocation(bool permit) =>
+      _consents[ConsentContentClass.location] = permit ? ProvisionType.permit : ProvisionType.deny;
+
+  bool get shareContactInfo =>
+      _consents[ConsentContentClass.contactInformation] == ProvisionType.permit;
+
+  set shareContactInfo(bool permit) => _consents[ConsentContentClass.contactInformation] =
+      permit ? ProvisionType.permit : ProvisionType.deny;
+
+  bool get shareAll => _consents[ConsentContentClass.all] == ProvisionType.permit;
+
+  set shareAll(bool permit) =>
+      _consents[ConsentContentClass.all] = permit ? ProvisionType.permit : ProvisionType.deny;
+
+  @override
+  ProvisionType operator [](Object key) => _consents[key];
+
+  @override
+  void operator []=(Coding key, ProvisionType value) => _consents[key] = value;
+
+  @override
+  void clear() => _consents.clear();
+
+  @override
+  Iterable<Coding> get keys => _consents.keys;
+
+  @override
+  ProvisionType remove(Object key) => _consents.remove(key);
+}
+
+class DataSharingConsents with MapMixin<Reference, ConsentGroup> {
+  List<Consent> _originalConsents = [];
+  Map<Reference, ConsentGroup> _consents = Map();
+
+  DataSharingConsents();
+
+  void reset() {
+    _initFrom(_originalConsents);
+  }
+
+  void _initFrom(List<Consent> consents) {
+    _consents = Map();
+    _originalConsents = consents.map((e) => e.toJson()).map((e) => Consent.fromJson(e)).toList();
     if (consents == null) return;
     consents.sort((Consent a, Consent b) {
       return a.provision.period.start.compareTo(b.provision.period.start);
     });
-    locationConsent = consents.firstWhere((Consent consent) {
-      return consent.hasCategory(ConsentContentClass.location);
-    }, orElse: () => null);
-    aboutYouConsent = consents.firstWhere((Consent consent) {
-      return consent.hasCategory(ConsentContentClass.aboutYou);
-    }, orElse: () => null);
-    contactInfoConsent = consents.firstWhere((Consent consent) {
-      return consent.hasCategory(ConsentContentClass.contactInformation);
-    }, orElse: () => null);
+    consents.forEach((Consent consent) {
+      Map contentCategories = _consents.putIfAbsent(consent.organization.first, () => ConsentGroup());
+      Coding contentClass = consent.provision.provisionClass.first;
+      contentCategories.putIfAbsent(contentClass, () => consent.provision.type);
+    });
   }
+
+  DataSharingConsents.from(List<Consent> consents) {
+    _initFrom(consents);
+  }
+
+  List<Consent> generateNewConsents(Patient patient) {
+    List<Consent> newConsents = [];
+    _consents.forEach((Reference org, Map<Coding, ProvisionType> orgConsents) {
+      orgConsents.forEach((Coding contentClass, ProvisionType type) {
+        ProvisionType existingProvisionType = _originalConsents
+            .firstWhere((Consent consent) {
+              return consent.organization.contains(org) &&
+                  consent.provision.provisionClass.contains(contentClass);
+            }, orElse: () => null)
+            ?.provision
+            ?.type;
+        if (existingProvisionType == null || existingProvisionType != type) {
+          newConsents.add(Consent.from(patient, org, contentClass, type));
+        }
+      });
+    });
+    return newConsents;
+  }
+
+  @override
+  ConsentGroup operator [](Object key) => _consents[key];
+
+  @override
+  void operator []=(Reference key,ConsentGroup value) =>
+      _consents[key] = value;
+
+  @override
+  void clear() => _consents.clear();
+
+  @override
+  Iterable<Reference> get keys => _consents.keys;
+
+  @override
+  ConsentGroup remove(Object key) => _consents.remove(key);
+
+
 }
