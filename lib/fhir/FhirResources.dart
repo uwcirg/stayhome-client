@@ -3,6 +3,7 @@
  */
 import 'package:intl/intl.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
+import 'package:map_app_flutter/map_app_code_system.dart';
 import 'package:map_app_flutter/services/Repository.dart';
 import "package:simple_auth/simple_auth.dart" show JsonSerializable;
 
@@ -12,7 +13,7 @@ abstract class Resource implements JsonSerializable {
 
   Resource({this.resourceType, this.id});
 
-  get reference => "$resourceType/$id";
+  String get reference => "$resourceType/$id";
 }
 
 class Gender {
@@ -88,7 +89,159 @@ class Priority {
   static const _vals = [routine, urgent, asap, stat];
 }
 
-class Communication extends Resource implements JsonSerializable {
+class Consent extends Resource {
+  Meta meta;
+  ConsentStatus status;
+  CodeableConcept scope;
+  List<CodeableConcept> category;
+  Reference patient;
+  Provision provision;
+  List<Reference> organization;
+
+  Consent(
+      {resourceType,
+      id,
+      this.meta,
+      this.status,
+      this.scope,
+      this.category,
+      this.patient,
+      this.provision,
+      this.organization})
+      : super(resourceType: "Consent", id: id);
+
+  Consent.fromJson(Map<String, dynamic> json) {
+    resourceType = json['resourceType'];
+    id = json['id'];
+    meta = json['meta'] != null ? Meta.fromJson(json['meta']) : null;
+
+    if (json['status'] != null) status = ConsentStatus.fromJson(json['status']);
+    if (json['scope'] != null) scope = CodeableConcept.fromJson(json['scope']);
+    if (json['category'] != null) {
+      category = new List<CodeableConcept>();
+      json['category'].forEach((v) {
+        category.add(new CodeableConcept.fromJson(v));
+      });
+    }
+    if (json['organization'] != null) {
+      organization = new List<Reference>();
+      json['organization'].forEach((v) {
+        organization.add(new Reference.fromJson(v));
+      });
+    }
+    if (json['patient'] != null) patient = Reference.fromJson(json['patient']);
+    if (json['provision'] != null) provision = Provision.fromJson(json['provision']);
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+
+    if (this.id != null) data['id'] = id;
+    if (this.resourceType != null) data['resourceType'] = resourceType;
+    if (this.meta != null) data['meta'] = meta.toJson();
+    if (this.scope != null) data['scope'] = scope.toJson();
+    if (this.status != null) data['status'] = status.toString();
+    if (this.category != null) data['category'] = this.category.map((v) => v.toJson()).toList();
+    if (this.organization != null)
+      data['organization'] = this.organization.map((v) => v.toJson()).toList();
+    if (this.patient != null) data['patient'] = patient.toJson();
+    if (this.provision != null) data['provision'] = provision.toJson();
+
+    return data;
+  }
+
+  bool hasCategory(Coding category) => this
+      .category
+      .any((CodeableConcept concept) => concept.coding.any((element) => element == category));
+
+  bool get isConsented => provision.type.isPermitted;
+
+  factory Consent.from(Patient patient, Reference organization, Coding contentClass,
+      ProvisionType type) {
+    return Consent(
+        status: ConsentStatus.active,
+        scope: CodeableConcept(coding: [ConsentScope.patientPrivacy]),
+        category: [
+          CodeableConcept(coding: [ConsentCategory.patientConsent])
+        ],
+        patient: Reference(reference: patient.reference),
+        organization: [organization],
+        provision: Provision(
+            provisionClass: [contentClass], type: type, period: Period(start: DateTime.now())));
+  }
+}
+
+class ConsentStatus {
+  final _value;
+
+  const ConsentStatus._(this._value);
+
+  toString() => _value;
+
+  static fromJson(String key) {
+    return _vals.firstWhere((v) => v._value == key,
+        orElse: () => throw ArgumentError("Key does not match any ConsentStatus"));
+  }
+
+  static const draft = const ConsentStatus._('draft');
+  static const proposed = const ConsentStatus._('proposed');
+  static const active = const ConsentStatus._('active');
+  static const rejected = const ConsentStatus._('rejected');
+  static const inactive = const ConsentStatus._('inactive');
+  static const entered_in_error = const ConsentStatus._('entered-in-error');
+
+  static const _vals = [draft, proposed, active, rejected, inactive, entered_in_error];
+}
+
+class Provision implements JsonSerializable {
+  ProvisionType type;
+  List<Coding> provisionClass;
+  Period period;
+
+  Provision({this.type, this.provisionClass, this.period});
+
+  Provision.fromJson(Map<String, dynamic> json) {
+    if (json['type'] != null) type = ProvisionType.fromJson(json['type']);
+    if (json['class'] != null) {
+      provisionClass = new List<Coding>();
+      json['class'].forEach((v) {
+        provisionClass.add(new Coding.fromJson(v));
+      });
+    }
+    if (json['period'] != null) period = Period.fromJson(json['period']);
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (this.type != null) data['type'] = this.type.toString();
+    if (this.provisionClass != null)
+      data['class'] = this.provisionClass.map((v) => v.toJson()).toList();
+    if (this.period != null) data['period'] = this.period.toJson();
+    return data;
+  }
+}
+
+class ProvisionType {
+  final _value;
+
+  const ProvisionType._(this._value);
+
+  toString() => _value;
+
+  static fromJson(String key) {
+    return _vals.firstWhere((v) => v._value == key,
+        orElse: () => throw ArgumentError("Key does not match any ProvisionType"));
+  }
+
+  static const deny = const ProvisionType._('deny');
+  static const permit = const ProvisionType._('permit');
+
+  static const _vals = [deny, permit];
+
+  bool get isPermitted => this == permit;
+}
+
+class Communication extends Resource {
   Meta meta;
   CommunicationStatus status;
   Priority priority;
@@ -1095,8 +1248,8 @@ class Period {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['start'] = this.start.toIso8601String();
-    data['end'] = this.end.toIso8601String();
+    if (this.start != null) data['start'] = this.start.toIso8601String();
+    if (this.end != null) data['end'] = this.end.toIso8601String();
     return data;
   }
 }
@@ -1572,7 +1725,6 @@ class Coding implements ChoiceOption {
   Answer get ifSelected => new Answer(valueCoding: this);
 
   Coding({this.system, this.code, this.display});
-
 
   @override
   String toString() => display;
@@ -2160,6 +2312,18 @@ class Reference {
   }
 
   Reference.from(Patient patient) : this(reference: patient.reference);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is Reference &&
+              reference == other.reference;
+
+  @override
+  int get hashCode => reference.hashCode;
+
+
+
 }
 
 class QuestionnaireResponseItem {

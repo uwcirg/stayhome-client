@@ -2,11 +2,14 @@
  * Copyright (c) 2020 CIRG. All rights reserved.
  */
 
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/KeycloakAuth.dart';
 import 'package:map_app_flutter/config/AppConfig.dart';
 import 'package:map_app_flutter/fhir/Exception.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
+import 'package:map_app_flutter/map_app_code_system.dart';
 import 'package:map_app_flutter/services/Repository.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:simple_auth/simple_auth.dart';
@@ -20,6 +23,7 @@ class CarePlanModel extends Model {
   bool isLoading = false;
   Patient patient;
   TreatmentCalendar treatmentCalendar;
+  DataSharingConsents consents;
 
   KeycloakAuth _auth;
 
@@ -197,6 +201,12 @@ class CarePlanModel extends Model {
     }
   }
 
+  Future<void> _loadConsents() {
+    return Repository.getConsents(patient, _api).then((List<Consent> responses) {
+      this.consents = DataSharingConsents.from(responses);
+    });
+  }
+
   Future<void> _loadQuestionnaires() async {
     List<Future> futures = [
       Repository.getQuestionnaires(this.carePlan, _api).then((var questionnaires) {
@@ -214,6 +224,7 @@ class CarePlanModel extends Model {
           .then((List<DocumentReference> responses) {
         this.infoLinks = responses;
       }),
+      _loadConsents()
     ];
     return Future.wait(futures).then((value) => rebuildTreatmentPlan());
   }
@@ -330,6 +341,13 @@ class CarePlanModel extends Model {
         (element) => element.id == response.questionnaireReference.split("/")[1],
         orElse: () => null);
   }
+
+  Future<void> updateConsents() async {
+    List<Consent> newConsents = consents.generateNewConsents(patient);
+
+    return Future.wait(newConsents.map((Consent c) => Repository.postConsent(c, _api)).toList())
+        .then((value) => _loadConsents());
+  }
 }
 
 class TreatmentCalendar {
@@ -436,8 +454,8 @@ class TreatmentCalendar {
     } else if (plan.period != null && plan.period.start != null && plan.period.end != null) {
       scheduledPeriod = plan.period;
     } else {
-      throw MalformedFhirResourceException(plan,
-          "${plan.reference} must have period start and end");
+      throw MalformedFhirResourceException(
+          plan, "${plan.reference} must have period start and end");
     }
     return scheduledPeriod;
   }
@@ -540,3 +558,110 @@ class TreatmentEvent {
 
 enum EventType { Assessment, Treatment }
 enum Status { Scheduled, Completed, Missed }
+
+class ConsentGroup with MapMixin<Coding, ProvisionType> {
+  Map<Coding, ProvisionType> _consents = Map();
+
+  bool get shareSymptoms =>
+      _consents[ConsentContentClass.symptomsTestingConditions] == ProvisionType.permit;
+
+  set shareSymptoms(bool permit) => _consents[ConsentContentClass.symptomsTestingConditions] =
+      permit ? ProvisionType.permit : ProvisionType.deny;
+
+  bool get shareLocation => _consents[ConsentContentClass.location] == ProvisionType.permit;
+
+  set shareLocation(bool permit) =>
+      _consents[ConsentContentClass.location] = permit ? ProvisionType.permit : ProvisionType.deny;
+
+  bool get shareContactInfo =>
+      _consents[ConsentContentClass.contactInformation] == ProvisionType.permit;
+
+  set shareContactInfo(bool permit) => _consents[ConsentContentClass.contactInformation] =
+      permit ? ProvisionType.permit : ProvisionType.deny;
+
+  bool get shareAll => _consents[ConsentContentClass.all] == ProvisionType.permit;
+
+  set shareAll(bool permit) =>
+      _consents[ConsentContentClass.all] = permit ? ProvisionType.permit : ProvisionType.deny;
+
+  @override
+  ProvisionType operator [](Object key) => _consents[key];
+
+  @override
+  void operator []=(Coding key, ProvisionType value) => _consents[key] = value;
+
+  @override
+  void clear() => _consents.clear();
+
+  @override
+  Iterable<Coding> get keys => _consents.keys;
+
+  @override
+  ProvisionType remove(Object key) => _consents.remove(key);
+}
+
+class DataSharingConsents with MapMixin<Reference, ConsentGroup> {
+  List<Consent> _originalConsents = [];
+  Map<Reference, ConsentGroup> _consents = Map();
+
+  DataSharingConsents();
+
+  void reset() {
+    _initFrom(_originalConsents);
+  }
+
+  void _initFrom(List<Consent> consents) {
+    _consents = Map();
+    _originalConsents = consents.map((e) => e.toJson()).map((e) => Consent.fromJson(e)).toList();
+    if (consents == null) return;
+    consents.sort((Consent a, Consent b) {
+      return a.provision.period.start.compareTo(b.provision.period.start);
+    });
+    consents.forEach((Consent consent) {
+      Map contentCategories = _consents.putIfAbsent(consent.organization.first, () => ConsentGroup());
+      Coding contentClass = consent.provision.provisionClass.first;
+      contentCategories.putIfAbsent(contentClass, () => consent.provision.type);
+    });
+  }
+
+  DataSharingConsents.from(List<Consent> consents) {
+    _initFrom(consents);
+  }
+
+  List<Consent> generateNewConsents(Patient patient) {
+    List<Consent> newConsents = [];
+    _consents.forEach((Reference org, Map<Coding, ProvisionType> orgConsents) {
+      orgConsents.forEach((Coding contentClass, ProvisionType type) {
+        ProvisionType existingProvisionType = _originalConsents
+            .firstWhere((Consent consent) {
+              return consent.organization.contains(org) &&
+                  consent.provision.provisionClass.contains(contentClass);
+            }, orElse: () => null)
+            ?.provision
+            ?.type;
+        if (existingProvisionType == null || existingProvisionType != type) {
+          newConsents.add(Consent.from(patient, org, contentClass, type));
+        }
+      });
+    });
+    return newConsents;
+  }
+
+  @override
+  ConsentGroup operator [](Object key) => _consents[key];
+
+  @override
+  void operator []=(Reference key,ConsentGroup value) =>
+      _consents[key] = value;
+
+  @override
+  void clear() => _consents.clear();
+
+  @override
+  Iterable<Reference> get keys => _consents.keys;
+
+  @override
+  ConsentGroup remove(Object key) => _consents.remove(key);
+
+
+}
