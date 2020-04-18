@@ -3,6 +3,7 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
 import 'package:map_app_flutter/map_app_widgets.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
@@ -85,13 +86,20 @@ class ProgramConsentWidgetState extends State<ProgramConsentWidget> {
           return Column(
             children: <Widget>[
               programTitle,
-              paragraph(widget.expandedTextMarkdown),
-              SwitchFormField(
-                title: widget.shareItemLabel,
-                initialValue: consentGroup.shareAll,
-                onChanged: (newValue) {
-                  consentGroup.shareAll = newValue;
-                },
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: Dimensions.fullMargin, vertical: Dimensions.halfMargin),
+                color: Theme.of(context).highlightColor,
+                child: Column(children: [
+                  paragraph(widget.expandedTextMarkdown),
+                  SwitchFormField(
+                    title: widget.shareItemLabel,
+                    initialValue: consentGroup.shareAll,
+                    onChanged: (newValue) {
+                      consentGroup.shareAll = newValue;
+                    },
+                  ),
+                ]),
               )
             ],
           );
