@@ -172,3 +172,14 @@ void snack(String text, context) {
 void launchResourceUrl(CarePlanModel model) {
   PlatformDefs().launchUrl(WhatInfo.resourceLinkWithZip(model?.patient?.homeZip), newTab: true);
 }
+
+String versionString() {
+  String commitSha = AppConfig.commitSha;
+  if (commitSha != null && commitSha.length > 8) {
+    commitSha = commitSha.substring(0, 8);
+  }
+  String versionString = AppConfig.version;
+  if (commitSha != null && !AppConfig.isProd) versionString += ' / $commitSha';
+
+  return versionString;
+}
