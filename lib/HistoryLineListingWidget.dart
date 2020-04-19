@@ -43,7 +43,9 @@ class HistoryLineListingWidget extends StatelessWidget {
                   : S.of(context).no_date,
               style: Theme.of(context).textTheme.caption,
             ),
-            Text(model.questionnaireForResponse(response).title)
+            Text(model
+                .questionnaireForResponse(response)
+                .titleLocalized(Localizations.localeOf(context).languageCode))
           ],
         ),
         children: response.item
@@ -64,7 +66,9 @@ class HistoryLineListingWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Text(
-            model.questionForLinkId(responseItem.linkId).text,
+            model
+                .questionForLinkId(responseItem.linkId)
+                .textLocalized(Localizations.localeOf(context).languageCode),
             style: Theme.of(context).textTheme.caption,
           ),
           Text(responseItem.answerDisplay)

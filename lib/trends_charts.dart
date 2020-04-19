@@ -55,7 +55,7 @@ class ChartWidgetState extends State<ChartWidget> {
             padding:
             const EdgeInsets.only(bottom: Dimensions.halfMargin),
             child: Text(
-              question.text,
+              question.textLocalized(Localizations.localeOf(context).languageCode),
               style: Theme.of(context).textTheme.title,
             ),
           ),

@@ -1,4 +1,5 @@
 import 'package:map_app_flutter/fhir/FhirResources.dart';
+import 'package:map_app_flutter/fhir/fhir_translations.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:map_app_flutter/value_utils.dart';
 import 'package:test/test.dart';
@@ -49,6 +50,48 @@ void main() {
       dataSharingConsents.reset();
       int newConsentCount = dataSharingConsents.generateNewConsents(patient).length;
       expect(newConsentCount, 0);
+    });
+  });
+
+  group("Translation utils: extract translation", () {
+    String english = "The quick brown fox jumps over the lazy dog.";
+    String german = "Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich";
+
+    PrimitiveTypeExtension ext = PrimitiveTypeExtension(extension: [
+      Extension(
+          url: "http://hl7.org/fhir/StructureDefinition/elementdefinition-translatable",
+          valueBoolean: true),
+      Extension(url: "http://hl7.org/fhir/StructureDefinition/translation", extension: [
+        Extension(url: "lang", valueCode: "de"),
+        Extension(url: "content", valueString: german)
+      ])
+    ]);
+
+    test("Extract existing translation", () {
+      expect(FhirTranslationUtils.extractTranslation(english, ext, "de"), german);
+    });
+    test("Extract english translation", () {
+      expect(FhirTranslationUtils.extractTranslation(english, ext, "en"), english);
+    });
+    test("Extract non-existent translation 1", () {
+      expect(FhirTranslationUtils.extractTranslation(english, ext, "es"), english);
+    });
+    test("Extract non-existent translation 2", () {
+      PrimitiveTypeExtension noneExt = null;
+      expect(FhirTranslationUtils.extractTranslation(english, noneExt, "es"), english);
+    });
+    test("Extract non-existent translation 3", () {
+      PrimitiveTypeExtension noneExt = PrimitiveTypeExtension();
+      expect(FhirTranslationUtils.extractTranslation(english, noneExt, "es"), english);
+    });
+    test("Extract non-existent translation 4", () {
+      PrimitiveTypeExtension noneExt = PrimitiveTypeExtension(extension: []);
+      expect(FhirTranslationUtils.extractTranslation(english, noneExt, "es"), english);
+    });
+    test("Extract non-existent translation 5", () {
+      PrimitiveTypeExtension noneExt =
+          PrimitiveTypeExtension(extension: [Extension(url: "nonsense")]);
+      expect(FhirTranslationUtils.extractTranslation(english, noneExt, "es"), english);
     });
   });
 }

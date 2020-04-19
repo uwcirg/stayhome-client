@@ -76,7 +76,6 @@ abstract class _PlanPageState extends State<PlanPage> {
 
   List<Widget> _buildCalendarPageChildren(BuildContext context, CarePlanModel model);
 
-
   Widget _buildQuestionnaireButtonSection(BuildContext context, CarePlanModel model) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Dimensions.fullMargin),
@@ -90,8 +89,9 @@ abstract class _PlanPageState extends State<PlanPage> {
   List<Widget> _buildQuestionnaireButtons(BuildContext context, CarePlanModel model) {
     if (model.questionnaires == null) return [];
     return model.questionnaires.map((Questionnaire questionnaire) {
-      String title =
-          questionnaire.title != null ? questionnaire.title.toLowerCase() : "questionnaire";
+      String title = questionnaire.title != null
+          ? questionnaire.titleLocalized(Localizations.localeOf(context).languageCode).toLowerCase()
+          : "questionnaire";
       return _buildQuestionnaireButton(context, title, questionnaire, model);
     }).toList();
   }
@@ -138,6 +138,7 @@ class TreatmentCalendarWidget extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => TreatmentCalendarWidgetState();
 }
+
 class TreatmentCalendarWidgetState extends State<TreatmentCalendarWidget> {
   CalendarController _calendarController;
 
@@ -318,8 +319,8 @@ class TreatmentCalendarWidgetState extends State<TreatmentCalendarWidget> {
 }
 
 class StayHomeTreatmentCalendarWidget extends TreatmentCalendarWidget {
-  StayHomeTreatmentCalendarWidget(CarePlanModel model)
-      : super(model);
+  StayHomeTreatmentCalendarWidget(CarePlanModel model) : super(model);
+
   @override
   State<StatefulWidget> createState() => StayHomeTreatmentCalendarWidgetState();
 }
@@ -402,8 +403,8 @@ class StayHomeTreatmentCalendarWidgetState extends TreatmentCalendarWidgetState 
 
       Widget completedBubble = _buildNumberBubble('$numCompleted', Theme.of(context).primaryColor,
           Theme.of(context).primaryTextTheme.caption);
-      Widget incompleteBubble = _buildNumberBubble('$numIncomplete',
-          widget._scheduledEventColor, Theme.of(context).primaryTextTheme.caption);
+      Widget incompleteBubble = _buildNumberBubble('$numIncomplete', widget._scheduledEventColor,
+          Theme.of(context).primaryTextTheme.caption);
       if (numIncomplete == 0) {
         child = completedBubble;
       } else if (numCompleted == 0) {
@@ -464,7 +465,7 @@ class _StayHomePlanPageState extends _PlanPageState {
   TreatmentCalendarWidget _buildTreatmentCalendarWidget(CarePlanModel model) {
     return StayHomeTreatmentCalendarWidget(model);
   }
-  
+
   Future<String> _showChangeDialogForActivity(
       BuildContext context, CarePlanModel model, int activityIndex) async {
     Activity activity = model.carePlan.activity[activityIndex];

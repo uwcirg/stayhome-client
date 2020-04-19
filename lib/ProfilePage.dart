@@ -264,6 +264,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
                     preferredContactMethod, (value) {
                   preferredContactMethod = value;
                 }, displayOverrides: {
+                      ContactPointSystem.email: S.of(context).contact_point_system_email,
                   ContactPointSystem.phone: S.of(context).profile_preferred_contact_voicecall_text,
                   ContactPointSystem.sms: S.of(context).profile_preferred_contact_sms_text
                 }),
@@ -336,7 +337,12 @@ class ProfileWidgetState extends State<ProfileWidget> {
                   (value) {
                     gender = value;
                   },
-                  displayOverrides: {Gender.unknown: S.of(context).decline_to_state},
+                  displayOverrides: {
+                    Gender.unknown: S.of(context).decline_to_state,
+                    Gender.male: S.of(context).gender_male,
+                    Gender.female: S.of(context).gender_female,
+                    Gender.other: S.of(context).gender_other
+                  },
                 ),
                 Divider(),
                 ..._permissionsPageContent(model),

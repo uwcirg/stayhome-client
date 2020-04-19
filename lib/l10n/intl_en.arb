@@ -130,6 +130,11 @@
   "fiuNH_toggle": "Share my information with FIU NeighborhoodHELP",
   "scan_title": "Seattle Coronavirus Assessment Network (SCAN)",
   "scan_body": "You can choose to share your information directly with the Seattle Coronavirus Assessment Network (SCAN). If you do they will be able to link your information from StayHome with the information in their system. If you share information with SCAN they will have access to:\n- Your symptoms, testing, and health condition information,\n- Your general location information (zip code), AND\n- Your name and contact information (email and/or phone number).",
-  "scan_toggle": "Share my information with the Seattle Coronavirus Assessment Network (SCAN)"
+  "scan_toggle": "Share my information with the Seattle Coronavirus Assessment Network (SCAN)",
+  "contact_point_system_email": "email",
+  "gender_male": "male",
+  "gender_female": "female",
+  "gender_other": "other"
+
 
 }

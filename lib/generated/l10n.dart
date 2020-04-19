@@ -1214,6 +1214,42 @@ class S {
       args: [],
     );
   }
+
+  String get contact_point_system_email {
+    return Intl.message(
+      'email',
+      name: 'contact_point_system_email',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get gender_male {
+    return Intl.message(
+      'male',
+      name: 'gender_male',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get gender_female {
+    return Intl.message(
+      'female',
+      name: 'gender_female',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get gender_other {
+    return Intl.message(
+      'other',
+      name: 'gender_other',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
