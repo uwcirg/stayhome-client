@@ -2,7 +2,6 @@
  * Copyright (c) 2020 CIRG. All rights reserved.
  */
 
-
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -35,7 +34,8 @@ class ChartWidgetState extends State<ChartWidget> {
   }
 
   Widget _buildChartWidget(String linkId, CarePlanModel model, BuildContext context) {
-    charts.NumericAxisSpec displayMappingSpec = _displayMappingSpec(model, linkId);
+    String languageCode = Localizations.localeOf(context).languageCode;
+    charts.NumericAxisSpec displayMappingSpec = _displayMappingSpec(model, linkId, languageCode);
     var timeSeries = _createTimeSeries(model, linkId, context);
 
     QuestionnaireItem question = model.questionForLinkId(linkId);
@@ -52,8 +52,7 @@ class ChartWidgetState extends State<ChartWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Padding(
-            padding:
-            const EdgeInsets.only(bottom: Dimensions.halfMargin),
+            padding: const EdgeInsets.only(bottom: Dimensions.halfMargin),
             child: Text(
               question.textLocalized(Localizations.localeOf(context).languageCode),
               style: Theme.of(context).textTheme.title,
@@ -71,7 +70,7 @@ class ChartWidgetState extends State<ChartWidget> {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text('${_measures != null ? _measures['Answers'] : ""}'),
+                      child: Text('${_measures != null ? _measures['Answers'].displayString(languageCode) : ""}'),
                     )
                   ]))
             ],
@@ -150,8 +149,9 @@ class ChartWidgetState extends State<ChartWidget> {
     });
   }
 
-  static charts.NumericAxisSpec _displayMappingSpec(CarePlanModel model, String linkId) {
-    var displayMappings = _displayMappings(model, linkId);
+  static charts.NumericAxisSpec _displayMappingSpec(
+      CarePlanModel model, String linkId, String languageCode) {
+    var displayMappings = _displayMappings(model, linkId, languageCode);
 
     List<num> keys = displayMappings?.keys?.toList();
     keys?.sort();
@@ -159,18 +159,18 @@ class ChartWidgetState extends State<ChartWidget> {
     num maxVal = keys?.last;
 
     return new charts.NumericAxisSpec(
-        tickFormatterSpec: charts.BasicNumericTickFormatterSpec(
-                (num measure) {
-                  if (displayMappings == null) return '$measure';
-                  var displayName = displayMappings[measure];
-                  if (displayName == null) return "";
-                  return displayName;
-                }),
-        viewport: displayMappings != null ? new charts.NumericExtents(minVal, maxVal) : null,
+      tickFormatterSpec: charts.BasicNumericTickFormatterSpec((num measure) {
+        if (displayMappings == null) return '$measure';
+        var displayName = displayMappings[measure];
+        if (displayName == null) return "";
+        return displayName;
+      }),
+      viewport: displayMappings != null ? new charts.NumericExtents(minVal, maxVal) : null,
     );
   }
 
-  static Map<num, String> _displayMappings(CarePlanModel model, String linkId) {
+  static Map<num, String> _displayMappings(
+      CarePlanModel model, String linkId, String languageCode) {
     QuestionnaireItem questionnaireItem = model.questionForLinkId(linkId);
     if (questionnaireItem.answerOption == null || questionnaireItem.answerOption.isEmpty) {
       return null;
@@ -179,7 +179,7 @@ class ChartWidgetState extends State<ChartWidget> {
     questionnaireItem.answerOption.forEach((AnswerOption option) {
       if (option.extension != null &&
           option.extension.any((Extension e) => e.url.contains("ordinalValue"))) {
-        String name = option.valueCoding.toString();
+        String name = option.valueCoding.displayLocalized(languageCode);
         num value = option.extension
             .firstWhere((Extension e) => e.url.contains("ordinalValue"))
             .valueDecimal
@@ -200,7 +200,7 @@ class ChartWidgetState extends State<ChartWidget> {
     for (QuestionnaireResponse response in responses) {
       if (response.item != null) {
         var answers =
-        response.item.where((QuestionnaireResponseItem r) => r.linkId == linkId).toList();
+            response.item.where((QuestionnaireResponseItem r) => r.linkId == linkId).toList();
         if (answers.length > 0 && answers[0].answer != null && answers[0].answer.length > 0) {
           Answer answer = answers[0].answer[0];
           double answerValue = answer.valueDecimal;
@@ -238,7 +238,6 @@ class ChartWidgetState extends State<ChartWidget> {
     ];
   }
 }
-
 
 /// Sample time series data type.
 class AnswerTimeSeries {

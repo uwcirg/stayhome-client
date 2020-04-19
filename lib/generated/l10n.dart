@@ -1250,6 +1250,42 @@ class S {
       args: [],
     );
   }
+
+  String get whatlink_title {
+    return Intl.message(
+      'What\'s StayHome?',
+      name: 'whatlink_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get share_symptoms {
+    return Intl.message(
+      'Share my symptoms, testing, and health conditions',
+      name: 'share_symptoms',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get share_location {
+    return Intl.message(
+      'Share my general location (zip code)',
+      name: 'share_location',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get share_contact_info {
+    return Intl.message(
+      'Share my name and contact information (email and/or phone number)',
+      name: 'share_contact_info',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

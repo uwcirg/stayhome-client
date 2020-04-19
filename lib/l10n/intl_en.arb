@@ -134,7 +134,11 @@
   "contact_point_system_email": "email",
   "gender_male": "male",
   "gender_female": "female",
-  "gender_other": "other"
+  "gender_other": "other",
+  "whatlink_title" : "What's StayHome?",
+  "share_symptoms": "Share my symptoms, testing, and health conditions",
+  "share_location": "Share my general location (zip code)",
+  "share_contact_info": "Share my name and contact information (email and/or phone number)"
 
 
 }

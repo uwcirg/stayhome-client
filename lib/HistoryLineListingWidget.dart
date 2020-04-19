@@ -71,7 +71,7 @@ class HistoryLineListingWidget extends StatelessWidget {
                 .textLocalized(Localizations.localeOf(context).languageCode),
             style: Theme.of(context).textTheme.caption,
           ),
-          Text(responseItem.answerDisplay)
+          Text(responseItem.answerDisplay(Localizations.localeOf(context).languageCode))
         ],
       ),
     );

@@ -148,6 +148,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "select" : MessageLookupByLibrary.simpleMessage("Select"),
     "select_trend_text" : MessageLookupByLibrary.simpleMessage("Select a question to see trends"),
     "session_expired_please_log_in_again" : MessageLookupByLibrary.simpleMessage("Session expired, please log in again."),
+    "share_contact_info" : MessageLookupByLibrary.simpleMessage("Share my name and contact information (email and/or phone number)"),
+    "share_location" : MessageLookupByLibrary.simpleMessage("Share my general location (zip code)"),
+    "share_symptoms" : MessageLookupByLibrary.simpleMessage("Share my symptoms, testing, and health conditions"),
     "sign_up_or_log_in_to_access_all_functions" : MessageLookupByLibrary.simpleMessage("Log in to access all functions"),
     "springboard_COVID19_resources_text" : MessageLookupByLibrary.simpleMessage("COVID-19 information & resources"),
     "springboard_cdc_symptom_checker_text" : MessageLookupByLibrary.simpleMessage("CDC symptom self-checker"),
@@ -168,6 +171,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "welcome" : MessageLookupByLibrary.simpleMessage("Thank you and welcome"),
     "what_do_you_want_to_do" : MessageLookupByLibrary.simpleMessage("What do you want to do?"),
     "what_is_your_email_address" : MessageLookupByLibrary.simpleMessage("What is your email address?"),
-    "what_is_your_name" : MessageLookupByLibrary.simpleMessage("What is your name?")
+    "what_is_your_name" : MessageLookupByLibrary.simpleMessage("What is your name?"),
+    "whatlink_title" : MessageLookupByLibrary.simpleMessage("What\'s StayHome?")
   };
 }

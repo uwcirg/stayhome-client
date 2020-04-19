@@ -460,22 +460,25 @@ class QuestionWidgetState extends State<QuestionWidget> {
   List<Widget> _buildChoicesFromAnswerOptions(
       QuestionnaireItem questionnaireItem, Answer currentResponse, BuildContext context) {
     return questionnaireItem.answerOption.map((AnswerOption option) {
+      String display = option.displayLocalized(Localizations.localeOf(context).languageCode);
       return _buildChip(
-          '${option.ordinalValue() != -1 ? option.ordinalValue() : option.displayLocalized(Localizations.localeOf(context).languageCode)}',
+          '${option.ordinalValue() != -1 ? option.ordinalValue() : display}',
           currentResponse == option,
           context,
           questionnaireItem,
           new Answer.fromAnswerOption(option),
-          helpLabel: '$option');
+          helpLabel: display);
     }).toList();
   }
 
   List<Widget> _buildChoicesFromAnswerValueSet(
       QuestionnaireItem questionnaireItem, Answer currentResponse, BuildContext context) {
     return questionnaireItem.answerValueSet.map((Coding option) {
-      return _buildChip('${option.displayLocalized(Localizations.localeOf(context).languageCode)}',
+      String display = option.displayLocalized(Localizations.localeOf(context).languageCode);
+
+      return _buildChip(display,
           currentResponse == option, context, questionnaireItem, new Answer(valueCoding: option),
-          helpLabel: '$option');
+          helpLabel: display);
     }).toList();
   }
 

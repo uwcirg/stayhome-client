@@ -1491,9 +1491,9 @@ class QuestionnaireResponseItem {
 
   QuestionnaireResponseItem({this.linkId, this.answer});
 
-  String get answerDisplay {
+  String answerDisplay(String languageCode) {
     if (answer == null || answer.isEmpty) return "";
-    return answer.map((e) => e.displayString).join(",");
+    return answer.map((e) => e.displayString(languageCode)).join(",");
   }
 
   factory QuestionnaireResponseItem.fromJson(Map<String, dynamic> json) =>
@@ -1527,14 +1527,14 @@ class Answer {
       this.valueDate,
       this.valueDateTime});
 
-  String get displayString {
+  String displayString(String languageCode) {
     if (this.valueDate != null) {
       return DateFormat.yMd().format(this.valueDate);
     }
     if (this.valueDateTime != null) {
       return DateFormat.yMd().add_jm().format(this.valueDateTime);
     }
-    return this.toString();
+    return this.toLocalizedString(languageCode);
   }
 
   bool operator ==(dynamic o) {
@@ -1576,10 +1576,9 @@ class Answer {
     return result;
   }
 
-  @override
-  String toString() {
+  String toLocalizedString(String languageCode) {
     if (valueInteger != null) return '$valueInteger';
-    if (valueCoding != null) return valueCoding.toString();
+    if (valueCoding != null) return valueCoding.displayLocalized(languageCode);
     if (valueDecimal != null) return valueDecimal.toString();
     if (valueString != null) return valueString;
     if (valueDate != null) return valueDate.toString();
