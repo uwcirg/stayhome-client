@@ -180,8 +180,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(
-                    "We won’t share any of the information in your profile, unless you allow us to by selecting specific programs, in the “Information Sharing” options below."),
+                Text(S.of(context).profile_info_sharing_text),
                 buildSectionHeader(S.of(context).profile_location_title_text, context),
                 TextFormField(
                   decoration: InputDecoration(

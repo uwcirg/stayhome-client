@@ -59,7 +59,7 @@ class QuestionnairePageState extends State<QuestionnairePage> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: new MapAppPageScaffold(
-        title: _questionnaire.titleLocalized(Localizations.localeOf(context).languageCode),
+        title: _questionnaire.title,
         showDrawer: false,
         showStandardAppBarActions: false,
         child: QuestionListWidget(
@@ -121,7 +121,7 @@ class QuestionnaireItemPageState extends State<QuestionnaireItemPage> {
   @override
   Widget build(BuildContext context) {
     return new MapAppPageScaffold(
-      title: _questionnaireItem.textLocalized(Localizations.localeOf(context).languageCode),
+      title: _questionnaireItem.text,
       child: QuestionListWidget(
           questions: _questionnaireItem.item,
           response: _response,
@@ -217,7 +217,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
                   children: [
                     Flexible(
                       child: Text(
-                        item.textLocalized(Localizations.localeOf(context).languageCode),
+                        item.text,
                         style: Theme.of(context).textTheme.subhead,
                       ),
                     ),
@@ -235,7 +235,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
         child: Padding(
       padding: MapAppPadding.cardPageMargins,
       child: Text(
-        "Unsupported question. Name: ${item.textLocalized(Localizations.localeOf(context).languageCode)}. Type: ${item.type}",
+        "Unsupported question. Name: ${item.text}. Type: ${item.type}",
         style: Theme.of(context).textTheme.title.apply(color: Colors.red),
       ),
     ));
@@ -285,7 +285,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
 
     var languageCode = Localizations.localeOf(context).languageCode;
     String helpText = questionnaireItem.helpText(languageCode);
-    String text = questionnaireItem.textLocalized(languageCode);
+    String text = questionnaireItem.text;
     SupportLink supportLink = questionnaireItem.supportLink(languageCode);
 
     return Padding(
@@ -331,7 +331,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
     return TextFormField(
       initialValue: _response.getAnswer(questionnaireItem.linkId)?.toString() ?? "",
       decoration: InputDecoration(
-          hintText: questionnaireItem.textLocalized(Localizations.localeOf(context).languageCode)),
+          hintText: questionnaireItem.text),
       onChanged: (value) {
         setState(() {
           _response.setAnswer(questionnaireItem.linkId, Answer(valueString: value));
@@ -345,7 +345,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
       child: IgnorePointer(
         child: TextFormField(
           controller: widget.dateCtrl,
-          decoration: InputDecoration(hintText: questionnaireItem.text),
+          decoration: InputDecoration(hintText: questionnaireItem.textBase),
         ),
       ),
       onTap: () {
@@ -392,7 +392,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
       ),
       items: choices.map((ChoiceOption choice) {
         return new DropdownMenuItem<ChoiceOption>(
-          child: Text(choice.displayLocalized(Localizations.localeOf(context).languageCode)),
+          child: Text(choice.display),
           value: choice,
         );
       }).toList(),
@@ -460,7 +460,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
   List<Widget> _buildChoicesFromAnswerOptions(
       QuestionnaireItem questionnaireItem, Answer currentResponse, BuildContext context) {
     return questionnaireItem.answerOption.map((AnswerOption option) {
-      String display = option.displayLocalized(Localizations.localeOf(context).languageCode);
+      String display = option.display;
       return _buildChip(
           '${option.ordinalValue() != -1 ? option.ordinalValue() : display}',
           currentResponse == option,
@@ -474,7 +474,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
   List<Widget> _buildChoicesFromAnswerValueSet(
       QuestionnaireItem questionnaireItem, Answer currentResponse, BuildContext context) {
     return questionnaireItem.answerValueSet.map((Coding option) {
-      String display = option.displayLocalized(Localizations.localeOf(context).languageCode);
+      String display = option.display;
 
       return _buildChip(display,
           currentResponse == option, context, questionnaireItem, new Answer(valueCoding: option),

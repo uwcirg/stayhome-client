@@ -1286,6 +1286,15 @@ class S {
       args: [],
     );
   }
+
+  String get profile_info_sharing_text {
+    return Intl.message(
+      'We won’t share any of the information in your profile, unless you allow us to by selecting specific programs, in the “Information Sharing” options below.',
+      name: 'profile_info_sharing_text',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

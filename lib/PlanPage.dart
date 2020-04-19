@@ -90,7 +90,7 @@ abstract class _PlanPageState extends State<PlanPage> {
     if (model.questionnaires == null) return [];
     return model.questionnaires.map((Questionnaire questionnaire) {
       String title = questionnaire.title != null
-          ? questionnaire.titleLocalized(Localizations.localeOf(context).languageCode).toLowerCase()
+          ? questionnaire.title.toLowerCase()
           : "questionnaire";
       return _buildQuestionnaireButton(context, title, questionnaire, model);
     }).toList();

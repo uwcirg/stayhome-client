@@ -68,30 +68,37 @@ void main() {
     ]);
 
     test("Extract existing translation", () {
-      expect(FhirTranslationUtils.extractTranslation(english, ext, "de"), german);
+      FhirTranslations.languageCode = "de";
+      expect(FhirTranslations.extractTranslation(english, ext), german);
     });
     test("Extract english translation", () {
-      expect(FhirTranslationUtils.extractTranslation(english, ext, "en"), english);
+      FhirTranslations.languageCode = "en";
+      expect(FhirTranslations.extractTranslation(english, ext), english);
     });
     test("Extract non-existent translation 1", () {
-      expect(FhirTranslationUtils.extractTranslation(english, ext, "es"), english);
+      FhirTranslations.languageCode = "es";
+      expect(FhirTranslations.extractTranslation(english, ext), english);
     });
     test("Extract non-existent translation 2", () {
       PrimitiveTypeExtension noneExt = null;
-      expect(FhirTranslationUtils.extractTranslation(english, noneExt, "es"), english);
+      FhirTranslations.languageCode = "es";
+      expect(FhirTranslations.extractTranslation(english, noneExt), english);
     });
     test("Extract non-existent translation 3", () {
       PrimitiveTypeExtension noneExt = PrimitiveTypeExtension();
-      expect(FhirTranslationUtils.extractTranslation(english, noneExt, "es"), english);
+      FhirTranslations.languageCode = "es";
+      expect(FhirTranslations.extractTranslation(english, noneExt), english);
     });
     test("Extract non-existent translation 4", () {
       PrimitiveTypeExtension noneExt = PrimitiveTypeExtension(extension: []);
-      expect(FhirTranslationUtils.extractTranslation(english, noneExt, "es"), english);
+      FhirTranslations.languageCode = "es";
+      expect(FhirTranslations.extractTranslation(english, noneExt), english);
     });
     test("Extract non-existent translation 5", () {
       PrimitiveTypeExtension noneExt =
           PrimitiveTypeExtension(extension: [Extension(url: "nonsense")]);
-      expect(FhirTranslationUtils.extractTranslation(english, noneExt, "es"), english);
+      FhirTranslations.languageCode = "es";
+      expect(FhirTranslations.extractTranslation(english, noneExt), english);
     });
   });
 }

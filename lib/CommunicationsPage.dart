@@ -101,7 +101,7 @@ class NotificationsWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: communications.map((Communication c) {
-        String text = c.payload[0]?.contentStringLocalized(Localizations.localeOf(context).languageCode) ?? S.of(context).no_content;
+        String text = c.payload[0]?.contentString ?? S.of(context).no_content;
         return Card(
           color: _colorForPriority(c.priority),
           child: Padding(

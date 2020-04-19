@@ -45,7 +45,7 @@ class HistoryLineListingWidget extends StatelessWidget {
             ),
             Text(model
                 .questionnaireForResponse(response)
-                .titleLocalized(Localizations.localeOf(context).languageCode))
+                .title)
           ],
         ),
         children: response.item
@@ -68,7 +68,7 @@ class HistoryLineListingWidget extends StatelessWidget {
           Text(
             model
                 .questionForLinkId(responseItem.linkId)
-                .textLocalized(Localizations.localeOf(context).languageCode),
+                .text,
             style: Theme.of(context).textTheme.caption,
           ),
           Text(responseItem.answerDisplay(Localizations.localeOf(context).languageCode))

@@ -107,7 +107,7 @@ class _ProgressInsightsPageState extends State<ProgressInsightsPage> {
                 .map((QuestionnaireItem question) => DropdownMenuItem(
                     value: question.linkId,
                     child:
-                        Text(question.textLocalized(Localizations.localeOf(context).languageCode))))
+                        Text(question.text)))
                 .toList(),
             onChanged: (String selectedLinkId) =>
                 setState(() => this._selectedLinkId = selectedLinkId),

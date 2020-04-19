@@ -138,7 +138,8 @@
   "whatlink_title" : "What's StayHome?",
   "share_symptoms": "Share my symptoms, testing, and health conditions",
   "share_location": "Share my general location (zip code)",
-  "share_contact_info": "Share my name and contact information (email and/or phone number)"
+  "share_contact_info": "Share my name and contact information (email and/or phone number)",
+  "profile_info_sharing_text": "We won’t share any of the information in your profile, unless you allow us to by selecting specific programs, in the “Information Sharing” options below."
 
 
 }

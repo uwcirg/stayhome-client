@@ -9,6 +9,7 @@ import 'package:map_app_flutter/LoginPage.dart';
 import 'package:map_app_flutter/app_assets.dart';
 import 'package:map_app_flutter/config/AppConfig.dart';
 import 'package:map_app_flutter/const.dart';
+import 'package:map_app_flutter/fhir/fhir_translations.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:map_app_flutter/platform_stub.dart';
@@ -60,11 +61,18 @@ class _MyAppState extends State<MyApp> {
     });
     S.load(Locale(_locale, ""));
     initializeDateFormatting(languageCode);
+    initializeFhirTranslations(languageCode);
+  }
+
+  void initializeFhirTranslations(String languageCode) {
+    FhirTranslations.languageCode = languageCode;
   }
 
   @override
   void initState() {
     initializeCareplanModel();
+    // set default language for FHIR resources with multiple languages
+    initializeFhirTranslations("en");
     super.initState();
   }
 

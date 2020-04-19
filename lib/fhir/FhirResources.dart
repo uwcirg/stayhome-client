@@ -202,17 +202,18 @@ class PrimitiveTypeExtension {
 
 @JsonSerializable(explicitToJson: true, includeIfNull: false)
 class Payload {
-  String contentString;
   Attachment contentAttachment;
   Reference contentReference;
 
+  @JsonKey(name: "contentString")
+  String contentStringBase;
   @JsonKey(name: "_contentString")
   PrimitiveTypeExtension contentStringExt;
 
-  String contentStringLocalized(String languageCode) =>
-      FhirTranslationUtils.extractTranslation(contentString, contentStringExt, languageCode);
+  String get contentString =>
+      FhirTranslations.extractTranslation(contentStringBase, contentStringExt);
 
-  Payload({this.contentString, this.contentAttachment, this.contentReference, this.contentStringExt});
+  Payload({this.contentStringBase, this.contentAttachment, this.contentReference, this.contentStringExt});
 
   factory Payload.fromJson(Map<String, dynamic> json) => _$PayloadFromJson(json);
 
@@ -994,15 +995,16 @@ class Questionnaire with Resource {
   Meta meta;
   String version;
   String name;
-  String title;
   String status;
   String description;
   List<QuestionnaireItem> item;
+
+  @JsonKey(name: "title")
+  String titleBase;
   @JsonKey(name: "_title")
   PrimitiveTypeExtension titleExt;
 
-  String titleLocalized(String languageCode) =>
-      FhirTranslationUtils.extractTranslation(title, titleExt, languageCode);
+  String get title => FhirTranslations.extractTranslation(titleBase, titleExt);
 
 
   Questionnaire(
@@ -1011,7 +1013,7 @@ class Questionnaire with Resource {
       this.id,
       this.meta,
       this.version,
-      this.title,
+      this.titleBase,
       this.status,
       this.description,
       this.item});
@@ -1068,17 +1070,18 @@ class CodeableConcept {
 class Coding implements ChoiceOption {
   String system;
   String code;
-  String display;
+  @JsonKey(name: "display")
+  String displayBase;
   @JsonKey(name: "_display")
   PrimitiveTypeExtension displayExt;
 
-  String displayLocalized(String languageCode) =>
-      FhirTranslationUtils.extractTranslation(display, displayExt, languageCode);
+  @JsonKey(ignore: true)
+  String get display => FhirTranslations.extractTranslation(displayBase, displayExt);
 
 
   Answer get ifSelected => new Answer(valueCoding: this);
 
-  Coding({this.system, this.code, this.display});
+  Coding({this.system, this.code, this.displayBase});
 
   String identifierString() {
     return "$system|$code";
@@ -1186,7 +1189,7 @@ enum QuestionType {
 @JsonSerializable(explicitToJson: true, includeIfNull: false)
 class QuestionnaireItem {
   String linkId;
-  String text;
+
   bool required;
   QuestionType type;
   List<Coding> code;
@@ -1196,16 +1199,18 @@ class QuestionnaireItem {
   List<Extension> extension;
   List<QuestionnaireItem> item;
 
+  @JsonKey(name: "text")
+  String textBase;
   @JsonKey(name: "_text")
   PrimitiveTypeExtension textExt;
 
-  String textLocalized(String languageCode) =>
-      FhirTranslationUtils.extractTranslation(text, textExt, languageCode);
+  String get text =>
+      FhirTranslations.extractTranslation(textBase, textExt);
 
 
   QuestionnaireItem(
       {this.linkId,
-      this.text,
+      this.textBase,
       this.required,
       this.type,
       this.code,
@@ -1253,7 +1258,7 @@ class QuestionnaireItem {
             extension.valueCodeableConcept.coding.any((Coding coding) =>
                 coding.code == "help" &&
                 coding.system == "http://hl7.org/fhir/questionnaire-item-control")));
-    return helpTextSubItem?.textLocalized(languageCode);
+    return helpTextSubItem?.text;
   }
 
   SupportLink supportLink(String languageCode) {
@@ -1269,7 +1274,7 @@ class QuestionnaireItem {
     // find the supportLink extension value
     Extension supportLinkExt = supportLinkSubItem.extension.firstWhere(
         (Extension extension) => extension.url != null && extension.url == supportLinkExtName);
-    return SupportLink(title: supportLinkSubItem.textLocalized(languageCode), url: supportLinkExt.valueUri);
+    return SupportLink(title: supportLinkSubItem.text, url: supportLinkExt.valueUri);
   }
 
   factory QuestionnaireItem.fromJson(Map<String, dynamic> json) =>
@@ -1292,7 +1297,7 @@ class SupportLink {
 
 abstract class ChoiceOption {
   Answer get ifSelected;
-  String displayLocalized(String languageCode);
+  String get display;
 }
 
 @JsonSerializable(explicitToJson: true, includeIfNull: false)
@@ -1310,9 +1315,9 @@ class AnswerOption implements ChoiceOption {
   Map<String, dynamic> toJson() => _$AnswerOptionToJson(this);
 
   @override
-  String displayLocalized(String languageCode) {
+  String get display {
     if (valueInteger != null) return '$valueInteger';
-    if (valueCoding != null) return valueCoding.displayLocalized(languageCode);
+    if (valueCoding != null) return valueCoding.display;
     return super.toString();
   }
 
@@ -1578,7 +1583,7 @@ class Answer {
 
   String toLocalizedString(String languageCode) {
     if (valueInteger != null) return '$valueInteger';
-    if (valueCoding != null) return valueCoding.displayLocalized(languageCode);
+    if (valueCoding != null) return valueCoding.display;
     if (valueDecimal != null) return valueDecimal.toString();
     if (valueString != null) return valueString;
     if (valueDate != null) return valueDate.toString();

@@ -188,7 +188,7 @@ void main() {
         priority: Priority.routine,
         payload: [
           Payload(
-              contentString:
+              contentStringBase:
                   "Welcome to StayHome! We're glad you're here.\n- Keep an eye on this space for messages\n- Dismiss them with the “Dismiss” button\n- Find new and old messages in the Menu under Communications",
               contentStringExt: PrimitiveTypeExtension(extension: [
                 Extension(
@@ -315,7 +315,7 @@ void main() {
     QuestionnaireResponse expected = QuestionnaireResponse.from(
         Questionnaire(id: "204"), Reference(reference: "Patient/1444"), CarePlan(id: "1445"),
         status: QuestionnaireResponseStatus.completed, id: "1729", meta: Meta(versionId: "1"));
-    expected.setAnswer("/70442-9", Answer(valueCoding: Coding(code: "LA6568-5", display: "Not at all")));
+    expected.setAnswer("/70442-9", Answer(valueCoding: Coding(code: "LA6568-5", displayBase: "Not at all")));
     expected.authored = DateTime(2020, 4, 18, 20, 7, 0, 0);
 
     QuestionnaireResponse actual = QuestionnaireResponse.fromJson(jsonDecode(jsonString));

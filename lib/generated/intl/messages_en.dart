@@ -121,6 +121,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "profile_form_error_text" : MessageLookupByLibrary.simpleMessage("There has been an error while saving profile updates. Please try again."),
     "profile_home_zipcode_label_text" : MessageLookupByLibrary.simpleMessage("Home zip code"),
     "profile_info_prompt_text" : MessageLookupByLibrary.simpleMessage("Click to learn how Location information is used"),
+    "profile_info_sharing_text" : MessageLookupByLibrary.simpleMessage("We won’t share any of the information in your profile, unless you allow us to by selecting specific programs, in the “Information Sharing” options below."),
     "profile_location_title_text" : MessageLookupByLibrary.simpleMessage("Location"),
     "profile_phone_hint_text" : MessageLookupByLibrary.simpleMessage("What is your phone number?"),
     "profile_phone_label_text" : MessageLookupByLibrary.simpleMessage("Cell/mobile Phone"),

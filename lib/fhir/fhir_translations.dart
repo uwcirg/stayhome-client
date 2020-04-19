@@ -4,11 +4,16 @@
 
 import 'package:map_app_flutter/fhir/FhirResources.dart';
 
-class FhirTranslationUtils {
-  FhirTranslationUtils._();
+class FhirTranslations {
+  
+  static String languageCode;
+  
+  FhirTranslations._();
 
-  static String extractTranslation(String baseString, PrimitiveTypeExtension extension,
-      String languageCode) {
+  static String extractTranslation(String baseString, PrimitiveTypeExtension extension) {
+    if (languageCode == null || languageCode.isEmpty) {
+      throw StateError("Language code has not been set.");
+    }
     Extension translationExt = extension?.extension?.firstWhere(
             (Extension translationExt) =>
         translationExt.url == "http://hl7.org/fhir/StructureDefinition/translation" &&

@@ -54,7 +54,7 @@ class ChartWidgetState extends State<ChartWidget> {
           Padding(
             padding: const EdgeInsets.only(bottom: Dimensions.halfMargin),
             child: Text(
-              question.textLocalized(Localizations.localeOf(context).languageCode),
+              question.text,
               style: Theme.of(context).textTheme.title,
             ),
           ),
@@ -179,7 +179,7 @@ class ChartWidgetState extends State<ChartWidget> {
     questionnaireItem.answerOption.forEach((AnswerOption option) {
       if (option.extension != null &&
           option.extension.any((Extension e) => e.url.contains("ordinalValue"))) {
-        String name = option.valueCoding.displayLocalized(languageCode);
+        String name = option.valueCoding.display;
         num value = option.extension
             .firstWhere((Extension e) => e.url.contains("ordinalValue"))
             .valueDecimal
