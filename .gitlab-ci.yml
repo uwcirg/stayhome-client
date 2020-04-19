@@ -40,7 +40,7 @@ before_script:
   - git clone git://github.com/fluttercouch/fluttercouch.git ../fluttercouch
   - sed -i 's/~> 2.5.1/~> 2.6.3/g' ../fluttercouch/ios/fluttercouch.podspec
   # generate mn (test locale) strings by prepending and appending characters to en strings
-  - sed 's/": "/": "¬¬¬/g' intl_en.arb | sed 's/",/□",/g' | sed 's/"$/□"/g' > intl_mn.arb
+  - bash lib/l10n/generate_mn_strings.sh
   - flutter pub global run intl_utils:generate
 
 stages:
