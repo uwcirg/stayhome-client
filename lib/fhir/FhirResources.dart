@@ -1248,7 +1248,7 @@ class QuestionnaireItem {
 
   int get choiceCount => choiceOptions != null ? choiceOptions.length : 0;
 
-  String helpText(String languageCode) {
+  String get helpText {
     // find the first sub item that has a help type extension
     QuestionnaireItem helpTextSubItem = item?.firstWhere((QuestionnaireItem subItem) =>
         subItem.extension != null &&
@@ -1261,7 +1261,7 @@ class QuestionnaireItem {
     return helpTextSubItem?.text;
   }
 
-  SupportLink supportLink(String languageCode) {
+  SupportLink get supportLink {
     String supportLinkExtName = "http://hl7.org/fhir/StructureDefinition/questionnaire-supportLink";
     // find the first sub item that has a supportLink type extension
     QuestionnaireItem supportLinkSubItem = item?.firstWhere(
@@ -1496,9 +1496,9 @@ class QuestionnaireResponseItem {
 
   QuestionnaireResponseItem({this.linkId, this.answer});
 
-  String answerDisplay(String languageCode) {
+  String get answerDisplay {
     if (answer == null || answer.isEmpty) return "";
-    return answer.map((e) => e.displayString(languageCode)).join(",");
+    return answer.map((e) => e.displayString).join(",");
   }
 
   factory QuestionnaireResponseItem.fromJson(Map<String, dynamic> json) =>
@@ -1532,14 +1532,14 @@ class Answer {
       this.valueDate,
       this.valueDateTime});
 
-  String displayString(String languageCode) {
+  String get displayString {
     if (this.valueDate != null) {
       return DateFormat.yMd().format(this.valueDate);
     }
     if (this.valueDateTime != null) {
       return DateFormat.yMd().add_jm().format(this.valueDateTime);
     }
-    return this.toLocalizedString(languageCode);
+    return this.toLocalizedString;
   }
 
   bool operator ==(dynamic o) {
@@ -1581,7 +1581,7 @@ class Answer {
     return result;
   }
 
-  String toLocalizedString(String languageCode) {
+  String get toLocalizedString {
     if (valueInteger != null) return '$valueInteger';
     if (valueCoding != null) return valueCoding.display;
     if (valueDecimal != null) return valueDecimal.toString();

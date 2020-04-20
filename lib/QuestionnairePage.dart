@@ -283,10 +283,10 @@ class QuestionWidgetState extends State<QuestionWidget> {
       throw UnimplementedError("Not implemented: ${questionnaireItem.type}");
     }
 
-    var languageCode = Localizations.localeOf(context).languageCode;
-    String helpText = questionnaireItem.helpText(languageCode);
+
+    String helpText = questionnaireItem.helpText;
     String text = questionnaireItem.text;
-    SupportLink supportLink = questionnaireItem.supportLink(languageCode);
+    SupportLink supportLink = questionnaireItem.supportLink;
 
     return Padding(
         padding: MapAppPadding.cardPageMargins,

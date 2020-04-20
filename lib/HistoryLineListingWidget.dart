@@ -59,6 +59,7 @@ class HistoryLineListingWidget extends StatelessWidget {
 
   Widget _buildQuestionnaireResponseItemView(
       BuildContext context, QuestionnaireResponseItem responseItem) {
+    if (model.questionForLinkId(responseItem.linkId) == null) return Container();
     return Padding(
       padding: const EdgeInsets.symmetric(
           horizontal: Dimensions.fullMargin, vertical: Dimensions.quarterMargin),
@@ -71,7 +72,7 @@ class HistoryLineListingWidget extends StatelessWidget {
                 .text,
             style: Theme.of(context).textTheme.caption,
           ),
-          Text(responseItem.answerDisplay(Localizations.localeOf(context).languageCode))
+          Text(responseItem.answerDisplay)
         ],
       ),
     );

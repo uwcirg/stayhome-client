@@ -70,7 +70,7 @@ class ChartWidgetState extends State<ChartWidget> {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text('${_measures != null ? _measures['Answers'].displayString(languageCode) : ""}'),
+                      child: Text('${_measures != null ? _measures['Answers'].displayString : ""}'),
                     )
                   ]))
             ],
