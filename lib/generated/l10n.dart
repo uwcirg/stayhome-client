@@ -207,15 +207,6 @@ class S {
     );
   }
 
-  String get birthdate_hint_text {
-    return Intl.message(
-      'Enter date of birth (m/d/y)',
-      name: 'birthdate_hint_text',
-      desc: '',
-      args: [],
-    );
-  }
-
   String get birthdate {
     return Intl.message(
       'Date of birth',
@@ -297,10 +288,10 @@ class S {
     );
   }
 
-  String get back_to_login {
+  String get back_to_login_register_small {
     return Intl.message(
-      'Back to login',
-      name: 'back_to_login',
+      'back to login/register',
+      name: 'back_to_login_register_small',
       desc: '',
       args: [],
     );
@@ -308,7 +299,7 @@ class S {
 
   String get attempt_login_text {
     return Intl.message(
-      'Attempt to log in...',
+      'Attempting to log in...',
       name: 'attempt_login_text',
       desc: '',
       args: [],
@@ -468,24 +459,6 @@ class S {
     );
   }
 
-  String get and {
-    return Intl.message(
-      'and',
-      name: 'and',
-      desc: '',
-      args: [],
-    );
-  }
-
-  String get or {
-    return Intl.message(
-      'or',
-      name: 'or',
-      desc: '',
-      args: [],
-    );
-  }
-
   String get completed {
     return Intl.message(
       'Completed',
@@ -506,7 +479,7 @@ class S {
 
   String get no_content {
     return Intl.message(
-      '<no content>',
+      '(no content)',
       name: 'no_content',
       desc: '',
       args: [],

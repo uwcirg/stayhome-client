@@ -299,7 +299,6 @@ class ProfileWidgetState extends State<ProfileWidget> {
                       controller: birthDateCtrl,
                       decoration: InputDecoration(
                           icon: Icon(Icons.cake),
-                          hintText: S.of(context).birthdate_hint_text,
                           labelText: S.of(context).birthdate),
                     ),
                   ),

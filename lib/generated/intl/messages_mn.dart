@@ -25,11 +25,11 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m2(number, unit) => "¬¬¬Once every ${number} ${unit}□";
 
-  static m4(text) => "¬¬¬System Announcement ${text}□";
+  static m3(text) => "¬¬¬System Announcement ${text}□";
 
-  static m5(minF, maxF, minC, maxC) => "¬¬¬Enter a value between ${minF} and ${maxF} (°F) or ${minC} and ${maxC} (°C). This value will not be saved.□";
+  static m4(minF, maxF, minC, maxC) => "¬¬¬Enter a value between ${minF} and ${maxF} (°F) or ${minC} and ${maxC} (°C). This value will not be saved.□";
 
-  static m3(version) => "¬¬¬Version ${version}□";
+  static m5(version) => "¬¬¬Version ${version}□";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -39,13 +39,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "about_stayhome_info_text" : MessageLookupByLibrary.simpleMessage("¬¬¬The COVID-19 pandemic is straining existing public health processes and workflows. Many community members may be concerned about developing COVID-19. To meet this need we have developed StayHome, an app to help people who are staying home to minimize any risk they might present to others do things like track their symptoms and temperature, connect with relevant information and resources, and maintain a diary of people with whom they have had contact. We hope the app might also help people and public health connect more easily, when needed, in a situation where public health resources may be stretched thin.□"),
     "active" : MessageLookupByLibrary.simpleMessage("¬¬¬Active□"),
     "add_the_default_careplan_for_me" : MessageLookupByLibrary.simpleMessage("¬¬¬add the default care plan for me□"),
-    "and" : MessageLookupByLibrary.simpleMessage("¬¬¬and□"),
     "attempt_login_text" : MessageLookupByLibrary.simpleMessage("¬¬¬Attempt to log in...□"),
     "back" : MessageLookupByLibrary.simpleMessage("¬¬¬back□"),
-    "back_to_login" : MessageLookupByLibrary.simpleMessage("¬¬¬Back to login□"),
     "back_to_login_register" : MessageLookupByLibrary.simpleMessage("¬¬¬Back to login/register□"),
     "birthdate" : MessageLookupByLibrary.simpleMessage("¬¬¬Date of birth□"),
-    "birthdate_hint_text" : MessageLookupByLibrary.simpleMessage("¬¬¬Enter date of birth (m/d/y)□"),
     "calendar" : MessageLookupByLibrary.simpleMessage("¬¬¬Calendar□"),
     "calender_history" : MessageLookupByLibrary.simpleMessage("¬¬¬Calendar & History□"),
     "cancel" : MessageLookupByLibrary.simpleMessage("¬¬¬cancel□"),
@@ -110,7 +107,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "no_date" : MessageLookupByLibrary.simpleMessage("¬¬¬No date□"),
     "not_now" : MessageLookupByLibrary.simpleMessage("¬¬¬continue without logging in□"),
     "nothing_here" : MessageLookupByLibrary.simpleMessage("¬¬¬Nothing here□"),
-    "or" : MessageLookupByLibrary.simpleMessage("¬¬¬or□"),
     "profile" : MessageLookupByLibrary.simpleMessage("¬¬¬Profile□"),
     "profile_about_you_title_text" : MessageLookupByLibrary.simpleMessage("¬¬¬About You□"),
     "profile_about_your_info_prompt_text" : MessageLookupByLibrary.simpleMessage("¬¬¬Click to learn how About You information is used□"),
@@ -162,13 +158,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "springboard_review_calendar_history_text" : MessageLookupByLibrary.simpleMessage("¬¬¬review calendar & history□"),
     "springboard_update_profile_text" : MessageLookupByLibrary.simpleMessage("¬¬¬update profile & permissions□"),
     "support_COVID19" : MessageLookupByLibrary.simpleMessage("¬¬¬Support during COVID-19□"),
-    "system_announcement" : m4,
-    "temperatureErrorMessage" : m5,
+    "system_announcement" : m3,
+    "temperatureErrorMessage" : m4,
     "terms_of_use" : MessageLookupByLibrary.simpleMessage("¬¬¬This app was built by the Clinical Informatics Research Group (CIRG), at the University of Washington, in order to benefit people, like you, who may be concerned about infection with Coronavirus (COVID-19). Or, who simply want to know how best to \"stay home\". Faculty, students, and staff at CIRG are doing this work to help people in our university, local, regional, state, national, and global communities.\n\nThe University of Washington (UW) is not responsible or liable for the accuracy or security of the information in the app. The UW did not develop the system, does not operate it, and has not endorsed it.\n\nThe privacy of your information is important to us. We do our best to keep our clinical information systems private and secure, but we are offering this application without any assurance or warranty.\n\nWe do not track GPS location information from your phone. We do not link your IP address to your information. We do use standard web analytic software (Matomo) to understand user patterns and will look at access logs if we suspect an attempt to compromise the security of our systems.\n\nYou can use this app without entering any personal information by skipping the prompts that ask for it. The system will be less able to personalize to your needs, but that\'s OK with us. We want you to use this app however you feel most comfortable doing so.\n\nThe Resources section of the app is available to anyone. You are welcome to use that feature without creating an account or logging in.\n\nIf you choose to create an account you will need to give us an email address, but you are welcome to use a fake email address. If your email is fake, you will not be able to recover your password, but everything else in the app will work the same. You can update your email address later, but you can\'t change your username.\n\nPlease look carefully at the Profile page. We explain on that page the uses of your personal information, such as an email address, a cell phone number, a zip code/postal code, etc. We ask that you either use accurate information in the profile, so we can personalize the app for you, or that you leave these fields blank.□"),
     "terms_of_use_title" : MessageLookupByLibrary.simpleMessage("¬¬¬Terms of Use□"),
     "un_saved_alert_text" : MessageLookupByLibrary.simpleMessage("¬¬¬You have unsaved responses□"),
     "value_not_saved_text" : MessageLookupByLibrary.simpleMessage("¬¬¬This value will not be saved.□"),
-    "versionString" : m3,
+    "versionString" : m5,
     "welcome" : MessageLookupByLibrary.simpleMessage("¬¬¬Thank you and welcome□"),
     "what_do_you_want_to_do" : MessageLookupByLibrary.simpleMessage("¬¬¬What do you want to do?□"),
     "what_is_your_email_address" : MessageLookupByLibrary.simpleMessage("¬¬¬What is your email address?□"),
