@@ -423,6 +423,12 @@ class ProfileWidgetState extends State<ProfileWidget> {
         consentGroupRef: OrganizationReference.scan,
         expandedTextMarkdown: S.of(context).scan_body,
         shareItemLabel: S.of(context).scan_toggle,
+      ),
+      ProgramConsentWidget(
+        programTitle: S.of(context).social_distancing_title,
+        consentGroupRef: OrganizationReference.socialDistancingStudy,
+        expandedTextMarkdown: S.of(context).social_distancing_body,
+        shareItemLabel: S.of(context).social_distancing_toggle,
       )
     ];
   }

@@ -1214,6 +1214,33 @@ class S {
       args: [],
     );
   }
+
+  String get social_distancing_title {
+    return Intl.message(
+      'Social Distancing study',
+      name: 'social_distancing_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get social_distancing_body {
+    return Intl.message(
+      'You can choose to share your information directly with the Social Distancing study. If you choose to share information, they will have access to:\n- Your symptoms, testing, and health condition information,\n- Your general location information (zip code), AND\n- Your name and contact information (email and/or phone number).',
+      name: 'social_distancing_body',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get social_distancing_toggle {
+    return Intl.message(
+      'Share my information with the Social Distancing study',
+      name: 'social_distancing_toggle',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
