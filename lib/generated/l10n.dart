@@ -675,15 +675,6 @@ class S {
     );
   }
 
-  String get profile_info_prompt_text {
-    return Intl.message(
-      'Click to learn how Location information is used',
-      name: 'profile_info_prompt_text',
-      desc: '',
-      args: [],
-    );
-  }
-
   String get profile_zipcode_hint_text {
     return Intl.message(
       'Where you spend most of your time',
@@ -738,15 +729,6 @@ class S {
     );
   }
 
-  String get profile_contact_info_prompt_text {
-    return Intl.message(
-      'Click to learn how Contact Information is used',
-      name: 'profile_contact_info_prompt_text',
-      desc: '',
-      args: [],
-    );
-  }
-
   String get profile_preferred_contact_text {
     return Intl.message(
       'Preferred contact method',
@@ -783,15 +765,6 @@ class S {
     );
   }
 
-  String get profile_about_your_info_prompt_text {
-    return Intl.message(
-      'Click to learn how About You information is used',
-      name: 'profile_about_your_info_prompt_text',
-      desc: '',
-      args: [],
-    );
-  }
-
   String get profile_updated_text {
     return Intl.message(
       'Profile updates saved',
@@ -823,15 +796,6 @@ class S {
     return Intl.message(
       'record symptoms & temp',
       name: 'springboard_record_symptom_text',
-      desc: '',
-      args: [],
-    );
-  }
-
-  String get springboard_cdc_symptom_checker_text {
-    return Intl.message(
-      'CDC symptom self-checker',
-      name: 'springboard_cdc_symptom_checker_text',
       desc: '',
       args: [],
     );

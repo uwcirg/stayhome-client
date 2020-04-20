@@ -98,7 +98,7 @@ class SpringBoardWidget extends StatelessWidget {
       ),
       SpringboardTile(
         assetPath: 'assets/stayhome/cdc.png',
-        text: S.of(context).springboard_cdc_symptom_checker_text,
+        text: S.of(context).cdc_symptom_checker,
         onPressed: () {
           Navigator.of(context)
               .push(MaterialPageRoute(builder: (context) => CDCSymptomCheckerInfoPage()));
