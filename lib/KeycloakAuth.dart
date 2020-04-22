@@ -15,9 +15,10 @@ class KeycloakAuth {
   String _issuer;
   String _clientSecret;
   String _clientId;
-  static final String _redirectUrl = PlatformDefs().redirectUrl();
+  static final String _defaultRedirectUrl = PlatformDefs().redirectUrl();
   DateTime accessTokenExpirationDateTime;
   bool isLoggedIn = false;
+  String site;
 
   KeycloakApi _api;
 
@@ -30,10 +31,11 @@ class KeycloakAuth {
   KeycloakAuth(this._issuer, this._clientSecret, this._clientId) {
     if (kIsWeb) {
       _setInitialLoginState();
-      _api = new KeycloakApi(_issuer, _clientId, _clientSecret, _redirectUrl,
+      _api = new KeycloakApi(_issuer, _clientId, _clientSecret, _defaultRedirectUrl,
           scopes: ["openid"], authStorage: MapAppWebAuthStorage());
     } else {
-      _api = new KeycloakApi(_issuer, _clientId, _clientSecret, _redirectUrl, scopes: ["openid"]);
+      _api = new KeycloakApi(_issuer, _clientId, _clientSecret, _defaultRedirectUrl,
+          scopes: ["openid"]);
     }
   }
 
@@ -47,7 +49,20 @@ class KeycloakAuth {
     return _api.currentOauthAccount.token;
   }
 
-  Future mapAppLogin() async {
+  void resetRedirectUrl() {
+    _api.authenticator.redirectUrl = _defaultRedirectUrl;
+  }
+
+  void setRedirectUrlForSite(String site) {
+    var redirectUrl = PlatformDefs().redirectUrl(site: site);
+    print("Redirect URL with site: $redirectUrl");
+    _api.authenticator.redirectUrl = redirectUrl;
+  }
+
+  Future mapAppLogin({String site}) async {
+    if (site != null) {
+      setRedirectUrlForSite(site);
+    }
     try {
       simpleAuth.OAuthAccount account = await _api.authenticate();
       accessTokenExpirationDateTime = account.created.add(Duration(seconds: account.expiresIn));
@@ -87,21 +102,21 @@ class KeycloakAuth {
           return await _completeWithLocalLogout();
         } else {
           //for Web platform, launching the logout url directly after local logout to clear Keycloak session if encounter error?
-           _completeWebLogout(url);
+          _completeWebLogout(url);
           return Future.error("Log out not completed: ${value.statusCode}");
         }
       }
     } catch (error) {
       //for Web platform, launching the logout url directly after local logout to clear Keycloak session if encounter error?
-       _completeWebLogout(url);
+      _completeWebLogout(url);
       return Future.error("Log out error: $error");
     }
   }
 
   _completeWebLogout(url) {
     if (kIsWeb) {
-        _clearWebLocalStorage();
-        PlatformDefs().launchUrl(url);
+      _clearWebLocalStorage();
+      PlatformDefs().launchUrl(url);
     }
   }
 
@@ -208,6 +223,7 @@ class KeycloakAuth {
   Future receivedCallback(String change) async {
     var authenticator = _api.authenticator;
 //    var authenticator = SimpleAuthFlutter.authenticators[_api.authenticator.identifier];
+    print("Change: $change");
     if (change.contains("canceled")) {
       authenticator.cancel();
       return Future.error("Authentication canceled");
@@ -217,17 +233,20 @@ class KeycloakAuth {
     }
 
     Uri uri = Uri.tryParse(change);
+    print("Uri: $uri");
 
     if (authenticator.checkUrl(uri)) {
       // --- copy pasted sections - need cleanup!
       // from API code
       var token = await authenticator.getAuthCode();
+      print("Token: $token");
       if (token?.isEmpty ?? true) {
         throw new Exception("Null Token");
       }
       simpleAuth.OAuthAccount account = await _api.getAccountFromAuthCode(authenticator);
       _api.saveAccountToCache(account);
       _api.currentAccount = account;
+      print("Oauth account updated and token non-null: ${_api.currentOauthAccount.token!=null}");
 
       //from KeycloakAuth mapAppLogin callback
       accessTokenExpirationDateTime = account.created.add(Duration(seconds: account.expiresIn));
@@ -288,7 +307,7 @@ class KeycloakApi extends simpleAuth.OAuthApi {
     String issuer,
     String clientId,
     String clientSecret,
-    String redirectUrl, {
+    String defaultRedirectUrl, {
     List<String> scopes,
     Client client,
     simpleAuth.AuthStorage authStorage,
@@ -298,7 +317,7 @@ class KeycloakApi extends simpleAuth.OAuthApi {
           clientSecret,
           "$issuer/protocol/openid-connect/token",
           '$issuer/protocol/openid-connect/auth',
-          redirectUrl,
+          defaultRedirectUrl,
           client: client,
           scopes: scopes,
           authStorage: authStorage,

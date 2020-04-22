@@ -240,8 +240,8 @@ class StayHomeAppAssets extends AppAssets {
       "/profile": (BuildContext context) => ProfilePage(),
       "/progress_insights": (BuildContext context) => StayHomeTrendsPage(),
       "/about": (BuildContext context) => StayHomeHelpPage(),
-      "/login": (BuildContext context) => LoginPage(),
-      "/authCallback": (BuildContext context) => PlatformDefs().getAuthCallbackPage(),
+      "/login": null, // handle this case specially to respect url parameters
+      "/authCallback": null, // handle this case specially to respect url parameters
       "/communications": (BuildContext context) => CommunicationsPage(),
     };
   }

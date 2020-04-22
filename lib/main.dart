@@ -113,7 +113,6 @@ class _MyAppState extends State<MyApp> {
                   secondaryLabelStyle: Theme.of(context).accentTextTheme.body1),
               dividerTheme: DividerThemeData(thickness: 1)),
           home: new LoginPage(),
-          // Will replace after login is complete
           routes: appAssets.navRoutes(context),
           locale: Locale(_locale, ""),
           localizationsDelegates: [
@@ -122,6 +121,27 @@ class _MyAppState extends State<MyApp> {
             GlobalWidgetsLocalizations.delegate,
           ],
           supportedLocales: S.delegate.supportedLocales,
+          onGenerateRoute: (settings) {
+            var uri = Uri.parse(settings.name);
+            String site = uri.queryParameters['site'];
+            print("onGenerateRoute path name: ${uri.path}");
+            print("onGenerateRoute queryParams: ${uri.queryParameters}");
+            if (uri.path == '/authCallback') {
+              return MaterialPageRoute(
+                builder: (context) {
+                  print("RETURNING AUTHCALLBACKPAGE: ${site}");
+                  return PlatformDefs().getAuthCallbackPage(site: site);
+                },
+              );
+            } else if (uri.path == "/login") {
+              return MaterialPageRoute(
+                builder: (context) {
+                  return LoginPage(site: site);
+                },
+              );
+            }
+            return null;
+          },
         ));
   }
 
@@ -154,6 +174,7 @@ class _MyAppState extends State<MyApp> {
 
   void dismissLoginScreen(BuildContext context) {
     if (auth.isLoggedIn) {
+      print("Dismiss login screen. Token is now: ${auth.api.currentOauthAccount.token!=null}");
       auth.getUserInfo().then((value) {
         String keycloakUserId = auth.userInfo.keycloakUserId;
         ScopedModel.of<CarePlanModel>(context).setUserAndAuthToken(keycloakUserId, auth);

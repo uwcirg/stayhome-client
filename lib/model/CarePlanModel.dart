@@ -114,6 +114,7 @@ class CarePlanModel extends Model {
       loadResourceLinks();
       return Future.error("No user information. Please log in again.");
     }
+    print("CarePlanModel - Auth site: ${_auth.site }");
 
     this.patient = await Repository.getPatient(_keycloakSystem, _keycloakUserId, _api);
     if (patient != null) {
@@ -129,10 +130,24 @@ class CarePlanModel extends Model {
       if (patient != null) {
         print("Successfully created ${patient.reference}");
         isFirstTimeUser = true;
+        if (_auth.site != null) {
+          await _addConsentForSite(_auth.site);
+        }
         return _loadCarePlan();
       } else {
         return Future.error("Returned patient was null");
       }
+    }
+  }
+
+  Future<Consent> _addConsentForSite(String site) {
+    Reference org = OrganizationReference.fromSiteString(site);
+    if (org != null) {
+      Consent c = Consent.from(patient, org, ConsentContentClass.all, ProvisionType.permit);
+      print("Creating a consent object indicating permission for site: $site");
+      return Repository.postConsent(c, _api);
+    } else {
+      return Future.value(null);
     }
   }
 
@@ -618,7 +633,8 @@ class DataSharingConsents with MapMixin<Reference, ConsentGroup> {
       return a.provision.period.start.compareTo(b.provision.period.start);
     });
     consents.forEach((Consent consent) {
-      Map contentCategories = _consents.putIfAbsent(consent.organization.first, () => ConsentGroup());
+      Map contentCategories =
+          _consents.putIfAbsent(consent.organization.first, () => ConsentGroup());
       Coding contentClass = consent.provision.provisionClass.first;
       contentCategories.putIfAbsent(contentClass, () => consent.provision.type);
     });
@@ -651,8 +667,7 @@ class DataSharingConsents with MapMixin<Reference, ConsentGroup> {
   ConsentGroup operator [](Object key) => _consents[key];
 
   @override
-  void operator []=(Reference key,ConsentGroup value) =>
-      _consents[key] = value;
+  void operator []=(Reference key, ConsentGroup value) => _consents[key] = value;
 
   @override
   void clear() => _consents.clear();
@@ -662,6 +677,4 @@ class DataSharingConsents with MapMixin<Reference, ConsentGroup> {
 
   @override
   ConsentGroup remove(Object key) => _consents.remove(key);
-
-
 }

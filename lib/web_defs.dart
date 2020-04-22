@@ -12,8 +12,15 @@ import 'package:map_app_flutter/platform_stub.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class WebDefs implements PlatformDefs {
-  String redirectUrl() {
+  String redirectUrl({String site}) {
+    if (site != null) {
+      return '${rootUrl()}/#/authCallback?site=$site';
+    }
     return '${rootUrl()}/#/authCallback';
+  }
+
+  String extractSiteName() {
+    return Uri.tryParse(window.location.href)?.queryParameters['site'];
   }
 
   String rootUrl() {
@@ -35,8 +42,8 @@ class WebDefs implements PlatformDefs {
   }
 
   @override
-  Widget getAuthCallbackPage() {
-    return AuthCallbackPage();
+  Widget getAuthCallbackPage({String site}) {
+    return AuthCallbackPage(site: site);
   }
 
   @override
@@ -69,8 +76,15 @@ class WebDefs implements PlatformDefs {
 }
 
 class AuthCallbackPage extends StatelessWidget {
+  final String site;
+
+  AuthCallbackPage({this.site});
+
   @override
   Widget build(BuildContext context) {
+    print("AuthCallbackPage site: $site");
+    MyApp.of(context).auth.site = site;
+    MyApp.of(context).auth.resetRedirectUrl();
     MyApp.of(context).auth.receivedCallback(window.location.href).then((d) {
       MyApp.of(context).dismissLoginScreen(context);
     }).catchError((error) {

@@ -7,9 +7,14 @@ import 'package:url_launcher/url_launcher.dart';
 
 class MobileDefs implements PlatformDefs {
 
-  String redirectUrl() {
+  String redirectUrl({String site}) {
     return 'edu.washington.cirg.mapapp:/callback';
   }
+
+  String extractSiteName() {
+    return null;
+  }
+
   String rootUrl() {
     return 'edu.washington.cirg.mapapp';
   }
@@ -26,7 +31,7 @@ class MobileDefs implements PlatformDefs {
   }
 
   @override
-  Widget getAuthCallbackPage() {
+  Widget getAuthCallbackPage({String site}) {
     return Container();
   }
 

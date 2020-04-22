@@ -9,14 +9,16 @@ import 'platform_interface.dart'
     if (dart.library.html) 'package:map_app_flutter/web_defs.dart';
 
 abstract class PlatformDefs {
-  String redirectUrl();
+  String redirectUrl({String site});
   String rootUrl();
   addToHomeScreen(Function onBeforeInstallPrompt);
   onAddToHomeScreenButtonPressed(deferredPrompt);
 
+  String extractSiteName();
+
   Future launchUrl(String url, {bool newTab = false});
 
-  Widget getAuthCallbackPage();
+  Widget getAuthCallbackPage({String site});
 
   factory PlatformDefs() => getPlatformDefs();
 }

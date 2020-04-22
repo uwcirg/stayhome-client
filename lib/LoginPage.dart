@@ -16,6 +16,10 @@ import 'package:map_app_flutter/services/Repository.dart';
 import 'package:simple_auth_flutter/simple_auth_flutter.dart';
 
 class LoginPage extends StatefulWidget {
+  final String site;
+
+  LoginPage({this.site});
+
   @override
   LoginPageState createState() => LoginPageState();
 }
@@ -26,7 +30,6 @@ class LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
-    super.initState();
     SimpleAuthFlutter.init(context);
     Repository.getSystemAnnouncement(MyApp.of(context).auth.api).then((Communication c) {
       setState(() {
@@ -38,6 +41,7 @@ class LoginPageState extends State<LoginPage> {
         snack("Error loading system announcement", context);
       });
     });
+    super.initState();
   }
 
   @override
@@ -48,9 +52,11 @@ class LoginPageState extends State<LoginPage> {
         : 12;
 
     PlatformDefs().addToHomeScreen((deferredPrompt) {
-      setState(() {
-        _deferredPrompt = deferredPrompt;
-      });
+      if (mounted) {
+        setState(() {
+          _deferredPrompt = deferredPrompt;
+        });
+      }
     });
 
     return Scaffold(
@@ -133,12 +139,13 @@ class LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildLoginButton(BuildContext context) {
+    print("Site name: ${widget.site}");
     return RaisedButton(
         color: Colors.white,
         elevation: 0,
         onPressed: () => MyApp.of(context)
             .auth
-            .mapAppLogin()
+            .mapAppLogin(site: widget.site)
             .then((value) => MyApp.of(context).dismissLoginScreen(context))
             .catchError((error) => snack("$error", context)),
         child: Padding(
