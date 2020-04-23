@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
+import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/map_app_widgets.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -127,21 +128,21 @@ class ConsentGroupWidgetState extends State<ConsentGroupWidget> {
           return Column(
             children: <Widget>[
               SwitchFormField(
-                title: "Share my symptoms, testing, and health conditions",
+                title: S.of(context).share_symptoms,
                 initialValue: consentGroup.shareSymptoms,
                 onChanged: (value) {
                   consentGroup.shareSymptoms = value;
                 },
               ),
               SwitchFormField(
-                title: "Share my general location (zip code)",
+                title: S.of(context).share_location,
                 initialValue: consentGroup.shareLocation,
                 onChanged: (value) {
                   consentGroup.shareLocation = value;
                 },
               ),
               SwitchFormField(
-                title: "Share my name and contact information (email and/or phone number)",
+                title: S.of(context).share_contact_info,
                 initialValue: consentGroup.shareContactInfo,
                 onChanged: (value) {
                   consentGroup.shareContactInfo = value;

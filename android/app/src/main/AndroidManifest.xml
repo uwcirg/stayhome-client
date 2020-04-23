@@ -32,16 +32,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.linusu.flutter_web_auth.CallbackActivity">
-            <intent-filter android:label="flutter_web_auth">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="edu.washington.cirg.mapapp" />
-            </intent-filter>
-        </activity>
         <activity android:name="clancey.simpleauth.simpleauthflutter.SimpleAuthCallbackActivity" >
             <intent-filter android:label="simple_auth">
                 <action android:name="android.intent.action.VIEW" />

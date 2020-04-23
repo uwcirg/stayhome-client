@@ -182,7 +182,7 @@ class LoginPageState extends State<LoginPage> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: _buildTextLink(
-          MyApp.of(context).appAssets.whatLinkTitle, MyApp.of(context).appAssets.whatLink,
+          S.of(context).whatlink_title, MyApp.of(context).appAssets.whatLink,
           large: true),
     );
   }

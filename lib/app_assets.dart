@@ -32,8 +32,6 @@ abstract class AppAssets {
 
   String get appName;
 
-  String get whatLinkTitle;
-
   String get whatLink;
 
   get issuer;
@@ -82,9 +80,6 @@ class StayHomeAppAssets extends AppAssets {
 
   @override
   String get appName => "StayHome";
-
-  @override
-  String get whatLinkTitle => "What’s StayHome?";
 
   @override
   String get whatLink => WhatInfo.link;

@@ -207,15 +207,6 @@ class S {
     );
   }
 
-  String get birthdate_hint_text {
-    return Intl.message(
-      'Enter date of birth (m/d/y)',
-      name: 'birthdate_hint_text',
-      desc: '',
-      args: [],
-    );
-  }
-
   String get birthdate {
     return Intl.message(
       'Date of birth',
@@ -297,10 +288,10 @@ class S {
     );
   }
 
-  String get back_to_login {
+  String get back_to_login_register_small {
     return Intl.message(
-      'Back to login',
-      name: 'back_to_login',
+      'back to login/register',
+      name: 'back_to_login_register_small',
       desc: '',
       args: [],
     );
@@ -308,7 +299,7 @@ class S {
 
   String get attempt_login_text {
     return Intl.message(
-      'Attempt to log in...',
+      'Attempting to log in...',
       name: 'attempt_login_text',
       desc: '',
       args: [],
@@ -468,24 +459,6 @@ class S {
     );
   }
 
-  String get and {
-    return Intl.message(
-      'and',
-      name: 'and',
-      desc: '',
-      args: [],
-    );
-  }
-
-  String get or {
-    return Intl.message(
-      'or',
-      name: 'or',
-      desc: '',
-      args: [],
-    );
-  }
-
   String get completed {
     return Intl.message(
       'Completed',
@@ -506,7 +479,7 @@ class S {
 
   String get no_content {
     return Intl.message(
-      '<no content>',
+      '(no content)',
       name: 'no_content',
       desc: '',
       args: [],
@@ -702,15 +675,6 @@ class S {
     );
   }
 
-  String get profile_info_prompt_text {
-    return Intl.message(
-      'Click to learn how Location information is used',
-      name: 'profile_info_prompt_text',
-      desc: '',
-      args: [],
-    );
-  }
-
   String get profile_zipcode_hint_text {
     return Intl.message(
       'Where you spend most of your time',
@@ -765,15 +729,6 @@ class S {
     );
   }
 
-  String get profile_contact_info_prompt_text {
-    return Intl.message(
-      'Click to learn how Contact Information is used',
-      name: 'profile_contact_info_prompt_text',
-      desc: '',
-      args: [],
-    );
-  }
-
   String get profile_preferred_contact_text {
     return Intl.message(
       'Preferred contact method',
@@ -810,15 +765,6 @@ class S {
     );
   }
 
-  String get profile_about_your_info_prompt_text {
-    return Intl.message(
-      'Click to learn how About You information is used',
-      name: 'profile_about_your_info_prompt_text',
-      desc: '',
-      args: [],
-    );
-  }
-
   String get profile_updated_text {
     return Intl.message(
       'Profile updates saved',
@@ -850,15 +796,6 @@ class S {
     return Intl.message(
       'record symptoms & temp',
       name: 'springboard_record_symptom_text',
-      desc: '',
-      args: [],
-    );
-  }
-
-  String get springboard_cdc_symptom_checker_text {
-    return Intl.message(
-      'CDC symptom self-checker',
-      name: 'springboard_cdc_symptom_checker_text',
       desc: '',
       args: [],
     );
@@ -1172,7 +1109,7 @@ class S {
 
   String get fiuNH_body {
     return Intl.message(
-      'You can choose to share your information directly with the NeighborhoodHELP program. If you do they will know if you might be sick from COVID-19, and what kind of help you or your family might need. If you share information with NeighborhoodHLEP they will have access to:\n- Your symptoms, testing, and health condition information,\n- Your general location information (zip code), AND\n- Your name and contact information (email and/or phone number).',
+      'You can choose to share your information directly with the NeighborhoodHELP program. If you do they will know if you might be sick from COVID-19, and what kind of help you or your family might need. If you share information with NeighborhoodHELP they will have access to:\n- Your symptoms, testing, and health condition information,\n- Your general location information (zip code), AND\n- Your name and contact information (email and/or phone number).',
       name: 'fiuNH_body',
       desc: '',
       args: [],
@@ -1210,6 +1147,87 @@ class S {
     return Intl.message(
       'Share my information with the Seattle Coronavirus Assessment Network (SCAN)',
       name: 'scan_toggle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get contact_point_system_email {
+    return Intl.message(
+      'email',
+      name: 'contact_point_system_email',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get gender_male {
+    return Intl.message(
+      'male',
+      name: 'gender_male',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get gender_female {
+    return Intl.message(
+      'female',
+      name: 'gender_female',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get gender_other {
+    return Intl.message(
+      'other',
+      name: 'gender_other',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get whatlink_title {
+    return Intl.message(
+      'What\'s StayHome?',
+      name: 'whatlink_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get share_symptoms {
+    return Intl.message(
+      'Share my symptoms, testing, and health conditions',
+      name: 'share_symptoms',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get share_location {
+    return Intl.message(
+      'Share my general location (zip code)',
+      name: 'share_location',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get share_contact_info {
+    return Intl.message(
+      'Share my name and contact information (email and/or phone number)',
+      name: 'share_contact_info',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get profile_info_sharing_text {
+    return Intl.message(
+      'We won’t share any of the information in your profile, unless you allow us to by selecting specific programs, in the “Information Sharing” options below.',
+      name: 'profile_info_sharing_text',
       desc: '',
       args: [],
     );

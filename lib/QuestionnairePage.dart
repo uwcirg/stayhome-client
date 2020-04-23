@@ -38,7 +38,7 @@ class QuestionnairePageState extends State<QuestionnairePage> {
   QuestionnairePageState(this._questionnaire, this._model, {QuestionnaireResponse response}) {
     this._response = response;
     if (this._response == null) {
-      this._response = new QuestionnaireResponse(
+      this._response = new QuestionnaireResponse.from(
           _questionnaire, Reference.from(_model.patient), _model.carePlan);
     }
   }
@@ -202,8 +202,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
               ),
             ],
           ),
-        )
-      );
+        ));
   }
 
   Widget _buildGroupCard(BuildContext context, QuestionnaireItem item) {
@@ -283,26 +282,32 @@ class QuestionWidgetState extends State<QuestionWidget> {
     } else {
       throw UnimplementedError("Not implemented: ${questionnaireItem.type}");
     }
+
+
+    String helpText = questionnaireItem.helpText;
+    String text = questionnaireItem.text;
+    SupportLink supportLink = questionnaireItem.supportLink;
+
     return Padding(
         padding: MapAppPadding.cardPageMargins,
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
           Visibility(
-            visible: questionnaireItem.text != null && questionnaireItem.text.isNotEmpty,
+            visible: text != null && text.isNotEmpty,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
-              child: Text(questionnaireItem.text ?? "", style: questionTitleStyle),
+              child: Text(text ?? "", style: questionTitleStyle),
             ),
           ),
           Visibility(
-              visible: questionnaireItem.helpText != null && questionnaireItem.helpText.isNotEmpty,
+              visible: helpText != null && helpText.isNotEmpty,
               child: Text(
-                questionnaireItem.helpText ?? "",
-                style: Theme.of(context).textTheme.subtitle1.apply(color: Theme.of(context).textTheme.caption.color),
+                helpText ?? "",
+                style: Theme.of(context)
+                    .textTheme
+                    .subtitle1
+                    .apply(color: Theme.of(context).textTheme.caption.color),
               )),
-          Visibility(
-              visible: questionnaireItem.supportLink != null,
-              child: _buildSupportLink(questionnaireItem.supportLink, context)
-          ),
+          Visibility(visible: supportLink != null, child: _buildSupportLink(supportLink, context)),
           item
         ]));
   }
@@ -311,11 +316,10 @@ class QuestionWidgetState extends State<QuestionWidget> {
     if (link == null) return Container();
     return Padding(
       padding: const EdgeInsets.all(Dimensions.largeMargin),
-      child:
-      Center(
-        child:
-        OutlineButton(
-          padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin, horizontal: Dimensions.fullMargin),
+      child: Center(
+        child: OutlineButton(
+          padding: const EdgeInsets.symmetric(
+              vertical: Dimensions.halfMargin, horizontal: Dimensions.fullMargin),
           child: Text(link.title ?? ""),
           onPressed: () => PlatformDefs().launchUrl(link.url ?? "", newTab: true),
         ),
@@ -325,14 +329,15 @@ class QuestionWidgetState extends State<QuestionWidget> {
 
   Widget _buildStringItem(QuestionnaireItem questionnaireItem, BuildContext context) {
     return TextFormField(
-        initialValue: _response.getAnswer(questionnaireItem.linkId)?.toString() ?? "",
-        decoration: InputDecoration(hintText: questionnaireItem.text),
-        onChanged: (value) {
-          setState(() {
-            _response.setAnswer(questionnaireItem.linkId, Answer(valueString: value));
-          });
-        },
-      );
+      initialValue: _response.getAnswer(questionnaireItem.linkId)?.toString() ?? "",
+      decoration: InputDecoration(
+          hintText: questionnaireItem.text),
+      onChanged: (value) {
+        setState(() {
+          _response.setAnswer(questionnaireItem.linkId, Answer(valueString: value));
+        });
+      },
+    );
   }
 
   Widget _buildDateItem(QuestionnaireItem questionnaireItem, BuildContext context) {
@@ -340,28 +345,26 @@ class QuestionWidgetState extends State<QuestionWidget> {
       child: IgnorePointer(
         child: TextFormField(
           controller: widget.dateCtrl,
-          decoration: InputDecoration(
-            hintText: questionnaireItem.text
-          ),
+          decoration: InputDecoration(hintText: questionnaireItem.textBase),
         ),
       ),
       onTap: () {
         showDatePicker(
-          context: context,
-          initialDate: _response.getAnswer(questionnaireItem.linkId)?.valueDate??new DateTime.now(),
-          firstDate: DateTime(2019, 1, 1),
-          lastDate: new DateTime.now(),
-          locale: Locale(Localizations.localeOf(context).languageCode, '')
-        )
-        .then((DateTime pickerdate) {
-            if (pickerdate != null) {
-              final String formattedDate = DateFormat.yMd().format(pickerdate);
-              DateTime date = DateFormat.yMd().parse(formattedDate.toString());
-              widget.dateCtrl.text = formattedDate;
-              setState(() {
-                _response.setAnswer(questionnaireItem.linkId, Answer(valueDate: date));
-              });
-            }
+                context: context,
+                initialDate:
+                    _response.getAnswer(questionnaireItem.linkId)?.valueDate ?? new DateTime.now(),
+                firstDate: DateTime(2019, 1, 1),
+                lastDate: new DateTime.now(),
+                locale: Locale(Localizations.localeOf(context).languageCode, ''))
+            .then((DateTime pickerdate) {
+          if (pickerdate != null) {
+            final String formattedDate = DateFormat.yMd().format(pickerdate);
+            DateTime date = DateFormat.yMd().parse(formattedDate.toString());
+            widget.dateCtrl.text = formattedDate;
+            setState(() {
+              _response.setAnswer(questionnaireItem.linkId, Answer(valueDate: date));
+            });
+          }
         });
       },
     );
@@ -389,7 +392,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
       ),
       items: choices.map((ChoiceOption choice) {
         return new DropdownMenuItem<ChoiceOption>(
-          child: Text(choice.toString()),
+          child: Text(choice.display),
           value: choice,
         );
       }).toList(),
@@ -404,8 +407,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
   Widget _buildTemperatureItem(QuestionnaireItem questionnaireItem, BuildContext context) {
     return TextFormField(
       initialValue: currentEntry ?? "",
-      decoration:
-          InputDecoration(hintText: S.of(context).enter_temperature_text, errorMaxLines: 3),
+      decoration: InputDecoration(hintText: S.of(context).enter_temperature_text, errorMaxLines: 3),
 //      inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
 //      keyboardType: TextInputType.numberWithOptions(decimal: true),
       onChanged: (value) {
@@ -426,7 +428,11 @@ class QuestionWidgetState extends State<QuestionWidget> {
           } else {
             if (!isValidTempF(result) && !isValidTempC(result)) {
               result = null;
-              message = S.of(context).temperatureErrorMessage(QuestionnaireConstants.minF, QuestionnaireConstants.maxF, QuestionnaireConstants.minC, QuestionnaireConstants.maxC);
+              message = S.of(context).temperatureErrorMessage(
+                  QuestionnaireConstants.minF,
+                  QuestionnaireConstants.maxF,
+                  QuestionnaireConstants.minC,
+                  QuestionnaireConstants.maxC);
             } else {
               // restrict to 2 decimals
               if (!isValidTempF(result)) result = double.parse(cToF(result).toStringAsFixed(2));
@@ -454,22 +460,25 @@ class QuestionWidgetState extends State<QuestionWidget> {
   List<Widget> _buildChoicesFromAnswerOptions(
       QuestionnaireItem questionnaireItem, Answer currentResponse, BuildContext context) {
     return questionnaireItem.answerOption.map((AnswerOption option) {
+      String display = option.display;
       return _buildChip(
-          '${option.ordinalValue() != -1 ? option.ordinalValue() : option}',
+          '${option.ordinalValue() != -1 ? option.ordinalValue() : display}',
           currentResponse == option,
           context,
           questionnaireItem,
           new Answer.fromAnswerOption(option),
-          helpLabel: '$option');
+          helpLabel: display);
     }).toList();
   }
 
   List<Widget> _buildChoicesFromAnswerValueSet(
       QuestionnaireItem questionnaireItem, Answer currentResponse, BuildContext context) {
     return questionnaireItem.answerValueSet.map((Coding option) {
-      return _buildChip('$option', currentResponse == option, context, questionnaireItem,
-          new Answer(valueCoding: option),
-          helpLabel: '$option');
+      String display = option.display;
+
+      return _buildChip(display,
+          currentResponse == option, context, questionnaireItem, new Answer(valueCoding: option),
+          helpLabel: display);
     }).toList();
   }
 

@@ -178,8 +178,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(
-                    "We won’t share any of the information in your profile, unless you allow us to by selecting specific programs, in the “Information Sharing” options below."),
+                Text(S.of(context).profile_info_sharing_text),
                 buildSectionHeader(S.of(context).profile_location_title_text, context),
                 TextFormField(
                   decoration: InputDecoration(
@@ -262,6 +261,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
                     preferredContactMethod, (value) {
                   preferredContactMethod = value;
                 }, displayOverrides: {
+                      ContactPointSystem.email: S.of(context).contact_point_system_email,
                   ContactPointSystem.phone: S.of(context).profile_preferred_contact_voicecall_text,
                   ContactPointSystem.sms: S.of(context).profile_preferred_contact_sms_text
                 }),
@@ -297,7 +297,6 @@ class ProfileWidgetState extends State<ProfileWidget> {
                       controller: birthDateCtrl,
                       decoration: InputDecoration(
                           icon: Icon(Icons.cake),
-                          hintText: S.of(context).birthdate_hint_text,
                           labelText: S.of(context).birthdate),
                     ),
                   ),
@@ -334,7 +333,12 @@ class ProfileWidgetState extends State<ProfileWidget> {
                   (value) {
                     gender = value;
                   },
-                  displayOverrides: {Gender.unknown: S.of(context).decline_to_state},
+                  displayOverrides: {
+                    Gender.unknown: S.of(context).decline_to_state,
+                    Gender.male: S.of(context).gender_male,
+                    Gender.female: S.of(context).gender_female,
+                    Gender.other: S.of(context).gender_other
+                  },
                 ),
                 Divider(),
                 ..._permissionsPageContent(model),

@@ -2,94 +2,73 @@
  * Copyright (c) 2020 CIRG. All rights reserved.
  */
 import 'package:intl/intl.dart';
+import 'package:map_app_flutter/fhir/fhir_translations.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/map_app_code_system.dart';
 import 'package:map_app_flutter/services/Repository.dart';
-import "package:simple_auth/simple_auth.dart" show JsonSerializable;
+import 'package:json_annotation/json_annotation.dart';
 
-abstract class Resource implements JsonSerializable {
-  String resourceType;
-  String id;
+part 'FhirResources.g.dart';
 
-  Resource({this.resourceType, this.id});
+abstract class Resource {
+  get resourceType;
+
+  get id;
 
   String get reference => "$resourceType/$id";
-}
 
-class Gender {
-  final _value;
-
-  const Gender._(this._value);
-
-  toString() => _value;
-
-  static fromJson(String key) {
-    return _vals.firstWhere((v) => v._value == key,
-        orElse: () => throw ArgumentError("Key does not match any Gender"));
+  factory Resource.fromJson(Map<String, dynamic> json) {
+    throw UnimplementedError();
   }
 
-  static const male = const Gender._('male');
-  static const female = const Gender._('female');
-  static const other = const Gender._('other');
-  static const unknown = const Gender._('unknown');
-
-  static const _vals = [male, female, other, unknown];
+  Map<String, dynamic> toJson();
 }
 
-class CommunicationStatus {
-  final _value;
-
-  const CommunicationStatus._(this._value);
-
-  toString() => _value;
-
-  static fromJson(String key) {
-    return _vals.firstWhere((v) => v._value == key,
-        orElse: () => throw ArgumentError("Key does not match any CommunicationStatus"));
-  }
-
-  static const preparation = const CommunicationStatus._('preparation');
-  static const in_progress = const CommunicationStatus._('in-progress');
-  static const not_done = const CommunicationStatus._('not-done');
-  static const on_hold = const CommunicationStatus._('on-hold');
-  static const stopped = const CommunicationStatus._('stopped');
-  static const completed = const CommunicationStatus._('completed');
-  static const entered_in_error = const CommunicationStatus._('entered-in-error');
-  static const unknown = const CommunicationStatus._('unknown');
-
-  static const _vals = [
-    preparation,
-    in_progress,
-    not_done,
-    on_hold,
-    stopped,
-    completed,
-    entered_in_error,
-    unknown
-  ];
+enum Gender {
+  @JsonValue('male')
+  male,
+  @JsonValue('female')
+  female,
+  @JsonValue('other')
+  other,
+  @JsonValue('unknown')
+  unknown
 }
 
-class Priority {
-  final _value;
-
-  const Priority._(this._value);
-
-  toString() => _value;
-
-  static fromJson(String key) {
-    return _vals.firstWhere((v) => v._value == key,
-        orElse: () => throw ArgumentError("Key does not match any Priority"));
-  }
-
-  static const routine = const Priority._('routine');
-  static const urgent = const Priority._('urgent');
-  static const asap = const Priority._('asap');
-  static const stat = const Priority._('stat');
-
-  static const _vals = [routine, urgent, asap, stat];
+enum CommunicationStatus {
+  @JsonValue('preparation')
+  preparation,
+  @JsonValue('in-progress')
+  in_progress,
+  @JsonValue('not-done')
+  not_done,
+  @JsonValue('on-hold')
+  on_hold,
+  @JsonValue('stopped')
+  stopped,
+  @JsonValue('completed')
+  completed,
+  @JsonValue('entered-in-error')
+  entered_in_error,
+  @JsonValue('unknown')
+  unknown
 }
 
-class Consent extends Resource {
+enum Priority {
+  @JsonValue("routine")
+  routine,
+  @JsonValue("urgent")
+  urgent,
+  @JsonValue("asap")
+  asap,
+  @JsonValue("stat")
+  stat,
+}
+
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
+class Consent with Resource {
+  final String resourceType;
+  String id;
   Meta meta;
   ConsentStatus status;
   CodeableConcept scope;
@@ -99,65 +78,28 @@ class Consent extends Resource {
   List<Reference> organization;
 
   Consent(
-      {resourceType,
-      id,
+      {this.resourceType = "Consent",
+      this.id,
       this.meta,
       this.status,
       this.scope,
       this.category,
       this.patient,
       this.provision,
-      this.organization})
-      : super(resourceType: "Consent", id: id);
+      this.organization});
 
-  Consent.fromJson(Map<String, dynamic> json) {
-    resourceType = json['resourceType'];
-    id = json['id'];
-    meta = json['meta'] != null ? Meta.fromJson(json['meta']) : null;
+  factory Consent.fromJson(Map<String, dynamic> json) => _$ConsentFromJson(json);
 
-    if (json['status'] != null) status = ConsentStatus.fromJson(json['status']);
-    if (json['scope'] != null) scope = CodeableConcept.fromJson(json['scope']);
-    if (json['category'] != null) {
-      category = new List<CodeableConcept>();
-      json['category'].forEach((v) {
-        category.add(new CodeableConcept.fromJson(v));
-      });
-    }
-    if (json['organization'] != null) {
-      organization = new List<Reference>();
-      json['organization'].forEach((v) {
-        organization.add(new Reference.fromJson(v));
-      });
-    }
-    if (json['patient'] != null) patient = Reference.fromJson(json['patient']);
-    if (json['provision'] != null) provision = Provision.fromJson(json['provision']);
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-
-    if (this.id != null) data['id'] = id;
-    if (this.resourceType != null) data['resourceType'] = resourceType;
-    if (this.meta != null) data['meta'] = meta.toJson();
-    if (this.scope != null) data['scope'] = scope.toJson();
-    if (this.status != null) data['status'] = status.toString();
-    if (this.category != null) data['category'] = this.category.map((v) => v.toJson()).toList();
-    if (this.organization != null)
-      data['organization'] = this.organization.map((v) => v.toJson()).toList();
-    if (this.patient != null) data['patient'] = patient.toJson();
-    if (this.provision != null) data['provision'] = provision.toJson();
-
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$ConsentToJson(this);
 
   bool hasCategory(Coding category) => this
       .category
       .any((CodeableConcept concept) => concept.coding.any((element) => element == category));
 
-  bool get isConsented => provision.type.isPermitted;
+  bool get isConsented => provision.type == ProvisionType.permit;
 
-  factory Consent.from(Patient patient, Reference organization, Coding contentClass,
-      ProvisionType type) {
+  factory Consent.from(
+      Patient patient, Reference organization, Coding contentClass, ProvisionType type) {
     return Consent(
         status: ConsentStatus.active,
         scope: CodeableConcept(coding: [ConsentScope.patientPrivacy]),
@@ -171,77 +113,46 @@ class Consent extends Resource {
   }
 }
 
-class ConsentStatus {
-  final _value;
-
-  const ConsentStatus._(this._value);
-
-  toString() => _value;
-
-  static fromJson(String key) {
-    return _vals.firstWhere((v) => v._value == key,
-        orElse: () => throw ArgumentError("Key does not match any ConsentStatus"));
-  }
-
-  static const draft = const ConsentStatus._('draft');
-  static const proposed = const ConsentStatus._('proposed');
-  static const active = const ConsentStatus._('active');
-  static const rejected = const ConsentStatus._('rejected');
-  static const inactive = const ConsentStatus._('inactive');
-  static const entered_in_error = const ConsentStatus._('entered-in-error');
-
-  static const _vals = [draft, proposed, active, rejected, inactive, entered_in_error];
+enum ConsentStatus {
+  @JsonValue('draft')
+  draft,
+  @JsonValue('proposed')
+  proposed,
+  @JsonValue('active')
+  active,
+  @JsonValue('rejected')
+  rejected,
+  @JsonValue('inactive')
+  inactive,
+  @JsonValue('entered-in-error')
+  entered_in_error
 }
 
-class Provision implements JsonSerializable {
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
+class Provision {
   ProvisionType type;
+  @JsonKey(name: "class")
   List<Coding> provisionClass;
   Period period;
 
   Provision({this.type, this.provisionClass, this.period});
 
-  Provision.fromJson(Map<String, dynamic> json) {
-    if (json['type'] != null) type = ProvisionType.fromJson(json['type']);
-    if (json['class'] != null) {
-      provisionClass = new List<Coding>();
-      json['class'].forEach((v) {
-        provisionClass.add(new Coding.fromJson(v));
-      });
-    }
-    if (json['period'] != null) period = Period.fromJson(json['period']);
-  }
+  factory Provision.fromJson(Map<String, dynamic> json) => _$ProvisionFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.type != null) data['type'] = this.type.toString();
-    if (this.provisionClass != null)
-      data['class'] = this.provisionClass.map((v) => v.toJson()).toList();
-    if (this.period != null) data['period'] = this.period.toJson();
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$ProvisionToJson(this);
 }
 
-class ProvisionType {
-  final _value;
-
-  const ProvisionType._(this._value);
-
-  toString() => _value;
-
-  static fromJson(String key) {
-    return _vals.firstWhere((v) => v._value == key,
-        orElse: () => throw ArgumentError("Key does not match any ProvisionType"));
-  }
-
-  static const deny = const ProvisionType._('deny');
-  static const permit = const ProvisionType._('permit');
-
-  static const _vals = [deny, permit];
-
-  bool get isPermitted => this == permit;
+enum ProvisionType {
+  @JsonValue('deny')
+  deny,
+  @JsonValue('permit')
+  permit
 }
 
-class Communication extends Resource {
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
+class Communication with Resource {
+  String resourceType;
+  String id;
   Meta meta;
   CommunicationStatus status;
   Priority priority;
@@ -251,67 +162,22 @@ class Communication extends Resource {
   DateTime sent;
 
   Communication(
-      {resourceType,
-      id,
+      {this.resourceType = "Communication",
+      this.id,
       this.meta,
       this.status,
       this.priority,
       this.category,
       this.recipient,
       this.payload,
-      this.sent})
-      : super(resourceType: "Communication", id: id);
+      this.sent});
 
-  factory Communication.fromJson(Map<String, dynamic> json) {
-    return Communication._fromJson(json);
-  }
+  factory Communication.fromJson(Map<String, dynamic> json) => _$CommunicationFromJson(json);
 
-  Communication._fromJson(Map<String, dynamic> json) {
-    resourceType = json['resourceType'];
-    id = json['id'];
-    meta = json['meta'] != null ? Meta.fromJson(json['meta']) : null;
-
-    if (json['status'] != null) status = CommunicationStatus.fromJson(json['status']);
-    if (json['priority'] != null) priority = Priority.fromJson(json['priority']);
-    if (json['category'] != null) {
-      category = new List<CodeableConcept>();
-      json['category'].forEach((v) {
-        category.add(new CodeableConcept.fromJson(v));
-      });
-    }
-    if (json['recipient'] != null) {
-      recipient = new List<Reference>();
-      json['recipient'].forEach((v) {
-        recipient.add(new Reference.fromJson(v));
-      });
-    }
-    if (json['payload'] != null) {
-      payload = new List<Payload>();
-      json['payload'].forEach((v) {
-        payload.add(new Payload.fromJson(v));
-      });
-    }
-    if (json['sent'] != null) sent = DateTime.parse(json['sent']);
-  }
+  Map<String, dynamic> toJson() => _$CommunicationToJson(this);
 
   String displayText(context) {
     return payload[0]?.contentString ?? S.of(context).no_content;
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-
-    if (this.id != null) data['id'] = id;
-    if (this.resourceType != null) data['resourceType'] = resourceType;
-    if (this.meta != null) data['meta'] = meta.toJson();
-    if (this.status != null) data['status'] = status.toString();
-    if (this.priority != null) data['priority'] = priority.toString();
-    if (this.category != null) data['category'] = this.category.map((v) => v.toJson()).toList();
-    if (this.recipient != null) data['recipient'] = this.recipient.map((v) => v.toJson()).toList();
-    if (this.payload != null) data['payload'] = this.payload.map((v) => v.toJson()).toList();
-    if (this.sent != null) data['sent'] = sent.toIso8601String();
-
-    return data;
   }
 
   factory Communication.fromTemplate(Communication commTemplate, Patient patient) {
@@ -322,31 +188,42 @@ class Communication extends Resource {
   }
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
+class PrimitiveTypeExtension {
+  List<Extension> extension;
+
+  PrimitiveTypeExtension({this.extension});
+
+  factory PrimitiveTypeExtension.fromJson(Map<String, dynamic> json) =>
+      _$PrimitiveTypeExtensionFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PrimitiveTypeExtensionToJson(this);
+}
+
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class Payload {
-  String contentString;
   Attachment contentAttachment;
   Reference contentReference;
 
-  Payload({this.contentString, this.contentAttachment, this.contentReference});
+  @JsonKey(name: "contentString")
+  String contentStringBase;
+  @JsonKey(name: "_contentString")
+  PrimitiveTypeExtension contentStringExt;
 
-  Payload.fromJson(Map<String, dynamic> json) {
-    contentString = json['contentString'];
-    if (json['contentAttachment'] != null)
-      contentAttachment = Attachment.fromJson(json['contentAttachment']);
-    if (json['contentReference'] != null)
-      contentReference = Reference.fromJson(json['contentReference']);
-  }
+  String get contentString =>
+      FhirTranslations.extractTranslation(contentStringBase, contentStringExt);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.contentString != null) data['contentString'] = this.contentString;
-    if (this.contentAttachment != null) data['contentAttachment'] = this.contentAttachment.toJson();
-    if (this.contentReference != null) data['contentReference'] = this.contentReference.toJson();
-    return data;
-  }
+  Payload({this.contentStringBase, this.contentAttachment, this.contentReference, this.contentStringExt});
+
+  factory Payload.fromJson(Map<String, dynamic> json) => _$PayloadFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PayloadToJson(this);
 }
 
-class Patient extends Resource {
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
+class Patient with Resource {
+  final String resourceType;
+  String id;
   Meta meta;
   Narrative text;
   List<Extension> extension;
@@ -361,8 +238,8 @@ class Patient extends Resource {
   List<PatientCommunication> communication;
 
   Patient(
-      {String resourceType,
-      String id,
+      {this.resourceType = 'Patient',
+      this.id,
       this.meta,
       this.text,
       this.extension,
@@ -374,8 +251,7 @@ class Patient extends Resource {
       this.address,
       this.maritalStatus,
       this.multipleBirthBoolean,
-      this.communication})
-      : super(resourceType: "Patient", id: id);
+      this.communication});
 
   factory Patient.fromNewPatientForm(Patient originalPatient,
       {String phoneNumber,
@@ -393,7 +269,6 @@ class Patient extends Resource {
     } else {
       patient = Patient();
     }
-    patient.resourceType = "Patient";
     patient.firstName = firstName;
     patient.lastName = lastName;
     patient.phoneNumber = phoneNumber;
@@ -572,133 +447,36 @@ class Patient extends Resource {
     address.postalCode = text;
   }
 
-  Patient.fromJson(Map<String, dynamic> json) {
-    resourceType = json['resourceType'];
-    id = json['id'];
-    meta = json['meta'] != null ? new Meta.fromJson(json['meta']) : null;
-    text = json['text'] != null ? new Narrative.fromJson(json['text']) : null;
-    if (json['extension'] != null) {
-      extension = new List<Extension>();
-      json['extension'].forEach((v) {
-        extension.add(new Extension.fromJson(v));
-      });
-    }
-    if (json['birthDate'] != null) {
-      birthDate = DateTime.parse(json['birthDate']);
-    }
-    if (json['identifier'] != null) {
-      identifier = new List<Identifier>();
-      json['identifier'].forEach((v) {
-        identifier.add(new Identifier.fromJson(v));
-      });
-    }
-    if (json['name'] != null) {
-      name = new List<HumanName>();
-      json['name'].forEach((v) {
-        name.add(new HumanName.fromJson(v));
-      });
-    }
-    if (json['telecom'] != null) {
-      telecom = new List<ContactPoint>();
-      json['telecom'].forEach((v) {
-        telecom.add(new ContactPoint.fromJson(v));
-      });
-    }
-    if (json['gender'] != null) gender = Gender.fromJson(json['gender']);
-    if (json['address'] != null) {
-      address = new List<Address>();
-      json['address'].forEach((v) {
-        address.add(new Address.fromJson(v));
-      });
-    }
-    maritalStatus =
-        json['maritalStatus'] != null ? new CodeableConcept.fromJson(json['maritalStatus']) : null;
-    multipleBirthBoolean = json['multipleBirthBoolean'];
-    if (json['communication'] != null) {
-      communication = new List<PatientCommunication>();
-      json['communication'].forEach((v) {
-        communication.add(new PatientCommunication.fromJson(v));
-      });
-    }
-  }
+  factory Patient.fromJson(Map<String, dynamic> json) => _$PatientFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['resourceType'] = this.resourceType;
-    if (this.id != null) data['id'] = this.id;
-    if (this.meta != null) {
-      data['meta'] = this.meta.toJson();
-    }
-    if (this.text != null) {
-      data['text'] = this.text.toJson();
-    }
-    if (this.extension != null && this.extension.length > 0) {
-      data['extension'] = this.extension.map((v) => v.toJson()).toList();
-    }
-    if (this.identifier != null && this.identifier.length > 0) {
-      data['identifier'] = this.identifier.map((v) => v.toJson()).toList();
-    }
-    if (this.name != null && this.name.length > 0) {
-      data['name'] = this.name.map((v) => v.toJson()).toList();
-    }
-    if (this.telecom != null && this.telecom.length > 0) {
-      data['telecom'] = this.telecom.map((v) => v.toJson()).toList();
-    }
-    if (this.gender != null) data['gender'] = this.gender.toString();
-    if (this.birthDate != null) data['birthDate'] = this.birthDate;
-    if (this.address != null && this.address.length > 0) {
-      data['address'] = this.address.map((v) => v.toJson()).toList();
-    }
-    if (this.maritalStatus != null) {
-      data['maritalStatus'] = this.maritalStatus.toJson();
-    }
-    if (this.multipleBirthBoolean != null) data['multipleBirthBoolean'] = this.multipleBirthBoolean;
-    if (this.communication != null && this.communication.length > 0) {
-      data['communication'] = this.communication.map((v) => v.toJson()).toList();
-    }
-    if (this.birthDate != null) data['birthDate'] = this.birthDate.toIso8601String();
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$PatientToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class Meta {
   String versionId;
-  String lastUpdated;
+  DateTime lastUpdated;
 
   Meta({this.versionId, this.lastUpdated});
 
-  Meta.fromJson(Map<String, dynamic> json) {
-    versionId = json['versionId'];
-    lastUpdated = json['lastUpdated'];
-  }
+  factory Meta.fromJson(Map<String, dynamic> json) => _$MetaFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['versionId'] = this.versionId;
-    data['lastUpdated'] = this.lastUpdated;
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$MetaToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class Narrative {
   String status;
   String div;
 
   Narrative({this.status, this.div});
 
-  Narrative.fromJson(Map<String, dynamic> json) {
-    status = json['status'];
-    div = json['div'];
-  }
+  factory Narrative.fromJson(Map<String, dynamic> json) => _$NarrativeFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['status'] = this.status;
-    data['div'] = this.div;
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$NarrativeToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class HumanName {
   String use;
   String family;
@@ -706,21 +484,12 @@ class HumanName {
 
   HumanName({this.use, this.family, this.given});
 
-  HumanName.fromJson(Map<String, dynamic> json) {
-    use = json['use'];
-    family = json['family'];
-    if (json['given'] != null) given = json['given'].cast<String>();
-  }
+  factory HumanName.fromJson(Map<String, dynamic> json) => _$HumanNameFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.use != null) data['use'] = this.use;
-    if (this.family != null) data['family'] = this.family;
-    if (this.given != null && this.given.length > 0) data['given'] = this.given;
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$HumanNameToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class ContactPoint {
   ContactPointSystem system;
   String value;
@@ -729,23 +498,12 @@ class ContactPoint {
 
   ContactPoint({this.system, this.value, this.use, this.rank});
 
-  ContactPoint.fromJson(Map<String, dynamic> json) {
-    if (json['system'] != null) system = ContactPointSystem.fromJson(json['system']);
-    value = json['value'];
-    use = json['use'];
-    if (json['rank'] != null) rank = json['rank'];
-  }
+  factory ContactPoint.fromJson(Map<String, dynamic> json) => _$ContactPointFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.system != null) data['system'] = this.system.toString();
-    if (this.value != null) data['value'] = this.value;
-    if (this.use != null) data['use'] = this.use;
-    if (this.rank != null) data['rank'] = this.rank;
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$ContactPointToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class Address {
   List<Extension> extension;
   List<String> line;
@@ -766,38 +524,9 @@ class Address {
       this.postalCode,
       this.country});
 
-  Address.fromJson(Map<String, dynamic> json) {
-    if (json['extension'] != null) {
-      extension = new List<Extension>();
-      json['extension'].forEach((v) {
-        extension.add(new Extension.fromJson(v));
-      });
-    }
-    if (json['line'] != null) {
-      line = json['line'].cast<String>();
-    }
-    city = json['city'];
-    if (json['use'] != null) use = AddressUse.fromJson(json['use']);
-    district = json['district'];
-    state = json['state'];
-    postalCode = json['postalCode'];
-    country = json['country'];
-  }
+  factory Address.fromJson(Map<String, dynamic> json) => _$AddressFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.extension != null) {
-      data['extension'] = this.extension.map((v) => v.toJson()).toList();
-    }
-    if (this.line != null) data['line'] = this.line;
-    if (this.use != null) data['use'] = this.use.toString();
-    if (this.city != null) data['city'] = this.city;
-    if (this.district != null) data['district'] = this.district;
-    if (this.state != null) data['state'] = this.state;
-    if (this.postalCode != null) data['postalCode'] = this.postalCode;
-    if (this.country != null) data['country'] = this.country;
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$AddressToJson(this);
 
   @override
   String toString() {
@@ -805,123 +534,85 @@ class Address {
   }
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class PatientCommunication {
   CodeableConcept language;
 
   PatientCommunication({this.language});
 
-  PatientCommunication.fromJson(Map<String, dynamic> json) {
-    language = json['language'] != null ? new CodeableConcept.fromJson(json['language']) : null;
-  }
+  factory PatientCommunication.fromJson(Map<String, dynamic> json) =>
+      _$PatientCommunicationFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.language != null) {
-      data['language'] = this.language.toJson();
-    }
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$PatientCommunicationToJson(this);
 }
 
-class AddressUse {
-  final _value;
-
-  const AddressUse._(this._value);
-
-  toString() => _value;
-
-  static fromJson(String key) {
-    return _vals.firstWhere((v) => v._value == key,
-        orElse: () => throw ArgumentError("Key does not match any Use"));
-  }
-
-  static const home = const AddressUse._('home');
-  static const work = const AddressUse._('work');
-  static const temp = const AddressUse._('temp');
-  static const old = const AddressUse._('old');
-  static const billing = const AddressUse._('billing');
-
-  static const _vals = [home, work, temp, old, billing];
+enum AddressUse {
+  @JsonValue('home')
+  home,
+  @JsonValue('work')
+  work,
+  @JsonValue('temp')
+  temp,
+  @JsonValue('old')
+  old,
+  @JsonValue('billing')
+  billing
 }
 
-class ContactPointSystem {
-  final _value;
-
-  const ContactPointSystem._(this._value);
-
-  toString() => _value;
-
-  static fromJson(String key) {
-    return _vals.firstWhere((v) => v._value == key,
-        orElse: () => throw ArgumentError("Key does not match any ContactPointSystem"));
-  }
-
-  static const phone = const ContactPointSystem._('phone');
-  static const fax = const ContactPointSystem._('fax');
-  static const email = const ContactPointSystem._('email');
-  static const pager = const ContactPointSystem._('pager');
-  static const url = const ContactPointSystem._('url');
-  static const sms = const ContactPointSystem._('sms');
-  static const other = const ContactPointSystem._('other');
-
-  static const _vals = [phone, fax, email, pager, url, sms, other];
+enum ContactPointSystem {
+  @JsonValue('phone')
+  phone,
+  @JsonValue('fax')
+  fax,
+  @JsonValue('email')
+  email,
+  @JsonValue('pager')
+  pager,
+  @JsonValue('url')
+  url,
+  @JsonValue('sms')
+  sms,
+  @JsonValue('other')
+  other
 }
 
-class ProcedureStatus {
-  final _value;
-
-  const ProcedureStatus._(this._value);
-
-  toString() => _value;
-
-  static fromJson(String key) {
-    return _vals.firstWhere((v) => v._value == key,
-        orElse: () => throw ArgumentError("Key does not match any ProcedureStatus"));
-  }
-
-  static const preparation = const ProcedureStatus._('preparation');
-  static const in_progress = const ProcedureStatus._('in-progress');
-  static const not_done = const ProcedureStatus._('not-done');
-  static const suspended = const ProcedureStatus._('suspended');
-  static const aborted = const ProcedureStatus._('aborted');
-  static const completed = const ProcedureStatus._('completed');
-  static const entered_in_error = const ProcedureStatus._('entered-in-error');
-  static const unknown = const ProcedureStatus._('unknown');
-
-  static const _vals = [
-    preparation,
-    in_progress,
-    not_done,
-    suspended,
-    aborted,
-    completed,
-    entered_in_error,
-    unknown
-  ];
+enum ProcedureStatus {
+  @JsonValue('preparation')
+  preparation,
+  @JsonValue('in-progress')
+  in_progress,
+  @JsonValue('not-done')
+  not_done,
+  @JsonValue('suspended')
+  suspended,
+  @JsonValue('aborted')
+  aborted,
+  @JsonValue('completed')
+  completed,
+  @JsonValue('entered-in-error')
+  entered_in_error,
+  @JsonValue('unknown')
+  unknown
 }
 
-class QuestionnaireResponseStatus {
-  final _value;
-
-  const QuestionnaireResponseStatus._(this._value);
-
-  toString() => _value;
-
-  static fromJson(String key) {
-    return _vals.firstWhere((v) => v._value == key,
-        orElse: () => throw ArgumentError("Key does not match any QuestionnaireResponseStatus"));
-  }
-
-  static const in_progress = const QuestionnaireResponseStatus._('in-progress');
-  static const stopped = const QuestionnaireResponseStatus._('stopped');
-  static const completed = const QuestionnaireResponseStatus._('completed');
-  static const amended = const QuestionnaireResponseStatus._('amended');
-  static const entered_in_error = const QuestionnaireResponseStatus._('entered-in-error');
-
-  static const _vals = [in_progress, stopped, completed, amended, entered_in_error];
+enum QuestionnaireResponseStatus {
+  @JsonValue('in-progress')
+  in_progress,
+  @JsonValue('stopped')
+  stopped,
+  @JsonValue('completed')
+  completed,
+  @JsonValue('amended')
+  amended,
+  @JsonValue('entered-in-error')
+  entered_in_error
 }
 
-class Procedure extends Resource {
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
+class Procedure with Resource {
+  final String resourceType;
+  String id;
+  Meta meta;
   Narrative text;
   List<Identifier> identifier;
   List<Reference> basedOnCarePlan;
@@ -936,8 +627,9 @@ class Procedure extends Resource {
   List<CodeableConcept> reasonCode;
 
   Procedure(
-      {resourceType,
-      id,
+      {this.resourceType = "Procedure",
+      this.id,
+      this.meta,
       this.text,
       this.identifier,
       this.basedOnCarePlan,
@@ -949,90 +641,14 @@ class Procedure extends Resource {
       this.performedDateTime,
       this.reasonCode,
       this.performedPeriod,
-      this.instantiatesQuestionnaire})
-      : super(resourceType: "Procedure", id: id);
+      this.instantiatesQuestionnaire});
 
-  Procedure.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    resourceType = json['resourceType'];
-    text = json['text'] != null ? new Narrative.fromJson(json['text']) : null;
-    if (json['identifier'] != null) {
-      identifier = new List<Identifier>();
-      json['identifier'].forEach((v) {
-        identifier.add(new Identifier.fromJson(v));
-      });
-    }
-    if (json['basedOn'] != null) {
-      basedOnCarePlan = new List<Reference>();
-      json['basedOn'].forEach((v) {
-        basedOnCarePlan.add(new Reference.fromJson(v));
-      });
-    }
-    if (json['instantiatesQuestionnaire'] != null)
-      instantiatesQuestionnaire = json['instantiatesQuestionnaire'].cast<String>();
-    if (json['status'] != null) {
-      status = ProcedureStatus.fromJson(json['status']);
-    }
-    statusReason =
-        json['statusReason'] != null ? new CodeableConcept.fromJson(json['statusReason']) : null;
-    category = json['category'] != null ? new CodeableConcept.fromJson(json['category']) : null;
-    code = json['code'] != null ? new CodeableConcept.fromJson(json['code']) : null;
-    performedPeriod =
-        json['performedPeriod'] != null ? new Period.fromJson(json['performedPeriod']) : null;
-    subject = json['subject'] != null ? new Reference.fromJson(json['subject']) : null;
-    if (json['performedDateTime'] != null) {
-      performedDateTime = DateTime.parse(json['performedDateTime']);
-    }
-    if (json['reasonCode'] != null) {
-      reasonCode = new List<CodeableConcept>();
-      json['reasonCode'].forEach((v) {
-        reasonCode.add(new CodeableConcept.fromJson(v));
-      });
-    }
-  }
+  factory Procedure.fromJson(Map<String, dynamic> json) => _$ProcedureFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['resourceType'] = this.resourceType;
-    data['id'] = this.id;
-    if (this.text != null) {
-      data['text'] = this.text.toJson();
-    }
-    if (this.identifier != null) {
-      data['identifier'] = this.identifier.map((v) => v.toJson()).toList();
-    }
-    if (this.basedOnCarePlan != null) {
-      data['basedOn'] = this.basedOnCarePlan.map((v) => v.toJson()).toList();
-    }
-    if (this.instantiatesQuestionnaire != null) {
-      data['instantiatesQuestionnaire'] = instantiatesQuestionnaire;
-    }
-    data['status'] = this.status.toString();
-    if (this.statusReason != null) {
-      data['statusReason'] = this.statusReason.toJson();
-    }
-    if (this.category != null) {
-      data['category'] = this.category.toJson();
-    }
-    if (this.code != null) {
-      data['code'] = this.code.toJson();
-    }
-    if (this.subject != null) {
-      data['subject'] = this.subject.toJson();
-    }
-    data['performedDateTime'] = this.performedDateTime.toIso8601String();
-    if (this.reasonCode != null) {
-      data['reasonCode'] = this.reasonCode.map((v) => v.toJson()).toList();
-    }
-    if (this.performedPeriod != null) {
-      data['performedPeriod'] = this.performedPeriod.toJson();
-    }
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$ProcedureToJson(this);
 
   Procedure.treatmentSession(int minutes, CarePlan carePlan,
-      {resourceType, id, this.status, this.code})
-      : super(resourceType: "Procedure", id: id) {
+      {this.resourceType = "Procedure", this.id, this.status, this.code}) {
     if (this.code == null) {
       this.code = carePlan.getTreatmentActivity().detail.code;
     }
@@ -1052,7 +668,11 @@ class Procedure extends Resource {
   }
 }
 
-class CarePlan extends Resource {
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
+class CarePlan with Resource {
+  final String resourceType;
+  String id;
+  Meta meta;
   List<Identifier> identifier;
   List<Reference> basedOn;
   CarePlanStatus status;
@@ -1065,8 +685,9 @@ class CarePlan extends Resource {
   List<Activity> activity;
 
   CarePlan(
-      {resourceType,
-      id,
+      {this.resourceType = "CarePlan",
+      this.id,
+      this.meta,
       this.identifier,
       this.basedOn,
       this.status,
@@ -1076,79 +697,11 @@ class CarePlan extends Resource {
       this.subject,
       this.period,
       this.created,
-      this.activity})
-      : super(resourceType: "CarePlan", id: id);
+      this.activity});
 
-  CarePlan.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    resourceType = json['resourceType'];
-    if (json['identifier'] != null) {
-      identifier = new List<Identifier>();
-      json['identifier'].forEach((v) {
-        identifier.add(new Identifier.fromJson(v));
-      });
-    }
-    if (json['basedOn'] != null) {
-      basedOn = new List<Reference>();
-      json['basedOn'].forEach((v) {
-        basedOn.add(Reference.fromJson(v));
-      });
-    }
+  factory CarePlan.fromJson(Map<String, dynamic> json) => _$CarePlanFromJson(json);
 
-    if (json['status'] != null) {
-      status = CarePlanStatus.fromJson(json['status']);
-    }
-    intent = json['intent'];
-    if (json['category'] != null) {
-      category = new List<CodeableConcept>();
-      json['category'].forEach((v) {
-        category.add(new CodeableConcept.fromJson(v));
-      });
-    }
-    description = json['description'];
-    subject = json['subject'] != null ? new Reference.fromJson(json['subject']) : null;
-    period = json['period'] != null ? new Period.fromJson(json['period']) : null;
-    if (json['created'] != null) created = DateTime.parse(json["created"]);
-    if (json['activity'] != null) {
-      activity = new List<Activity>();
-      json['activity'].forEach((v) {
-        activity.add(new Activity.fromJson(v));
-      });
-    }
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['resourceType'] = this.resourceType;
-    if (this.identifier != null) {
-      data['identifier'] = this.identifier.map((v) => v.toJson()).toList();
-    }
-    if (this.basedOn != null) {
-      data['basedOn'] = this.basedOn.map((v) => v.toJson()).toList();
-    }
-    if (this.status != null) {
-      data['status'] = this.status.toString();
-    }
-    data['intent'] = this.intent;
-    if (this.category != null) {
-      data['category'] = this.category.map((v) => v.toJson()).toList();
-    }
-    data['description'] = this.description;
-    if (this.subject != null) {
-      data['subject'] = this.subject.toJson();
-    }
-    if (this.period != null) {
-      data['period'] = this.period.toJson();
-    }
-    if (this.created != null) {
-      data['created'] = this.created.toIso8601String();
-    }
-    if (this.activity != null) {
-      data['activity'] = this.activity.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$CarePlanToJson(this);
 
   Activity getActivityWithCode(String code) {
     return activity.firstWhere((Activity activity) {
@@ -1167,7 +720,7 @@ class CarePlan extends Resource {
           activity.detail.instantiatesCanonical == null) return false;
 
       return activity.detail.instantiatesCanonical
-          .any((String instantiated) => instantiated.startsWith(Questionnaire.resourceTypeName));
+          .any((String instantiated) => instantiated.startsWith(Questionnaire().resourceType));
     });
   }
 
@@ -1195,8 +748,7 @@ class CarePlan extends Resource {
               activity.detail.instantiatesCanonical == null ||
               activity.detail.instantiatesCanonical.length > 1 ||
               activity.detail.instantiatesCanonical.length == 0) return false;
-          return activity.detail.instantiatesCanonical[0]
-              .startsWith(Questionnaire.resourceTypeName);
+          return activity.detail.instantiatesCanonical[0].startsWith(Questionnaire().resourceType);
         })
         .map((Activity questionnaireActivity) =>
             questionnaireActivity.detail.instantiatesCanonical[0])
@@ -1216,62 +768,42 @@ class CarePlan extends Resource {
   }
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class Identifier {
   String value;
   String system;
 
   Identifier({this.value, this.system});
 
-  Identifier.fromJson(Map<String, dynamic> json) {
-    value = json['value'];
-    system = json['system'];
-  }
+  factory Identifier.fromJson(Map<String, dynamic> json) => _$IdentifierFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['value'] = this.value;
-    data['system'] = this.system;
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$IdentifierToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class Period {
   DateTime start;
   DateTime end;
 
   Period({this.start, this.end});
 
-  Period.fromJson(Map<String, dynamic> json) {
-    if (json['start'] != null) start = DateTime.parse(json['start']);
-    if (json['end'] != null) end = DateTime.parse(json['end']);
-  }
+  factory Period.fromJson(Map<String, dynamic> json) => _$PeriodFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.start != null) data['start'] = this.start.toIso8601String();
-    if (this.end != null) data['end'] = this.end.toIso8601String();
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$PeriodToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class Activity {
   Detail detail;
 
   Activity({this.detail});
 
-  Activity.fromJson(Map<String, dynamic> json) {
-    detail = json['detail'] != null ? new Detail.fromJson(json['detail']) : null;
-  }
+  factory Activity.fromJson(Map<String, dynamic> json) => _$ActivityFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.detail != null) {
-      data['detail'] = this.detail.toJson();
-    }
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$ActivityToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class Detail {
   CodeableConcept code;
   DetailStatus status;
@@ -1294,83 +826,24 @@ class Detail {
       this.instantiatesCanonical,
       this.reasonReference});
 
-  Detail.fromJson(Map<String, dynamic> json) {
-    code = json['code'] != null ? new CodeableConcept.fromJson(json['code']) : null;
-    if (json['status'] != null) {
-      status = DetailStatus.fromJson(json['status']);
-    }
-    statusReason =
-        json['statusReason'] != null ? new CodeableConcept.fromJson(json['statusReason']) : null;
-    doNotPerform = json['doNotPerform'];
-    scheduledTiming =
-        json['scheduledTiming'] != null ? new Timing.fromJson(json['scheduledTiming']) : null;
-    scheduledPeriod =
-        json['scheduledPeriod'] != null ? new Period.fromJson(json['scheduledPeriod']) : null;
-    description = json['description'];
-    if (json['instantiatesCanonical'] != null) {
-      instantiatesCanonical = new List<String>();
-      json['instantiatesCanonical'].forEach((v) {
-        instantiatesCanonical.add(v);
-      });
-    }
-    if (json['reasonReference'] != null) {
-      reasonReference = new List<Reference>();
-      json['reasonReference'].forEach((v) {
-        reasonReference.add(Reference.fromJson(v));
-      });
-    }
-  }
+  factory Detail.fromJson(Map<String, dynamic> json) => _$DetailFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.code != null) {
-      data['code'] = this.code.toJson();
-    }
-    if (this.status != null) data['status'] = this.status.toString();
-    if (this.statusReason != null) {
-      data['statusReason'] = this.statusReason.toJson();
-    }
-    data['doNotPerform'] = this.doNotPerform;
-    if (this.scheduledTiming != null) {
-      data['scheduledTiming'] = this.scheduledTiming.toJson();
-    }
-    if (this.scheduledPeriod != null) {
-      data['scheduledPeriod'] = this.scheduledPeriod.toJson();
-    }
-    data['description'] = description;
-    if (this.instantiatesCanonical != null) {
-      data['instantiatesCanonical'] = this.instantiatesCanonical.map((v) => v).toList();
-    }
-    if (this.reasonReference != null) {
-      data['reasonReference'] = this.reasonReference.map((Reference v) => v.toJson()).toList();
-    }
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$DetailToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class Timing {
   Repeat repeat;
   CodeableConcept code;
 
   Timing({this.repeat});
 
-  Timing.fromJson(Map<String, dynamic> json) {
-    repeat = json['repeat'] != null ? new Repeat.fromJson(json['repeat']) : null;
-    code = json['code'] != null ? CodeableConcept.fromJson(json['code']) : null;
-  }
+  factory Timing.fromJson(Map<String, dynamic> json) => _$TimingFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.repeat != null) {
-      data['repeat'] = this.repeat.toJson();
-    }
-    if (this.code != null) {
-      data['code'] = this.code.toJson();
-    }
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$TimingToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class Repeat {
   double duration;
   String durationUnit;
@@ -1380,46 +853,24 @@ class Repeat {
 
   Repeat({this.frequency, this.period, this.periodUnit, this.durationUnit, this.duration});
 
-  Repeat.fromJson(Map<String, dynamic> json) {
-    frequency = json['frequency'];
-    period = json['period'].toDouble();
-    if (json['duration'] != null) duration = json['duration'].toDouble();
-    periodUnit = json['periodUnit'];
-    durationUnit = json['durationUnit'];
-  }
+  factory Repeat.fromJson(Map<String, dynamic> json) => _$RepeatFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['frequency'] = this.frequency;
-    data['period'] = this.period;
-    data['periodUnit'] = this.periodUnit;
-    data['duration'] = this.duration;
-    data['durationUnit'] = this.durationUnit;
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$RepeatToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class Range {
   SimpleQuantity low;
   SimpleQuantity high;
 
   Range({this.low, this.high});
 
-  factory Range.fromJson(Map<String, dynamic> json) {
-    return Range(
-      low: SimpleQuantity.fromJson(json["low"]),
-      high: SimpleQuantity.fromJson(json["high"]),
-    );
-  }
+  factory Range.fromJson(Map<String, dynamic> json) => _$RangeFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    return {
-      "low": this.low,
-      "high": this.high,
-    };
-  }
+  Map<String, dynamic> toJson() => _$RangeToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class SimpleQuantity {
   double value;
   String unit;
@@ -1428,199 +879,144 @@ class SimpleQuantity {
 
   SimpleQuantity({this.value, this.unit, this.system, this.code});
 
-  Map<String, dynamic> toJson() {
-    return {
-      "value": this.value,
-      "unit": this.unit,
-      "system": this.system,
-      "code": this.code,
-    };
-  }
+  factory SimpleQuantity.fromJson(Map<String, dynamic> json) => _$SimpleQuantityFromJson(json);
 
-  factory SimpleQuantity.fromJson(Map<String, dynamic> json) {
-    return SimpleQuantity(
-      value: double.parse(json["value"]),
-      unit: json["unit"],
-      system: json["system"],
-      code: json["code"],
-    );
-  }
+  Map<String, dynamic> toJson() => _$SimpleQuantityToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class TimingAbbreviation {
-  final String display;
-  final String definition;
+  String display;
+  String definition;
 
-  const TimingAbbreviation._(this.display, this.definition);
+  TimingAbbreviation();
 
-  static const TimingAbbreviation BID = const TimingAbbreviation._("BID", "Two times a day");
+  TimingAbbreviation._(this.display, this.definition);
 
-  static const TimingAbbreviation TID =
-      const TimingAbbreviation._("TID", "Three times a day at institution specified time");
-  static const TimingAbbreviation QID =
-      const TimingAbbreviation._("QID", "Four times a day at institution specified time");
-  static const TimingAbbreviation AM =
-      const TimingAbbreviation._("AM", "Every morning at institution specified times");
-  static const TimingAbbreviation PM =
-      const TimingAbbreviation._("PM", "Every afternoon at institution specified times");
-  static const TimingAbbreviation QD =
-      const TimingAbbreviation._("QD", "Every Day at institution specified times");
-  static const TimingAbbreviation QOD =
-      const TimingAbbreviation._("QOD", "Every Other Day at institution specified times");
-  static const TimingAbbreviation Q1H =
-      const TimingAbbreviation._("every hour", "Every hour at institution specified times");
-  static const TimingAbbreviation Q2H =
-      const TimingAbbreviation._("every 2 hours", "Every 2 hours at institution specified times");
-  static const TimingAbbreviation Q3H =
-      const TimingAbbreviation._("every 3 hours", "Every 3 hours at institution specified times");
-  static const TimingAbbreviation Q4H =
-      const TimingAbbreviation._("Q4H", "Every 4 hours at institution specified times");
-  static const TimingAbbreviation Q6H =
-      const TimingAbbreviation._("Q6H", "Every 6 Hours at institution specified times");
-  static const TimingAbbreviation Q8H =
-      const TimingAbbreviation._("every 8 hours", "Every 8 hours at institution specified times");
-  static const TimingAbbreviation BED =
-      const TimingAbbreviation._("at bedtime", "At bedtime (institution specified time)");
-  static const TimingAbbreviation WK =
-      const TimingAbbreviation._("weekly", "Weekly at institution specified time");
-  static const TimingAbbreviation MO =
-      const TimingAbbreviation._("monthly", "Monthly at institution specified time");
+  static TimingAbbreviation BID = TimingAbbreviation._("BID", "Two times a day");
 
-  TimingAbbreviation fromJson(String key) {
-    switch (key) {
-      case "TID":
-        return TID;
-      case "QID":
-        return QID;
-      case "AM":
-        return AM;
-      case "PM":
-        return PM;
-      case "QD":
-        return QD;
-      case "QOD":
-        return QOD;
-      case "Q1H":
-        return Q1H;
-      case "Q2H":
-        return Q2H;
-      case "Q3H":
-        return Q3H;
-      case "Q4H":
-        return Q4H;
-      case "Q6H":
-        return Q6H;
-      case "Q8H":
-        return Q8H;
-      case "BED":
-        return BED;
-      case "WK":
-        return WK;
-      case "MO":
-        return MO;
-    }
-    return TID;
+  static TimingAbbreviation TID =
+      TimingAbbreviation._("TID", "Three times a day at institution specified time");
+  static TimingAbbreviation QID =
+      TimingAbbreviation._("QID", "Four times a day at institution specified time");
+  static TimingAbbreviation AM =
+      TimingAbbreviation._("AM", "Every morning at institution specified times");
+  static TimingAbbreviation PM =
+      TimingAbbreviation._("PM", "Every afternoon at institution specified times");
+  static TimingAbbreviation QD =
+      TimingAbbreviation._("QD", "Every Day at institution specified times");
+  static TimingAbbreviation QOD =
+      TimingAbbreviation._("QOD", "Every Other Day at institution specified times");
+  static TimingAbbreviation Q1H =
+      TimingAbbreviation._("every hour", "Every hour at institution specified times");
+  static TimingAbbreviation Q2H =
+      TimingAbbreviation._("every 2 hours", "Every 2 hours at institution specified times");
+  static TimingAbbreviation Q3H =
+      TimingAbbreviation._("every 3 hours", "Every 3 hours at institution specified times");
+  static TimingAbbreviation Q4H =
+      TimingAbbreviation._("Q4H", "Every 4 hours at institution specified times");
+  static TimingAbbreviation Q6H =
+      TimingAbbreviation._("Q6H", "Every 6 Hours at institution specified times");
+  static TimingAbbreviation Q8H =
+      TimingAbbreviation._("every 8 hours", "Every 8 hours at institution specified times");
+  static TimingAbbreviation BED =
+      TimingAbbreviation._("at bedtime", "At bedtime (institution specified time)");
+  static TimingAbbreviation WK =
+      TimingAbbreviation._("weekly", "Weekly at institution specified time");
+  static TimingAbbreviation MO =
+      TimingAbbreviation._("monthly", "Monthly at institution specified time");
+
+  static List<TimingAbbreviation> _vals = [
+    TID,
+    QID,
+    AM,
+    PM,
+    QD,
+    QOD,
+    Q1H,
+    Q2H,
+    Q3H,
+    Q4H,
+    Q6H,
+    Q8H,
+    BED,
+    WK,
+    MO
+  ];
+
+  static TimingAbbreviation fromJson(String key) {
+    return _vals.firstWhere((TimingAbbreviation v) => v.display == key,
+        orElse: () => throw ArgumentError("Key does not match any TimingAbbreviation"));
   }
 }
 
-class DetailStatus {
-  final _value;
-
-  const DetailStatus._(this._value);
-
-  toString() => _value;
-
-  static const DetailStatus not_started = DetailStatus._('not-started');
-  static const DetailStatus scheduled = DetailStatus._('scheduled');
-  static const DetailStatus in_progress = DetailStatus._('in-progress');
-  static const DetailStatus on_hold = DetailStatus._('on-hold');
-  static const DetailStatus completed = DetailStatus._('completed');
-  static const DetailStatus cancelled = DetailStatus._('cancelled');
-  static const DetailStatus stopped = DetailStatus._('stopped');
-  static const DetailStatus unknown = DetailStatus._('unknown');
-  static const DetailStatus entered_in_error = DetailStatus._('entered-in-error');
-
-  static DetailStatus fromJson(String key) {
-    switch (key) {
-      case 'not-started':
-        return not_started;
-      case 'scheduled':
-        return scheduled;
-      case 'in-progress':
-        return in_progress;
-      case 'on-hold':
-        return on_hold;
-      case 'completed':
-        return completed;
-      case 'cancelled':
-        return cancelled;
-      case 'stopped':
-        return stopped;
-      case 'unknown':
-        return unknown;
-      case 'entered-in-error':
-        return entered_in_error;
-    }
-    return unknown;
-  }
+enum DetailStatus {
+  @JsonValue('not-started')
+  not_started,
+  @JsonValue('scheduled')
+  scheduled,
+  @JsonValue('in-progress')
+  in_progress,
+  @JsonValue('on-hold')
+  on_hold,
+  @JsonValue('completed')
+  completed,
+  @JsonValue('cancelled')
+  cancelled,
+  @JsonValue('stopped')
+  stopped,
+  @JsonValue('unknown')
+  unknown,
+  @JsonValue('entered-in-error')
+  entered_in_error
 }
 
-class CarePlanStatus {
-  final _value;
-
-  const CarePlanStatus._(this._value);
-
-  toString() => _value;
-  static const draft = const CarePlanStatus._('draft');
-  static const active = const CarePlanStatus._('active');
-  static const suspended = const CarePlanStatus._('suspended');
-  static const completed = const CarePlanStatus._('completed');
-  static const entered_in_error = const CarePlanStatus._('entered-in-error');
-  static const cancelled = const CarePlanStatus._('cancelled');
-  static const unknown = const CarePlanStatus._('unknown');
-
-  static fromJson(String key) {
-    switch (key) {
-      case 'draft':
-        return draft;
-      case 'active':
-        return active;
-      case 'suspended':
-        return suspended;
-      case 'completed':
-        return completed;
-      case 'entered-in-error':
-        return entered_in_error;
-      case 'cancelled':
-        return cancelled;
-      case 'unknown':
-        return unknown;
-    }
-  }
+enum CarePlanStatus {
+  @JsonValue('draft')
+  draft,
+  @JsonValue('active')
+  active,
+  @JsonValue('suspended')
+  suspended,
+  @JsonValue('completed')
+  completed,
+  @JsonValue('entered-in-error')
+  entered_in_error,
+  @JsonValue('cancelled')
+  cancelled,
+  @JsonValue('unknown')
+  unknown
 }
 
-class Questionnaire extends Resource {
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
+class Questionnaire with Resource {
+  final String resourceType;
+  String id;
   Meta meta;
   String version;
   String name;
-  String title;
   String status;
   String description;
   List<QuestionnaireItem> item;
 
-  static const resourceTypeName = "Questionnaire";
+  @JsonKey(name: "title")
+  String titleBase;
+  @JsonKey(name: "_title")
+  PrimitiveTypeExtension titleExt;
+
+  String get title => FhirTranslations.extractTranslation(titleBase, titleExt);
+
 
   Questionnaire(
-      {this.name,
-      String resourceType,
-      String id,
+      {this.resourceType = "Questionnaire",
+      this.name,
+      this.id,
       this.meta,
       this.version,
-      this.title,
+      this.titleBase,
       this.status,
       this.description,
-      this.item})
-      : super(resourceType: resourceTypeName, id: id);
+      this.item});
 
   Future<void> loadValueSets() async {
     return Future.wait(item.map((QuestionnaireItem questionnaireItem) async {
@@ -1637,44 +1033,12 @@ class Questionnaire extends Resource {
     return futures;
   }
 
-  Questionnaire.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    resourceType = json['resourceType'];
-    name = json['name'];
+  factory Questionnaire.fromJson(Map<String, dynamic> json) => _$QuestionnaireFromJson(json);
 
-    meta = json['meta'] != null ? new Meta.fromJson(json['meta']) : null;
-    version = json['version'];
-    title = json['title'];
-    status = json['status'];
-    description = json['description'];
-    if (json['item'] != null) {
-      item = new List<QuestionnaireItem>();
-      json['item'].forEach((v) {
-        item.add(new QuestionnaireItem.fromJson(v));
-      });
-    }
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
-
-    data['resourceType'] = this.resourceType;
-    data['id'] = this.id;
-    if (this.meta != null) {
-      data['meta'] = this.meta.toJson();
-    }
-    data['version'] = this.version;
-    data['title'] = this.title;
-    data['status'] = this.status;
-    data['description'] = this.description;
-    if (this.item != null) {
-      data['item'] = this.item.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$QuestionnaireToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class CodeableConcept {
   List<Coding> coding;
   String text;
@@ -1686,24 +1050,9 @@ class CodeableConcept {
     return coding.toString();
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.coding != null) {
-      data['coding'] = this.coding.map((v) => v.toJson()).toList();
-    }
-    data['text'] = this.text;
-    return data;
-  }
+  factory CodeableConcept.fromJson(Map<String, dynamic> json) => _$CodeableConceptFromJson(json);
 
-  CodeableConcept.fromJson(Map<String, dynamic> json) {
-    if (json['coding'] != null) {
-      coding = new List<Coding>();
-      json['coding'].forEach((v) {
-        coding.add(new Coding.fromJson(v));
-      });
-    }
-    text = json['text'];
-  }
+  Map<String, dynamic> toJson() => _$CodeableConceptToJson(this);
 
   @override
   bool operator ==(Object other) =>
@@ -1717,35 +1066,30 @@ class CodeableConcept {
   int get hashCode => coding.hashCode;
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class Coding implements ChoiceOption {
   String system;
   String code;
-  String display;
+  @JsonKey(name: "display")
+  String displayBase;
+  @JsonKey(name: "_display")
+  PrimitiveTypeExtension displayExt;
+
+  @JsonKey(ignore: true)
+  String get display => FhirTranslations.extractTranslation(displayBase, displayExt);
+
 
   Answer get ifSelected => new Answer(valueCoding: this);
 
-  Coding({this.system, this.code, this.display});
-
-  @override
-  String toString() => display;
+  Coding({this.system, this.code, this.displayBase});
 
   String identifierString() {
     return "$system|$code";
   }
 
-  Coding.fromJson(Map<String, dynamic> json) {
-    system = json['system'];
-    code = json['code'];
-    display = json['display'];
-  }
+  factory Coding.fromJson(Map<String, dynamic> json) => _$CodingFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['system'] = this.system;
-    data['code'] = this.code;
-    data['display'] = this.display;
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$CodingToJson(this);
 
   @override
   bool operator ==(other) {
@@ -1758,6 +1102,7 @@ class Coding implements ChoiceOption {
   int get hashCode => system.hashCode ^ code.hashCode;
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class Extension {
   Address valueAddress;
 
@@ -1767,11 +1112,16 @@ class Extension {
   CodeableConcept valueCodeableConcept;
   Coding valueCoding;
   String valueString;
+  String valueCode;
+  bool valueBoolean;
   int valueDecimal;
   String valueUri;
+  List<Extension> extension;
 
   Extension(
       {this.valueString,
+      this.valueCode,
+      this.valueBoolean,
       this.valueDecimal,
       this.url,
       this.valueCanonical,
@@ -1779,120 +1129,67 @@ class Extension {
       this.valueCodeableConcept,
       this.valueCoding,
       this.valueAddress,
-      this.valueUri});
+      this.valueUri,
+      this.extension});
 
-  Extension.fromJson(Map<String, dynamic> json) {
-    url = json['url'];
-    valueAddress = json['valueAddress'] != null ? new Address.fromJson(json['valueAddress']) : null;
-    valueCanonical = json['valueCanonical'];
-    valueExpression = json['valueExpression'] != null
-        ? new ValueExpression.fromJson(json['valueExpression'])
-        : null;
-    valueCodeableConcept = json['valueCodeableConcept'] != null
-        ? new CodeableConcept.fromJson(json['valueCodeableConcept'])
-        : null;
-    valueCoding = json['valueCoding'] != null ? new Coding.fromJson(json['valueCoding']) : null;
-    valueString = json['valueString'];
-    valueDecimal = json['valueDecimal'];
-    valueUri = json['valueUri'];
-  }
+  factory Extension.fromJson(Map<String, dynamic> json) => _$ExtensionFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['url'] = this.url;
-    if (this.valueAddress != null) {
-      data['valueAddress'] = this.valueAddress.toJson();
-    }
-    data['valueCanonical'] = this.valueCanonical;
-    if (this.valueExpression != null) {
-      data['valueExpression'] = this.valueExpression.toJson();
-    }
-    if (this.valueCodeableConcept != null) {
-      data['valueCodeableConcept'] = this.valueCodeableConcept.toJson();
-    }
-    if (this.valueCoding != null) {
-      data['valueCoding'] = this.valueCoding.toJson();
-    }
-    data['valueString'] = this.valueString;
-    data['valueDecimal'] = this.valueDecimal;
-    data['valueUri'] = this.valueUri;
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$ExtensionToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class ValueExpression {
   String language;
   String expression;
 
   ValueExpression({this.language, this.expression});
 
-  ValueExpression.fromJson(Map<String, dynamic> json) {
-    language = json['language'];
-    expression = json['expression'];
-  }
+  factory ValueExpression.fromJson(Map<String, dynamic> json) => _$ValueExpressionFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['language'] = this.language;
-    data['expression'] = this.expression;
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$ValueExpressionToJson(this);
 }
 
-class QuestionType {
-  final _value;
+enum QuestionType {
+  @JsonValue('group')
+  group,
+  @JsonValue('display')
+  display,
 
-  const QuestionType._(this._value);
-
-  toString() => _value;
-
-  static fromJson(String key) {
-    return _vals.firstWhere((v) => v._value == key,
-        orElse: () => throw ArgumentError("Key does not match any QuestionType"));
-  }
-
-  static const group = const QuestionType._('group');
-  static const display = const QuestionType._('display');
-
-  // question types
-  static const boolean = const QuestionType._('boolean');
-  static const decimal = const QuestionType._('decimal');
-  static const integer = const QuestionType._('integer');
-  static const date = const QuestionType._('date');
-  static const dateTime = const QuestionType._('dateTime');
-  static const time = const QuestionType._('time');
-  static const string = const QuestionType._('string');
-  static const text = const QuestionType._('text');
-  static const url = const QuestionType._('url');
-  static const choice = const QuestionType._('choice');
-  static const open_choice = const QuestionType._('open-choice');
-  static const attachment = const QuestionType._('attachment');
-  static const reference = const QuestionType._('reference');
-  static const quantity = const QuestionType._('quantity');
-
-  static const _vals = [
-    group,
-    display,
-    boolean,
-    decimal,
-    integer,
-    date,
-    dateTime,
-    time,
-    string,
-    text,
-    url,
-    choice,
-    open_choice,
-    attachment,
-    reference,
-    quantity
-  ];
+// question types
+  @JsonValue('boolean')
+  boolean,
+  @JsonValue('decimal')
+  decimal,
+  @JsonValue('integer')
+  integer,
+  @JsonValue('date')
+  date,
+  @JsonValue('dateTime')
+  dateTime,
+  @JsonValue('time')
+  time,
+  @JsonValue('string')
+  string,
+  @JsonValue('text')
+  text,
+  @JsonValue('url')
+  url,
+  @JsonValue('choice')
+  choice,
+  @JsonValue('open-choice')
+  open_choice,
+  @JsonValue('attachment')
+  attachment,
+  @JsonValue('reference')
+  reference,
+  @JsonValue('quantity')
+  quantity
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class QuestionnaireItem {
   String linkId;
-  String text;
+
   bool required;
   QuestionType type;
   List<Coding> code;
@@ -1902,9 +1199,18 @@ class QuestionnaireItem {
   List<Extension> extension;
   List<QuestionnaireItem> item;
 
+  @JsonKey(name: "text")
+  String textBase;
+  @JsonKey(name: "_text")
+  PrimitiveTypeExtension textExt;
+
+  String get text =>
+      FhirTranslations.extractTranslation(textBase, textExt);
+
+
   QuestionnaireItem(
       {this.linkId,
-      this.text,
+      this.textBase,
       this.required,
       this.type,
       this.code,
@@ -1971,75 +1277,17 @@ class QuestionnaireItem {
     return SupportLink(title: supportLinkSubItem.text, url: supportLinkExt.valueUri);
   }
 
-  QuestionnaireItem.fromJson(Map<String, dynamic> json) {
-    linkId = json['linkId'];
-    text = json['text'];
-    required = json['required'];
-    if (json['type'] != null) type = QuestionType.fromJson(json['type']);
+  factory QuestionnaireItem.fromJson(Map<String, dynamic> json) =>
+      _$QuestionnaireItemFromJson(json);
 
-    if (json['answerOption'] != null) {
-      answerOption = new List<AnswerOption>();
-      json['answerOption'].forEach((v) {
-        answerOption.add(new AnswerOption.fromJson(v));
-      });
-    }
-    if (json['code'] != null) {
-      code = new List<Coding>();
-      json['code'].forEach((v) {
-        code.add(new Coding.fromJson(v));
-      });
-    }
-    if (json['extension'] != null) {
-      extension = new List<Extension>();
-      json['extension'].forEach((v) {
-        extension.add(new Extension.fromJson(v));
-      });
-    }
-
-    answerValueSetAddress = json['answerValueSet'];
-    // answerValueSet actual values are loaded separately
-
-    if (json['code'] != null) {
-      code = new List<Coding>();
-      json['code'].forEach((v) {
-        code.add(new Coding.fromJson(v));
-      });
-    }
-    if (json['item'] != null) {
-      item = new List<QuestionnaireItem>();
-      json['item'].forEach((v) {
-        item.add(new QuestionnaireItem.fromJson(v));
-      });
-    }
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.type != null) data['type'] = this.type.toString();
-    data['linkId'] = this.linkId;
-    data['text'] = this.text;
-    data['required'] = this.required;
-    if (this.answerOption != null) {
-      data['answerOption'] = this.answerOption.map((v) => v.toJson()).toList();
-    }
-    data['answerValueSet'] = this.answerValueSetAddress;
-    if (this.extension != null) {
-      data['extension'] = this.extension.map((v) => v.toJson()).toList();
-    }
-    if (this.code != null) {
-      data['code'] = this.code.map((v) => v.toJson()).toList();
-    }
-    if (this.item != null) {
-      data['item'] = this.item.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$QuestionnaireItemToJson(this);
 
   bool isGroup() {
     return type == QuestionType.group;
   }
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class SupportLink {
   final String title;
   final String url;
@@ -2049,8 +1297,10 @@ class SupportLink {
 
 abstract class ChoiceOption {
   Answer get ifSelected;
+  String get display;
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class AnswerOption implements ChoiceOption {
   int valueInteger;
   List<Extension> extension;
@@ -2060,33 +1310,14 @@ class AnswerOption implements ChoiceOption {
 
   AnswerOption({this.valueInteger, this.extension, this.valueCoding});
 
-  AnswerOption.fromJson(Map<String, dynamic> json) {
-    valueInteger = json['valueInteger'];
-    if (json['extension'] != null) {
-      extension = new List<Extension>();
-      json['extension'].forEach((v) {
-        extension.add(new Extension.fromJson(v));
-      });
-    }
-    valueCoding = json['valueCoding'] != null ? new Coding.fromJson(json['valueCoding']) : null;
-  }
+  factory AnswerOption.fromJson(Map<String, dynamic> json) => _$AnswerOptionFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['valueInteger'] = this.valueInteger;
-    if (this.extension != null) {
-      data['extension'] = this.extension.map((v) => v.toJson()).toList();
-    }
-    if (this.valueCoding != null) {
-      data['valueCoding'] = this.valueCoding.toJson();
-    }
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$AnswerOptionToJson(this);
 
   @override
-  String toString() {
+  String get display {
     if (valueInteger != null) return '$valueInteger';
-    if (valueCoding != null) return valueCoding.toString();
+    if (valueCoding != null) return valueCoding.display;
     return super.toString();
   }
 
@@ -2103,49 +1334,39 @@ class AnswerOption implements ChoiceOption {
 }
 
 /// https://www.hl7.org/fhir/questionnaireresponse.html
-class QuestionnaireResponse extends Resource {
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
+class QuestionnaireResponse with Resource {
+  final String resourceType;
+  String id;
   Meta meta;
-  String questionnaireReference;
-  List<Reference> basedOnCarePlan;
+  String questionnaire;
+  List<Reference> basedOn;
   Reference subject;
   DateTime authored;
   List<QuestionnaireResponseItem> item;
   QuestionnaireResponseStatus status;
 
-  QuestionnaireResponse(Questionnaire questionnaire, this.subject, CarePlan carePlan,
-      {resourceType, id, this.meta, this.status, this.item})
-      : super(resourceType: "QuestionnaireResponse", id: id) {
+  QuestionnaireResponse(
+      {this.resourceType = "QuestionnaireResponse",
+      this.id,
+      this.meta,
+      this.questionnaire,
+      this.basedOn,
+      this.subject,
+      this.authored,
+      this.item,
+      this.status});
+
+  QuestionnaireResponse.from(Questionnaire questionnaire, this.subject, CarePlan carePlan,
+      {this.resourceType = "QuestionnaireResponse", this.id, this.meta, this.status, this.item
+      }) {
     if (this.item == null) {
       this.item = [];
     }
-    this.questionnaireReference = questionnaire.reference;
-    this.basedOnCarePlan = [Reference(reference: carePlan.reference)];
+    this.questionnaire = questionnaire.reference;
+    this.basedOn = [Reference(reference: carePlan.reference)];
     var today = new DateTime.now();
     this.authored = new DateTime(today.year, today.month, today.day, today.hour, today.minute);
-  }
-
-  QuestionnaireResponse.fromJson(Map<String, dynamic> json) {
-    resourceType = json['resourceType'];
-    id = json['id'];
-    meta = json['meta'] != null ? new Meta.fromJson(json['meta']) : null;
-    questionnaireReference = json['questionnaire'];
-
-    if (json['basedOn'] != null) {
-      basedOnCarePlan = new List<Reference>();
-      json['basedOn'].forEach((v) {
-        basedOnCarePlan.add(new Reference.fromJson(v));
-      });
-    }
-
-    if (json['status'] != null) status = QuestionnaireResponseStatus.fromJson(json['status']);
-    if (json['authored'] != null) authored = DateTime.parse(json['authored']);
-    subject = json['subject'] != null ? new Reference.fromJson(json['subject']) : null;
-    if (json['item'] != null) {
-      item = new List<QuestionnaireResponseItem>();
-      json['item'].forEach((v) {
-        item.add(new QuestionnaireResponseItem.fromJson(v));
-      });
-    }
   }
 
   bool get isEmpty =>
@@ -2153,25 +1374,10 @@ class QuestionnaireResponse extends Resource {
       this.item.isEmpty ||
       this.item.every((QuestionnaireResponseItem element) => element.isEmpty);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['resourceType'] = this.resourceType;
-    data['id'] = this.id;
-    if (this.meta != null) {
-      data['meta'] = this.meta.toJson();
-    }
-    data['basedOn'] = this.basedOnCarePlan;
-    data['questionnaire'] = this.questionnaireReference;
-    data['status'] = this.status.toString();
-    if (this.subject != null) {
-      data['subject'] = this.subject.toJson();
-    }
-    data['authored'] = this.authored.toIso8601String();
-    if (this.item != null) {
-      data['item'] = this.item.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
+  factory QuestionnaireResponse.fromJson(Map<String, dynamic> json) =>
+      _$QuestionnaireResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$QuestionnaireResponseToJson(this);
 
   void setAnswer(String linkId, Answer answer) {
     if (answer == null || answer.isEmpty) {
@@ -2208,26 +1414,18 @@ class QuestionnaireResponse extends Resource {
   }
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class Content {
   Attachment attachment;
 
   Content({this.attachment});
 
-  Content.fromJson(Map<String, dynamic> json) {
-    if (json['attachment'] != null) {
-      attachment = Attachment.fromJson(json['attachment']);
-    }
-  }
+  factory Content.fromJson(Map<String, dynamic> json) => _$ContentFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.attachment != null) {
-      data['attachment'] = this.attachment.toJson();
-    }
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$ContentToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class DocumentReference {
   //	"type" : Loinc 48766-0 	(Information source)
   //	"description": string
@@ -2243,20 +1441,6 @@ class DocumentReference {
 
   DocumentReference({this.description, this.content, this.type, this.status});
 
-  DocumentReference.fromJson(Map<String, dynamic> json) {
-    description = json['description'];
-    status = json['status'];
-    if (json['type'] != null) {
-      type = CodeableConcept.fromJson(json['type']);
-    }
-    if (json['content'] != null) {
-      content = new List<Content>();
-      json['content'].forEach((v) {
-        content.add(new Content.fromJson(v));
-      });
-    }
-  }
-
   bool isGroup() {
     return content != null && content.length > 1 && description != null;
   }
@@ -2265,67 +1449,45 @@ class DocumentReference {
       ? content[0].attachment.url
       : "";
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['description'] = this.description;
-    data['status'] = this.status;
-    if (this.content != null) {
-      data['content'] = this.content.map((v) => v.toJson()).toList();
-    }
-    //TODO: type
-    return data;
-  }
+  factory DocumentReference.fromJson(Map<String, dynamic> json) =>
+      _$DocumentReferenceFromJson(json);
+
+  Map<String, dynamic> toJson() => _$DocumentReferenceToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class Attachment {
   String url;
   String title;
 
   Attachment({this.url, this.title});
 
-  Attachment.fromJson(Map<String, dynamic> json) {
-    url = json['url'];
-    title = json['title'];
-  }
+  factory Attachment.fromJson(Map<String, dynamic> json) => _$AttachmentFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.url != null) data['url'] = this.url;
-    if (this.title != null) data['title'] = this.title;
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$AttachmentToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class Reference {
   String reference;
 
   Reference({this.reference});
 
-  Reference.fromJson(Map<String, dynamic> json) {
-    reference = json['reference'];
-  }
+  factory Reference.fromJson(Map<String, dynamic> json) => _$ReferenceFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['reference'] = this.reference;
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$ReferenceToJson(this);
 
-  Reference.from(Patient patient) : this(reference: patient.reference);
+  Reference.from(Resource resource) : this(reference: resource.reference);
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-          other is Reference &&
-              reference == other.reference;
+      identical(this, other) || other is Reference && reference == other.reference;
 
   @override
   int get hashCode => reference.hashCode;
-
-
-
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class QuestionnaireResponseItem {
   String linkId;
   List<Answer> answer;
@@ -2334,31 +1496,18 @@ class QuestionnaireResponseItem {
 
   QuestionnaireResponseItem({this.linkId, this.answer});
 
-  QuestionnaireResponseItem.fromJson(Map<String, dynamic> json) {
-    linkId = json['linkId'];
-    if (json['answer'] != null) {
-      answer = new List<Answer>();
-      json['answer'].forEach((v) {
-        answer.add(new Answer.fromJson(v));
-      });
-    }
-  }
-
   String get answerDisplay {
     if (answer == null || answer.isEmpty) return "";
     return answer.map((e) => e.displayString).join(",");
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['linkId'] = this.linkId;
-    if (this.answer != null) {
-      data['answer'] = this.answer.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
+  factory QuestionnaireResponseItem.fromJson(Map<String, dynamic> json) =>
+      _$QuestionnaireResponseItemFromJson(json);
+
+  Map<String, dynamic> toJson() => _$QuestionnaireResponseItemToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class Answer {
   int valueInteger;
   double valueDecimal;
@@ -2390,7 +1539,7 @@ class Answer {
     if (this.valueDateTime != null) {
       return DateFormat.yMd().add_jm().format(this.valueDateTime);
     }
-    return this.toString();
+    return this.toLocalizedString;
   }
 
   bool operator ==(dynamic o) {
@@ -2432,10 +1581,9 @@ class Answer {
     return result;
   }
 
-  @override
-  String toString() {
+  String get toLocalizedString {
     if (valueInteger != null) return '$valueInteger';
-    if (valueCoding != null) return valueCoding.toString();
+    if (valueCoding != null) return valueCoding.display;
     if (valueDecimal != null) return valueDecimal.toString();
     if (valueString != null) return valueString;
     if (valueDate != null) return valueDate.toString();
@@ -2447,59 +1595,35 @@ class Answer {
     return Answer.fromJson(option.toJson());
   }
 
-  Answer.fromJson(Map<String, dynamic> json) {
-    valueInteger = json['valueInteger'];
-    if (json['valueDecimal'] != null) valueDecimal = json['valueDecimal'].toDouble();
-    if (json['valueCoding'] != null) valueCoding = Coding.fromJson(json['valueCoding']);
-    if (json['valueString'] != null) valueString = json['valueString'];
-    if (json['valueDate'] != null) valueDate = DateTime.parse(json['valueDate']);
-    if (json['valueDateTime'] != null) valueDateTime = DateTime.parse(json['valueDateTime']);
-  }
+  factory Answer.fromJson(Map<String, dynamic> json) => _$AnswerFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.valueInteger != null) data['valueInteger'] = this.valueInteger;
-    if (this.valueDecimal != null) data['valueDecimal'] = this.valueDecimal;
-    if (this.valueCoding != null) data['valueCoding'] = this.valueCoding.toJson();
-    if (this.valueString != null) data['valueString'] = this.valueString;
-    if (this.valueDate != null) data['valueDate'] = this.valueDate.toIso8601String();
-    if (this.valueDateTime != null) data['valueDateTime'] = this.valueDateTime.toIso8601String();
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$AnswerToJson(this);
 }
 
-class ValueSet extends Resource {
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
+class ValueSet with Resource {
+  final String resourceType;
+  String id;
+  Meta meta;
   String language;
   String url;
   String status;
   Expansion expansion;
 
-  ValueSet({String resourceType, String id, this.language, this.url, this.status, this.expansion})
-      : super(resourceType: "ValueSet", id: id);
+  ValueSet(
+      {this.resourceType = "ValueSet",
+      this.id,
+      this.language,
+      this.url,
+      this.status,
+      this.expansion});
 
-  ValueSet.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    resourceType = json['resourceType'];
-    language = json['language'];
-    url = json['url'];
-    status = json['status'];
-    expansion = json['expansion'] != null ? new Expansion.fromJson(json['expansion']) : null;
-  }
+  factory ValueSet.fromJson(Map<String, dynamic> json) => _$ValueSetFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['resourceType'] = this.resourceType;
-    data['id'] = this.id;
-    data['language'] = this.language;
-    data['url'] = this.url;
-    data['status'] = this.status;
-    if (this.expansion != null) {
-      data['expansion'] = this.expansion.toJson();
-    }
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$ValueSetToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class Expansion {
   String identifier;
   String timestamp;
@@ -2509,39 +1633,12 @@ class Expansion {
 
   Expansion({this.identifier, this.timestamp, this.total, this.parameter, this.contains});
 
-  Expansion.fromJson(Map<String, dynamic> json) {
-    identifier = json['identifier'];
-    timestamp = json['timestamp'];
-    total = json['total'];
-    if (json['parameter'] != null) {
-      parameter = new List<Parameter>();
-      json['parameter'].forEach((v) {
-        parameter.add(new Parameter.fromJson(v));
-      });
-    }
-    if (json['contains'] != null) {
-      contains = new List<Coding>();
-      json['contains'].forEach((v) {
-        contains.add(new Coding.fromJson(v));
-      });
-    }
-  }
+  factory Expansion.fromJson(Map<String, dynamic> json) => _$ExpansionFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['identifier'] = this.identifier;
-    data['timestamp'] = this.timestamp;
-    data['total'] = this.total;
-    if (this.parameter != null) {
-      data['parameter'] = this.parameter.map((v) => v.toJson()).toList();
-    }
-    if (this.contains != null) {
-      data['contains'] = this.contains.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$ExpansionToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class Parameter {
   String name;
   String valueUri;
@@ -2549,17 +1646,7 @@ class Parameter {
 
   Parameter({this.name, this.valueUri, this.valueInteger});
 
-  Parameter.fromJson(Map<String, dynamic> json) {
-    name = json['name'];
-    valueUri = json['valueUri'];
-    valueInteger = json['valueInteger'];
-  }
+  factory Parameter.fromJson(Map<String, dynamic> json) => _$ParameterFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
-    data['valueUri'] = this.valueUri;
-    data['valueInteger'] = this.valueInteger;
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$ParameterToJson(this);
 }

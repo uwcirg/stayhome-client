@@ -33,7 +33,11 @@ class _ProgressInsightsPageState extends State<ProgressInsightsPage> {
         _calendarTabView(),
         _chartTabView(),
         _listTabView(),
-      ], tabPageTitles: [S.of(context).calendar,S.of(context).my_trends, S.of(context).history]),
+      ], tabPageTitles: [
+        S.of(context).calendar,
+        S.of(context).my_trends,
+        S.of(context).history
+      ]),
     );
   }
 
@@ -42,16 +46,16 @@ class _ProgressInsightsPageState extends State<ProgressInsightsPage> {
       Widget errorWidget = MapAppErrorMessage.fromModel(model, context);
       if (errorWidget != null) return errorWidget;
       return Expanded(
-            child: ListView.builder(
-              itemBuilder: (context, i) {
-                return Padding(
-                  padding: const EdgeInsets.all(Dimensions.halfMargin),
-                  child: StayHomeTreatmentCalendarWidget(model),
-                );
-              },
-              itemCount: 1,
-              shrinkWrap: true,
-            ));
+          child: ListView.builder(
+        itemBuilder: (context, i) {
+          return Padding(
+            padding: const EdgeInsets.all(Dimensions.halfMargin),
+            child: StayHomeTreatmentCalendarWidget(model),
+          );
+        },
+        itemCount: 1,
+        shrinkWrap: true,
+      ));
     });
   }
 
@@ -100,8 +104,10 @@ class _ProgressInsightsPageState extends State<ProgressInsightsPage> {
           child: DropdownButton(
             isExpanded: true,
             items: questionChoices
-                .map((QuestionnaireItem question) =>
-                    DropdownMenuItem(value: question.linkId, child: Text(question.text)))
+                .map((QuestionnaireItem question) => DropdownMenuItem(
+                    value: question.linkId,
+                    child:
+                        Text(question.text)))
                 .toList(),
             onChanged: (String selectedLinkId) =>
                 setState(() => this._selectedLinkId = selectedLinkId),

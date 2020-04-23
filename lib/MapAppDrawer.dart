@@ -105,7 +105,7 @@ class MapAppDrawer extends Drawer {
 
   Widget _buildLogoutListTile(BuildContext context) {
     return ListTile(
-        title: Text(MyApp.of(context).auth.isLoggedIn ? S.of(context).logout : S.of(context).back_to_login),
+        title: Text(MyApp.of(context).auth.isLoggedIn ? S.of(context).logout : S.of(context).back_to_login_register),
         leading: Icon(MdiIcons.logout),
         onTap: () => MyApp.of(context).logout(context: context));
   }

@@ -338,7 +338,7 @@ class CarePlanModel extends Model {
 
   Questionnaire questionnaireForResponse(QuestionnaireResponse response) {
     return questionnaires?.firstWhere(
-        (element) => element.id == response.questionnaireReference.split("/")[1],
+        (element) => element.id == response.questionnaire.split("/")[1],
         orElse: () => null);
   }
 
@@ -401,7 +401,7 @@ class TreatmentCalendar {
     List<String> applicableQuestionnaires = plan.getAllQuestionnaireReferences();
 
     for (QuestionnaireResponse response in responses) {
-      if (!applicableQuestionnaires.contains(response.questionnaireReference)) {
+      if (!applicableQuestionnaires.contains(response.questionnaire)) {
         continue;
       }
 
@@ -412,7 +412,7 @@ class TreatmentCalendar {
       // find matching scheduled event
       TreatmentEvent event = eventList.firstWhere(
           (TreatmentEvent e) =>
-              e.questionnaireReference == response.questionnaireReference &&
+              e.questionnaireReference == response.questionnaire &&
               e.status == Status.Scheduled, orElse: () {
         return null;
       });
@@ -543,7 +543,7 @@ class TreatmentEvent {
       // assume a questionnaire
       if (activity.detail.instantiatesCanonical == null ||
           activity.detail.instantiatesCanonical.length > 1 ||
-          !activity.detail.instantiatesCanonical[0].startsWith(Questionnaire.resourceTypeName)) {
+          !activity.detail.instantiatesCanonical[0].startsWith(Questionnaire().resourceType)) {
         throw MalformedFhirResourceException(
             activity,
             "Activity should have exactly one "
