@@ -2,10 +2,8 @@
  * Copyright (c) 2020 CIRG. All rights reserved.
  */
 
-import 'package:configurable_expansion_tile/configurable_expansion_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart';
 import 'package:map_app_flutter/KeycloakAuth.dart';
 import 'package:map_app_flutter/MapAppDrawer.dart';
@@ -60,7 +58,7 @@ class _ProfilePageState extends State<ProfilePage> {
     if (_error != null) {
       return MapAppPageScaffold(
         title: title,
-        child: MapAppErrorMessage.loadingErrorWithLogoutButton(context),
+        child: MapAppErrorMessage.loadingErrorWithLogout(context),
       );
     }
     return MapAppPageScaffold(title: title, child: new CircularProgressIndicator());
@@ -118,7 +116,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
     return ScopedModelDescendant<CarePlanModel>(
       builder: (context, child, model) {
         if (model == null) {
-          return MapAppErrorMessage.loadingErrorWithLogoutButton(context);
+          return MapAppErrorMessage.loadingErrorWithLogout(context);
         }
         if (model.error != null) {
           return MapAppErrorMessage.modelError(model);
@@ -156,7 +154,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
     if (model.hasNoUser) {
       KeycloakAuth auth = MyApp.of(context).auth;
       print("model has no user / KeycloakAuth has user id: ${auth.userInfo.keycloakUserId}");
-      return MapAppErrorMessage.loadingErrorWithLogoutButton(context);
+      return MapAppErrorMessage.loadingErrorWithLogout(context);
     }
     UserInfo userInfo = MyApp.of(context).auth.userInfo;
     Patient originalPatient =

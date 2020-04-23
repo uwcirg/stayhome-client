@@ -20,21 +20,27 @@ class MapAppErrorMessage extends StatelessWidget {
       : _buttonLabel = buttonLabel,
         _onPressed = onButtonPressed;
 
-  factory MapAppErrorMessage.loadingErrorWithLogoutButton(BuildContext context) {
+  factory MapAppErrorMessage.loadingErrorWithLogout(BuildContext context) {
     /*
      * if loading error and user is logged in, attempts to log in again
      */
-    var action = MyApp.of(context).auth.isLoggedIn ? MyApp.of(context)
-                                .auth
-                                .mapAppLogin()
-                                .then((value) => MyApp.of(context).dismissLoginScreen(context))
-                                .catchError((error) => snack("$error", context)) : MyApp.of(context).logout(pushLogin: true, context: context);
-    var buttonLabel = MyApp.of(context).auth.isLoggedIn ? null : S.of(context).logout;
-    var message = MyApp.of(context).auth.isLoggedIn ? S.of(context).attempt_login_text: S.of(context).loading_error_log_in_again;
+    if (MyApp.of(context).auth.isLoggedIn) {
+      MyApp.of(context)
+          .auth
+          .mapAppLogin()
+          .then((value) => MyApp.of(context).dismissLoginScreen(context))
+          .catchError((error) {
+            snack("$error", context);
+            MyApp.of(context).logout(pushLogin: true, context: context);
+          });
+    } else {
+      MyApp.of(context).logout(pushLogin: true, context: context);
+    }
+    var message = MyApp.of(context).auth.isLoggedIn
+        ? S.of(context).attempt_login_text
+        : S.of(context).loading_error_log_in_again;
     return MapAppErrorMessage(
-      message,
-      buttonLabel: buttonLabel,
-      onButtonPressed: () => action,
+      message
     );
   }
 
@@ -60,7 +66,7 @@ class MapAppErrorMessage extends StatelessWidget {
   static Widget fromModel(CarePlanModel model, BuildContext context) {
     if (model == null) {
       print("Model is null.");
-      return MapAppErrorMessage.loadingErrorWithLogoutButton(context);
+      return MapAppErrorMessage.loadingErrorWithLogout(context);
     }
     if (model.error != null) {
       return MapAppErrorMessage('${model.error}');
@@ -71,7 +77,7 @@ class MapAppErrorMessage extends StatelessWidget {
     }
 
     if (model.hasNoUser) {
-      return MapAppErrorMessage.loadingErrorWithLogoutButton(context);
+      return MapAppErrorMessage.loadingErrorWithLogout(context);
     }
 
     if (model.hasNoPatient) {

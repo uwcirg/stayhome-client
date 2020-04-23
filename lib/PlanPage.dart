@@ -64,7 +64,7 @@ abstract class _PlanPageState extends State<PlanPage> {
 
     if (model.treatmentCalendar == null) {
       print("Treatment calendar is null.");
-      return MapAppErrorMessage.loadingErrorWithLogoutButton(context);
+      return MapAppErrorMessage.loadingErrorWithLogout(context);
     }
 
     return Column(
