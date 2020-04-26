@@ -333,7 +333,8 @@ class Repository {
       [
         OrganizationReference.scan,
         OrganizationReference.fiu,
-        OrganizationReference.fiuNeighborhoodHelp
+        OrganizationReference.fiuNeighborhoodHelp,
+        OrganizationReference.socialDistancingStudy
       ].forEach((Reference org) {
         var consent = responses.firstWhere(
             (Consent c) =>

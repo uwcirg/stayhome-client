@@ -43,4 +43,5 @@ class OrganizationReference extends Reference {
   static OrganizationReference fiu = OrganizationReference._("1465");
   static OrganizationReference publicHealthAgencies = OrganizationReference._("1466");
   static OrganizationReference researchers = OrganizationReference._("1467");
+  static OrganizationReference socialDistancingStudy = OrganizationReference._("1737");
 }
