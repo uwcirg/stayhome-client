@@ -114,7 +114,6 @@ class CarePlanModel extends Model {
       loadResourceLinks();
       return Future.error("No user information. Please log in again.");
     }
-    print("CarePlanModel - Auth site: ${_auth.site }");
 
     this.patient = await Repository.getPatient(_keycloakSystem, _keycloakUserId, _api);
     if (patient != null) {
@@ -130,9 +129,6 @@ class CarePlanModel extends Model {
       if (patient != null) {
         print("Successfully created ${patient.reference}");
         isFirstTimeUser = true;
-        if (_auth.site != null) {
-          await _addConsentForSite(_auth.site);
-        }
         return _loadCarePlan();
       } else {
         return Future.error("Returned patient was null");
@@ -140,11 +136,25 @@ class CarePlanModel extends Model {
     }
   }
 
-  Future<Consent> _addConsentForSite(String site) {
-    Reference org = OrganizationReference.fromSiteString(site);
+  bool hasConsentForProgram(String name) {
+    Reference org = OrganizationReference.fromName(name);
+    if (org == null) return true;
+    return this.consents[org][ConsentContentClass.all].isPermitted;
+  }
+
+  Future<void> addConsentForProgram(String name) async {
+    await _addConsentForProgram(name).then((Consent value) {
+      print("Consent added: ${value.reference}.");
+      load();
+    });
+  }
+
+  Future<Consent> _addConsentForProgram(String name) {
+    print("Adding consent for $name");
+    Reference org = OrganizationReference.fromName(name);
     if (org != null) {
       Consent c = Consent.from(patient, org, ConsentContentClass.all, ProvisionType.permit);
-      print("Creating a consent object indicating permission for site: $site");
+      print("Creating a consent object indicating permission for program site: $name");
       return Repository.postConsent(c, _api);
     } else {
       return Future.value(null);
