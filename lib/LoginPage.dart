@@ -48,9 +48,11 @@ class LoginPageState extends State<LoginPage> {
         : 12;
 
     PlatformDefs().addToHomeScreen((deferredPrompt) {
-      setState(() {
-        _deferredPrompt = deferredPrompt;
-      });
+      if (mounted) {
+        setState(() {
+          _deferredPrompt = deferredPrompt;
+        });
+      }
     });
 
     return Scaffold(

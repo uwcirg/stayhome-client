@@ -11,11 +11,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_auth/simple_auth.dart' as simpleAuth;
 import 'package:simple_auth_flutter/simple_auth_flutter.dart';
 
+const String KEYCLOAK_KEY = "keycloak";
+
 class KeycloakAuth {
   String _issuer;
   String _clientSecret;
   String _clientId;
-  static final String _redirectUrl = PlatformDefs().redirectUrl();
+  static final String _defaultRedirectUrl = PlatformDefs().redirectUrl();
   DateTime accessTokenExpirationDateTime;
   bool isLoggedIn = false;
 
@@ -25,15 +27,17 @@ class KeycloakAuth {
 
   bool refreshTokenExpired = false;
 
-  final String keycloakKey = "keycloak";
-
   KeycloakAuth(this._issuer, this._clientSecret, this._clientId) {
+    _createApi(_defaultRedirectUrl);
+  }
+
+  void _createApi(String redirectUrl) {
     if (kIsWeb) {
       _setInitialLoginState();
-      _api = new KeycloakApi(_issuer, _clientId, _clientSecret, _redirectUrl,
+      _api = new KeycloakApi(_issuer, _clientId, _clientSecret, redirectUrl,
           scopes: ["openid"], authStorage: MapAppWebAuthStorage());
     } else {
-      _api = new KeycloakApi(_issuer, _clientId, _clientSecret, _redirectUrl, scopes: ["openid"]);
+      _api = new KeycloakApi(_issuer, _clientId, _clientSecret, redirectUrl, scopes: ["openid"]);
     }
   }
 
@@ -47,7 +51,10 @@ class KeycloakAuth {
     return _api.currentOauthAccount.token;
   }
 
-  Future mapAppLogin() async {
+  Future mapAppLogin({String redirectUrl}) async {
+    if (redirectUrl != null) {
+      _createApi(redirectUrl);
+    }
     try {
       simpleAuth.OAuthAccount account = await _api.authenticate();
       accessTokenExpirationDateTime = account.created.add(Duration(seconds: account.expiresIn));
@@ -75,6 +82,7 @@ class KeycloakAuth {
         // lost account...
         return await _completeWithLocalLogout();
       } else {
+        // first try a "POST" logout with session info
         var value = await post(url, headers: {
           "authorization": 'Bearer ${account.token}'
         }, body: {
@@ -86,22 +94,23 @@ class KeycloakAuth {
         if (value.statusCode == 204) {
           return await _completeWithLocalLogout();
         } else {
-          //for Web platform, launching the logout url directly after local logout to clear Keycloak session if encounter error?
-           _completeWebLogout(url);
-          return Future.error("Log out not completed: ${value.statusCode}");
+          // for Web platform, the best we can do is do a "GET" with the logout url and no parameters
+          _completeWebLogout(url);
+          return await _completeWithLocalLogout();
+//          return Future.error("Log out not completed: ${value.statusCode}");
         }
       }
     } catch (error) {
-      //for Web platform, launching the logout url directly after local logout to clear Keycloak session if encounter error?
-       _completeWebLogout(url);
-      return Future.error("Log out error: $error");
+      // for Web platform, the best we can do is do a "GET" with the logout url and no parameters
+      print("Error logging out.");
+      _completeWebLogout(url);
+      return await _completeWithLocalLogout();
     }
   }
 
   _completeWebLogout(url) {
     if (kIsWeb) {
-        _clearWebLocalStorage();
-        PlatformDefs().launchUrl(url);
+      PlatformDefs().launchUrl(url);
     }
   }
 
@@ -109,19 +118,11 @@ class KeycloakAuth {
     isLoggedIn = false;
     accessTokenExpirationDateTime = null;
     userInfo = null;
-    _clearWebLocalStorage();
     try {
       await _api.logOut();
       return Future.value("Logged out");
     } catch (e) {
       return Future.error("Logged out, but local logout failed: $e");
-    }
-  }
-
-  _clearWebLocalStorage() async {
-    if (kIsWeb) {
-      final prefs = await SharedPreferences.getInstance();
-      prefs.remove(keycloakKey);
     }
   }
 
@@ -131,7 +132,7 @@ class KeycloakAuth {
      */
     if (kIsWeb) {
       final prefs = await SharedPreferences.getInstance();
-      if (prefs.getString(keycloakKey) != null) {
+      if (prefs.getString(KEYCLOAK_KEY) != null) {
         isLoggedIn = true;
       }
     }
@@ -154,7 +155,6 @@ class KeycloakAuth {
         _api.currentOauthAccount.token == null) {
       print("_api.currentOauthAccount.token not set");
       print(StackTrace.current);
-      _clearWebLocalStorage();
       return Future.error("Error getting user info. Please log in again.");
     }
     return post(url, headers: {
@@ -205,9 +205,13 @@ class KeycloakAuth {
     return Future.value(this.userInfo);
   }
 
-  Future receivedCallback(String change) async {
+  Future receivedCallback(String change, {String redirectUrl}) async {
+    if (redirectUrl != null) {
+      _createApi(redirectUrl);
+    }
     var authenticator = _api.authenticator;
 //    var authenticator = SimpleAuthFlutter.authenticators[_api.authenticator.identifier];
+    print("Change: $change");
     if (change.contains("canceled")) {
       authenticator.cancel();
       return Future.error("Authentication canceled");
@@ -217,17 +221,20 @@ class KeycloakAuth {
     }
 
     Uri uri = Uri.tryParse(change);
+    print("Uri: $uri");
 
     if (authenticator.checkUrl(uri)) {
       // --- copy pasted sections - need cleanup!
       // from API code
       var token = await authenticator.getAuthCode();
+      print("Token: $token");
       if (token?.isEmpty ?? true) {
         throw new Exception("Null Token");
       }
       simpleAuth.OAuthAccount account = await _api.getAccountFromAuthCode(authenticator);
       _api.saveAccountToCache(account);
       _api.currentAccount = account;
+      print("Oauth account updated and token non-null: ${_api.currentOauthAccount.token != null}");
 
       //from KeycloakAuth mapAppLogin callback
       accessTokenExpirationDateTime = account.created.add(Duration(seconds: account.expiresIn));
@@ -266,7 +273,8 @@ class MapAppWebAuthStorage implements simpleAuth.AuthStorage {
   @override
   Future<void> write({String key, String value}) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value);
+    // this method will be called with a value of '' when the storage should be cleared out.
+    prefs.setString(key, value == '' ? null : value);
   }
 }
 
@@ -288,17 +296,17 @@ class KeycloakApi extends simpleAuth.OAuthApi {
     String issuer,
     String clientId,
     String clientSecret,
-    String redirectUrl, {
+    String defaultRedirectUrl, {
     List<String> scopes,
     Client client,
     simpleAuth.AuthStorage authStorage,
   }) : super(
-          "keycloak",
+          KEYCLOAK_KEY,
           clientId,
           clientSecret,
           "$issuer/protocol/openid-connect/token",
           '$issuer/protocol/openid-connect/auth',
-          redirectUrl,
+          defaultRedirectUrl,
           client: client,
           scopes: scopes,
           authStorage: authStorage,

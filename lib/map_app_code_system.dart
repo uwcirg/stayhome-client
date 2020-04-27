@@ -37,6 +37,19 @@ class ConsentCategory extends Coding {
 
 class OrganizationReference extends Reference {
   static const _resourceType = "Organization";
+
+  static OrganizationReference fromName(String site) {
+    switch (site) {
+      case 'scan': return OrganizationReference.scan;
+      case 'fiuNeighborhoodHelp': return OrganizationReference.fiuNeighborhoodHelp;
+      case 'fiu': return OrganizationReference.fiu;
+      case 'publicHealthAgencies': return OrganizationReference.publicHealthAgencies;
+      case 'researchers': return OrganizationReference.researchers;
+      case 'socialDistancingStudy': return OrganizationReference.socialDistancingStudy;
+    }
+    return null;
+  }
+
   OrganizationReference._(String id): super(reference: "$_resourceType/$id");
   static OrganizationReference scan = OrganizationReference._("1463");
   static OrganizationReference fiuNeighborhoodHelp = OrganizationReference._("1464");

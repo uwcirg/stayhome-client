@@ -11,6 +11,7 @@ import 'package:map_app_flutter/HelpPage.dart';
 import 'package:map_app_flutter/HomePage.dart';
 import 'package:map_app_flutter/LoginPage.dart';
 import 'package:map_app_flutter/ProfilePage.dart';
+import 'package:map_app_flutter/ProgramLandingPage.dart';
 import 'package:map_app_flutter/ProgressInsightsPage.dart';
 import 'package:map_app_flutter/color_palette.dart';
 import 'package:map_app_flutter/config/AppConfig.dart';
@@ -242,6 +243,7 @@ class StayHomeAppAssets extends AppAssets {
       "/about": (BuildContext context) => StayHomeHelpPage(),
       "/login": (BuildContext context) => LoginPage(),
       "/authCallback": (BuildContext context) => PlatformDefs().getAuthCallbackPage(),
+      "/enroll": (BuildContext context) => ProgramEnrollmentPage(),
       "/communications": (BuildContext context) => CommunicationsPage(),
     };
   }

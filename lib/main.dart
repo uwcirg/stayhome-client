@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:map_app_flutter/LoginPage.dart';
+import 'package:map_app_flutter/ProgramLandingPage.dart';
 import 'package:map_app_flutter/app_assets.dart';
 import 'package:map_app_flutter/config/AppConfig.dart';
 import 'package:map_app_flutter/const.dart';
@@ -113,7 +114,6 @@ class _MyAppState extends State<MyApp> {
                   secondaryLabelStyle: Theme.of(context).accentTextTheme.body1),
               dividerTheme: DividerThemeData(thickness: 1)),
           home: new LoginPage(),
-          // Will replace after login is complete
           routes: appAssets.navRoutes(context),
           locale: Locale(_locale, ""),
           localizationsDelegates: [
@@ -122,6 +122,21 @@ class _MyAppState extends State<MyApp> {
             GlobalWidgetsLocalizations.delegate,
           ],
           supportedLocales: S.delegate.supportedLocales,
+          onGenerateRoute: (settings) {
+            // URL param parsing
+            var uri = Uri.parse(settings.name);
+            print("onGenerateRoute path name: ${uri.path}");
+            print("onGenerateRoute queryParams: ${uri.queryParameters}");
+            if (uri.path == '/enroll') {
+              String program = uri.queryParameters['program'];
+              return MaterialPageRoute(
+                builder: (context) {
+                  return ProgramEnrollmentPage(programSiteName: program);
+                },
+              );
+            }
+            return null;
+          },
         ));
   }
 
@@ -154,13 +169,14 @@ class _MyAppState extends State<MyApp> {
 
   void dismissLoginScreen(BuildContext context) {
     if (auth.isLoggedIn) {
-      auth.getUserInfo().then((value) {
-        String keycloakUserId = auth.userInfo.keycloakUserId;
-        ScopedModel.of<CarePlanModel>(context).setUserAndAuthToken(keycloakUserId, auth);
-        Navigator.of(context).pushReplacementNamed('/home');
-      }).catchError((error) {
-        ScopedModel.of<CarePlanModel>(context).setGuestUser(auth);
-        Navigator.of(context).pushReplacementNamed('/guestHome');
+      print(
+          "Dismiss login screen. Token is not null: ${auth.api.currentOauthAccount?.token != null}");
+      completePostLoginSetup(context).then((loggedIn) {
+        if (loggedIn) {
+          Navigator.of(context).pushReplacementNamed('/home');
+        } else {
+          Navigator.of(context).pushReplacementNamed('/guestHome');
+        }
       });
     } else {
       // clear credentials from browser by calling log out
@@ -168,6 +184,54 @@ class _MyAppState extends State<MyApp> {
       ScopedModel.of<CarePlanModel>(context).setGuestUser(auth);
       Navigator.of(context).pushReplacementNamed('/guestHome');
     }
+  }
+
+  Future completeLoginFromCallback(String href, {String redirectUrl}) {
+    return auth
+        .receivedCallback(href, redirectUrl: redirectUrl)
+        .then((value) => completePostLoginSetup(context));
+  }
+
+  Future<bool> completePostLoginSetup(BuildContext context) {
+    return auth.getUserInfo().then((value) {
+      String keycloakUserId = auth.userInfo.keycloakUserId;
+      ScopedModel.of<CarePlanModel>(context).setUserAndAuthToken(keycloakUserId, auth);
+      return true;
+    }).catchError((error) {
+      ScopedModel.of<CarePlanModel>(context).setGuestUser(auth);
+      return false;
+    });
+  }
+
+  Future<bool> getLoginStatus() async {
+    print("getLoginStatus");
+    if (auth.isLoggedIn) {
+      print("Dismiss login screen. Token is now: ${auth.api.currentOauthAccount.token != null}");
+      return await auth.getUserInfo().then((value) {
+        String keycloakUserId = auth.userInfo.keycloakUserId;
+        ScopedModel.of<CarePlanModel>(context).setUserAndAuthToken(keycloakUserId, auth);
+        return true;
+      }).catchError((error) {
+        ScopedModel.of<CarePlanModel>(context).setGuestUser(auth);
+        return false;
+      });
+    } else {
+      // clear credentials from browser by calling log out
+      logout(pushLogin: false);
+      ScopedModel.of<CarePlanModel>(context).setGuestUser(auth);
+      print("returning Future.value(false)");
+      return Future.value(false);
+    }
+  }
+
+  Future<void> nav(BuildContext context) async {
+    print("nav");
+    bool loggedIn = await getLoginStatus();
+    print("Nav received value: $loggedIn");
+    if (loggedIn)
+      Navigator.of(context).pushReplacementNamed('/home');
+    else
+      Navigator.of(context).pushReplacementNamed('/guestHome');
   }
 }
 
