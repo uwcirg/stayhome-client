@@ -139,7 +139,7 @@ class CarePlanModel extends Model {
   bool hasConsentForProgram(String name) {
     Reference org = OrganizationReference.fromName(name);
     if (org == null) return true;
-    return this.consents[org][ConsentContentClass.all].isPermitted;
+    return this.consents[org][ConsentContentClass.all] == ProvisionType.permit;
   }
 
   Future<void> addConsentForProgram(String name) async {
