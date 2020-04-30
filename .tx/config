@@ -1,0 +1,9 @@
+[main]
+host = https://www.transifex.com
+
+[stayhome.intl-en-json]
+file_filter = lib/l10n/intl_<lang>.arb
+minimum_perc = 0
+source_file = lib/l10n/intl_en.arb
+source_lang = en
+type = KEYVALUEJSON
