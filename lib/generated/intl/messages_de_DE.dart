@@ -1,5 +1,5 @@
 // DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
-// This is a library that provides messages for a de locale. All the
+// This is a library that provides messages for a de_DE locale. All the
 // messages from the main program should be duplicated here with the same
 // function name.
 
@@ -17,9 +17,9 @@ final messages = new MessageLookup();
 typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 
 class MessageLookup extends MessageLookupByLibrary {
-  String get localeName => 'de';
+  String get localeName => 'de_DE';
 
-  static m0(deploymentType) => "System ist im ${deploymentType}-Modus - nicht für den klinischen Gebrauch vorgesehen.";
+  static m0(deploymentType) => "This is a ${deploymentType} system - not for real data.";
 
   static m1(duration, durationUnit) => "${duration} ${durationUnit}";
 
@@ -124,7 +124,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "profile_zipcode_hint_text" : MessageLookupByLibrary.simpleMessage("Wo Sie die meiste Zeit verbringen"),
     "profile_zipcode_validation_error_text" : MessageLookupByLibrary.simpleMessage("Lassen Sie das Feld leer oder geben Sie eine gültige Postleitzahl ein"),
     "public_health_information_sharing_info" : MessageLookupByLibrary.simpleMessage("Wenn Sie Informationen an öffentliche Gesundheitsbehörden weitergeben, wissen diese, wie sie für den COVID-19-Ausbruch in Ihrer Region planen und ihn angehen können. Wenn Sie Ihren Namen und Ihre Kontaktinformationen mitteilen, werden Sie möglicherweise auch kontaktiert, wenn diese der Meinung sind, dass Sie Hilfe benötigen."),
-    "public_health_information_sharing_question" : MessageLookupByLibrary.simpleMessage("Welche Informationen möchten Sie an **öffentliche Gesundheitsbehörden** in Ihrer Nähe weitergeben?"),
+    "public_health_information_sharing_question" : MessageLookupByLibrary.simpleMessage("Which information do you choose to share with **public health agencies** in your area?"),
     "read_more" : MessageLookupByLibrary.simpleMessage("Weiterlesen"),
     "record_symptoms_and_temp" : MessageLookupByLibrary.simpleMessage("Symptome & Temperatur aufzeichnen"),
     "research_information_sharing_info" : MessageLookupByLibrary.simpleMessage("Wenn Sie Informationen mit Forschern teilen, erfahren diese mehr über den COVID-19-Ausbruch und wie Sie Menschen wie Ihnen helfen können. Wenn Sie Ihren Namen und Ihre Kontaktinformationen mitteilen, werden Sie möglicherweise auch kontaktiert, falls COVID-19-Forschungsteilnehmer gesucht sind."),
