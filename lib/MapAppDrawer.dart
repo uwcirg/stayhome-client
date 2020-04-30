@@ -133,7 +133,7 @@ class MapAppDrawer extends Drawer {
         underline: Container(
           height: 0,
         ),
-        items: S.delegate.supportedLocales.map((locale) {
+        items: MyApp.of(context).supportedLocales.map((locale) {
           return new DropdownMenuItem<String>(
             child: Text(locale.languageCode),
             value: locale.languageCode,

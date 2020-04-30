@@ -13,3 +13,8 @@ version: v1.6 17-Apr-2020
 deploymentType: test
 careplanTemplateId: 1058
 newUserWelcomeMessageTemplateId: 57
+
+supportedLocales:
+  - en
+  - mn
+  - de

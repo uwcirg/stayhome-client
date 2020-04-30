@@ -37,4 +37,12 @@ class AppConfig {
   static bool get isProd => deploymentType != null && deploymentType == "prod";
 
   static String get commitSha => GlobalConfiguration().get("COMMIT_SHA")?.toString();
+
+  static List<String> get supportedLocales =>
+      GlobalConfiguration()
+          .get("supportedLocales")
+          ?.map((element) => element.toString())
+          ?.cast<String>()
+          ?.toList() ??
+      [];
 }

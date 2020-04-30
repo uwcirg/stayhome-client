@@ -121,8 +121,16 @@ class _MyAppState extends State<MyApp> {
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
           ],
-          supportedLocales: S.delegate.supportedLocales,
+          supportedLocales: this.supportedLocales,
         ));
+  }
+
+  List<Locale> get supportedLocales {
+    List<Locale> definedLocales = S.delegate.supportedLocales;
+    List<String> configuredLocales = AppConfig.supportedLocales;
+    return definedLocales
+        .where((Locale locale) => configuredLocales.contains(locale.languageCode))
+        .toList();
   }
 
   toggleAppMode() {
