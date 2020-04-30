@@ -22,8 +22,6 @@ RUN rm -rf .packages .flutter-plugins .flutter-plugin-dependencies
 # Enable flutter web
 RUN flutter config --enable-web
 
-# remove test locales
-RUN rm lib/l10n/intl_mn.arb lib/l10n/intl_de.arb
 RUN flutter packages pub global activate intl_utils
 # rerun string generator
 RUN flutter pub global run intl_utils:generate
