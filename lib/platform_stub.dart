@@ -11,6 +11,7 @@ import 'platform_interface.dart'
 abstract class PlatformDefs {
   String redirectUrl();
   String rootUrl();
+  String currentUrl();
   addToHomeScreen(Function onBeforeInstallPrompt);
   onAddToHomeScreenButtonPressed(deferredPrompt);
 

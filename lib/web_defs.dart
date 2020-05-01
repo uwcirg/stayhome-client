@@ -20,6 +20,10 @@ class WebDefs implements PlatformDefs {
     return AppConfig.appRootUrl;
   }
 
+  String currentUrl() {
+    return window.location.href;
+  }
+
   @override
   Future launchUrl(String url, {bool newTab = false}) async {
     if (await canLaunch(url).catchError((error) => print("Error: $error"))) {
