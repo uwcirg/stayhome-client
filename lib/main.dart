@@ -144,7 +144,9 @@ class _MyAppState extends State<MyApp> {
     List<Locale> definedLocales = S.delegate.supportedLocales;
     List<String> configuredLocales = AppConfig.supportedLocales;
     return definedLocales
-        .where((Locale locale) => configuredLocales.contains(locale.languageCode))
+        .where((Locale locale) =>
+            configuredLocales.contains(locale.languageCode) ||
+            configuredLocales.contains(locale.toString()))
         .toList();
   }
 

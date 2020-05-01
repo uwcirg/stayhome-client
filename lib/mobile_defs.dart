@@ -13,6 +13,9 @@ class MobileDefs implements PlatformDefs {
   String rootUrl() {
     return 'edu.washington.cirg.mapapp';
   }
+  String currentUrl() {
+    throw UnimplementedError("No URL for Mobile");
+  }
 
   @override
   Future launchUrl(String url, {bool newTab = false}) async {

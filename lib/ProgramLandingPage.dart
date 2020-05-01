@@ -2,8 +2,6 @@
  * Copyright (c) 2020 CIRG. All rights reserved.
  */
 
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/MapAppDrawer.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
@@ -27,7 +25,7 @@ class ProgramEnrollmentPage extends StatelessWidget {
         return Center(child: CircularProgressIndicator());
       }
 
-      Uri uri = Uri.tryParse(window.location.href);
+      Uri uri = Uri.tryParse(PlatformDefs().currentUrl());
       if (model.isLoading) {
         return Center(child: CircularProgressIndicator());
       }
@@ -53,7 +51,7 @@ class ProgramEnrollmentPage extends StatelessWidget {
           // auth params available. receiveCallback and load!
           var auth = MyApp.of(context).auth;
 
-          auth.receivedCallback(window.location.href, redirectUrl: _redirectUrl()).then((d) {
+          auth.receivedCallback(PlatformDefs().currentUrl(), redirectUrl: _redirectUrl()).then((d) {
             auth.getUserInfo().then((value) {
               String keycloakUserId = auth.userInfo.keycloakUserId;
               ScopedModel.of<CarePlanModel>(context).setUserAndAuthToken(keycloakUserId, auth);

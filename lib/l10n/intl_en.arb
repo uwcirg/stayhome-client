@@ -1,5 +1,8 @@
 {
   "demoVersionBannerText": "This is a {deploymentType} system - not for real data.",
+  "@demoVersionBannerText": {
+    "context": "This is the context"
+  },
   "versionString": "Version {version}",
   "developedByCIRG": "Developed by the Clinical Informatics Research Group (CIRG) at University of Washington, 2019-2020.",
   "about": "About",
@@ -128,7 +131,7 @@
   "gender_male": "male",
   "gender_female": "female",
   "gender_other": "other",
-  "whatlink_title" : "What's StayHome?",
+  "whatlink_title": "What's StayHome?",
   "share_symptoms": "Share my symptoms, testing, and health conditions",
   "share_location": "Share my general location (zip code)",
   "share_contact_info": "Share my name and contact information (email and/or phone number)",

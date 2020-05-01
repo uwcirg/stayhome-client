@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/message_lookup_by_library.dart';
 import 'package:map_app_flutter/app_assets.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
@@ -69,21 +70,17 @@ class MapAppDrawer extends Drawer {
   Widget _buildProfileIcon(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(Dimensions.halfMargin),
-      child: Stack(alignment: AlignmentDirectional.bottomEnd,
-          children: [
-            Icon(
-              Icons.account_circle,
-              color: Theme.of(context).primaryIconTheme.color,
-              size: Dimensions.profileImageSize,
-            ),
-            Container(
-              padding: const EdgeInsets.all(1),
-              decoration: ShapeDecoration(
-                  color: Theme.of(context).primaryColor,
-                  shape: CircleBorder()
-              ),
-              child:  Icon(Icons.settings, color: Theme.of(context).primaryIconTheme.color),
-            )
+      child: Stack(alignment: AlignmentDirectional.bottomEnd, children: [
+        Icon(
+          Icons.account_circle,
+          color: Theme.of(context).primaryIconTheme.color,
+          size: Dimensions.profileImageSize,
+        ),
+        Container(
+          padding: const EdgeInsets.all(1),
+          decoration: ShapeDecoration(color: Theme.of(context).primaryColor, shape: CircleBorder()),
+          child: Icon(Icons.settings, color: Theme.of(context).primaryIconTheme.color),
+        )
       ]),
     );
   }
@@ -105,7 +102,9 @@ class MapAppDrawer extends Drawer {
 
   Widget _buildLogoutListTile(BuildContext context) {
     return ListTile(
-        title: Text(MyApp.of(context).auth.isLoggedIn ? S.of(context).logout : S.of(context).back_to_login_register),
+        title: Text(MyApp.of(context).auth.isLoggedIn
+            ? S.of(context).logout
+            : S.of(context).back_to_login_register),
         leading: Icon(MdiIcons.logout),
         onTap: () => MyApp.of(context).logout(context: context));
   }
@@ -123,7 +122,7 @@ class MapAppDrawer extends Drawer {
       title: DropdownButton(
         isExpanded: true,
         hint: Text(
-          S.of(context).languageName,
+          languageDisplayName(Localizations.localeOf(context).languageCode),
           style: TextStyle(
               fontSize: Theme.of(context).textTheme.subtitle.fontSize,
               color: Theme.of(context).textTheme.subtitle.color),
@@ -133,9 +132,9 @@ class MapAppDrawer extends Drawer {
         underline: Container(
           height: 0,
         ),
-        items: MyApp.of(context).supportedLocales.map((locale) {
+        items: this.sortedLocales(context).map((locale) {
           return new DropdownMenuItem<String>(
-            child: Text(locale.languageCode),
+            child: Text(languageDisplayName(locale.languageCode)),
             value: locale.languageCode,
           );
         }).toList(),
@@ -144,6 +143,16 @@ class MapAppDrawer extends Drawer {
         },
       ),
     );
+  }
+
+  static String languageDisplayName(languageCode) {
+    return {
+      'en': "English",
+      'fr': "Kreyòl Ayisyen",
+      'de': "Deutsch",
+      'es': "Español",
+      'mn': "¬¬¬Test language□"
+    }[languageCode];
   }
 
   void profileOrLogin(BuildContext context) {
@@ -200,5 +209,13 @@ class MapAppDrawer extends Drawer {
       return nameDisplay;
     }
     return S.of(context).name_not_entered;
+  }
+
+  List<Locale> sortedLocales(context) {
+    List<Locale> locales = MyApp.of(context).supportedLocales;
+    locales.sort((Locale a, Locale b) {
+      return languageDisplayName(a.languageCode).compareTo(languageDisplayName(b.languageCode));
+    });
+    return locales;
   }
 }
