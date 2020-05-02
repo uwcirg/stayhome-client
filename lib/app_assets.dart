@@ -128,7 +128,8 @@ class StayHomeAppAssets extends AppAssets {
       padding:
           EdgeInsets.only(left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, top: 10),
       child: Text(S.of(context).support_COVID19,
-          style: Theme.of(context).primaryTextTheme.headline5.apply(color: Colors.white)),
+          style: Theme.of(context).primaryTextTheme.headline5.apply(color: Colors.white),
+      textAlign: TextAlign.center,),
     );
   }
 

@@ -18,7 +18,7 @@ abstract class HelpPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MapAppPageScaffold(
       child: _buildScreen(context),
-      title: "About",
+      title: S.of(context).about,
     );
   }
 

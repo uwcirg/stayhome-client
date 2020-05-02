@@ -1,8 +1,5 @@
 {
   "demoVersionBannerText": "This is a {deploymentType} system - not for real data.",
-  "@demoVersionBannerText": {
-    "context": "This is the context"
-  },
   "versionString": "Version {version}",
   "developedByCIRG": "Developed by the Clinical Informatics Research Group (CIRG) at University of Washington, 2019-2020.",
   "about": "About",

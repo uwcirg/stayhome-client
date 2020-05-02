@@ -19,7 +19,7 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'de_DE';
 
-  static m0(deploymentType) => "This is a ${deploymentType} system - not for real data.";
+  static m0(deploymentType) => "System ist im ${deploymentType}-Modus - nicht für echte Daten vorgesehen.";
 
   static m1(duration, durationUnit) => "${duration} ${durationUnit}";
 
@@ -42,6 +42,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "attempt_login_text" : MessageLookupByLibrary.simpleMessage("Anmeldung erfolgt..."),
     "back" : MessageLookupByLibrary.simpleMessage("zurück"),
     "back_to_login_register" : MessageLookupByLibrary.simpleMessage("Zurück zur Anmeldung/Registrierung"),
+    "back_to_login_register_small" : MessageLookupByLibrary.simpleMessage("zurück zur Anmeldung/Registrierung"),
     "birthdate" : MessageLookupByLibrary.simpleMessage("Geburtsdatum"),
     "calendar" : MessageLookupByLibrary.simpleMessage("Kalender"),
     "calender_history" : MessageLookupByLibrary.simpleMessage("Kalender & Verlauf"),
@@ -53,6 +54,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "clear_birthdate_text" : MessageLookupByLibrary.simpleMessage("Geburtsdatum entfernen"),
     "communications" : MessageLookupByLibrary.simpleMessage("Kommunikationen"),
     "completed" : MessageLookupByLibrary.simpleMessage("Abgeschlossen"),
+    "contact_point_system_email" : MessageLookupByLibrary.simpleMessage("E-Mail"),
     "contact_us" : MessageLookupByLibrary.simpleMessage("Kontakt/Feedback"),
     "continue_to_resources" : MessageLookupByLibrary.simpleMessage("weiter zu den Informationsressourcen"),
     "copied" : MessageLookupByLibrary.simpleMessage("Kopiert"),
@@ -80,6 +82,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "frequency" : MessageLookupByLibrary.simpleMessage("Häufigkeit:"),
     "frequency_with_contents" : m2,
     "gender" : MessageLookupByLibrary.simpleMessage("Geschlecht"),
+    "gender_female" : MessageLookupByLibrary.simpleMessage("weiblich"),
+    "gender_male" : MessageLookupByLibrary.simpleMessage("männlich"),
+    "gender_other" : MessageLookupByLibrary.simpleMessage("andere"),
     "guest_home_text" : MessageLookupByLibrary.simpleMessage("StayHome enthält eine Liste von Ressourcen, mit denen Sie direkt auf Informationsquellen zugreifen können, von denen wir glauben, dass sie korrekt sind. Wir hoffen, dass diese Quellen Ihnen helfen, Ihre Gesundheit, Sicherheit und Ihr Wohlbefinden während des COVID-19-Ausbruchs zu erhalten.\n\nOhne Konto können Sie unten fortfahren, um diese Quellen zu durchsuchen und den darin enthaltenen Links zu folgen.\n\nWenn Sie jetzt oder später ein Konto erstellen möchten, können Sie:\n\n- Ihre Symptome und Temperatur verfolgen\n- Reisen und / oder Zeiten, in denen Sie möglicherweise ausgesetzt waren, aufzeichnen\n- COVID-19-Tests aufzeichnen, und damit dazu beitragen, dass die Gesundheitsbehörden Ihre Ergebnisse mit Ihren Kontaktinformationen in Verbindung bringen können\n- andere Informationen wie Schwangerschaft und Beruf aufzeichnen, die den Gesundheitsbehörden helfen können, bestimmte Programme oder Schutzmaßnahmen für Sie zu ermitteln."),
     "history" : MessageLookupByLibrary.simpleMessage("Verlauf"),
     "home" : MessageLookupByLibrary.simpleMessage("Home"),
@@ -97,7 +102,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "name_not_entered" : MessageLookupByLibrary.simpleMessage("(Name nicht bekannt)"),
     "no_FHIR_patient_record_text" : MessageLookupByLibrary.simpleMessage("In der FHIR-Datenbank ist noch keine Patientenakte für Sie vorhanden."),
     "no_active_careplan_text" : MessageLookupByLibrary.simpleMessage("Sie haben keinen aktiven Pflegeplan."),
-    "no_content" : MessageLookupByLibrary.simpleMessage("<kein Inhalt>"),
+    "no_content" : MessageLookupByLibrary.simpleMessage("(kein Inhalt)"),
     "no_data" : MessageLookupByLibrary.simpleMessage("Keine Daten"),
     "no_data_to_show_text" : MessageLookupByLibrary.simpleMessage("Noch keine Daten zu zeigen. Beginnen Sie das Tracking und Ihre Daten werden hier angezeigt."),
     "no_date" : MessageLookupByLibrary.simpleMessage("Kein Datum"),
@@ -110,6 +115,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "profile_email_validation_error_text" : MessageLookupByLibrary.simpleMessage("Lassen Sie das Feld leer oder geben Sie eine gültige E-Mail-Adresse ein"),
     "profile_form_error_text" : MessageLookupByLibrary.simpleMessage("Beim Speichern der Profiländerungen ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."),
     "profile_home_zipcode_label_text" : MessageLookupByLibrary.simpleMessage("Postleitzahl (Wohnort)"),
+    "profile_info_sharing_text" : MessageLookupByLibrary.simpleMessage("Wir geben keine Informationen in Ihrem Profil weiter, es sei denn, Sie erlauben uns dies durch Auswahl bestimmter Partnerprogramme in den unten stehenden Optionen unter \"Informationsaustausch\"."),
     "profile_location_title_text" : MessageLookupByLibrary.simpleMessage("Standort"),
     "profile_phone_hint_text" : MessageLookupByLibrary.simpleMessage("Wie ist Ihre Telefonnummer?"),
     "profile_phone_label_text" : MessageLookupByLibrary.simpleMessage("Handynummer"),
@@ -124,7 +130,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "profile_zipcode_hint_text" : MessageLookupByLibrary.simpleMessage("Wo Sie die meiste Zeit verbringen"),
     "profile_zipcode_validation_error_text" : MessageLookupByLibrary.simpleMessage("Lassen Sie das Feld leer oder geben Sie eine gültige Postleitzahl ein"),
     "public_health_information_sharing_info" : MessageLookupByLibrary.simpleMessage("Wenn Sie Informationen an öffentliche Gesundheitsbehörden weitergeben, wissen diese, wie sie für den COVID-19-Ausbruch in Ihrer Region planen und ihn angehen können. Wenn Sie Ihren Namen und Ihre Kontaktinformationen mitteilen, werden Sie möglicherweise auch kontaktiert, wenn diese der Meinung sind, dass Sie Hilfe benötigen."),
-    "public_health_information_sharing_question" : MessageLookupByLibrary.simpleMessage("Which information do you choose to share with **public health agencies** in your area?"),
+    "public_health_information_sharing_question" : MessageLookupByLibrary.simpleMessage("Welche Informationen möchten Sie **Gesundheitsbehörden** mitteilen, die für Ihre Region zuständig sind?"),
     "read_more" : MessageLookupByLibrary.simpleMessage("Weiterlesen"),
     "record_symptoms_and_temp" : MessageLookupByLibrary.simpleMessage("Symptome & Temperatur aufzeichnen"),
     "research_information_sharing_info" : MessageLookupByLibrary.simpleMessage("Wenn Sie Informationen mit Forschern teilen, erfahren diese mehr über den COVID-19-Ausbruch und wie Sie Menschen wie Ihnen helfen können. Wenn Sie Ihren Namen und Ihre Kontaktinformationen mitteilen, werden Sie möglicherweise auch kontaktiert, falls COVID-19-Forschungsteilnehmer gesucht sind."),
@@ -137,7 +143,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "select" : MessageLookupByLibrary.simpleMessage("Auswählen"),
     "select_trend_text" : MessageLookupByLibrary.simpleMessage("Wählen Sie eine Frage aus, um den Verlauf anzuzeigen"),
     "session_expired_please_log_in_again" : MessageLookupByLibrary.simpleMessage("Session abgelaufen, bitte erneut einloggen."),
+    "share_contact_info" : MessageLookupByLibrary.simpleMessage("Meinen Namen und meine Kontaktinformationen (E-Mail Adresse und/oder Telefonnummer) weitergeben"),
+    "share_location" : MessageLookupByLibrary.simpleMessage("Meinen allgemeinen Standort (Postleitzahl) weitergeben"),
+    "share_symptoms" : MessageLookupByLibrary.simpleMessage("Meine Symptome, Testergebnisse, und meinen Gesundheitszustand weitergeben"),
     "sign_up_or_log_in_to_access_all_functions" : MessageLookupByLibrary.simpleMessage("Bitte melden Sie sich an, um auf alle Funktionen zuzugreifen."),
+    "social_distancing_body" : MessageLookupByLibrary.simpleMessage("Sie können Ihre Informationen direkt mit der Studie zur Sozialen Distanzierung teilen. Wenn Sie Informationen freigeben, erteilen Sie Zugriff auf:\n- Informationen zu Symptomen, Tests und Gesundheitszuständen,\n- Ihre allgemeinen Standortinformationen (Postleitzahl) UND\n- Ihren Namen und Ihre Kontaktinformationen (E-Mail und / oder Telefonnummer)."),
+    "social_distancing_title" : MessageLookupByLibrary.simpleMessage("Studie zur Sozialen Distanzierung"),
+    "social_distancing_toggle" : MessageLookupByLibrary.simpleMessage("Meine Informationen weitergeben"),
     "springboard_COVID19_resources_text" : MessageLookupByLibrary.simpleMessage("COVID-19 Informationsressourcen"),
     "springboard_enter_pregnancy_text" : MessageLookupByLibrary.simpleMessage("Schwangerschaft, Beruf & mögliche Risiken aufzeichnen"),
     "springboard_enter_travel_exposure_text" : MessageLookupByLibrary.simpleMessage("Reise oder Aussetzung aufzeichnen"),
@@ -156,6 +168,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "welcome" : MessageLookupByLibrary.simpleMessage("Danke und willkommen"),
     "what_do_you_want_to_do" : MessageLookupByLibrary.simpleMessage("Wie möchten Sie fortfahren?"),
     "what_is_your_email_address" : MessageLookupByLibrary.simpleMessage("Was ist Ihre E-Mail-Addresse?"),
-    "what_is_your_name" : MessageLookupByLibrary.simpleMessage("Wie heißen Sie?")
+    "what_is_your_name" : MessageLookupByLibrary.simpleMessage("Wie heißen Sie?"),
+    "whatlink_title" : MessageLookupByLibrary.simpleMessage("Was ist StayHome?")
   };
 }
