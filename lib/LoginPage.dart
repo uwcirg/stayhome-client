@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/config/AppConfig.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
@@ -45,7 +46,7 @@ class LoginPageState extends State<LoginPage> {
     MediaQueryData deviceInfo = MediaQuery.of(context);
     double buttonContainerInsets = deviceInfo.size.width > MediaQueryConstants.minDesktopWidth
         ? deviceInfo.size.width / 4.5
-        : 12;
+        : 24;
 
     PlatformDefs().addToHomeScreen((deferredPrompt) {
       if (mounted) {
@@ -62,40 +63,38 @@ class LoginPageState extends State<LoginPage> {
           position: DecorationPosition.background,
           decoration: MyApp.of(context).appAssets.loginBackgroundDecoration(),
           child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  _buildAddToHomeScreenButton(),
-                  MyApp.of(context).appAssets.topLogos(context),
-                  Expanded(
-                    child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                      MyApp.of(context).appAssets.loginBanner(context),
-                      _buildSystemAnnouncement(context),
-                    ]),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                DemoVersionWarningBanner(),
+                _buildAddToHomeScreenButton(),
+                MyApp.of(context).appAssets.topLogos(context),
+                Expanded(
+                  child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                    MyApp.of(context).appAssets.loginBanner(context),
+                    _buildSystemAnnouncement(context),
+                  ]),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: buttonContainerInsets),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      _buildSessionExpiredMessage(context),
+                      _buildWhatLink(),
+                      _buildLoginButton(context),
+                      ...MyApp.of(context).appAssets.additionalLoginPageViews(context),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: _buildNotNowButton(context),
+                      ),
+                      _buildVersionLink(),
+                    ],
                   ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: buttonContainerInsets),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        _buildSessionExpiredMessage(context),
-                        _buildWhatLink(),
-                        _buildLoginButton(context),
-                        ...MyApp.of(context).appAssets.additionalLoginPageViews(context),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12),
-                          child: _buildNotNowButton(context),
-                        ),
-                        _buildVersionLink(),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           )),
     ));
