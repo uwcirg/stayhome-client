@@ -71,11 +71,14 @@ class LoginPageState extends State<LoginPage> {
                 _buildAddToHomeScreenButton(),
                 MyApp.of(context).appAssets.topLogos(context),
                 Expanded(
-                  child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                    MyApp.of(context).appAssets.loginBanner(context),
-                    _buildSystemAnnouncement(context),
-                  ]),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                      MyApp.of(context).appAssets.loginBanner(context),
+                      _buildSystemAnnouncement(context),
+                    ]),
+                  ),
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: buttonContainerInsets),

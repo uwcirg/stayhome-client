@@ -8,6 +8,9 @@ import 'package:map_app_flutter/map_app_code_system.dart';
 import 'package:map_app_flutter/services/Repository.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+// To generate the serialization code run in project root: flutter pub run build_runner build
+// see https://pub.dev/packages/json_serializable
+//  and https://flutter.dev/docs/development/data-and-backend/json
 part 'FhirResources.g.dart';
 
 abstract class Resource {
@@ -15,6 +18,7 @@ abstract class Resource {
 
   get id;
 
+  @JsonKey(ignore: true)
   String get reference => "$resourceType/$id";
 
   factory Resource.fromJson(Map<String, dynamic> json) {
@@ -96,6 +100,8 @@ class Consent with Resource {
       .category
       .any((CodeableConcept concept) => concept.coding.any((element) => element == category));
 
+
+  @JsonKey(ignore: true)
   bool get isConsented => provision.type == ProvisionType.permit;
 
   factory Consent.from(
@@ -210,6 +216,7 @@ class Payload {
   @JsonKey(name: "_contentString")
   PrimitiveTypeExtension contentStringExt;
 
+  @JsonKey(ignore: true)
   String get contentString =>
       FhirTranslations.extractTranslation(contentStringBase, contentStringExt);
 
@@ -281,6 +288,7 @@ class Patient with Resource {
     return patient;
   }
 
+  @JsonKey(ignore: true)
   String get firstName => this.name != null &&
           this.name.length > 0 &&
           this.name[0].given != null &&
@@ -288,6 +296,7 @@ class Patient with Resource {
       ? this.name[0].given[0]
       : null;
 
+  @JsonKey(ignore: true)
   String get fullNameDisplay {
     List<String> names = [];
     if (firstName != null && firstName.isNotEmpty) names.add(firstName);
@@ -307,21 +316,25 @@ class Patient with Resource {
     }
   }
 
+  @JsonKey(ignore: true)
   set firstName(String text) {
     if (this.name == null || this.name.isEmpty) this.name = [HumanName()];
     if (this.name[0].given == null || this.name[0].given.length == 0) this.name[0].given = [""];
     this.name[0].given[0] = text;
   }
 
+  @JsonKey(ignore: true)
   String get lastName => this.name != null && this.name.length > 0 && this.name[0].family != null
       ? this.name[0].family
       : null;
 
+  @JsonKey(ignore: true)
   set lastName(String text) {
     if (this.name == null || this.name.isEmpty) this.name = [HumanName()];
     this.name[0].family = text;
   }
 
+  @JsonKey(ignore: true)
   set emailAddress(String text) {
     this.telecom ??= [];
     ContactPoint p = _contactPointForSystem(ContactPointSystem.email);
@@ -332,6 +345,7 @@ class Patient with Resource {
     }
   }
 
+  @JsonKey(ignore: true)
   set phoneNumber(String text) {
     this.telecom ??= [];
     ContactPoint p = _contactPointForSystem(ContactPointSystem.phone);
@@ -348,6 +362,7 @@ class Patient with Resource {
         : null;
   }
 
+  @JsonKey(ignore: true)
   set preferredContactMethod(ContactPointSystem system) {
     // if sms is preferred and we have a phone number, use that and set its use to sms.
     // if phone is preferred and we have a sms number, use that and set its use to phone.
@@ -383,6 +398,7 @@ class Patient with Resource {
     });
   }
 
+  @JsonKey(ignore: true)
   ContactPointSystem get preferredContactMethod => this.telecom != null && this.telecom.length > 0
       ? this
           .telecom
@@ -390,11 +406,13 @@ class Patient with Resource {
           .system
       : null;
 
+  @JsonKey(ignore: true)
   String get emailAddress {
     ContactPoint p = _contactPointForSystem(ContactPointSystem.email);
     return p != null ? p.value : null;
   }
 
+  @JsonKey(ignore: true)
   String get phoneNumber {
     ContactPoint phone = _contactPointForSystem(ContactPointSystem.phone);
     ContactPoint sms = _contactPointForSystem(ContactPointSystem.sms);
@@ -411,6 +429,7 @@ class Patient with Resource {
     return p != null ? p.value : null;
   }
 
+  @JsonKey(ignore: true)
   String get homeZip => this.address != null && this.address.length > 0
       ? this
           .address
@@ -418,6 +437,7 @@ class Patient with Resource {
           .postalCode
       : null;
 
+  @JsonKey(ignore: true)
   set homeZip(String text) {
     if (this.address == null) this.address = [];
     Address address =
@@ -429,6 +449,7 @@ class Patient with Resource {
     address.postalCode = text;
   }
 
+  @JsonKey(ignore: true)
   String get secondZip => this.address != null && this.address.length > 0
       ? this
           .address
@@ -436,6 +457,7 @@ class Patient with Resource {
           .postalCode
       : null;
 
+  @JsonKey(ignore: true)
   set secondZip(String text) {
     if (this.address == null) this.address = [];
     Address address =
@@ -1004,6 +1026,7 @@ class Questionnaire with Resource {
   @JsonKey(name: "_title")
   PrimitiveTypeExtension titleExt;
 
+  @JsonKey(ignore: true)
   String get title => FhirTranslations.extractTranslation(titleBase, titleExt);
 
 
@@ -1078,7 +1101,7 @@ class Coding implements ChoiceOption {
   @JsonKey(ignore: true)
   String get display => FhirTranslations.extractTranslation(displayBase, displayExt);
 
-
+  @JsonKey(ignore: true)
   Answer get ifSelected => new Answer(valueCoding: this);
 
   Coding({this.system, this.code, this.displayBase});
@@ -1204,6 +1227,7 @@ class QuestionnaireItem {
   @JsonKey(name: "_text")
   PrimitiveTypeExtension textExt;
 
+  @JsonKey(ignore: true)
   String get text =>
       FhirTranslations.extractTranslation(textBase, textExt);
 
@@ -1244,10 +1268,13 @@ class QuestionnaireItem {
     }
   }
 
+  @JsonKey(ignore: true)
   List<ChoiceOption> get choiceOptions => answerOption ?? answerValueSet;
 
+  @JsonKey(ignore: true)
   int get choiceCount => choiceOptions != null ? choiceOptions.length : 0;
 
+  @JsonKey(ignore: true)
   String get helpText {
     // find the first sub item that has a help type extension
     QuestionnaireItem helpTextSubItem = item?.firstWhere((QuestionnaireItem subItem) =>
@@ -1261,6 +1288,7 @@ class QuestionnaireItem {
     return helpTextSubItem?.text;
   }
 
+  @JsonKey(ignore: true)
   SupportLink get supportLink {
     String supportLinkExtName = "http://hl7.org/fhir/StructureDefinition/questionnaire-supportLink";
     // find the first sub item that has a supportLink type extension
@@ -1306,6 +1334,7 @@ class AnswerOption implements ChoiceOption {
   List<Extension> extension;
   Coding valueCoding;
 
+  @JsonKey(ignore: true)
   Answer get ifSelected => new Answer.fromAnswerOption(this);
 
   AnswerOption({this.valueInteger, this.extension, this.valueCoding});
@@ -1369,6 +1398,7 @@ class QuestionnaireResponse with Resource {
     this.authored = new DateTime(today.year, today.month, today.day, today.hour, today.minute);
   }
 
+  @JsonKey(ignore: true)
   bool get isEmpty =>
       this.item == null ||
       this.item.isEmpty ||
@@ -1445,6 +1475,7 @@ class DocumentReference {
     return content != null && content.length > 1 && description != null;
   }
 
+  @JsonKey(ignore: true)
   String get url => content != null && content.length > 0 && content[0].attachment != null
       ? content[0].attachment.url
       : "";
@@ -1492,10 +1523,12 @@ class QuestionnaireResponseItem {
   String linkId;
   List<Answer> answer;
 
+  @JsonKey(ignore: true)
   bool get isEmpty => answer == null || answer.isEmpty || answer.every((Answer a) => a.isEmpty);
 
   QuestionnaireResponseItem({this.linkId, this.answer});
 
+  @JsonKey(ignore: true)
   String get answerDisplay {
     if (answer == null || answer.isEmpty) return "";
     return answer.map((e) => e.displayString).join(",");
@@ -1516,6 +1549,7 @@ class Answer {
   DateTime valueDate;
   DateTime valueDateTime;
 
+  @JsonKey(ignore: true)
   bool get isEmpty =>
       valueInteger == null &&
       valueDecimal == null &&
@@ -1532,6 +1566,7 @@ class Answer {
       this.valueDate,
       this.valueDateTime});
 
+  @JsonKey(ignore: true)
   String get displayString {
     if (this.valueDate != null) {
       return DateFormat.yMd().format(this.valueDate);
@@ -1581,6 +1616,7 @@ class Answer {
     return result;
   }
 
+  @JsonKey(ignore: true)
   String get toLocalizedString {
     if (valueInteger != null) return '$valueInteger';
     if (valueCoding != null) return valueCoding.display;
