@@ -302,15 +302,7 @@ Patient _$PatientFromJson(Map<String, dynamic> json) {
             ? null
             : PatientCommunication.fromJson(e as Map<String, dynamic>))
         ?.toList(),
-  )
-    ..firstName = json['firstName'] as String
-    ..lastName = json['lastName'] as String
-    ..preferredContactMethod = _$enumDecodeNullable(
-        _$ContactPointSystemEnumMap, json['preferredContactMethod'])
-    ..emailAddress = json['emailAddress'] as String
-    ..phoneNumber = json['phoneNumber'] as String
-    ..homeZip = json['homeZip'] as String
-    ..secondZip = json['secondZip'] as String;
+  );
 }
 
 Map<String, dynamic> _$PatientToJson(Patient instance) {
@@ -339,14 +331,6 @@ Map<String, dynamic> _$PatientToJson(Patient instance) {
   writeNotNull('multipleBirthBoolean', instance.multipleBirthBoolean);
   writeNotNull('communication',
       instance.communication?.map((e) => e?.toJson())?.toList());
-  writeNotNull('firstName', instance.firstName);
-  writeNotNull('lastName', instance.lastName);
-  writeNotNull('preferredContactMethod',
-      _$ContactPointSystemEnumMap[instance.preferredContactMethod]);
-  writeNotNull('emailAddress', instance.emailAddress);
-  writeNotNull('phoneNumber', instance.phoneNumber);
-  writeNotNull('homeZip', instance.homeZip);
-  writeNotNull('secondZip', instance.secondZip);
   return val;
 }
 
@@ -355,16 +339,6 @@ const _$GenderEnumMap = {
   Gender.female: 'female',
   Gender.other: 'other',
   Gender.unknown: 'unknown',
-};
-
-const _$ContactPointSystemEnumMap = {
-  ContactPointSystem.phone: 'phone',
-  ContactPointSystem.fax: 'fax',
-  ContactPointSystem.email: 'email',
-  ContactPointSystem.pager: 'pager',
-  ContactPointSystem.url: 'url',
-  ContactPointSystem.sms: 'sms',
-  ContactPointSystem.other: 'other',
 };
 
 Meta _$MetaFromJson(Map<String, dynamic> json) {
@@ -458,6 +432,16 @@ Map<String, dynamic> _$ContactPointToJson(ContactPoint instance) {
   writeNotNull('rank', instance.rank);
   return val;
 }
+
+const _$ContactPointSystemEnumMap = {
+  ContactPointSystem.phone: 'phone',
+  ContactPointSystem.fax: 'fax',
+  ContactPointSystem.email: 'email',
+  ContactPointSystem.pager: 'pager',
+  ContactPointSystem.url: 'url',
+  ContactPointSystem.sms: 'sms',
+  ContactPointSystem.other: 'other',
+};
 
 Address _$AddressFromJson(Map<String, dynamic> json) {
   return Address(
