@@ -113,9 +113,9 @@ class StayHomeAppAssets extends AppAssets {
   Widget _buildUWLogo() {
     return Padding(
         padding: EdgeInsets.only(
-          left: Dimensions.fullMargin,
-          top: Dimensions.fullMargin,
-          right: Dimensions.fullMargin,
+          left: Dimensions.largeMargin,
+          top: Dimensions.largeMargin,
+          right: Dimensions.largeMargin,
         ),
         child: Image.asset(
           'assets/stayhome/Signature_Stacked_White.png',
@@ -146,7 +146,7 @@ class StayHomeAppAssets extends AppAssets {
   Widget _buildCirgLogo() {
     return Padding(
         padding: EdgeInsets.only(
-            top: Dimensions.fullMargin, left: Dimensions.fullMargin, right: Dimensions.fullMargin),
+            top: Dimensions.largeMargin, left: Dimensions.largeMargin, right: Dimensions.largeMargin),
         child: InkWell(
           onTap: () => PlatformDefs().launchUrl(WhatInfo.cirgLink, newTab: true),
           child: Image.asset(

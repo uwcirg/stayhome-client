@@ -44,8 +44,8 @@ class WhatInfo {
       Uri.encodeComponent(PlatformDefs().rootUrl()) +
       "#change-log";
   static const String cirgLink = "https://www.cirg.washington.edu/";
-  static const String resourceLink = "https://tiny.cc/covidlinks";
-  static const String _resourceLinkZipPrefix = "https://tiny.cc/covidlinks?zip=";
+  static const String resourceLink = "https://uwcirg.github.io/stayhomeresources";
+  static const String _resourceLinkZipPrefix = "https://uwcirg.github.io/stayhomeresources?zip=";
   static const String contactLink = "mailto:help@stayhome-app.on.spiceworks.com";
   static const String cdcSymptomSelfCheckerLink =
       "https://uwcirg.github.io/stayhomelanding/gotoCDCbot.html";
