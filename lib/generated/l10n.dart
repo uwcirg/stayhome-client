@@ -63,6 +63,15 @@ class S {
     );
   }
 
+  String get about_small {
+    return Intl.message(
+      'about',
+      name: 'about_small',
+      desc: '',
+      args: [],
+    );
+  }
+
   String get about_stayhome {
     return Intl.message(
       'About StayHome',
@@ -175,6 +184,15 @@ class S {
     return Intl.message(
       'Profile and Information Sharing',
       name: 'profile',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get profile_small {
+    return Intl.message(
+      'profile',
+      name: 'profile_small',
       desc: '',
       args: [],
     );
@@ -315,6 +333,15 @@ class S {
     );
   }
 
+  String get contact_small {
+    return Intl.message(
+      'contact',
+      name: 'contact_small',
+      desc: '',
+      args: [],
+    );
+  }
+
   String get back {
     return Intl.message(
       'back',
@@ -337,6 +364,15 @@ class S {
     return Intl.message(
       'Logout',
       name: 'logout',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get logout_small {
+    return Intl.message(
+      'logout',
+      name: 'logout_small',
       desc: '',
       args: [],
     );
