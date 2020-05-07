@@ -28,7 +28,7 @@ self.addEventListener('fetch', function(event) {
 
     // return error response as fallback.
     var fallbackResponse = {
-      error: "fetching response failed"
+      "error" : "fetching response failed"
     };
 
     // Construct the fallback response via an in-memory variable.
