@@ -297,8 +297,6 @@ class SpringboardTile extends StatelessWidget {
                   child: Text(
                     this.text,
                     textAlign: TextAlign.center,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
                     style: _textStyle(context),
                   ),
                 ),
