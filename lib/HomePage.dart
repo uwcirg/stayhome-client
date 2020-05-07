@@ -284,7 +284,7 @@ class SpringboardTile extends StatelessWidget {
     return _littleEmptyTile(context);
   }
 
-  Expanded _opaqueTile(BuildContext context) {
+  Widget _opaqueTile(BuildContext context) {
     var card = Card(
         color: _cardColor(context),
         child: Padding(
@@ -306,12 +306,16 @@ class SpringboardTile extends StatelessWidget {
         ));
     var child = this.square ? AspectRatio(aspectRatio: 1, child: card) : card;
 
-    return Expanded(
-      child: InkWell(
-        child: child,
-        onTap: this.onPressed,
-      ),
-    );
+    if (this.square) {
+      return InkWell(child: child, onTap:this.onPressed);
+    } else {
+      return Expanded(
+        child: InkWell(
+          child: child,
+          onTap: this.onPressed,
+        ),
+      );
+    }
   }
 
   Expanded _emptyTileWithLeftIconAndChevron(BuildContext context) {
