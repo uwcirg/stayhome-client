@@ -73,6 +73,13 @@ class SpringBoardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var scrollableItems = [
+      _exposureAndTravelTile(context),
+      _covidTestingTile(context),
+      _pregnancyAndRisksTile(context),
+      _cdcSymptomCheckerTile(context)
+    ];
+
     return Column(children: [
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: Dimensions.halfMargin),
@@ -101,19 +108,9 @@ class SpringBoardWidget extends StatelessWidget {
         height: 155,
         child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: Dimensions.halfMargin),
-            itemCount: 4,
+            itemCount: scrollableItems.length,
             itemBuilder: (BuildContext context, int index) {
-              return [
-                _exposureAndTravelTile(context),
-                _covidTestingTile(context),
-                _pregnancyAndRisksTile(context),
-                _cdcSymptomCheckerTile(context)
-              ]
-                  .map((Widget w) => AspectRatio(
-                        aspectRatio: 1,
-                        child: w,
-                      ))
-                  .toList()[index];
+              return scrollableItems[index];
             },
             scrollDirection: Axis.horizontal),
       ),
@@ -179,6 +176,7 @@ class SpringBoardWidget extends StatelessWidget {
 
   SpringboardTile _pregnancyAndRisksTile(context) {
     return SpringboardTile(
+      square: true,
       style: SpringboardTileStyle.Opaque,
       assetPath: model.questionnaires.length > 3
           ? 'assets/stayhome/Pregnant.png'
@@ -204,6 +202,7 @@ class SpringBoardWidget extends StatelessWidget {
 
   SpringboardTile _covidTestingTile(context) {
     return SpringboardTile(
+      square: true,
       style: SpringboardTileStyle.Opaque,
       assetPath: model.questionnaires.length > 2
           ? 'assets/stayhome/Testing.transparent.png'
@@ -220,6 +219,7 @@ class SpringBoardWidget extends StatelessWidget {
 
   SpringboardTile _exposureAndTravelTile(context) {
     return SpringboardTile(
+      square: true,
       style: SpringboardTileStyle.Opaque,
       assetPath: 'assets/stayhome/Risk.transparent.png',
       text: S.of(context).springboard_enter_travel_exposure_text,
@@ -234,6 +234,7 @@ class SpringBoardWidget extends StatelessWidget {
 
   SpringboardTile _cdcSymptomCheckerTile(context) {
     return SpringboardTile(
+      square: true,
       style: SpringboardTileStyle.Opaque,
       assetPath: 'assets/stayhome/cdc.png',
       text: S.of(context).cdc_symptom_checker,
@@ -258,17 +259,19 @@ class SpringBoardWidget extends StatelessWidget {
 }
 
 enum SpringboardTileStyle { Opaque, EmptyWithChevron, Empty }
+
 class SpringboardTile extends StatelessWidget {
   final Function onPressed;
 
   final String assetPath;
-
+  final bool square;
   final String text;
   final bool enabled;
   final SpringboardTileStyle style;
   final Icon icon;
 
-  const SpringboardTile({this.icon, this.onPressed, this.assetPath, this.text, this.style})
+  const SpringboardTile(
+      {this.square = false, this.icon, this.onPressed, this.assetPath, this.text, this.style})
       : enabled = onPressed != null;
 
   @override
@@ -282,69 +285,74 @@ class SpringboardTile extends StatelessWidget {
   }
 
   Expanded _opaqueTile(BuildContext context) {
+    var card = Card(
+        color: _cardColor(context),
+        child: Padding(
+          padding: const EdgeInsets.all(5),
+          child: Column(
+            children: <Widget>[
+              _image(context) ?? Container(),
+              Flexible(
+                child: Center(
+                  child: Text(
+                    this.text,
+                    textAlign: TextAlign.center,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: _textStyle(context),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ));
+    var child = this.square ? AspectRatio(aspectRatio: 1, child: card) : card;
+
     return Expanded(
       child: InkWell(
-        child: Card(
-            color: _cardColor(context),
-            child: Padding(
-              padding: const EdgeInsets.all(5),
-              child: Column(
-                children: <Widget>[
-                  _image(context) ?? Container(),
-                  Expanded(
-                    child: Center(
-                      child: Flexible(
-                        child: Text(
-                          this.text,
-                          textAlign: TextAlign.center,
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: _textStyle(context),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            )),
+        child: child,
         onTap: this.onPressed,
       ),
     );
   }
 
   Expanded _emptyTileWithLeftIconAndChevron(BuildContext context) {
-    return _emptyTile(context, Row(
-      children: <Widget>[
-        _image(context) ?? Container(),
-        Expanded(
-          child: Text(
-            this.text,
-            textAlign: TextAlign.left,
-            maxLines: 3,
-            style: _textStyle(context),
-          ),
-        ),
-        Icon(Icons.chevron_right)
-      ],
-    ));
+    return _emptyTile(
+        context,
+        Row(
+          children: <Widget>[
+            _image(context) ?? Container(),
+            Expanded(
+              child: Text(
+                this.text,
+                textAlign: TextAlign.left,
+                maxLines: 3,
+                style: _textStyle(context),
+              ),
+            ),
+            Icon(Icons.chevron_right)
+          ],
+        ));
   }
 
   Widget _littleEmptyTile(BuildContext context) {
-    return _emptyTile(context, Column(
-      children: <Widget>[
-        Padding(padding: EdgeInsets.all(4), child: this.icon),
-        Expanded(
-          child: Center(
-            child: Text(
-              this.text,
-              textAlign: TextAlign.center,
-              maxLines: 3,
-              style: _textStyle(context),
+    return _emptyTile(
+        context,
+        Column(
+          children: <Widget>[
+            Padding(padding: EdgeInsets.all(4), child: this.icon),
+            Expanded(
+              child: Center(
+                child: Text(
+                  this.text,
+                  textAlign: TextAlign.center,
+                  maxLines: 3,
+                  style: _textStyle(context),
+                ),
+              ),
             ),
-          ),
-        ),
-      ],
-    ));
+          ],
+        ));
   }
 
   Widget _emptyTile(BuildContext context, Widget child) {
