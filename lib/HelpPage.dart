@@ -11,6 +11,7 @@ import 'package:map_app_flutter/config/AppConfig.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
+import 'package:map_app_flutter/map_app_widgets.dart';
 import 'package:map_app_flutter/platform_stub.dart';
 
 abstract class HelpPage extends StatelessWidget {
@@ -49,7 +50,7 @@ class StayHomeHelpPage extends HelpPage {
             Text(S.of(context).about_stayhome_info_text),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: Dimensions.fullMargin),
-              child: OutlineButton(
+              child: SecondaryButton(
                   onPressed: () => PlatformDefs().launchUrl(WhatInfo.link, newTab: true),
                   child: Text(S.of(context).read_more)),
             ),
@@ -57,14 +58,14 @@ class StayHomeHelpPage extends HelpPage {
             Text(S.of(context).developedByCIRG),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: Dimensions.fullMargin),
-              child: OutlineButton(
+              child: SecondaryButton(
                   onPressed: () => PlatformDefs().launchUrl(WhatInfo.cirgLink, newTab: true),
                   child: Text(S.of(context).read_more)),
             ),
             Divider(),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: Dimensions.fullMargin),
-              child: OutlineButton(
+              child: SecondaryButton(
                   onPressed: () => showDialog(
                       context: context,
                       builder: (context) {
@@ -77,14 +78,14 @@ class StayHomeHelpPage extends HelpPage {
                               bottom: Dimensions.halfMargin,
                               left: Dimensions.halfMargin),
                           actions: <Widget>[
-                            new OutlineButton(
+                            new SecondaryButton(
                               //TODO: This crashes (?) on iOS
                               onPressed: () => Clipboard.setData(new ClipboardData(text: terms))
                                   .then((value) => snack(S.of(context).copied, context))
                                   .catchError((error) => snack("Copying failed: $e", context)),
                               child: Text(S.of(context).copy_to_clipboard),
                             ),
-                            new OutlineButton(
+                            new SecondaryButton(
                               onPressed: () => Navigator.of(context).pop(),
                               child: new Text(S.of(context).done),
                             ),

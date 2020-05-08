@@ -98,7 +98,7 @@
   "loading_error_log_in_again": "Loading error. Try logging out and in again.",
   "form_error_text": "Form has errors. Please scroll up and fix your entries.",
   "enter_temperature_text": "Enter body temperature, in either °F or °C",
-  "temperatureErrorMessage": "Enter a value between {minF} and {maxF} (°F) or {minC} and {maxC} (°C). This value will not be saved.",
+  "temperatureErrorMessage": "Enter a value between {minF} and {maxF} (°F) or {minC} and {maxC} (°C). Invalid values will not be saved.",
   "decimal_validation_text": "Please enter a valid decimal",
   "select": "Select",
   "system_announcement": "System Announcement {text}",

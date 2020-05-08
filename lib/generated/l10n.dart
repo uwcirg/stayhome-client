@@ -920,7 +920,7 @@ class S {
 
   String temperatureErrorMessage(Object minF, Object maxF, Object minC, Object maxC) {
     return Intl.message(
-      'Enter a value between $minF and $maxF (°F) or $minC and $maxC (°C). This value will not be saved.',
+      'Enter a value between $minF and $maxF (°F) or $minC and $maxC (°C). Invalid values will not be saved.',
       name: 'temperatureErrorMessage',
       desc: '',
       args: [minF, maxF, minC, maxC],

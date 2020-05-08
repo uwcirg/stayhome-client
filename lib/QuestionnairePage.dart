@@ -11,6 +11,7 @@ import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
+import 'package:map_app_flutter/map_app_widgets.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:map_app_flutter/platform_stub.dart';
 import 'package:map_app_flutter/value_utils.dart';
@@ -190,7 +191,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
             spacing: Dimensions.halfMargin,
             runSpacing: Dimensions.fullMargin,
             children: <Widget>[
-              OutlineButton(
+              SecondaryButton(
                 padding: MapAppPadding.largeButtonPadding,
                 child: Text(S.of(context).cancel),
                 onPressed: _onCancelPressed,
@@ -317,7 +318,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
     return Padding(
       padding: const EdgeInsets.all(Dimensions.largeMargin),
       child: Center(
-        child: OutlineButton(
+        child: SecondaryButton(
           padding: const EdgeInsets.symmetric(
               vertical: Dimensions.halfMargin, horizontal: Dimensions.fullMargin),
           child: Text(link.title ?? ""),
@@ -424,7 +425,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
         } else {
           result = double.tryParse(value);
           if (result == null) {
-            message = S.of(context).decline_to_state;
+            message = S.of(context).decimal_validation_text;
           } else {
             if (!isValidTempF(result) && !isValidTempC(result)) {
               result = null;

@@ -6,6 +6,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
+import 'package:map_app_flutter/map_app_widgets.dart';
 import 'package:map_app_flutter/model/CarePlanModel.dart';
 import 'package:map_app_flutter/platform_stub.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -67,7 +68,7 @@ class CDCSymptomCheckerInfoPage extends StatelessWidget {
     if (primary) {
       button = RaisedButton(padding: edgeInsets, child: text, onPressed: onPressed);
     } else {
-      button = OutlineButton(padding: edgeInsets, child: text, onPressed: onPressed);
+      button = SecondaryButton(padding: edgeInsets, child: text, onPressed: onPressed);
     }
 
     return Padding(

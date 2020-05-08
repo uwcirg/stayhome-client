@@ -27,7 +27,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m3(text) => "System Announcement ${text}";
 
-  static m4(minF, maxF, minC, maxC) => "Enter a value between ${minF} and ${maxF} (°F) or ${minC} and ${maxC} (°C). This value will not be saved.";
+  static m4(minF, maxF, minC, maxC) => "Enter a value between ${minF} and ${maxF} (°F) or ${minC} and ${maxC} (°C). Invalid values will not be saved.";
 
   static m5(version) => "Version ${version}";
 

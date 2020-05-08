@@ -76,8 +76,7 @@ class SpringBoardWidget extends StatelessWidget {
     var scrollableItems = [
       _exposureAndTravelTile(context),
       _covidTestingTile(context),
-      _pregnancyAndRisksTile(context),
-      _cdcSymptomCheckerTile(context)
+      _pregnancyAndRisksTile(context)
     ];
 
     return Column(children: [
@@ -86,7 +85,8 @@ class SpringBoardWidget extends StatelessWidget {
         child: IntrinsicHeight(
           child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [_symptomsAndTempTile(context)]),
+              children: [_symptomsAndTempTile(context),
+                _cdcSymptomCheckerTile(context)]),
         ),
       ),
       Padding(
@@ -235,7 +235,7 @@ class SpringBoardWidget extends StatelessWidget {
   SpringboardTile _cdcSymptomCheckerTile(context) {
     return SpringboardTile(
       square: true,
-      style: SpringboardTileStyle.Opaque,
+      style: SpringboardTileStyle.Empty,
       assetPath: 'assets/stayhome/cdc.png',
       text: S.of(context).cdc_symptom_checker,
       onPressed: () {
@@ -247,6 +247,7 @@ class SpringBoardWidget extends StatelessWidget {
 
   SpringboardTile _symptomsAndTempTile(context) {
     return SpringboardTile(
+      flex:2,
       style: SpringboardTileStyle.Opaque,
       assetPath: 'assets/stayhome/Track.png',
       text: S.of(context).springboard_record_symptom_text,
@@ -269,9 +270,10 @@ class SpringboardTile extends StatelessWidget {
   final bool enabled;
   final SpringboardTileStyle style;
   final Icon icon;
+  final int flex;
 
   const SpringboardTile(
-      {this.square = false, this.icon, this.onPressed, this.assetPath, this.text, this.style})
+      {this.flex=1, this.square = false, this.icon, this.onPressed, this.assetPath, this.text, this.style})
       : enabled = onPressed != null;
 
   @override
@@ -342,7 +344,7 @@ class SpringboardTile extends StatelessWidget {
         context,
         Column(
           children: <Widget>[
-            Padding(padding: EdgeInsets.all(4), child: this.icon),
+            Padding(padding: EdgeInsets.all(4), child: this.icon ?? _image(context)),
             Expanded(
               child: Center(
                 child: Text(
@@ -359,10 +361,13 @@ class SpringboardTile extends StatelessWidget {
 
   Widget _emptyTile(BuildContext context, Widget child) {
     return Expanded(
+      flex: this.flex,
       child: Padding(
         padding: const EdgeInsets.all(5.0),
-        child: OutlineButton(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(3))),
+        child: SecondaryButton(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(3)),
+          ),
           padding: EdgeInsets.all(5),
           child: child,
           onPressed: this.onPressed,

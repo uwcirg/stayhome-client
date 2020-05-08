@@ -121,7 +121,7 @@ class NotificationsWidget extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
-                      OutlineButton(child: Text(S.of(context).dismiss), onPressed: () => onButtonPress(c)),
+                      SecondaryButton(child: Text(S.of(context).dismiss), onPressed: () => onButtonPress(c)),
                     ],
                   ),
                 )

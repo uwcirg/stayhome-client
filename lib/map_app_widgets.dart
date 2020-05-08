@@ -30,18 +30,16 @@ class MapAppErrorMessage extends StatelessWidget {
           .mapAppLogin()
           .then((value) => MyApp.of(context).dismissLoginScreen(context))
           .catchError((error) {
-            snack("$error", context);
-            MyApp.of(context).logout(pushLogin: true, context: context);
-          });
+        snack("$error", context);
+        MyApp.of(context).logout(pushLogin: true, context: context);
+      });
     } else {
       MyApp.of(context).logout(pushLogin: true, context: context);
     }
     var message = MyApp.of(context).auth.isLoggedIn
         ? S.of(context).attempt_login_text
         : S.of(context).loading_error_log_in_again;
-    return MapAppErrorMessage(
-      message
-    );
+    return MapAppErrorMessage(message);
   }
 
   factory MapAppErrorMessage.modelError(CarePlanModel model) {
@@ -132,23 +130,24 @@ class SaveAndCancelBar extends StatelessWidget {
       padding: const EdgeInsets.only(top: Dimensions.largeMargin),
       child: Center(
           child: Wrap(
-            spacing: Dimensions.halfMargin,
-            runSpacing: Dimensions.fullMargin,
-            children: <Widget>[
-              OutlineButton(
-                child: Text(S.of(context).cancel),
-                onPressed: onCancel,
-              ),
-              RaisedButton(
-                padding: MapAppPadding.largeButtonPadding,
-                child: Text(S.of(context).save, style: Theme.of(context).textTheme.button),
-                onPressed: onSave,
-              )
-            ],
-          )),
+        spacing: Dimensions.halfMargin,
+        runSpacing: Dimensions.fullMargin,
+        children: <Widget>[
+          SecondaryButton(
+            child: Text(S.of(context).cancel),
+            onPressed: onCancel,
+          ),
+          RaisedButton(
+            padding: MapAppPadding.largeButtonPadding,
+            child: Text(S.of(context).save, style: Theme.of(context).textTheme.button),
+            onPressed: onSave,
+          )
+        ],
+      )),
     );
   }
 }
+
 buildSectionHeader(String text, BuildContext context) {
   return Padding(
     padding: const EdgeInsets.only(top: Dimensions.largeMargin, bottom: 4),
@@ -159,6 +158,26 @@ buildSectionHeader(String text, BuildContext context) {
 Widget paragraph(String text) => padded(MarkdownBody(data: text));
 
 Widget padded(Widget w) => Padding(
-  padding: const EdgeInsets.symmetric(vertical: Dimensions.quarterMargin),
-  child: w,
-);
+      padding: const EdgeInsets.symmetric(vertical: Dimensions.quarterMargin),
+      child: w,
+    );
+
+class SecondaryButton extends OutlineButton {
+  const SecondaryButton({
+    Key key,
+    @required VoidCallback onPressed,
+    Widget child,
+    EdgeInsets padding,
+    ShapeBorder shape,
+  }) : super(
+          key: key,
+          onPressed: onPressed,
+          child: child,
+          borderSide: const BorderSide(
+            width: 2,
+            color: const Color(0x1f000000)
+          ),
+          padding: padding,
+          shape: shape,
+        );
+}
