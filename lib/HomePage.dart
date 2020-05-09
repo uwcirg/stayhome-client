@@ -85,15 +85,7 @@ class SpringBoardWidget extends StatelessWidget {
         child: IntrinsicHeight(
           child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [_symptomsAndTempTile(context)]),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: Dimensions.halfMargin),
-        child: IntrinsicHeight(
-          child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [_cdcSymptomCheckerTile(context)]),
+              children: [_symptomsAndTempTile(context),_cdcSymptomCheckerTile(context)]),
         ),
       ),
       Padding(
@@ -112,7 +104,7 @@ class SpringBoardWidget extends StatelessWidget {
         ),
       ),
       Container(
-        height: 150,
+        height: 145,
         child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: Dimensions.halfMargin),
             itemCount: scrollableItems.length,
@@ -242,7 +234,7 @@ class SpringBoardWidget extends StatelessWidget {
   SpringboardTile _cdcSymptomCheckerTile(context) {
     return SpringboardTile(
       square: true,
-      style: SpringboardTileStyle.EmptyWithChevron,
+      style: SpringboardTileStyle.Empty,
       assetPath: 'assets/stayhome/cdc.png',
       text: S.of(context).cdc_symptom_checker,
       onPressed: () {
@@ -254,7 +246,6 @@ class SpringBoardWidget extends StatelessWidget {
 
   SpringboardTile _symptomsAndTempTile(context) {
     return SpringboardTile(
-      flex: 2,
       style: SpringboardTileStyle.Opaque,
       assetPath: 'assets/stayhome/Track.transparent.png',
       text: S.of(context).springboard_record_symptom_text,
