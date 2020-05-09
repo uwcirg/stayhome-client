@@ -85,8 +85,15 @@ class SpringBoardWidget extends StatelessWidget {
         child: IntrinsicHeight(
           child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [_symptomsAndTempTile(context),
-                _cdcSymptomCheckerTile(context)]),
+              children: [_symptomsAndTempTile(context)]),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: Dimensions.halfMargin),
+        child: IntrinsicHeight(
+          child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [_cdcSymptomCheckerTile(context)]),
         ),
       ),
       Padding(
@@ -105,7 +112,7 @@ class SpringBoardWidget extends StatelessWidget {
         ),
       ),
       Container(
-        height: 155,
+        height: 150,
         child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: Dimensions.halfMargin),
             itemCount: scrollableItems.length,
@@ -159,7 +166,7 @@ class SpringBoardWidget extends StatelessWidget {
   SpringboardTile _historyAndTrendsTile(context) {
     return SpringboardTile(
       style: SpringboardTileStyle.EmptyWithChevron,
-      assetPath: 'assets/stayhome/Trend.png',
+      assetPath: 'assets/stayhome/Trend.transparent.png',
       text: S.of(context).springboard_review_calendar_history_text,
       onPressed: () => MapAppDrawer.navigate(context, "/progress_insights"),
     );
@@ -179,7 +186,7 @@ class SpringBoardWidget extends StatelessWidget {
       square: true,
       style: SpringboardTileStyle.Opaque,
       assetPath: model.questionnaires.length > 3
-          ? 'assets/stayhome/Pregnant.png'
+          ? 'assets/stayhome/Pregnant.transparent.png'
           : 'assets/stayhome/Pregnant.gray.png',
       text: S.of(context).springboard_enter_pregnancy_text,
       onPressed: model.questionnaires.length > 3
@@ -194,7 +201,7 @@ class SpringBoardWidget extends StatelessWidget {
   SpringboardTile _resourcesTile(context) {
     return SpringboardTile(
       style: SpringboardTileStyle.EmptyWithChevron,
-      assetPath: 'assets/stayhome/Resource.png',
+      assetPath: 'assets/stayhome/Resource.transparent.png',
       text: S.of(context).springboard_COVID19_resources_text,
       onPressed: () => launchResourceUrl(model),
     );
@@ -235,7 +242,7 @@ class SpringBoardWidget extends StatelessWidget {
   SpringboardTile _cdcSymptomCheckerTile(context) {
     return SpringboardTile(
       square: true,
-      style: SpringboardTileStyle.Empty,
+      style: SpringboardTileStyle.EmptyWithChevron,
       assetPath: 'assets/stayhome/cdc.png',
       text: S.of(context).cdc_symptom_checker,
       onPressed: () {
@@ -247,9 +254,9 @@ class SpringBoardWidget extends StatelessWidget {
 
   SpringboardTile _symptomsAndTempTile(context) {
     return SpringboardTile(
-      flex:2,
+      flex: 2,
       style: SpringboardTileStyle.Opaque,
-      assetPath: 'assets/stayhome/Track.png',
+      assetPath: 'assets/stayhome/Track.transparent.png',
       text: S.of(context).springboard_record_symptom_text,
       onPressed: () {
         Navigator.of(context).push(MaterialPageRoute(
@@ -273,7 +280,13 @@ class SpringboardTile extends StatelessWidget {
   final int flex;
 
   const SpringboardTile(
-      {this.flex=1, this.square = false, this.icon, this.onPressed, this.assetPath, this.text, this.style})
+      {this.flex = 1,
+      this.square = false,
+      this.icon,
+      this.onPressed,
+      this.assetPath,
+      this.text,
+      this.style})
       : enabled = onPressed != null;
 
   @override
@@ -309,9 +322,10 @@ class SpringboardTile extends StatelessWidget {
     var child = this.square ? AspectRatio(aspectRatio: 1, child: card) : card;
 
     if (this.square) {
-      return InkWell(child: child, onTap:this.onPressed);
+      return InkWell(child: child, onTap: this.onPressed);
     } else {
       return Expanded(
+        flex: this.flex,
         child: InkWell(
           child: child,
           onTap: this.onPressed,
@@ -325,7 +339,10 @@ class SpringboardTile extends StatelessWidget {
         context,
         Row(
           children: <Widget>[
-            _image(context) ?? Container(),
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: _image(context) ?? Container(),
+            ),
             Expanded(
               child: Text(
                 this.text,
@@ -378,8 +395,20 @@ class SpringboardTile extends StatelessWidget {
 
   Widget _image(BuildContext context) {
     if (this.assetPath != null) {
-      return Image.asset(this.assetPath,
-          height: 80, color: enabled ? null : Theme.of(context).disabledColor);
+      double circleSize = 60;
+      double imageSize = 70;
+      return Padding(
+        padding: const EdgeInsets.all(2.0),
+        child: Stack(alignment: AlignmentDirectional.center, children: [
+          Container(
+              height: circleSize,
+              width: circleSize,
+              decoration:
+                  ShapeDecoration(color: Theme.of(context).accentColor, shape: CircleBorder())),
+          Image.asset(this.assetPath,
+              height: imageSize, color: enabled ? null : Theme.of(context).disabledColor),
+        ]),
+      );
     }
     return null;
   }
