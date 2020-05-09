@@ -382,9 +382,7 @@ class SpringboardTile extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(5.0),
         child: SecondaryButton(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(3)),
-          ),
+          cornerRadius: 3,
           padding: EdgeInsets.all(5),
           child: child,
           onPressed: this.onPressed,
@@ -406,7 +404,8 @@ class SpringboardTile extends StatelessWidget {
               decoration:
                   ShapeDecoration(color: Theme.of(context).accentColor, shape: CircleBorder())),
           Image.asset(this.assetPath,
-              height: imageSize, color: enabled ? null : Theme.of(context).disabledColor),
+              height: imageSize,
+              color: enabled ? null : Theme.of(context).disabledColor),
         ]),
       );
     }

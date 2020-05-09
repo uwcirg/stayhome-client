@@ -162,22 +162,32 @@ Widget padded(Widget w) => Padding(
       child: w,
     );
 
-class SecondaryButton extends OutlineButton {
-  const SecondaryButton({
-    Key key,
-    @required VoidCallback onPressed,
-    Widget child,
-    EdgeInsets padding,
-    ShapeBorder shape,
-  }) : super(
-          key: key,
-          onPressed: onPressed,
-          child: child,
-          borderSide: const BorderSide(
-            width: 2,
-            color: const Color(0x1f000000)
-          ),
-          padding: padding,
-          shape: shape,
-        );
+class SecondaryButton extends StatelessWidget {
+  final Key key;
+  final VoidCallback onPressed;
+  final Widget child;
+  final EdgeInsets padding;
+  final double cornerRadius;
+
+  SecondaryButton({
+    this.key,
+    @required this.onPressed,
+    this.child,
+    this.padding,
+    double cornerRadius,
+  }) : this.cornerRadius = cornerRadius ?? 50;
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlineButton(
+      key: key,
+      onPressed: onPressed,
+      child: child,
+      padding: padding,
+      borderSide: BorderSide(color: Color(0x1f000000), width: 4) ,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(cornerRadius)),
+      ),
+    );
+  }
 }
