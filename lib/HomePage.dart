@@ -103,15 +103,13 @@ class SpringBoardWidget extends StatelessWidget {
               children: [_historyAndTrendsTile(context)]),
         ),
       ),
-      Container(
-        height: 145,
-        child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: Dimensions.halfMargin),
-            itemCount: scrollableItems.length,
-            itemBuilder: (BuildContext context, int index) {
-              return scrollableItems[index];
-            },
-            scrollDirection: Axis.horizontal),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: Dimensions.halfMargin),
+        child: IntrinsicHeight(
+          child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: scrollableItems),
+        ),
       ),
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: Dimensions.halfMargin),
@@ -175,7 +173,7 @@ class SpringBoardWidget extends StatelessWidget {
 
   SpringboardTile _pregnancyAndRisksTile(context) {
     return SpringboardTile(
-      square: true,
+      smallerIcon: true,
       style: SpringboardTileStyle.Opaque,
       assetPath: model.questionnaires.length > 3
           ? 'assets/stayhome/Pregnant.transparent.png'
@@ -201,7 +199,7 @@ class SpringBoardWidget extends StatelessWidget {
 
   SpringboardTile _covidTestingTile(context) {
     return SpringboardTile(
-      square: true,
+      smallerIcon: true,
       style: SpringboardTileStyle.Opaque,
       assetPath: model.questionnaires.length > 2
           ? 'assets/stayhome/Testing.transparent.png'
@@ -218,7 +216,7 @@ class SpringBoardWidget extends StatelessWidget {
 
   SpringboardTile _exposureAndTravelTile(context) {
     return SpringboardTile(
-      square: true,
+      smallerIcon: true,
       style: SpringboardTileStyle.Opaque,
       assetPath: 'assets/stayhome/Risk.transparent.png',
       text: S.of(context).springboard_enter_travel_exposure_text,
@@ -233,7 +231,6 @@ class SpringBoardWidget extends StatelessWidget {
 
   SpringboardTile _cdcSymptomCheckerTile(context) {
     return SpringboardTile(
-      square: true,
       style: SpringboardTileStyle.Empty,
       assetPath: 'assets/stayhome/cdc.png',
       text: S.of(context).cdc_symptom_checker,
@@ -264,6 +261,7 @@ class SpringboardTile extends StatelessWidget {
 
   final String assetPath;
   final bool square;
+  final bool smallerIcon;
   final String text;
   final bool enabled;
   final SpringboardTileStyle style;
@@ -273,6 +271,7 @@ class SpringboardTile extends StatelessWidget {
   const SpringboardTile(
       {this.flex = 1,
       this.square = false,
+      this.smallerIcon = false,
       this.icon,
       this.onPressed,
       this.assetPath,
@@ -297,7 +296,7 @@ class SpringboardTile extends StatelessWidget {
           padding: const EdgeInsets.all(5),
           child: Column(
             children: <Widget>[
-              _image(context) ?? Container(),
+              _image(context, this.smallerIcon) ?? Container(),
               Flexible(
                 child: Center(
                   child: Text(
@@ -332,7 +331,7 @@ class SpringboardTile extends StatelessWidget {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
-              child: _image(context) ?? Container(),
+              child: _image(context, this.smallerIcon) ?? Container(),
             ),
             Expanded(
               child: Text(
@@ -352,7 +351,7 @@ class SpringboardTile extends StatelessWidget {
         context,
         Column(
           children: <Widget>[
-            Padding(padding: EdgeInsets.all(4), child: this.icon ?? _image(context)),
+            Padding(padding: EdgeInsets.all(4), child: this.icon ?? _image(context, this.smallerIcon)),
             Expanded(
               child: Center(
                 child: Text(
@@ -382,10 +381,14 @@ class SpringboardTile extends StatelessWidget {
     );
   }
 
-  Widget _image(BuildContext context) {
+  Widget _image(BuildContext context, bool smallerIcon) {
     if (this.assetPath != null) {
       double circleSize = 60;
       double imageSize = 70;
+      if (smallerIcon) {
+        circleSize = 40;
+        imageSize = 50;
+      }
       return Padding(
         padding: const EdgeInsets.all(2.0),
         child: Stack(alignment: AlignmentDirectional.center, children: [
