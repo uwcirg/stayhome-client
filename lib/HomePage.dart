@@ -408,7 +408,7 @@ class SpringboardTile extends StatelessWidget {
 
   TextStyle _textStyle(BuildContext context) {
     TextStyle textStyle = Theme.of(context).textTheme.subtitle1;
-    if (enabled) return textStyle.apply(color: Theme.of(context).primaryColor);
+    if (enabled) return textStyle.apply(color: Theme.of(context).textTheme.button.color);
     return textStyle.apply(color: Theme.of(context).disabledColor);
   }
 

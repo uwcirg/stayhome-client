@@ -62,7 +62,7 @@ class CDCSymptomCheckerInfoPage extends StatelessWidget {
 
   Padding _button(BuildContext context, {String title, Function onPressed, bool primary = true}) {
     const edgeInsets = MapAppPadding.largeButtonPadding;
-    var text = Text(title, style: Theme.of(context).textTheme.button);
+    var text = Text(title);
 
     Widget button;
     if (primary) {

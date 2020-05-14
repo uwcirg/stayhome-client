@@ -102,7 +102,12 @@ class _MyAppState extends State<MyApp> {
               textTheme: appAssets.textThemeOverride(Theme.of(context).textTheme),
               buttonTheme: ButtonThemeData(
                 buttonColor: appAssets.accentColor,
-                textTheme: ButtonTextTheme.primary,
+                textTheme: ButtonTextTheme.accent,
+                colorScheme: Theme.of(context).colorScheme.copyWith(
+                  // secondary will be the textColor, when the textTheme is set to accent
+                  secondary: appAssets.buttonTextColor,
+                  primary: appAssets.buttonTextColor,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(50.0),
                 ),

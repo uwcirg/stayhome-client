@@ -18,7 +18,7 @@ class MapAppColors {
       900: Color(0xFF311B92),
     },
   );
-  static const int _stayHomePrimaryValue = 0xFF4b2e83; // UW color
+  static const int _stayHomePrimaryValue = 0xFF5835bd; // UW color
 
   static const MaterialAccentColor stayHomeAccent = MaterialAccentColor(
     _stayHomeAccentValue,
@@ -27,9 +27,11 @@ class MapAppColors {
       200: Color(_stayHomeAccentValue),
     },
   );
-  static const int _stayHomeAccentValue = 0xFFE8E4D2; // not UW Gold
+  static const int _stayHomeAccentValue = 0xFFD1C4E9;
 
   static const int _stayHomeHighlightValue = 0xFFD1C4E9; // Deep purple 100
 
   static const Color stayHomeHighlight = Color(_stayHomeHighlightValue);
+
+  static const Color stayHomeButtonTextColor = Color(0xFF2b4162);
 }

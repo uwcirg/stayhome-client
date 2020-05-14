@@ -198,7 +198,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
               ),
               RaisedButton(
                 padding: MapAppPadding.largeButtonPadding,
-                child: Text(S.of(context).save, style: Theme.of(context).textTheme.button),
+                child: Text(S.of(context).save),
                 onPressed: _onDonePressed,
               ),
             ],

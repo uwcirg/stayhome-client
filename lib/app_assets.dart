@@ -25,6 +25,7 @@ abstract class AppAssets {
   final primarySwatch;
   final accentColor;
   final highlightColor;
+  final buttonTextColor;
   final completedCalendarItemColor;
   final loginBackgroundImagePath;
   final systemUiOverlayStyle;
@@ -43,8 +44,8 @@ abstract class AppAssets {
 
   get keycloakIdentifierSystemName => issuer;
 
-  AppAssets(
-      this.primarySwatch, this.accentColor, this.highlightColor, this.completedCalendarItemColor,
+  AppAssets(this.primarySwatch, this.accentColor, this.highlightColor,
+      this.completedCalendarItemColor, this.buttonTextColor,
       {this.loginBackgroundImagePath,
       this.systemUiOverlayStyle = SystemUiOverlayStyle.light,
       this.textTheme,
@@ -55,6 +56,7 @@ abstract class AppAssets {
   }
 
   Widget topLogos(BuildContext context);
+
   Widget loginBanner(BuildContext context);
 
   Widget drawerBanner(BuildContext context);
@@ -86,8 +88,12 @@ class StayHomeAppAssets extends AppAssets {
   String get whatLink => WhatInfo.link;
 
   StayHomeAppAssets()
-      : super(MapAppColors.stayHomePrimary, MapAppColors.stayHomeAccent,
-            MapAppColors.stayHomeHighlight, MapAppColors.stayHomePrimary,
+      : super(
+            MapAppColors.stayHomePrimary,
+            MapAppColors.stayHomeAccent,
+            MapAppColors.stayHomeHighlight,
+            MapAppColors.stayHomePrimary,
+            MapAppColors.stayHomeButtonTextColor,
             careplanTemplateRef: "CarePlan/${AppConfig.careplanTemplateId}");
 
   @override
@@ -127,9 +133,11 @@ class StayHomeAppAssets extends AppAssets {
     return Padding(
       padding:
           EdgeInsets.only(left: Dimensions.quarterMargin, right: Dimensions.quarterMargin, top: 10),
-      child: Text(S.of(context).support_COVID19,
-          style: Theme.of(context).primaryTextTheme.headline5.apply(color: Colors.white),
-      textAlign: TextAlign.center,),
+      child: Text(
+        S.of(context).support_COVID19,
+        style: Theme.of(context).primaryTextTheme.headline5.apply(color: Colors.white),
+        textAlign: TextAlign.center,
+      ),
     );
   }
 
@@ -146,7 +154,9 @@ class StayHomeAppAssets extends AppAssets {
   Widget _buildCirgLogo() {
     return Padding(
         padding: EdgeInsets.only(
-            top: Dimensions.largeMargin, left: Dimensions.largeMargin, right: Dimensions.largeMargin),
+            top: Dimensions.largeMargin,
+            left: Dimensions.largeMargin,
+            right: Dimensions.largeMargin),
         child: InkWell(
           onTap: () => PlatformDefs().launchUrl(WhatInfo.cirgLink, newTab: true),
           child: Image.asset(
@@ -168,7 +178,7 @@ class StayHomeAppAssets extends AppAssets {
 
   TextTheme textThemeOverride(TextTheme textTheme) {
     return textTheme.copyWith(
-        button: textTheme.subhead.apply(color: this.primarySwatch, fontWeightDelta: 2));
+        button: textTheme.subhead.apply(color: this.buttonTextColor, fontWeightDelta: 2));
   }
 
   @override
