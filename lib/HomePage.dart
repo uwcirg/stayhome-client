@@ -54,7 +54,7 @@ class HomePage extends StatelessWidget {
         Visibility(
           visible: model.activeCommunications.isNotEmpty,
           child: Padding(
-            padding: const EdgeInsets.only(bottom: Dimensions.halfMargin),
+            padding: const EdgeInsets.only(bottom: Dimensions.halfMargin, left: Dimensions.halfMargin, right: Dimensions.halfMargin),
             child: ActiveNotificationsWidget(model),
           ),
         ),

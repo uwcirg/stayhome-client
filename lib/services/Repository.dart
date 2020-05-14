@@ -216,15 +216,22 @@ class Repository {
 
   static Future<Consent> postConsent(Consent consent, OAuthApi api) async {
     String result;
+    String action;
     try {
-      result = await postResource(consent, api);
+      if (consent.id == null || consent.id.isEmpty) {
+        result = await postResource(consent, api);
+        action = "Created";
+      } else {
+        result = await updateResource(consent, api);
+        action = "Updated";
+      }
     } catch (e) {
       printError(e);
       return Future.error(
           "An error occurred when trying to update sharing permissions. Please try logging in again.");
     }
     Consent postedResponse = Consent.fromJson(jsonDecode(result));
-    print("Created ${postedResponse.reference}");
+    print("$action ${postedResponse.reference}");
     return postedResponse;
   }
 
@@ -315,8 +322,7 @@ class Repository {
       ].forEach((Reference org) {
         Consent consent = responses.firstWhere(
             (Consent c) =>
-                c.organization.contains(org) &&
-                c.provision.provisionClass.contains(contentClass),
+                c.organization.contains(org) && c.provision.provisionClass.contains(contentClass),
             orElse: () => null);
         if (consent != null) {
           relevantResponses.add(consent);
@@ -338,8 +344,7 @@ class Repository {
       ].forEach((Reference org) {
         var consent = responses.firstWhere(
             (Consent c) =>
-                c.organization.contains(org) &&
-                c.provision.provisionClass.contains(contentClass),
+                c.organization.contains(org) && c.provision.provisionClass.contains(contentClass),
             orElse: () => null);
         if (consent != null) {
           relevantResponses.add(consent);

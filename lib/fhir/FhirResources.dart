@@ -104,6 +104,11 @@ class Consent with Resource {
   @JsonKey(ignore: true)
   bool get isConsented => provision.type == ProvisionType.permit;
 
+  update(ProvisionType type) {
+    this.provision.type = type;
+    this.provision.period = Period(start: DateTime.now());
+  }
+
   factory Consent.from(
       Patient patient, Reference organization, Coding contentClass, ProvisionType type) {
     return Consent(
