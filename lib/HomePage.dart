@@ -2,8 +2,6 @@
  * Copyright (c) 2020 CIRG. All rights reserved.
  */
 
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/CDCSymptomCheckerInfoPage.dart';
 import 'package:map_app_flutter/CommunicationsPage.dart';
@@ -175,9 +173,7 @@ class SpringBoardWidget extends StatelessWidget {
     return SpringboardTile(
       smallerIcon: true,
       style: SpringboardTileStyle.Opaque,
-      assetPath: model.questionnaires.length > 3
-          ? 'assets/stayhome/Pregnant.transparent.png'
-          : 'assets/stayhome/Pregnant.gray.png',
+      assetPath: 'assets/stayhome/Pregnant.transparent.png',
       text: S.of(context).springboard_enter_pregnancy_text,
       onPressed: model.questionnaires.length > 3
           ? () {
@@ -201,9 +197,7 @@ class SpringBoardWidget extends StatelessWidget {
     return SpringboardTile(
       smallerIcon: true,
       style: SpringboardTileStyle.Opaque,
-      assetPath: model.questionnaires.length > 2
-          ? 'assets/stayhome/Testing.transparent.png'
-          : 'assets/stayhome/Testing.gray.png',
+      assetPath: 'assets/stayhome/Testing.transparent.png',
       text: S.of(context).springboard_record_COVID19_text,
       onPressed: model.questionnaires.length > 2
           ? () {
@@ -383,24 +377,15 @@ class SpringboardTile extends StatelessWidget {
 
   Widget _image(BuildContext context, bool smallerIcon) {
     if (this.assetPath != null) {
-      double circleSize = 60;
       double imageSize = 70;
       if (smallerIcon) {
-        circleSize = 40;
         imageSize = 50;
       }
       return Padding(
         padding: const EdgeInsets.all(2.0),
-        child: Stack(alignment: AlignmentDirectional.center, children: [
-          Container(
-              height: circleSize,
-              width: circleSize,
-              decoration:
-                  ShapeDecoration(color: Theme.of(context).accentColor, shape: CircleBorder())),
-          Image.asset(this.assetPath,
-              height: imageSize,
-              color: enabled ? null : Theme.of(context).disabledColor),
-        ]),
+        child: Image.asset(this.assetPath,
+            height: imageSize,
+            color: enabled ? null : Theme.of(context).disabledColor),
       );
     }
     return null;
