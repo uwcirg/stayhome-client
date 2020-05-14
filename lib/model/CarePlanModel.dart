@@ -658,15 +658,20 @@ class DataSharingConsents with MapMixin<Reference, ConsentGroup> {
     List<Consent> newConsents = [];
     _consents.forEach((Reference org, Map<Coding, ProvisionType> orgConsents) {
       orgConsents.forEach((Coding contentClass, ProvisionType type) {
-        ProvisionType existingProvisionType = _originalConsents
+        Consent existingConsent = _originalConsents
             .firstWhere((Consent consent) {
-              return consent.organization.contains(org) &&
-                  consent.provision.provisionClass.contains(contentClass);
-            }, orElse: () => null)
+          return consent.organization.contains(org) &&
+              consent.provision.provisionClass.contains(contentClass);
+        }, orElse: () => null);
+
+        ProvisionType existingProvisionType = existingConsent
             ?.provision
             ?.type;
-        if (existingProvisionType == null || existingProvisionType != type) {
+        if (existingProvisionType == null) {
           newConsents.add(Consent.from(patient, org, contentClass, type));
+        } else if (existingProvisionType != type) {
+          existingConsent.update(type);
+          newConsents.add(existingConsent);
         }
       });
     });

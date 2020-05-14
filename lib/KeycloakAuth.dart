@@ -227,14 +227,12 @@ class KeycloakAuth {
       // --- copy pasted sections - need cleanup!
       // from API code
       var token = await authenticator.getAuthCode();
-      print("Token: $token");
       if (token?.isEmpty ?? true) {
         throw new Exception("Null Token");
       }
       simpleAuth.OAuthAccount account = await _api.getAccountFromAuthCode(authenticator);
       _api.saveAccountToCache(account);
       _api.currentAccount = account;
-      print("Oauth account updated and token non-null: ${_api.currentOauthAccount.token != null}");
 
       //from KeycloakAuth mapAppLogin callback
       accessTokenExpirationDateTime = account.created.add(Duration(seconds: account.expiresIn));
