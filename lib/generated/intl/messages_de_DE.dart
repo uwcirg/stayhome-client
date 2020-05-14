@@ -27,15 +27,15 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m3(text) => "Systemankündigung ${text}";
 
-  static m4(minF, maxF, minC, maxC) => "Geben Sie einen Wert zwischen ${minF} und ${maxF} (° F) oder ${minC} und ${maxC} (° C) ein. Dieser Wert wird nicht gespeichert.";
+  static m4(minF, maxF, minC, maxC) => "Geben Sie einen Wert zwischen ${minF} und ${maxF} (°F) oder ${minC} und ${maxC} (°C) ein. Ungültige Werte werden nicht gespeichert.";
 
   static m5(version) => "Version ${version}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
-    "about" : MessageLookupByLibrary.simpleMessage("Über"),
+    "about" : MessageLookupByLibrary.simpleMessage("Über Stayhome"),
     "about_CIRG" : MessageLookupByLibrary.simpleMessage("Über CIRG"),
-    "about_small" : MessageLookupByLibrary.simpleMessage("über"),
+    "about_small" : MessageLookupByLibrary.simpleMessage("Impressum"),
     "about_stayhome" : MessageLookupByLibrary.simpleMessage("Über StayHome"),
     "about_stayhome_info_text" : MessageLookupByLibrary.simpleMessage("Die COVID-19-Pandemie belastet bestehende Prozesse und Arbeitsabläufe im Bereich der öffentlichen Gesundheit. Viele Gemeindemitglieder sind möglicherweise besorgt über die Entwicklung von COVID-19. Um diesem Bedarf gerecht zu werden, haben wir StayHome entwickelt, eine App, die Menschen, die zu Hause bleiben, dabei hilft, das Risiko zu minimieren, das sie für andere darstellen, beispielsweise indem sie ihre Symptome und ihre Temperatur verfolgen, sich mit relevanten Informationen und Ressourcen verbinden und Aufzeichnungen davon führen, mit wem sie Kontakt hatten. Wir hoffen, dass die App Menschen und den öffentlichen Gesundheitsbehörden bei Bedarf auch dabei hilft, sich leichter zu verbinden, wenn die Ressourcen der öffentlichen Gesundheitsbehörden knapp werden."),
     "active" : MessageLookupByLibrary.simpleMessage("Aktiv"),
@@ -86,7 +86,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "gender" : MessageLookupByLibrary.simpleMessage("Geschlecht"),
     "gender_female" : MessageLookupByLibrary.simpleMessage("weiblich"),
     "gender_male" : MessageLookupByLibrary.simpleMessage("männlich"),
-    "gender_other" : MessageLookupByLibrary.simpleMessage("andere"),
+    "gender_other" : MessageLookupByLibrary.simpleMessage("divers"),
     "guest_home_text" : MessageLookupByLibrary.simpleMessage("StayHome enthält eine Liste von Ressourcen, mit denen Sie direkt auf Informationsquellen zugreifen können, von denen wir glauben, dass sie korrekt sind. Wir hoffen, dass diese Quellen Ihnen helfen, Ihre Gesundheit, Sicherheit und Ihr Wohlbefinden während des COVID-19-Ausbruchs zu erhalten.\n\nOhne Konto können Sie unten fortfahren, um diese Quellen zu durchsuchen und den darin enthaltenen Links zu folgen.\n\nWenn Sie jetzt oder später ein Konto erstellen möchten, können Sie:\n\n- Ihre Symptome und Temperatur verfolgen\n- Reisen und / oder Zeiten, in denen Sie möglicherweise ausgesetzt waren, aufzeichnen\n- COVID-19-Tests aufzeichnen, und damit dazu beitragen, dass die Gesundheitsbehörden Ihre Ergebnisse mit Ihren Kontaktinformationen in Verbindung bringen können\n- andere Informationen wie Schwangerschaft und Beruf aufzeichnen, die den Gesundheitsbehörden helfen können, bestimmte Programme oder Schutzmaßnahmen für Sie zu ermitteln."),
     "history" : MessageLookupByLibrary.simpleMessage("Verlauf"),
     "home" : MessageLookupByLibrary.simpleMessage("Home"),
@@ -98,7 +98,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "loading_error_log_in_again" : MessageLookupByLibrary.simpleMessage("Ladefehler. Versuchen Sie, sich ab- und wieder anzumelden."),
     "login" : MessageLookupByLibrary.simpleMessage("anmelden / registrieren"),
     "logout" : MessageLookupByLibrary.simpleMessage("Abmelden"),
-    "logout_small" : MessageLookupByLibrary.simpleMessage("ab­melden"),
+    "logout_small" : MessageLookupByLibrary.simpleMessage("Abmelden"),
     "member_program_question" : MessageLookupByLibrary.simpleMessage("Sind Sie Teilnehmer oder Mitglied eines der folgenden Programme?"),
     "more_charts_text" : MessageLookupByLibrary.simpleMessage("Es gibt weitere Diagramme, die nicht angezeigt werden."),
     "my_trends" : MessageLookupByLibrary.simpleMessage("Mein Verlauf"),
