@@ -18,7 +18,6 @@ The informational resources are located at [https://resources.stayhome.app/](htt
 StayHome makes use of some internal codes as follows.
 - The login page will display the most recently `sent` Communication with a `status` of `in-progress` and a `category` of `https://stayhome.app/CodeSystem/communication-category|system-announcement`
 
-
 # Development
 ## Flutter Troubleshooting
 "The application's Info.plist does not contain CFBundleVersion."
