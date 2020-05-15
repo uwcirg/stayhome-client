@@ -160,7 +160,7 @@ class ChartWidgetState extends State<ChartWidget> {
 
     return new charts.NumericAxisSpec(
       tickFormatterSpec: charts.BasicNumericTickFormatterSpec((num measure) {
-        if (displayMappings == null) return '$measure';
+        if (displayMappings == null) return NumberFormat.decimalPattern().format(measure);
         var displayName = displayMappings[measure];
         if (displayName == null) return "";
         return displayName;

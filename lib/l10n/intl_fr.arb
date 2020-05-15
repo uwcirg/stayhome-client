@@ -139,5 +139,6 @@
   "profile_info_sharing_text": "Nou pa pral pataje okenn nan enfòmasyon ki nan pwofil ou a, sofsi ou pèmèt nou fè sa depi w chwazi yon pwogram presi ki nan opsyon \"pataj enfòmasyon\" ki annapre a.",
   "social_distancing_title": "Etid sou distans sosyal",
   "social_distancing_body": "Ou ka chwazi pou w pataje enfòmasyon ou yo an dirèk avèk etid sou distans sosyal la. Si w chwazi pou fè pataj enfòmasyon ou yo, y ap kapab wè:\n- Sentòm, tès, ak enfòmason sou sante w,\n- Enfòmasyon nan ki zòn ou ye (zipkòd), EPI\n- Kijan w rele ak kowòdone w (imèl epi/oubyen nimewo telefòn).",
-  "social_distancing_toggle": "Pataje enfòmasyon mwen yo avèk etid sou distans sosyal la"
+  "social_distancing_toggle": "Pataje enfòmasyon mwen yo avèk etid sou distans sosyal la",
+  "enter_response": "Antre repons isit la"
 }

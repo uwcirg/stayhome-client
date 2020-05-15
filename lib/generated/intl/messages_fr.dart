@@ -72,6 +72,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "duration" : MessageLookupByLibrary.simpleMessage("Dire tan:"),
     "duration_duration_durationunit" : m1,
     "email" : MessageLookupByLibrary.simpleMessage("Imèl"),
+    "enter_response" : MessageLookupByLibrary.simpleMessage("Antre repons isit la"),
     "enter_temperature_text" : MessageLookupByLibrary.simpleMessage("Mete tanperati kò a, swa °F oubyen °C"),
     "firstname" : MessageLookupByLibrary.simpleMessage("Premye non"),
     "fiuNH_body" : MessageLookupByLibrary.simpleMessage("Ou ka chwazi pou fè pataj enfòmasyon ou yo an dirèk avèk pwogram NeighborhoodHELP la. Si w fè sa, y ap ka konnen si gendwa gen maladi COVID-19, epi ki sòt èd ni oumenm ni fanmi w gendwa bezwen. Si w fè pataj enfòmasyon ou yo avèk NeighborhoodHELP, y ap kapab wè:\n- Enfòmasyon sou sentòm, tès, epi sante w,\n- Enfòmasyon sou zòn kote w ye a (zipkòd), EPI\n- Kijan w rele epi kowòdone w (imèl epi/oubyen nimewo telefòn ou)."),

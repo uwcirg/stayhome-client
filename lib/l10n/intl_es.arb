@@ -139,5 +139,6 @@
   "profile_info_sharing_text": "No compartiremos la información de su perfil, a menos que nos lo permita seleccionando programas específicos, en la opción “Compartir Información” de abajo.",
   "social_distancing_title": "estudio de Distanciamiento Social",
   "social_distancing_body": "Puede optar por compartir su información directamente con el estudio de Distanciamiento Social. Si decide compartir información, ellos tendrán acceso a:\n- Sus sintomas, pruebas, e información de su condición de salud,\n- La información general de su ubicación (código postal), Y\n- Su nombre e información de contacto (correo electrónico y/o número de teléfono).",
-  "social_distancing_toggle": "Compartir mi información con el estudio de Distanciamiento Social"
+  "social_distancing_toggle": "Compartir mi información con el estudio de Distanciamiento Social",
+  "enter_response": "Ingrese la respuesta aquí"
 }

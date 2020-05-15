@@ -1579,6 +1579,9 @@ class Answer {
     if (this.valueDateTime != null) {
       return DateFormat.yMd().add_jm().format(this.valueDateTime);
     }
+    if (this.valueInteger != null || this.valueDecimal != null) {
+      return NumberFormat.decimalPattern().format(this.valueInteger ?? this.valueDecimal);
+    }
     return this.toLocalizedString;
   }
 
