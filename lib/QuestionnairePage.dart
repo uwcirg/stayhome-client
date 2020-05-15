@@ -332,7 +332,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
     return TextFormField(
       initialValue: _response.getAnswer(questionnaireItem.linkId)?.toString() ?? "",
       decoration: InputDecoration(
-          hintText: questionnaireItem.text),
+          hintText: S.of(context).enter_response),
       onChanged: (value) {
         setState(() {
           _response.setAnswer(questionnaireItem.linkId, Answer(valueString: value));
@@ -346,7 +346,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
       child: IgnorePointer(
         child: TextFormField(
           controller: widget.dateCtrl,
-          decoration: InputDecoration(hintText: questionnaireItem.textBase),
+          decoration: InputDecoration(hintText: S.of(context).enter_response),
         ),
       ),
       onTap: () {
@@ -406,43 +406,53 @@ class QuestionWidgetState extends State<QuestionWidget> {
   }
 
   Widget _buildTemperatureItem(QuestionnaireItem questionnaireItem, BuildContext context) {
-    return TextFormField(
-      initialValue: currentEntry ?? "",
-      decoration: InputDecoration(hintText: S.of(context).enter_temperature_text, errorMaxLines: 3),
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Text(S.of(context).enter_temperature_text,
+          style: Theme.of(context)
+              .textTheme
+              .subtitle1
+              .apply(color: Theme.of(context).textTheme.caption.color),
+        ),
+        TextFormField(
+          initialValue: currentEntry ?? "",
+          decoration: InputDecoration(hintText: S.of(context).enter_response, errorMaxLines: 3),
 //      inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
 //      keyboardType: TextInputType.numberWithOptions(decimal: true),
-      onChanged: (value) {
-        setState(() {
-          currentEntry = value;
-        });
-      },
-      autovalidate: true,
-      validator: (value) {
-        String message;
-        double result;
-        if (value.isEmpty) {
-          result = null;
-        } else {
-          result = double.tryParse(value);
-          if (result == null) {
-            message = S.of(context).decimal_validation_text;
-          } else {
-            if (!isValidTempF(result) && !isValidTempC(result)) {
+          onChanged: (value) {
+            setState(() {
+              currentEntry = value;
+            });
+          },
+          autovalidate: true,
+          validator: (value) {
+            String message;
+            double result;
+            if (value.isEmpty) {
               result = null;
-              message = S.of(context).temperatureErrorMessage(
-                  QuestionnaireConstants.minF,
-                  QuestionnaireConstants.maxF,
-                  QuestionnaireConstants.minC,
-                  QuestionnaireConstants.maxC);
             } else {
-              // restrict to 2 decimals
-              if (!isValidTempF(result)) result = double.parse(cToF(result).toStringAsFixed(2));
+              result = double.tryParse(value);
+              if (result == null) {
+                message = S.of(context).decimal_validation_text;
+              } else {
+                if (!isValidTempF(result) && !isValidTempC(result)) {
+                  result = null;
+                  message = S.of(context).temperatureErrorMessage(
+                      QuestionnaireConstants.minF,
+                      QuestionnaireConstants.maxF,
+                      QuestionnaireConstants.minC,
+                      QuestionnaireConstants.maxC);
+                } else {
+                  // restrict to 2 decimals
+                  if (!isValidTempF(result)) result = double.parse(cToF(result).toStringAsFixed(2));
+                }
+              }
             }
-          }
-        }
-        _response.setAnswer(questionnaireItem.linkId, Answer(valueDecimal: result));
-        return message;
-      },
+            _response.setAnswer(questionnaireItem.linkId, Answer(valueDecimal: result));
+            return message;
+          },
+        ),
+      ],
     );
   }
 

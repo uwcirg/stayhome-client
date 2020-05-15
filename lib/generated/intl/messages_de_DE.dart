@@ -72,6 +72,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "duration" : MessageLookupByLibrary.simpleMessage("Dauer:"),
     "duration_duration_durationunit" : m1,
     "email" : MessageLookupByLibrary.simpleMessage("E-Mail"),
+    "enter_response" : MessageLookupByLibrary.simpleMessage("Antwort hier eingeben"),
     "enter_temperature_text" : MessageLookupByLibrary.simpleMessage("Geben Sie die Körpertemperatur entweder in °F oder °C ein"),
     "firstname" : MessageLookupByLibrary.simpleMessage("Vorname"),
     "fiuNH_body" : MessageLookupByLibrary.simpleMessage("Sie können Ihre Informationen direkt mit dem NeighborhoodHELP-Programm teilen. Wenn Sie dies tun, werden sie wissen, ob Sie möglicherweise an COVID-19 erkrankt sind und welche Art von Hilfe Sie oder Ihre Familie möglicherweise benötigen. Wenn Sie Informationen mit NeighborhoodHELP teilen, haben diese Zugriff auf:\n- Ihre Symptome, Tests und Informationen zum Gesundheitszustand,\n- Ihre allgemeinen Standortinformationen (Postleitzahl) UND\n- Ihr Name und Ihre Kontaktinformationen (E-Mail und/oder Telefonnummer)."),

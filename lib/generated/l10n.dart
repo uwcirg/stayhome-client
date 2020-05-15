@@ -1295,6 +1295,15 @@ class S {
       args: [],
     );
   }
+
+  String get enter_response {
+    return Intl.message(
+      'Enter response here',
+      name: 'enter_response',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
