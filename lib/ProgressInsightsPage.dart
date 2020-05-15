@@ -87,12 +87,29 @@ class _ProgressInsightsPageState extends State<ProgressInsightsPage> {
       if (q.item != null) {
         for (QuestionnaireResponseItem i in q.item) {
           var questionForLinkId = model.questionForLinkId(i.linkId);
-          if (questionForLinkId != null) questionChoices.add(questionForLinkId);
+          if (questionForLinkId != null && hasNumericAnswers(questionForLinkId)) {
+            questionChoices.add(questionForLinkId);
+          }
         }
       }
     }
     questionChoices = questionChoices.toSet().toList();
     return questionChoices;
+  }
+
+  bool hasNumericAnswers(QuestionnaireItem questionForLinkId) {
+    if ([
+      QuestionType.integer,
+      QuestionType.decimal,
+      QuestionType.boolean,
+      QuestionType.date,
+      QuestionType.dateTime
+    ].contains(questionForLinkId.type)) return true;
+    if (questionForLinkId.type == QuestionType.choice) {
+      return questionForLinkId.answerOption
+          .every((AnswerOption element) => element.ordinalValue() != -1);
+    }
+    return false;
   }
 
   Widget _buildChartPage(
@@ -104,10 +121,8 @@ class _ProgressInsightsPageState extends State<ProgressInsightsPage> {
           child: DropdownButton(
             isExpanded: true,
             items: questionChoices
-                .map((QuestionnaireItem question) => DropdownMenuItem(
-                    value: question.linkId,
-                    child:
-                        Text(question.text)))
+                .map((QuestionnaireItem question) =>
+                    DropdownMenuItem(value: question.linkId, child: Text(question.text)))
                 .toList(),
             onChanged: (String selectedLinkId) =>
                 setState(() => this._selectedLinkId = selectedLinkId),
