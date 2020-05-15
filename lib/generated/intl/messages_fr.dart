@@ -27,7 +27,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m3(text) => "Anonsman sistèm lan ${text}";
 
-  static m4(minF, maxF, minC, maxC) => "Mete yon valè ki ant ${minF} ak ${maxF} (°F) oubyen ${minC} ak ${maxC} (°C). Valè sa a pa p anrejistre.";
+  static m4(minF, maxF, minC, maxC) => "Mete yon valè ki ant ${minF} ak ${maxF} (°F) oubyen ${minC} ak ${maxC} (°C). Valè valab pa pral sove.";
 
   static m5(version) => "Vèsyon ${version}";
 
@@ -35,13 +35,15 @@ class MessageLookup extends MessageLookupByLibrary {
   static _notInlinedMessages(_) => <String, Function> {
     "about" : MessageLookupByLibrary.simpleMessage("Sou"),
     "about_CIRG" : MessageLookupByLibrary.simpleMessage("Enfòmasyon sou CIRG"),
+    "about_small" : MessageLookupByLibrary.simpleMessage("sou"),
     "about_stayhome" : MessageLookupByLibrary.simpleMessage("Enfòmasyon sou StayHome"),
     "about_stayhome_info_text" : MessageLookupByLibrary.simpleMessage("Pandemik COVID-19 la yon tèt chaje pou pwosesis epi dewoulman travay ki genyen sou kesyon sante piblik la. Anpil manm nan kominote yo gendwa gen enkyetid sou devlopman COVID-19. Pou satisfè tout bezwen yo, nou gen yon app, StayHome (rete lakay), pou ede moun - ki pa soti - gen pi piti chans pou yo lakòz lòt moun risk tankou siveye setòm epi tanperati kò pa yo a, rete okouran enfòmasyon ak resous enpòtan, epi kenbe yon jounal kote yo make avèk ki moun yo rankontre. N espere app la gendwa ede moun epi piblik la konekte fasil, lè l nesesè, nan sitiyasyon kote resous pou sante piblik la gendwa difisil pou jwenn. "),
     "active" : MessageLookupByLibrary.simpleMessage("Aktif"),
     "add_the_default_careplan_for_me" : MessageLookupByLibrary.simpleMessage("mete premye plan swen mwen an"),
-    "attempt_login_text" : MessageLookupByLibrary.simpleMessage("Attempt to log in..."),
+    "attempt_login_text" : MessageLookupByLibrary.simpleMessage("Ap eseye konekte nan..."),
     "back" : MessageLookupByLibrary.simpleMessage("macharyè"),
     "back_to_login_register" : MessageLookupByLibrary.simpleMessage("Macharyè pou konekte/anrejistre"),
+    "back_to_login_register_small" : MessageLookupByLibrary.simpleMessage("macharyè pou konekte/anrejistre"),
     "birthdate" : MessageLookupByLibrary.simpleMessage("Dat nesans"),
     "calendar" : MessageLookupByLibrary.simpleMessage("Kalandriye"),
     "calender_history" : MessageLookupByLibrary.simpleMessage("Kalandriye & Istorik"),
@@ -53,6 +55,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "clear_birthdate_text" : MessageLookupByLibrary.simpleMessage("Efase dat nesans lan"),
     "communications" : MessageLookupByLibrary.simpleMessage("Kominikasyon"),
     "completed" : MessageLookupByLibrary.simpleMessage("Fin fèt"),
+    "contact_point_system_email" : MessageLookupByLibrary.simpleMessage("imèl"),
+    "contact_small" : MessageLookupByLibrary.simpleMessage("kowodone"),
     "contact_us" : MessageLookupByLibrary.simpleMessage("Kominike avè n/soumèt kòmantè"),
     "continue_to_resources" : MessageLookupByLibrary.simpleMessage("ale nan resous yo"),
     "copied" : MessageLookupByLibrary.simpleMessage("Kopye"),
@@ -70,7 +74,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "email" : MessageLookupByLibrary.simpleMessage("Imèl"),
     "enter_temperature_text" : MessageLookupByLibrary.simpleMessage("Mete tanperati kò a, swa °F oubyen °C"),
     "firstname" : MessageLookupByLibrary.simpleMessage("Premye non"),
-    "fiuNH_body" : MessageLookupByLibrary.simpleMessage("You can choose to share your information directly with the NeighborhoodHELP program. If you do they will know if you might be sick from COVID-19, and what kind of help you or your family might need. If you share information with NeighborhoodHLEP they will have access to:\n- Your symptoms, testing, and health condition information,\n- Your general location information (zip code), AND\n- Your name and contact information (email and/or phone number)."),
+    "fiuNH_body" : MessageLookupByLibrary.simpleMessage("Ou ka chwazi pou fè pataj enfòmasyon ou yo an dirèk avèk pwogram NeighborhoodHELP la. Si w fè sa, y ap ka konnen si gendwa gen maladi COVID-19, epi ki sòt èd ni oumenm ni fanmi w gendwa bezwen. Si w fè pataj enfòmasyon ou yo avèk NeighborhoodHELP, y ap kapab wè:\n- Enfòmasyon sou sentòm, tès, epi sante w,\n- Enfòmasyon sou zòn kote w ye a (zipkòd), EPI\n- Kijan w rele epi kowòdone w (imèl epi/oubyen nimewo telefòn ou)."),
     "fiuNH_title" : MessageLookupByLibrary.simpleMessage("Pwogram FIU NeighborhoodHELP"),
     "fiuNH_toggle" : MessageLookupByLibrary.simpleMessage("Pataje enfòmasyon mwen yo avèk FIU NeighborhoodHELP"),
     "fiu_body" : MessageLookupByLibrary.simpleMessage("Ou ka chwazi pou fè pataj enfòmasyon ou yo an dirèk avèk FIU. Sa ap ede w planifye epi anrejistre bezwen ak byennèt ki asosye avèk COVID-19 nan kominote FIU a. Si w pataje enfòmasyon ou yo avèk FIU, y ap kapab wè:\n- Enfòmasyon sou sentòm, tès, epi sante w,\n- Enfòm sou zòn kote w ye a (zipkòd), EPI\n- Kijan w rele epi kowòdone w (imèl epi/oubyen nimewo telefòn ou)."),
@@ -80,6 +84,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "frequency" : MessageLookupByLibrary.simpleMessage("Regilarite:"),
     "frequency_with_contents" : m2,
     "gender" : MessageLookupByLibrary.simpleMessage("Sèks"),
+    "gender_female" : MessageLookupByLibrary.simpleMessage("fi"),
+    "gender_male" : MessageLookupByLibrary.simpleMessage("gason"),
+    "gender_other" : MessageLookupByLibrary.simpleMessage("lòt"),
     "guest_home_text" : MessageLookupByLibrary.simpleMessage("StayHome gen yon lis resos ki ba w aksè dirèk nan sous enfòmasyon ki korèk. N espere sous sa yo pral ede rete byen pòtan, an sekirite, epi avèk byennèt ou pandan epidemi COVID-19 la.\n\nSan w pa gen yon kont, ou ka \"kontinye\" gade sous anba yo, epi suiv lyen elektwonik yo gen.\n\nSi w deside kòmanse yon kont, swa kounye la oswa apre, ou ka:\n\n- anrejistre sentòm epi tanperati pwòp ou yo\n- anrejistre lè ou vwayaje epi/oubyen kote w ta gendwa ekspoze\n- make tès pou COVID-19, ki ka ede depatman sante piblik konnen pou kominike ak ou\n- make lòt enfòmasyon tankou gwosè epi travay ki gendwa ede depatman sante piblik idantifye pwogram oubyen pwoteksyon pou ou."),
     "history" : MessageLookupByLibrary.simpleMessage("Istorik"),
     "home" : MessageLookupByLibrary.simpleMessage("Lakay"),
@@ -91,13 +98,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "loading_error_log_in_again" : MessageLookupByLibrary.simpleMessage("Erè. Eseye dekonekte nèt epi konekte ankò."),
     "login" : MessageLookupByLibrary.simpleMessage("konekte / anrejistre"),
     "logout" : MessageLookupByLibrary.simpleMessage("Dekonekte"),
+    "logout_small" : MessageLookupByLibrary.simpleMessage("dekonekte"),
     "member_program_question" : MessageLookupByLibrary.simpleMessage("Èske w yon patispan oubyen manm nan pwogram annapre a la?"),
     "more_charts_text" : MessageLookupByLibrary.simpleMessage("Gen plis graf ki pa montre la."),
     "my_trends" : MessageLookupByLibrary.simpleMessage("Tandans mwen genyen yo"),
     "name_not_entered" : MessageLookupByLibrary.simpleMessage("(non an pa anrejistre)"),
     "no_FHIR_patient_record_text" : MessageLookupByLibrary.simpleMessage("Pa gen dosye malad pou ou nan done FHIT a."),
     "no_active_careplan_text" : MessageLookupByLibrary.simpleMessage("Ou pa gen plan swen ki aktif."),
-    "no_content" : MessageLookupByLibrary.simpleMessage("<no content>"),
+    "no_content" : MessageLookupByLibrary.simpleMessage("(vid)"),
     "no_data" : MessageLookupByLibrary.simpleMessage("Pa gen done"),
     "no_data_to_show_text" : MessageLookupByLibrary.simpleMessage("Pa ko gen done ki parèt. Kòmanse suiv epi done ou yo pral parèl isit la."),
     "no_date" : MessageLookupByLibrary.simpleMessage("Pa gen dat"),
@@ -110,6 +118,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "profile_email_validation_error_text" : MessageLookupByLibrary.simpleMessage("Pa mete anyen oubyen mete yon bon adrès imèl"),
     "profile_form_error_text" : MessageLookupByLibrary.simpleMessage("Te gen yon erè nan anrejistreman mizajou pwofil la. Eseye ankò.."),
     "profile_home_zipcode_label_text" : MessageLookupByLibrary.simpleMessage("Zipkòd lakay ou a"),
+    "profile_info_sharing_text" : MessageLookupByLibrary.simpleMessage("Nou pa pral pataje okenn nan enfòmasyon ki nan pwofil ou a, sofsi ou pèmèt nou fè sa depi w chwazi yon pwogram presi ki nan opsyon \"pataj enfòmasyon\" ki annapre a."),
     "profile_location_title_text" : MessageLookupByLibrary.simpleMessage("Ki kote"),
     "profile_phone_hint_text" : MessageLookupByLibrary.simpleMessage("Ki nimewo telefòn ou an?"),
     "profile_phone_label_text" : MessageLookupByLibrary.simpleMessage("Telefòn selilè/mobil"),
@@ -120,6 +129,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "profile_save_error_text" : MessageLookupByLibrary.simpleMessage("Gen yon erè ki fèt lè w anrejistre mizajou pwofil la. Swa enpe oswa tout chanjman yo gendwa pa t anrejistre."),
     "profile_secondary_zipcode_hint_text" : MessageLookupByLibrary.simpleMessage("Si w pase anpil tan nan diferan kote (travay, lekòl, fanmi, etc.)"),
     "profile_secondary_zipcode_label_text" : MessageLookupByLibrary.simpleMessage("Dezyèm zipkòd ou a"),
+    "profile_small" : MessageLookupByLibrary.simpleMessage("pwofil"),
     "profile_updated_text" : MessageLookupByLibrary.simpleMessage("Mizajou sou pwofil la anrejistre"),
     "profile_zipcode_hint_text" : MessageLookupByLibrary.simpleMessage("Ki kote ou ye pi plis tan"),
     "profile_zipcode_validation_error_text" : MessageLookupByLibrary.simpleMessage("Pa mete anyen oubyen mete yon bon zipkòd"),
@@ -137,7 +147,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "select" : MessageLookupByLibrary.simpleMessage("Chwazi"),
     "select_trend_text" : MessageLookupByLibrary.simpleMessage("Chwazi yon kesyon pou w wè tandans yo"),
     "session_expired_please_log_in_again" : MessageLookupByLibrary.simpleMessage("Seyans lan fini, konekte ankò tanpri"),
+    "share_contact_info" : MessageLookupByLibrary.simpleMessage("Pataje non w epi kowòdone m (imèl epi/oubyen nimewo telefòn)"),
+    "share_location" : MessageLookupByLibrary.simpleMessage("Pataje zòn kote mwen ye a (zipkòd)"),
+    "share_symptoms" : MessageLookupByLibrary.simpleMessage("Pataje sentòm, tès, ak sante m."),
     "sign_up_or_log_in_to_access_all_functions" : MessageLookupByLibrary.simpleMessage("Konkete pou jwenn tout fonksyon yo"),
+    "social_distancing_body" : MessageLookupByLibrary.simpleMessage("Ou ka chwazi pou w pataje enfòmasyon ou yo an dirèk avèk etid sou distans sosyal la. Si w chwazi pou fè pataj enfòmasyon ou yo, y ap kapab wè:\n- Sentòm, tès, ak enfòmason sou sante w,\n- Enfòmasyon nan ki zòn ou ye (zipkòd), EPI\n- Kijan w rele ak kowòdone w (imèl epi/oubyen nimewo telefòn)."),
+    "social_distancing_title" : MessageLookupByLibrary.simpleMessage("Etid sou distans sosyal"),
+    "social_distancing_toggle" : MessageLookupByLibrary.simpleMessage("Pataje enfòmasyon mwen yo avèk etid sou distans sosyal la"),
     "springboard_COVID19_resources_text" : MessageLookupByLibrary.simpleMessage("resous ak enfòmasyon sou COVID-19"),
     "springboard_enter_pregnancy_text" : MessageLookupByLibrary.simpleMessage("mete si ansent, travay, ak risk ki posib"),
     "springboard_enter_travel_exposure_text" : MessageLookupByLibrary.simpleMessage("mete ekspozisyon an oubyen vwayaj la"),
@@ -156,6 +172,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "welcome" : MessageLookupByLibrary.simpleMessage("Byenveni epi mèsi"),
     "what_do_you_want_to_do" : MessageLookupByLibrary.simpleMessage("Kisa w vle fè?"),
     "what_is_your_email_address" : MessageLookupByLibrary.simpleMessage("Ki adrès imèl ou a?"),
-    "what_is_your_name" : MessageLookupByLibrary.simpleMessage("Kijan w rele?")
+    "what_is_your_name" : MessageLookupByLibrary.simpleMessage("Kijan w rele?"),
+    "whatlink_title" : MessageLookupByLibrary.simpleMessage("Kisa StayHome ye?")
   };
 }
