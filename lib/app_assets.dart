@@ -60,6 +60,7 @@ abstract class AppAssets {
   Widget loginBanner(BuildContext context);
 
   Widget drawerBanner(BuildContext context);
+  Widget appTitle(BuildContext context);
 
   List<Widget> additionalLoginPageViews(BuildContext context);
 
@@ -183,11 +184,15 @@ class StayHomeAppAssets extends AppAssets {
 
   @override
   Widget drawerBanner(BuildContext context) {
-    return Center(
-        child: Text(
+    return Center(child: appTitle(context));
+  }
+
+  @override
+  Text appTitle(BuildContext context) {
+    return Text(
       this.appName,
       style: Theme.of(context).primaryTextTheme.headline6.apply(fontWeightDelta: 2),
-    ));
+    );
   }
 
   @override

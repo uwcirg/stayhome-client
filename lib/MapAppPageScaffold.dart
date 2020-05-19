@@ -68,7 +68,7 @@ class MapAppPageScaffold extends StatelessWidget {
         backgroundColor: backgroundColor,
         appBar: AppBar(
           centerTitle: true,
-          title: MyApp.of(context).appAssets.drawerBanner(context),
+          title: MyApp.of(context).appAssets.appTitle(context),
           actions: actions,
           bottom: appBarBottom,
         ),
