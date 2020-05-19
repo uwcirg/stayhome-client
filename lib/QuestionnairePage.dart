@@ -284,7 +284,6 @@ class QuestionWidgetState extends State<QuestionWidget> {
       throw UnimplementedError("Not implemented: ${questionnaireItem.type}");
     }
 
-
     String helpText = questionnaireItem.helpText;
     String text = questionnaireItem.text;
     SupportLink supportLink = questionnaireItem.supportLink;
@@ -330,9 +329,8 @@ class QuestionWidgetState extends State<QuestionWidget> {
 
   Widget _buildStringItem(QuestionnaireItem questionnaireItem, BuildContext context) {
     return TextFormField(
-      initialValue: _response.getAnswer(questionnaireItem.linkId)?.toString() ?? "",
-      decoration: InputDecoration(
-          hintText: S.of(context).enter_response),
+      initialValue: _response.getAnswers(questionnaireItem.linkId)?.toString() ?? "",
+      decoration: InputDecoration(hintText: S.of(context).enter_response),
       onChanged: (value) {
         setState(() {
           _response.setAnswer(questionnaireItem.linkId, Answer(valueString: value));
@@ -352,8 +350,8 @@ class QuestionWidgetState extends State<QuestionWidget> {
       onTap: () {
         showDatePicker(
                 context: context,
-                initialDate:
-                    _response.getAnswer(questionnaireItem.linkId)?.valueDate ?? new DateTime.now(),
+                initialDate: _response.getAnswers(questionnaireItem.linkId)?.first?.valueDate ??
+                    new DateTime.now(),
                 firstDate: DateTime(2019, 1, 1),
                 lastDate: new DateTime.now(),
                 locale: Locale(Localizations.localeOf(context).languageCode, ''))
@@ -380,7 +378,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
   }
 
   Widget _buildDropDown(QuestionnaireItem questionnaireItem) {
-    Answer currentResponse = _response.getAnswer(questionnaireItem.linkId);
+    Answer currentResponse = _response.getAnswers(questionnaireItem.linkId)?.first;
 
     List<ChoiceOption> choices = questionnaireItem.choiceOptions;
 
@@ -406,9 +404,11 @@ class QuestionWidgetState extends State<QuestionWidget> {
   }
 
   Widget _buildTemperatureItem(QuestionnaireItem questionnaireItem, BuildContext context) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Text(S.of(context).enter_temperature_text,
+        Text(
+          S.of(context).enter_temperature_text,
           style: Theme.of(context)
               .textTheme
               .subtitle1
@@ -457,49 +457,46 @@ class QuestionWidgetState extends State<QuestionWidget> {
   }
 
   List<Widget> _buildChoices(QuestionnaireItem questionnaireItem, BuildContext context) {
-    Answer currentResponse = _response.getAnswer(questionnaireItem.linkId);
+    List<Answer> currentResponses = _response.getAnswers(questionnaireItem.linkId);
 
     if (questionnaireItem.answerOption != null) {
-      return _buildChoicesFromAnswerOptions(questionnaireItem, currentResponse, context);
+      return _buildChoicesFromAnswerOptions(questionnaireItem, currentResponses, context);
     }
     if (questionnaireItem.answerValueSet != null) {
-      return _buildChoicesFromAnswerValueSet(questionnaireItem, currentResponse, context);
+      return _buildChoicesFromAnswerValueSet(questionnaireItem, currentResponses, context);
     }
     throw UnimplementedError("Only answerOption and answerValueSet are supported");
   }
 
   List<Widget> _buildChoicesFromAnswerOptions(
-      QuestionnaireItem questionnaireItem, Answer currentResponse, BuildContext context) {
+      QuestionnaireItem questionnaireItem, List<Answer> currentResponses, BuildContext context) {
     return questionnaireItem.answerOption.map((AnswerOption option) {
       String display = option.display;
+      bool isSelected = (questionnaireItem.repeats
+              ? currentResponses?.contains(option)
+              : currentResponses?.first == option) ??
+          false;
       return _buildChip(
-          '${option.ordinalValue() != -1 ? option.ordinalValue() : display}',
-          currentResponse == option,
-          context,
-          questionnaireItem,
-          new Answer.fromAnswerOption(option),
-          helpLabel: display);
+          display, isSelected, context, questionnaireItem, new Answer.fromAnswerOption(option));
     }).toList();
   }
 
   List<Widget> _buildChoicesFromAnswerValueSet(
-      QuestionnaireItem questionnaireItem, Answer currentResponse, BuildContext context) {
+      QuestionnaireItem questionnaireItem, List<Answer> currentResponses, BuildContext context) {
     return questionnaireItem.answerValueSet.map((Coding option) {
       String display = option.display;
+      bool isSelected = (questionnaireItem.repeats
+              ? currentResponses?.contains(option)
+              : currentResponses?.first == option) ??
+          false;
 
-      return _buildChip(display,
-          currentResponse == option, context, questionnaireItem, new Answer(valueCoding: option),
-          helpLabel: display);
+      return _buildChip(
+          display, isSelected, context, questionnaireItem, new Answer(valueCoding: option));
     }).toList();
   }
 
   Widget _buildChip(String chipLabel, bool isSelected, BuildContext context,
-      QuestionnaireItem questionnaireItem, Answer ifChosen,
-      {String helpLabel}) {
-    if (chipLabel == "-1") {
-      chipLabel = helpLabel;
-      helpLabel = null;
-    }
+      QuestionnaireItem questionnaireItem, Answer ifChosen) {
     return Flexible(
       fit: FlexFit.tight,
       child: Column(
@@ -510,16 +507,18 @@ class QuestionWidgetState extends State<QuestionWidget> {
               selected: isSelected,
               onSelected: (bool) {
                 setState(() {
-                  // set answer to null if it was already selected
-                  _response.setAnswer(questionnaireItem.linkId, isSelected ? null : ifChosen);
+                  // remove answer if it was already selected
+                  if (isSelected) {
+                    _response.removeAnswer(questionnaireItem.linkId, ifChosen);
+                  } else {
+                    _response.setAnswer(questionnaireItem.linkId, ifChosen,
+                        replace: !questionnaireItem.repeats);
+                  }
                 });
               }),
           Visibility(
-            visible: helpLabel != null,
-            child: Text(
-              helpLabel == "Somewhat" ? "Some\u00ADwhat" : (helpLabel ?? ""),
-              textAlign: TextAlign.center,
-            ),
+            visible: chipLabel != null,
+            child: Text(chipLabel ?? "", textAlign: TextAlign.center),
           )
         ],
       ),

@@ -1243,6 +1243,8 @@ class QuestionnaireItem {
   String linkId;
 
   bool required;
+  @JsonKey(defaultValue: false)
+  bool repeats;
   QuestionType type;
   List<Coding> code;
   List<AnswerOption> answerOption;
@@ -1269,7 +1271,8 @@ class QuestionnaireItem {
       this.answerValueSetAddress,
       this.answerValueSet,
       this.extension,
-      this.item});
+      this.item,
+      this.repeats});
 
   bool isSupported() {
     return type == QuestionType.choice ||
@@ -1412,7 +1415,9 @@ class QuestionnaireResponse with Resource {
       this.subject,
       this.authored,
       this.item,
-      this.status});
+      this.status}) {
+    this.item ??= [];
+  }
 
   QuestionnaireResponse.from(Questionnaire questionnaire, this.subject, CarePlan carePlan,
       {this.resourceType = "QuestionnaireResponse", this.id, this.meta, this.status, this.item}) {
@@ -1436,22 +1441,38 @@ class QuestionnaireResponse with Resource {
 
   Map<String, dynamic> toJson() => _$QuestionnaireResponseToJson(this);
 
-  void setAnswer(String linkId, Answer answer) {
+  void removeAnswer(String linkId, Answer answer) {
+    QuestionnaireResponseItem responseItem = getResponseItem(linkId);
+    if (responseItem == null || responseItem.answer == null) return;
+
+    responseItem.answer.remove(answer);
+
+    if (responseItem.answer.isEmpty) {
+      removeResponseItem(linkId);
+    }
+  }
+
+  void setAnswer(String linkId, Answer answer, {bool replace=false}) {
     if (answer == null || answer.isEmpty) {
       removeResponseItem(linkId);
     } else {
-      var responseItem = getResponseItem(linkId);
+      QuestionnaireResponseItem responseItem = getResponseItem(linkId);
       if (responseItem != null) {
-        responseItem.answer = [answer]; // single response
+        if (replace) {
+          responseItem.answer = [answer];
+        } else {
+          responseItem.answer ??= [];
+          responseItem.answer.add(answer);
+        }
       } else {
         this.item.add(new QuestionnaireResponseItem(linkId: linkId, answer: [answer]));
       }
     }
   }
 
-  Answer getAnswer(String linkId) {
+  List<Answer> getAnswers(String linkId) {
     List<Answer> answers = getResponseItem(linkId)?.answer;
-    if (answers != null && answers.length > 0) return answers[0];
+    if (answers != null && answers.length > 0) return answers;
     return null;
   }
 
@@ -1558,7 +1579,7 @@ class QuestionnaireResponseItem {
   @JsonKey(ignore: true)
   String get answerDisplay {
     if (answer == null || answer.isEmpty) return "";
-    return answer.map((e) => e.displayString).join(",");
+    return answer.map((e) => e.displayString).join(", ");
   }
 
   factory QuestionnaireResponseItem.fromJson(Map<String, dynamic> json) =>
