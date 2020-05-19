@@ -100,7 +100,6 @@ class Consent with Resource {
       .category
       .any((CodeableConcept concept) => concept.coding.any((element) => element == category));
 
-
   @JsonKey(ignore: true)
   bool get isConsented => provision.type == ProvisionType.permit;
 
@@ -225,7 +224,11 @@ class Payload {
   String get contentString =>
       FhirTranslations.extractTranslation(contentStringBase, contentStringExt);
 
-  Payload({this.contentStringBase, this.contentAttachment, this.contentReference, this.contentStringExt});
+  Payload(
+      {this.contentStringBase,
+      this.contentAttachment,
+      this.contentReference,
+      this.contentStringExt});
 
   factory Payload.fromJson(Map<String, dynamic> json) => _$PayloadFromJson(json);
 
@@ -474,6 +477,27 @@ class Patient with Resource {
     address.postalCode = text;
   }
 
+  @JsonKey(ignore: true)
+  String get language => this
+      .communication
+      ?.firstWhere((element) => element?.preferred ?? false, orElse: () => null)
+      ?.language
+      ?.coding
+      ?.first
+      ?.code;
+
+  @JsonKey(ignore: true)
+  set language(String text) {
+    String localeString = text;
+    if (localeString.contains("_")) {
+      localeString = localeString.replaceAll("_", "-");
+    }
+    this.communication = [
+      PatientCommunication(
+          language: CodeableConcept(coding: [CommunicationLanguage(localeString)]), preferred: true)
+    ];
+  }
+
   factory Patient.fromJson(Map<String, dynamic> json) => _$PatientFromJson(json);
 
   Map<String, dynamic> toJson() => _$PatientToJson(this);
@@ -564,8 +588,9 @@ class Address {
 @JsonSerializable(explicitToJson: true, includeIfNull: false)
 class PatientCommunication {
   CodeableConcept language;
+  bool preferred;
 
-  PatientCommunication({this.language});
+  PatientCommunication({this.language, this.preferred});
 
   factory PatientCommunication.fromJson(Map<String, dynamic> json) =>
       _$PatientCommunicationFromJson(json);
@@ -1034,7 +1059,6 @@ class Questionnaire with Resource {
   @JsonKey(ignore: true)
   String get title => FhirTranslations.extractTranslation(titleBase, titleExt);
 
-
   Questionnaire(
       {this.resourceType = "Questionnaire",
       this.name,
@@ -1233,9 +1257,7 @@ class QuestionnaireItem {
   PrimitiveTypeExtension textExt;
 
   @JsonKey(ignore: true)
-  String get text =>
-      FhirTranslations.extractTranslation(textBase, textExt);
-
+  String get text => FhirTranslations.extractTranslation(textBase, textExt);
 
   QuestionnaireItem(
       {this.linkId,
@@ -1330,6 +1352,7 @@ class SupportLink {
 
 abstract class ChoiceOption {
   Answer get ifSelected;
+
   String get display;
 }
 
@@ -1392,8 +1415,7 @@ class QuestionnaireResponse with Resource {
       this.status});
 
   QuestionnaireResponse.from(Questionnaire questionnaire, this.subject, CarePlan carePlan,
-      {this.resourceType = "QuestionnaireResponse", this.id, this.meta, this.status, this.item
-      }) {
+      {this.resourceType = "QuestionnaireResponse", this.id, this.meta, this.status, this.item}) {
     if (this.item == null) {
       this.item = [];
     }

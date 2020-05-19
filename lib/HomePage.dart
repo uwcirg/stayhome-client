@@ -28,6 +28,10 @@ class HomePage extends StatelessWidget {
             return new Padding(
               padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
               child: ScopedModelDescendant<CarePlanModel>(builder: (context, child, model) {
+                WidgetsBinding.instance.addPostFrameCallback((_) async {
+                  MyApp.of(context).checkLanguage();
+                });
+
                 Widget errorWidget = MapAppErrorMessage.fromModel(model, context);
                 if (errorWidget != null) return errorWidget;
 
@@ -54,7 +58,10 @@ class HomePage extends StatelessWidget {
         Visibility(
           visible: model.activeCommunications.isNotEmpty,
           child: Padding(
-            padding: const EdgeInsets.only(bottom: Dimensions.halfMargin, left: Dimensions.halfMargin, right: Dimensions.halfMargin),
+            padding: const EdgeInsets.only(
+                bottom: Dimensions.halfMargin,
+                left: Dimensions.halfMargin,
+                right: Dimensions.halfMargin),
             child: ActiveNotificationsWidget(model),
           ),
         ),
@@ -83,7 +90,7 @@ class SpringBoardWidget extends StatelessWidget {
         child: IntrinsicHeight(
           child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [_symptomsAndTempTile(context),_cdcSymptomCheckerTile(context)]),
+              children: [_symptomsAndTempTile(context), _cdcSymptomCheckerTile(context)]),
         ),
       ),
       Padding(
@@ -104,9 +111,7 @@ class SpringBoardWidget extends StatelessWidget {
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: Dimensions.halfMargin),
         child: IntrinsicHeight(
-          child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: scrollableItems),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: scrollableItems),
         ),
       ),
       Padding(
@@ -345,7 +350,8 @@ class SpringboardTile extends StatelessWidget {
         context,
         Column(
           children: <Widget>[
-            Padding(padding: EdgeInsets.all(4), child: this.icon ?? _image(context, this.smallerIcon)),
+            Padding(
+                padding: EdgeInsets.all(4), child: this.icon ?? _image(context, this.smallerIcon)),
             Expanded(
               child: Center(
                 child: Text(
@@ -384,8 +390,7 @@ class SpringboardTile extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.all(2.0),
         child: Image.asset(this.assetPath,
-            height: imageSize,
-            color: enabled ? null : Theme.of(context).disabledColor),
+            height: imageSize, color: enabled ? null : Theme.of(context).disabledColor),
       );
     }
     return null;
