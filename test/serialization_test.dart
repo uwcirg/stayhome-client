@@ -338,6 +338,7 @@ void main() {
       "linkId": "/info",
       "type": "display",
       "required": false,
+      "repeats": false,
       "item": [
         {
           "extension": [
@@ -355,6 +356,7 @@ void main() {
               }
             }
           ],
+          "repeats": false,
           "linkId": "/info-help",
           "text": "All questions are optional.",
           "type": "display"
@@ -373,6 +375,7 @@ void main() {
       "text": "I recently started coughing",
       "type": "choice",
       "required": false,
+      "repeats": false,
       "answerOption": [
         {
           "extension": [
@@ -424,6 +427,7 @@ void main() {
       "text": "I recently have been wheezing or short of breath",
       "type": "choice",
       "required": false,
+      "repeats": false,
       "answerOption": [
         {
           "extension": [
@@ -475,6 +479,7 @@ void main() {
       "text": "My sense of smell or taste is",
       "type": "choice",
       "required": false,
+      "repeats": false,
       "answerOption": [
         {
           "extension": [
@@ -529,6 +534,7 @@ void main() {
       "text": "I have felt feverish (had episodes of high body temperature)",
       "type": "choice",
       "required": false,
+      "repeats": false,
       "answerOption": [
         {
           "extension": [
@@ -587,7 +593,8 @@ void main() {
       ],
       "text": "Temperature if taken by thermometer",
       "type": "decimal",
-      "required": false
+      "required": false,
+      "repeats": false
     },
     {
       "linkId": "/comment",
@@ -600,12 +607,14 @@ void main() {
       ],
       "text": "Comments",
       "type": "string",
-      "required": false
+      "required": false,
+      "repeats": false
     },
     {
       "linkId": "/exposure_info",
       "type": "display",
       "required": false,
+      "repeats": false,
       "item": [
         {
           "extension": [
@@ -625,7 +634,8 @@ void main() {
           ],
           "linkId": "/exposure_info-help",
           "text": "If you have had a possible or known exposure to a person infected with COVID-19, or if you have traveled within the last two weeks, please enter that information in “enter possible exposure or travel”.",
-          "type": "display"
+          "type": "display",
+          "repeats": false
         }
       ]
     }

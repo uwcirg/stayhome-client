@@ -1126,6 +1126,7 @@ QuestionnaireItem _$QuestionnaireItemFromJson(Map<String, dynamic> json) {
             ? null
             : QuestionnaireItem.fromJson(e as Map<String, dynamic>))
         ?.toList(),
+    repeats: json['repeats'] as bool ?? false,
   )..textExt = json['_text'] == null
       ? null
       : PrimitiveTypeExtension.fromJson(json['_text'] as Map<String, dynamic>);
@@ -1142,6 +1143,7 @@ Map<String, dynamic> _$QuestionnaireItemToJson(QuestionnaireItem instance) {
 
   writeNotNull('linkId', instance.linkId);
   writeNotNull('required', instance.required);
+  writeNotNull('repeats', instance.repeats);
   writeNotNull('type', _$QuestionTypeEnumMap[instance.type]);
   writeNotNull('code', instance.code?.map((e) => e?.toJson())?.toList());
   writeNotNull(
