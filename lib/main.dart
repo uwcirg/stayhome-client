@@ -63,6 +63,13 @@ class _MyAppState extends State<MyApp> {
     S.load(Locale(_locale, ""));
     initializeDateFormatting(languageCode);
     initializeFhirTranslations(languageCode);
+
+    if (!_carePlanModel.hasNoUser && !_carePlanModel.hasNoPatient) {
+      if (_locale != _carePlanModel.patient.language) {
+        print("updating preferred language to: $_locale");
+        _carePlanModel.updateUserLanguage(_locale);
+      }
+    }
   }
 
   void initializeFhirTranslations(String languageCode) {
@@ -104,10 +111,10 @@ class _MyAppState extends State<MyApp> {
                 buttonColor: appAssets.accentColor,
                 textTheme: ButtonTextTheme.accent,
                 colorScheme: Theme.of(context).colorScheme.copyWith(
-                  // secondary will be the textColor, when the textTheme is set to accent
-                  secondary: appAssets.buttonTextColor,
-                  primary: appAssets.buttonTextColor,
-                ),
+                      // secondary will be the textColor, when the textTheme is set to accent
+                      secondary: appAssets.buttonTextColor,
+                      primary: appAssets.buttonTextColor,
+                    ),
                 shape: RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(50.0),
                 ),
@@ -247,6 +254,12 @@ class _MyAppState extends State<MyApp> {
       Navigator.of(context).pushReplacementNamed('/home');
     else
       Navigator.of(context).pushReplacementNamed('/guestHome');
+  }
+
+  void checkLanguage() {
+    if (_carePlanModel?.patient?.language != null && _carePlanModel.patient.language != _locale) {
+      onChangeLanguage(_carePlanModel.patient.language);
+    }
   }
 }
 

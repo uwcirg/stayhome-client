@@ -35,6 +35,11 @@ class ConsentCategory extends Coding {
   static ConsentCategory patientConsent = ConsentCategory._("59284-0");
 }
 
+class CommunicationLanguage extends Coding {
+  static const _system = "urn:ietf:bcp:47";
+  CommunicationLanguage(String code): super(system: _system, code: code);
+}
+
 class OrganizationReference extends Reference {
   static const _resourceType = "Organization";
 

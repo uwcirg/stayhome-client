@@ -493,6 +493,7 @@ PatientCommunication _$PatientCommunicationFromJson(Map<String, dynamic> json) {
     language: json['language'] == null
         ? null
         : CodeableConcept.fromJson(json['language'] as Map<String, dynamic>),
+    preferred: json['preferred'] as bool,
   );
 }
 
@@ -507,6 +508,7 @@ Map<String, dynamic> _$PatientCommunicationToJson(
   }
 
   writeNotNull('language', instance.language?.toJson());
+  writeNotNull('preferred', instance.preferred);
   return val;
 }
 

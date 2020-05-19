@@ -373,6 +373,11 @@ class CarePlanModel extends Model {
     return Future.wait(newConsents.map((Consent c) => Repository.postConsent(c, _api)).toList())
         .then((value) => _loadConsents());
   }
+
+  Future<void> updateUserLanguage(String locale) {
+    patient.language = locale;
+    return updatePatientResource(patient);
+  }
 }
 
 class TreatmentCalendar {
@@ -437,8 +442,8 @@ class TreatmentCalendar {
       // find matching scheduled event
       TreatmentEvent event = eventList.firstWhere(
           (TreatmentEvent e) =>
-              e.questionnaireReference == response.questionnaire &&
-              e.status == Status.Scheduled, orElse: () {
+              e.questionnaireReference == response.questionnaire && e.status == Status.Scheduled,
+          orElse: () {
         return null;
       });
 
@@ -658,15 +663,12 @@ class DataSharingConsents with MapMixin<Reference, ConsentGroup> {
     List<Consent> newConsents = [];
     _consents.forEach((Reference org, Map<Coding, ProvisionType> orgConsents) {
       orgConsents.forEach((Coding contentClass, ProvisionType type) {
-        Consent existingConsent = _originalConsents
-            .firstWhere((Consent consent) {
+        Consent existingConsent = _originalConsents.firstWhere((Consent consent) {
           return consent.organization.contains(org) &&
               consent.provision.provisionClass.contains(contentClass);
         }, orElse: () => null);
 
-        ProvisionType existingProvisionType = existingConsent
-            ?.provision
-            ?.type;
+        ProvisionType existingProvisionType = existingConsent?.provision?.type;
         if (existingProvisionType == null) {
           newConsents.add(Consent.from(patient, org, contentClass, type));
         } else if (existingProvisionType != type) {
