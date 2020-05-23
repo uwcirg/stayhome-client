@@ -944,6 +944,10 @@ Questionnaire _$QuestionnaireFromJson(Map<String, dynamic> json) {
             ? null
             : QuestionnaireItem.fromJson(e as Map<String, dynamic>))
         ?.toList(),
+    contained: (json['contained'] as List)
+        ?.map((e) =>
+            e == null ? null : ValueSet.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
   )..titleExt = json['_title'] == null
       ? null
       : PrimitiveTypeExtension.fromJson(json['_title'] as Map<String, dynamic>);
@@ -966,6 +970,8 @@ Map<String, dynamic> _$QuestionnaireToJson(Questionnaire instance) {
   writeNotNull('status', instance.status);
   writeNotNull('description', instance.description);
   writeNotNull('item', instance.item?.map((e) => e?.toJson())?.toList());
+  writeNotNull(
+      'contained', instance.contained?.map((e) => e?.toJson())?.toList());
   writeNotNull('title', instance.titleBase);
   writeNotNull('_title', instance.titleExt?.toJson());
   return val;
@@ -1112,11 +1118,7 @@ QuestionnaireItem _$QuestionnaireItemFromJson(Map<String, dynamic> json) {
         ?.map((e) =>
             e == null ? null : AnswerOption.fromJson(e as Map<String, dynamic>))
         ?.toList(),
-    answerValueSetAddress: json['answerValueSetAddress'] as String,
-    answerValueSet: (json['answerValueSet'] as List)
-        ?.map((e) =>
-            e == null ? null : Coding.fromJson(e as Map<String, dynamic>))
-        ?.toList(),
+    answerValueSet: json['answerValueSet'] as String,
     extension: (json['extension'] as List)
         ?.map((e) =>
             e == null ? null : Extension.fromJson(e as Map<String, dynamic>))
@@ -1148,9 +1150,7 @@ Map<String, dynamic> _$QuestionnaireItemToJson(QuestionnaireItem instance) {
   writeNotNull('code', instance.code?.map((e) => e?.toJson())?.toList());
   writeNotNull(
       'answerOption', instance.answerOption?.map((e) => e?.toJson())?.toList());
-  writeNotNull('answerValueSetAddress', instance.answerValueSetAddress);
-  writeNotNull('answerValueSet',
-      instance.answerValueSet?.map((e) => e?.toJson())?.toList());
+  writeNotNull('answerValueSet', instance.answerValueSet);
   writeNotNull(
       'extension', instance.extension?.map((e) => e?.toJson())?.toList());
   writeNotNull('item', instance.item?.map((e) => e?.toJson())?.toList());
@@ -1449,6 +1449,9 @@ ValueSet _$ValueSetFromJson(Map<String, dynamic> json) {
     expansion: json['expansion'] == null
         ? null
         : Expansion.fromJson(json['expansion'] as Map<String, dynamic>),
+    compose: json['compose'] == null
+        ? null
+        : Compose.fromJson(json['compose'] as Map<String, dynamic>),
   )..meta = json['meta'] == null
       ? null
       : Meta.fromJson(json['meta'] as Map<String, dynamic>);
@@ -1470,6 +1473,73 @@ Map<String, dynamic> _$ValueSetToJson(ValueSet instance) {
   writeNotNull('url', instance.url);
   writeNotNull('status', instance.status);
   writeNotNull('expansion', instance.expansion?.toJson());
+  writeNotNull('compose', instance.compose?.toJson());
+  return val;
+}
+
+Compose _$ComposeFromJson(Map<String, dynamic> json) {
+  return Compose(
+    include: (json['include'] as List)
+        ?.map((e) =>
+            e == null ? null : Include.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
+  );
+}
+
+Map<String, dynamic> _$ComposeToJson(Compose instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('include', instance.include?.map((e) => e?.toJson())?.toList());
+  return val;
+}
+
+Include _$IncludeFromJson(Map<String, dynamic> json) {
+  return Include(
+    concept: (json['concept'] as List)
+        ?.map((e) =>
+            e == null ? null : Coding.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
+  );
+}
+
+Map<String, dynamic> _$IncludeToJson(Include instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('concept', instance.concept?.map((e) => e?.toJson())?.toList());
+  return val;
+}
+
+Concept _$ConceptFromJson(Map<String, dynamic> json) {
+  return Concept(
+    concept: (json['concept'] as List)
+        ?.map((e) =>
+            e == null ? null : Concept.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
+  );
+}
+
+Map<String, dynamic> _$ConceptToJson(Concept instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('concept', instance.concept?.map((e) => e?.toJson())?.toList());
   return val;
 }
 
