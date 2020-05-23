@@ -1025,6 +1025,7 @@ class Questionnaire with Resource {
   String status;
   String description;
   List<QuestionnaireItem> item;
+  List<ValueSet> contained;
 
   @JsonKey(name: "title")
   String titleBase;
@@ -1044,7 +1045,8 @@ class Questionnaire with Resource {
       this.titleBase,
       this.status,
       this.description,
-      this.item});
+      this.item,
+      this.contained});
 
   Future<void> loadValueSets() async {
     return Future.wait(item.map((QuestionnaireItem questionnaireItem) async {
@@ -1054,7 +1056,7 @@ class Questionnaire with Resource {
   }
 
   List<Future> _loadValueSetsForSelfAndChildren(QuestionnaireItem item) {
-    List<Future> futures = [item.loadValueSet()];
+    List<Future> futures = [item.loadValueSet(this.contained)];
     item.item?.forEach((element) {
       futures.addAll(_loadValueSetsForSelfAndChildren(element));
     });
@@ -1222,8 +1224,9 @@ class QuestionnaireItem {
   QuestionType type;
   List<Coding> code;
   List<AnswerOption> answerOption;
-  String answerValueSetAddress;
-  List<Coding> answerValueSet;
+  String answerValueSet;
+  @JsonKey(ignore: true)
+  List<Coding> answerValueSetExpansion;
   List<Extension> extension;
   List<QuestionnaireItem> item;
 
@@ -1244,7 +1247,6 @@ class QuestionnaireItem {
       this.type,
       this.code,
       this.answerOption,
-      this.answerValueSetAddress,
       this.answerValueSet,
       this.extension,
       this.item});
@@ -1266,10 +1268,13 @@ class QuestionnaireItem {
             "8310-5";
   }
 
-  loadValueSet() async {
-    if (answerValueSetAddress != null) {
-      ValueSet answers = await Repository.getValueSet(answerValueSetAddress);
-      answerValueSet = answers.expansion.contains;
+  loadValueSet(List<ValueSet> contained) async {
+    if (answerValueSet != null && answerValueSet.startsWith("http")) {
+      ValueSet answers = await Repository.getValueSet(answerValueSet);
+      answerValueSetExpansion = answers.expansion.contains;
+    } else if (answerValueSet.startsWith("#")) {
+      String answerValueSetName = answerValueSet.substring(1);
+      answerValueSetExpansion = contained.firstWhere((element) => element.id == answerValueSetName)?.compose?.include?.first?.concept;
     }
   }
 
@@ -1653,6 +1658,7 @@ class ValueSet with Resource {
   String url;
   String status;
   Expansion expansion;
+  Compose compose;
 
   ValueSet(
       {this.resourceType = "ValueSet",
@@ -1660,11 +1666,45 @@ class ValueSet with Resource {
       this.language,
       this.url,
       this.status,
-      this.expansion});
+      this.expansion,
+      this.compose});
 
   factory ValueSet.fromJson(Map<String, dynamic> json) => _$ValueSetFromJson(json);
 
   Map<String, dynamic> toJson() => _$ValueSetToJson(this);
+}
+
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
+class Compose {
+  List<Include> include;
+
+  Compose({this.include});
+
+  factory Compose.fromJson(Map<String, dynamic> json) => _$ComposeFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ComposeToJson(this);
+}
+
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
+class Include {
+  List<Coding> concept;
+
+  Include({this.concept});
+
+  factory Include.fromJson(Map<String, dynamic> json) => _$IncludeFromJson(json);
+
+  Map<String, dynamic> toJson() => _$IncludeToJson(this);
+}
+
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
+class Concept {
+  List<Concept> concept;
+
+  Concept({this.concept});
+
+  factory Concept.fromJson(Map<String, dynamic> json) => _$ConceptFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ConceptToJson(this);
 }
 
 @JsonSerializable(explicitToJson: true, includeIfNull: false)

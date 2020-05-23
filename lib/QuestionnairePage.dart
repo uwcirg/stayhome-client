@@ -484,7 +484,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
 
   List<Widget> _buildChoicesFromAnswerValueSet(
       QuestionnaireItem questionnaireItem, Answer currentResponse, BuildContext context) {
-    return questionnaireItem.answerValueSet.map((Coding option) {
+    return questionnaireItem.answerValueSetExpansion.map((Coding option) {
       String display = option.display;
 
       return _buildChip(display,
