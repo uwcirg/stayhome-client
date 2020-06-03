@@ -169,6 +169,14 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
               }
 
               QuestionnaireItem item = _questions[i];
+
+              if (item.isCalculated()) {
+                print("Item is a calculated item: ${item.linkId}");
+                double calculatedValue = item.calculate(response);
+                response.setAnswer(item.linkId, Answer(valueDecimal: calculatedValue));
+                return Text("${item.text}: ${response.getResponseItem(item.linkId)?.answerDisplay}");
+              }
+
               if (item.isSupported()) {
                 return QuestionWidget(item, this);
               } else if (item.isGroup()) {

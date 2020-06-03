@@ -19,5 +19,7 @@ abstract class PlatformDefs {
 
   Widget getAuthCallbackPage();
 
+  dynamic evaluateFhirPathExpression(resource, expression);
+
   factory PlatformDefs() => getPlatformDefs();
 }

@@ -6,6 +6,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:map_app_flutter/fhir/fhir_translations.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/map_app_code_system.dart';
+import 'package:map_app_flutter/platform_stub.dart';
 import 'package:map_app_flutter/services/Repository.dart';
 
 // To generate the serialization code run in project root: flutter pub run build_runner build
@@ -1371,6 +1372,27 @@ class QuestionnaireItem {
       return condition.isMetBy(responseItem);
     });
   }
+
+  bool isCalculated() {
+    if (this.extension == null) return false;
+    return this.extension.any((element) =>
+        element.url ==
+        "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression");
+  }
+
+  double calculate(QuestionnaireResponse response) {
+    String expression = this
+        .extension
+        .firstWhere((element) =>
+            element.url ==
+            "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression")
+        ?.valueExpression
+        ?.expression;
+    if (expression != null) {
+      return PlatformDefs().evaluateFhirPathExpression(response, expression);
+    }
+    return null;
+  }
 }
 
 @JsonSerializable(explicitToJson: true, includeIfNull: false)
@@ -1420,7 +1442,6 @@ class EnableWhen {
         return false;
       }
     });
-
   }
 }
 
@@ -1548,7 +1569,7 @@ class QuestionnaireResponse with Resource {
     }
   }
 
-  void setAnswer(String linkId, Answer answer, {bool replace=false}) {
+  void setAnswer(String linkId, Answer answer, {bool replace = false}) {
     if (answer == null || answer.isEmpty) {
       removeResponseItem(linkId);
     } else {
@@ -1686,6 +1707,7 @@ class QuestionnaireResponseItem {
 
 @JsonSerializable(explicitToJson: true, includeIfNull: false)
 class Answer {
+  List<Extension> extension;
   int valueInteger;
   double valueDecimal;
   Coding valueCoding;
@@ -1708,7 +1730,8 @@ class Answer {
       this.valueCoding,
       this.valueString,
       this.valueDate,
-      this.valueDateTime});
+      this.valueDateTime,
+      this.extension});
 
   @JsonKey(ignore: true)
   String get displayString {
@@ -1781,6 +1804,17 @@ class Answer {
   factory Answer.fromJson(Map<String, dynamic> json) => _$AnswerFromJson(json);
 
   Map<String, dynamic> toJson() => _$AnswerToJson(this);
+
+  /// returns -1 if there is no ordinal value.
+  int ordinalValue() {
+    if (extension == null) return -1;
+    Extension ordinalValueExtension = extension.firstWhere(
+            (Extension e) => e.url == 'http://hl7.org/fhir/StructureDefinition/ordinalValue');
+    if (ordinalValueExtension != null) {
+      return ordinalValueExtension.valueDecimal;
+    }
+    return -1;
+  }
 }
 
 @JsonSerializable(explicitToJson: true, includeIfNull: false)

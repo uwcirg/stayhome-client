@@ -948,7 +948,6 @@ Questionnaire _$QuestionnaireFromJson(Map<String, dynamic> json) {
         ?.map((e) =>
             e == null ? null : ValueSet.fromJson(e as Map<String, dynamic>))
         ?.toList(),
-
   )..titleExt = json['_title'] == null
       ? null
       : PrimitiveTypeExtension.fromJson(json['_title'] as Map<String, dynamic>);
@@ -1462,6 +1461,10 @@ Answer _$AnswerFromJson(Map<String, dynamic> json) {
     valueDateTime: json['valueDateTime'] == null
         ? null
         : DateTime.parse(json['valueDateTime'] as String),
+    extension: (json['extension'] as List)
+        ?.map((e) =>
+            e == null ? null : Extension.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
   );
 }
 
@@ -1474,6 +1477,8 @@ Map<String, dynamic> _$AnswerToJson(Answer instance) {
     }
   }
 
+  writeNotNull(
+      'extension', instance.extension?.map((e) => e?.toJson())?.toList());
   writeNotNull('valueInteger', instance.valueInteger);
   writeNotNull('valueDecimal', instance.valueDecimal);
   writeNotNull('valueCoding', instance.valueCoding?.toJson());

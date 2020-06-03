@@ -5,6 +5,8 @@
 import 'dart:async';
 import 'dart:html';
 
+import 'package:map_app_flutter/fhir/FhirPath2.dart';
+
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/config/AppConfig.dart';
 import 'package:map_app_flutter/main.dart';
@@ -69,6 +71,10 @@ class WebDefs implements PlatformDefs {
       }
       deferredPrompt = null;
     });
+  }
+
+  dynamic evaluateFhirPathExpression(resource, expression) {
+    return evaluate(resource, expression);
   }
 }
 
