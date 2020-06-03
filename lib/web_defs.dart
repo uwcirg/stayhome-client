@@ -5,10 +5,9 @@
 import 'dart:async';
 import 'dart:html';
 
-import 'package:map_app_flutter/fhir/FhirPath2.dart';
-
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/config/AppConfig.dart';
+import 'package:map_app_flutter/fhir/FhirPathJsWrapper.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
 import 'package:map_app_flutter/main.dart';
 import 'package:map_app_flutter/platform_stub.dart';
@@ -80,7 +79,7 @@ class WebDefs implements PlatformDefs {
       return evaluate(resource, expression);
     } catch (e) {
       print("FhirPath.js threw exception: $e. Attempting to evaluate expression manually.");
-      
+
       if (expression != "answers().sum(value.ordinal())") {
         throw UnsupportedError("FhirPath expression cannot be evaluated: $expression");
       }
