@@ -9,9 +9,6 @@ import 'package:map_app_flutter/map_app_code_system.dart';
 import 'package:map_app_flutter/platform_stub.dart';
 import 'package:map_app_flutter/services/Repository.dart';
 
-// To generate the serialization code run in project root: flutter pub run build_runner build
-// see https://pub.dev/packages/json_serializable
-//  and https://flutter.dev/docs/development/data-and-backend/json
 part 'FhirResources.g.dart';
 
 abstract class Resource {

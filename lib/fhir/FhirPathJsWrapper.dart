@@ -9,12 +9,12 @@ library fhirpath;
 import "package:js/js.dart";
 
 @JS()
-external evaluate(dynamic resourceObject, String fhirPathExpression, {dynamic environment});
+external evaluate(dynamic resourceObject, String fhirPathExpression);
 
-@JS()
-@anonymous
-class Options {
-  external bool get responsive;
-
-  external factory Options({bool responsive});
-}
+//@JS()
+//@anonymous
+//class Options {
+//  external bool get responsive;
+//
+//  external factory Options({bool responsive});
+//}
