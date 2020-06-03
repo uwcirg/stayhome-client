@@ -1126,6 +1126,10 @@ QuestionnaireItem _$QuestionnaireItemFromJson(Map<String, dynamic> json) {
             ? null
             : QuestionnaireItem.fromJson(e as Map<String, dynamic>))
         ?.toList(),
+    enableWhen: (json['enableWhen'] as List)
+        ?.map((e) =>
+            e == null ? null : EnableWhen.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
   )..textExt = json['_text'] == null
       ? null
       : PrimitiveTypeExtension.fromJson(json['_text'] as Map<String, dynamic>);
@@ -1150,6 +1154,8 @@ Map<String, dynamic> _$QuestionnaireItemToJson(QuestionnaireItem instance) {
   writeNotNull(
       'extension', instance.extension?.map((e) => e?.toJson())?.toList());
   writeNotNull('item', instance.item?.map((e) => e?.toJson())?.toList());
+  writeNotNull(
+      'enableWhen', instance.enableWhen?.map((e) => e?.toJson())?.toList());
   writeNotNull('text', instance.textBase);
   writeNotNull('_text', instance.textExt?.toJson());
   return val;
@@ -1172,6 +1178,43 @@ const _$QuestionTypeEnumMap = {
   QuestionType.attachment: 'attachment',
   QuestionType.reference: 'reference',
   QuestionType.quantity: 'quantity',
+};
+
+EnableWhen _$EnableWhenFromJson(Map<String, dynamic> json) {
+  return EnableWhen(
+    question: json['question'] as String,
+    operator: _$enumDecodeNullable(_$OperatorEnumMap, json['operator']),
+    answerDecimal: (json['answerDecimal'] as num)?.toDouble(),
+    answerCoding: json['answerCoding'] == null
+        ? null
+        : Coding.fromJson(json['answerCoding'] as Map<String, dynamic>),
+  );
+}
+
+Map<String, dynamic> _$EnableWhenToJson(EnableWhen instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('question', instance.question);
+  writeNotNull('operator', _$OperatorEnumMap[instance.operator]);
+  writeNotNull('answerDecimal', instance.answerDecimal);
+  writeNotNull('answerCoding', instance.answerCoding?.toJson());
+  return val;
+}
+
+const _$OperatorEnumMap = {
+  Operator.exists: 'exists',
+  Operator.equals: '=',
+  Operator.notEquals: '!=',
+  Operator.greaterThan: '>',
+  Operator.lessThan: '<',
+  Operator.greaterOrEquals: '>=',
+  Operator.lessOrEquals: '<=',
 };
 
 SupportLink _$SupportLinkFromJson(Map<String, dynamic> json) {

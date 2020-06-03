@@ -149,12 +149,12 @@ class QuestionListWidget extends StatefulWidget {
 
 class QuestionListWidgetState extends State<QuestionListWidget> {
   final List<QuestionnaireItem> _questions;
-  final QuestionnaireResponse _response;
+  final QuestionnaireResponse response;
   final Function _onDonePressed;
   final Function _onCancelPressed;
 
   QuestionListWidgetState(
-      this._questions, this._response, this._onDonePressed, this._onCancelPressed);
+      this._questions, this.response, this._onDonePressed, this._onCancelPressed);
 
   @override
   Widget build(BuildContext context) {
@@ -170,7 +170,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
 
               QuestionnaireItem item = _questions[i];
               if (item.isSupported()) {
-                return QuestionWidget(_response, item);
+                return QuestionWidget(item, this);
               } else if (item.isGroup()) {
                 return _buildGroupCard(context, item);
               } else {
@@ -209,7 +209,7 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
   Widget _buildGroupCard(BuildContext context, QuestionnaireItem item) {
     return InkWell(
         onTap: () => Navigator.of(context).push(MaterialPageRoute(
-            builder: (BuildContext context) => QuestionnaireItemPage(item, _response))),
+            builder: (BuildContext context) => QuestionnaireItemPage(item, response))),
         child: Card(
             color: Theme.of(context).highlightColor,
             child: Padding(
@@ -244,21 +244,29 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
 }
 
 class QuestionWidget extends StatefulWidget {
-  final QuestionnaireResponse response;
+  QuestionnaireResponse get response => parentState.response;
   final QuestionnaireItem question;
+  final QuestionListWidgetState parentState;
   final dateCtrl = TextEditingController();
 
-  QuestionWidget(this.response, this.question);
+  QuestionWidget(this.question, this.parentState);
 
   @override
-  State<StatefulWidget> createState() => QuestionWidgetState(this.response);
+  State<StatefulWidget> createState() => QuestionWidgetState();
 }
 
 class QuestionWidgetState extends State<QuestionWidget> {
-  QuestionnaireResponse _response;
+  QuestionnaireResponse get _response => widget.parentState.response;
   String currentEntry;
 
-  QuestionWidgetState(this._response);
+  QuestionWidgetState();
+
+  @override
+  void setState(VoidCallback fn) {
+    super.setState(() {
+      widget.parentState.setState(fn);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -266,6 +274,13 @@ class QuestionWidgetState extends State<QuestionWidget> {
   }
 
   Widget _buildItem(BuildContext context, QuestionnaireItem questionnaireItem) {
+    if (!questionnaireItem.isEnabled(_response)) {
+      return Card(
+          child: Padding(
+        padding: MapAppPadding.cardPageMargins,
+        child: Text("Hidden item. Name: ${questionnaireItem.text}"),
+      ));
+    }
     var questionTitleStyle = Theme.of(context).textTheme.title;
     Widget item;
     if (questionnaireItem.isTemperature()) {
@@ -284,33 +299,36 @@ class QuestionWidgetState extends State<QuestionWidget> {
       throw UnimplementedError("Not implemented: ${questionnaireItem.type}");
     }
 
-
     String helpText = questionnaireItem.helpText;
     String text = questionnaireItem.text;
     SupportLink supportLink = questionnaireItem.supportLink;
 
     return Padding(
         padding: MapAppPadding.cardPageMargins,
-        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
-          Visibility(
-            visible: text != null && text.isNotEmpty,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
-              child: Text(text ?? "", style: questionTitleStyle),
-            ),
-          ),
-          Visibility(
-              visible: helpText != null && helpText.isNotEmpty,
-              child: Text(
-                helpText ?? "",
-                style: Theme.of(context)
-                    .textTheme
-                    .subtitle1
-                    .apply(color: Theme.of(context).textTheme.caption.color),
-              )),
-          Visibility(visible: supportLink != null, child: _buildSupportLink(supportLink, context)),
-          item
-        ]));
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Visibility(
+                visible: text != null && text.isNotEmpty,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
+                  child: Text(text ?? "", style: questionTitleStyle),
+                ),
+              ),
+              Visibility(
+                  visible: helpText != null && helpText.isNotEmpty,
+                  child: Text(
+                    helpText ?? "",
+                    style: Theme.of(context)
+                        .textTheme
+                        .subtitle1
+                        .apply(color: Theme.of(context).textTheme.caption.color),
+                  )),
+              Visibility(
+                  visible: supportLink != null, child: _buildSupportLink(supportLink, context)),
+              item
+            ]));
   }
 
   Widget _buildSupportLink(SupportLink link, BuildContext context) {
@@ -331,8 +349,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
   Widget _buildStringItem(QuestionnaireItem questionnaireItem, BuildContext context) {
     return TextFormField(
       initialValue: _response.getAnswer(questionnaireItem.linkId)?.toString() ?? "",
-      decoration: InputDecoration(
-          hintText: S.of(context).enter_response),
+      decoration: InputDecoration(hintText: S.of(context).enter_response),
       onChanged: (value) {
         setState(() {
           _response.setAnswer(questionnaireItem.linkId, Answer(valueString: value));
@@ -372,7 +389,12 @@ class QuestionWidgetState extends State<QuestionWidget> {
   }
 
   Widget _buildChoiceItem(QuestionnaireItem questionnaireItem, BuildContext context) {
-    if (questionnaireItem.choiceCount > 5) return _buildDropDown(questionnaireItem);
+    if (questionnaireItem.choiceCount > 5) {
+      return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: _buildChoices(questionnaireItem, context, vertical: true));
+    }
     return Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -387,7 +409,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
     return DropdownButton(
       isExpanded: true,
       hint: Text(
-        currentResponse != null ? currentResponse.toString() : S.of(context).select,
+        currentResponse != null ? currentResponse.displayString : S.of(context).select,
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
       ),
@@ -406,9 +428,11 @@ class QuestionWidgetState extends State<QuestionWidget> {
   }
 
   Widget _buildTemperatureItem(QuestionnaireItem questionnaireItem, BuildContext context) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Text(S.of(context).enter_temperature_text,
+        Text(
+          S.of(context).enter_temperature_text,
           style: Theme.of(context)
               .textTheme
               .subtitle1
@@ -456,20 +480,21 @@ class QuestionWidgetState extends State<QuestionWidget> {
     );
   }
 
-  List<Widget> _buildChoices(QuestionnaireItem questionnaireItem, BuildContext context) {
+  List<Widget> _buildChoices(QuestionnaireItem questionnaireItem, BuildContext context,
+      {vertical = false}) {
     Answer currentResponse = _response.getAnswer(questionnaireItem.linkId);
 
     if (questionnaireItem.answerOption != null) {
-      return _buildChoicesFromAnswerOptions(questionnaireItem, currentResponse, context);
+      return _buildChoicesFromAnswerOptions(questionnaireItem, currentResponse, context, vertical);
     }
     if (questionnaireItem.answerValueSet != null) {
-      return _buildChoicesFromAnswerValueSet(questionnaireItem, currentResponse, context);
+      return _buildChoicesFromAnswerValueSet(questionnaireItem, currentResponse, context, vertical);
     }
     throw UnimplementedError("Only answerOption and answerValueSet are supported");
   }
 
-  List<Widget> _buildChoicesFromAnswerOptions(
-      QuestionnaireItem questionnaireItem, Answer currentResponse, BuildContext context) {
+  List<Widget> _buildChoicesFromAnswerOptions(QuestionnaireItem questionnaireItem,
+      Answer currentResponse, BuildContext context, bool vertical) {
     return questionnaireItem.answerOption.map((AnswerOption option) {
       String display = option.display;
       return _buildChip(
@@ -478,51 +503,55 @@ class QuestionWidgetState extends State<QuestionWidget> {
           context,
           questionnaireItem,
           new Answer.fromAnswerOption(option),
-          helpLabel: display);
+          helpLabel: display,
+          containedInVerticalList: vertical);
     }).toList();
   }
 
-  List<Widget> _buildChoicesFromAnswerValueSet(
-      QuestionnaireItem questionnaireItem, Answer currentResponse, BuildContext context) {
+  List<Widget> _buildChoicesFromAnswerValueSet(QuestionnaireItem questionnaireItem,
+      Answer currentResponse, BuildContext context, bool vertical) {
     return questionnaireItem.answerValueSetExpansion.map((Coding option) {
       String display = option.display;
 
-      return _buildChip(display,
-          currentResponse == option, context, questionnaireItem, new Answer(valueCoding: option),
-          helpLabel: display);
+      return _buildChip(display, currentResponse == option, context, questionnaireItem,
+          new Answer(valueCoding: option),
+          helpLabel: display, containedInVerticalList: vertical);
     }).toList();
   }
 
   Widget _buildChip(String chipLabel, bool isSelected, BuildContext context,
       QuestionnaireItem questionnaireItem, Answer ifChosen,
-      {String helpLabel}) {
+      {String helpLabel, bool containedInVerticalList}) {
     if (chipLabel == "-1") {
       chipLabel = helpLabel;
       helpLabel = null;
     }
-    return Flexible(
-      fit: FlexFit.tight,
-      child: Column(
-        children: <Widget>[
-          ChoiceChip(
-              label: Text("  "),
-              selectedColor: Theme.of(context).primaryColor,
-              selected: isSelected,
-              onSelected: (bool) {
-                setState(() {
-                  // set answer to null if it was already selected
-                  _response.setAnswer(questionnaireItem.linkId, isSelected ? null : ifChosen);
-                });
-              }),
-          Visibility(
-            visible: helpLabel != null,
-            child: Text(
-              helpLabel == "Somewhat" ? "Some\u00ADwhat" : (helpLabel ?? ""),
-              textAlign: TextAlign.center,
-            ),
-          )
-        ],
+    Widget chip = ChoiceChip(
+        label: Text("  "),
+        selectedColor: Theme.of(context).primaryColor,
+        selected: isSelected,
+        onSelected: (bool) {
+          setState(() {
+            // set answer to null if it was already selected
+            _response.setAnswer(questionnaireItem.linkId, isSelected ? null : ifChosen);
+          });
+        });
+    Widget labelText = Visibility(
+      visible: helpLabel != null,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Text(
+          helpLabel == "Somewhat" ? "Some\u00ADwhat" : (helpLabel ?? ""),
+          textAlign: containedInVerticalList ? TextAlign.start : TextAlign.center,
+          softWrap: true,
+        ),
       ),
+    );
+    return Flexible(
+      fit: FlexFit.loose,
+      child: containedInVerticalList
+          ? Row(children: [chip, Flexible(fit: FlexFit.tight, child: labelText)])
+          : Column(children: [chip, labelText]),
     );
   }
 }
