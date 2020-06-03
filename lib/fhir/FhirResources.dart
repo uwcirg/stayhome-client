@@ -2,11 +2,11 @@
  * Copyright (c) 2020 CIRG. All rights reserved.
  */
 import 'package:intl/intl.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:map_app_flutter/fhir/fhir_translations.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/map_app_code_system.dart';
 import 'package:map_app_flutter/services/Repository.dart';
-import 'package:json_annotation/json_annotation.dart';
 
 // To generate the serialization code run in project root: flutter pub run build_runner build
 // see https://pub.dev/packages/json_serializable
@@ -1255,6 +1255,7 @@ class QuestionnaireItem {
   List<Coding> answerValueSetExpansion;
   List<Extension> extension;
   List<QuestionnaireItem> item;
+  List<EnableWhen> enableWhen;
 
   @JsonKey(name: "text")
   String textBase;
@@ -1274,6 +1275,7 @@ class QuestionnaireItem {
       this.answerValueSet,
       this.extension,
       this.item,
+      this.enableWhen,
       this.repeats});
 
   bool isSupported() {
@@ -1294,12 +1296,19 @@ class QuestionnaireItem {
   }
 
   loadValueSet(List<ValueSet> contained) async {
-    if (answerValueSet != null && answerValueSet.startsWith("http")) {
-      ValueSet answers = await Repository.getValueSet(answerValueSet);
-      answerValueSetExpansion = answers.expansion.contains;
-    } else if (answerValueSet.startsWith("#")) {
-      String answerValueSetName = answerValueSet.substring(1);
-      answerValueSetExpansion = contained.firstWhere((element) => element.id == answerValueSetName)?.compose?.include?.first?.concept;
+    if (answerValueSet != null) {
+      if (answerValueSet.startsWith("http")) {
+        ValueSet answers = await Repository.getValueSet(answerValueSet);
+        answerValueSetExpansion = answers.expansion.contains;
+      } else if (answerValueSet.startsWith("#")) {
+        String answerValueSetName = answerValueSet.substring(1);
+        answerValueSetExpansion = contained
+            ?.firstWhere((element) => element.id == answerValueSetName)
+            ?.compose
+            ?.include
+            ?.first
+            ?.concept;
+      }
     }
   }
 
@@ -1348,6 +1357,88 @@ class QuestionnaireItem {
   bool isGroup() {
     return type == QuestionType.group;
   }
+
+  bool isEnabled(QuestionnaireResponse response) {
+    // enableWhen field does not apply
+    if (enableWhen == null || enableWhen.isEmpty) return true;
+
+    // enableWhen field applies and there is nothing to check against- treat as not enabled.
+    if (response == null) return false;
+
+    // Enable if any condition is met.
+    return enableWhen.any((EnableWhen condition) {
+      QuestionnaireResponseItem responseItem = response.getResponseItem(condition.question);
+      return condition.isMetBy(responseItem);
+    });
+  }
+}
+
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
+class EnableWhen {
+  String question;
+  Operator operator;
+  double answerDecimal;
+  Coding answerCoding;
+
+  EnableWhen({this.question, this.operator, this.answerDecimal, this.answerCoding});
+
+  factory EnableWhen.fromJson(Map<String, dynamic> json) => _$EnableWhenFromJson(json);
+
+  Map<String, dynamic> toJson() => _$EnableWhenToJson(this);
+
+  bool isMetBy(QuestionnaireResponseItem responseItem) {
+    if (responseItem == null) return false;
+    if (operator == Operator.exists && responseItem.isEmpty) return false;
+    if (operator == Operator.equals || operator == Operator.notEquals) {
+      bool equals = responseItem.answer.any((Answer answer) {
+        if (this.answerDecimal != null) {
+          return answer.valueDecimal == this.answerDecimal;
+        } else if (this.answerCoding != null) {
+          return answer.valueCoding == this.answerCoding;
+        }
+        return false;
+      });
+
+      if (operator == Operator.equals) return equals;
+      return !equals;
+    }
+    // other criteria can only apply to numbers
+    if (this.answerCoding != null) return false;
+
+    if (this.answerDecimal == null) return false;
+
+    return responseItem.answer.any((Answer answer) {
+      if (operator == Operator.greaterThan) {
+        return answer.valueDecimal > answerDecimal;
+      } else if (operator == Operator.lessThan) {
+        return answer.valueDecimal < answerDecimal;
+      } else if (operator == Operator.lessOrEquals) {
+        return answer.valueDecimal <= answerDecimal;
+      } else if (operator == Operator.greaterOrEquals) {
+        return answer.valueDecimal >= answerDecimal;
+      } else {
+        return false;
+      }
+    });
+
+  }
+}
+
+enum Operator {
+  @JsonValue('exists')
+  exists,
+  @JsonValue('=')
+  equals,
+  @JsonValue('!=')
+  notEquals,
+  @JsonValue('>')
+  greaterThan,
+  @JsonValue('<')
+  lessThan,
+  @JsonValue('>=')
+  greaterOrEquals,
+  @JsonValue('<=')
+  lessOrEquals
 }
 
 @JsonSerializable(explicitToJson: true, includeIfNull: false)

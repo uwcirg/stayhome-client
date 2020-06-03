@@ -30,14 +30,18 @@ class LoginPageState extends State<LoginPage> {
     super.initState();
     SimpleAuthFlutter.init(context);
     Repository.getSystemAnnouncement(MyApp.of(context).auth.api).then((Communication c) {
-      setState(() {
-        _systemAnnouncement = c;
-      });
+      if (this.mounted) {
+        setState(() {
+          _systemAnnouncement = c;
+        });
+      }
     }).catchError((error) {
       print("Loading system announcement failed: $error");
-      setState(() {
-        snack("Error loading system announcement", context);
-      });
+      if (this.mounted) {
+        setState(() {
+          snack("Error loading system announcement", context);
+        });
+      }
     });
   }
 
@@ -73,8 +77,7 @@ class LoginPageState extends State<LoginPage> {
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
+                    child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
                       MyApp.of(context).appAssets.loginBanner(context),
                       _buildSystemAnnouncement(context),
                     ]),
@@ -126,14 +129,14 @@ class LoginPageState extends State<LoginPage> {
   Widget _buildSystemAnnouncement(BuildContext context) {
     if (_systemAnnouncement == null) return Container();
     return Column(children: [
-            Text(S.of(context).system_announcement(DateFormat.yMd().format(_systemAnnouncement.sent)),
-                style: Theme.of(context).primaryTextTheme.caption),
-            Text(
-              _systemAnnouncement.displayText(context),
-              style: Theme.of(context).primaryTextTheme.bodyText1,
-              textAlign: TextAlign.center,
-            )
-          ]);
+      Text(S.of(context).system_announcement(DateFormat.yMd().format(_systemAnnouncement.sent)),
+          style: Theme.of(context).primaryTextTheme.caption),
+      Text(
+        _systemAnnouncement.displayText(context),
+        style: Theme.of(context).primaryTextTheme.bodyText1,
+        textAlign: TextAlign.center,
+      )
+    ]);
   }
 
   Widget _buildLoginButton(BuildContext context) {
@@ -185,8 +188,7 @@ class LoginPageState extends State<LoginPage> {
   Widget _buildWhatLink() {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
-      child: _buildTextLink(
-          S.of(context).whatlink_title, MyApp.of(context).appAssets.whatLink,
+      child: _buildTextLink(S.of(context).whatlink_title, MyApp.of(context).appAssets.whatLink,
           large: true),
     );
   }
