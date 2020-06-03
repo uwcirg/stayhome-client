@@ -948,6 +948,10 @@ Questionnaire _$QuestionnaireFromJson(Map<String, dynamic> json) {
         ?.map((e) =>
             e == null ? null : ValueSet.fromJson(e as Map<String, dynamic>))
         ?.toList(),
+    contained: (json['contained'] as List)
+        ?.map((e) =>
+            e == null ? null : ValueSet.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
   )..titleExt = json['_title'] == null
       ? null
       : PrimitiveTypeExtension.fromJson(json['_title'] as Map<String, dynamic>);
