@@ -288,6 +288,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
 
   Widget _buildItem(BuildContext context, QuestionnaireItem questionnaireItem) {
     if (!questionnaireItem.isEnabled(_response)) {
+      _response.removeResponseItem(questionnaireItem.linkId);
       return Container();
     }
 
