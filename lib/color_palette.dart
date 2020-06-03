@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:map_app_flutter/fhir/FhirResources.dart';
+import 'package:map_app_flutter/map_app_code_system.dart';
 
 class MapAppColors {
   static const MaterialColor stayHomePrimary = Colors.deepPurple;
@@ -18,4 +20,31 @@ class MapAppColors {
   static const Color stayHomeHighlight = Color(_stayHomeHighlightValue);
 
   static const Color stayHomeButtonTextColor = Color(0xFF2b4162);
+
+  static Color colorForFlagPriority(Coding flagPriority) {
+    return colorForPriority(priorityForFlagPriority(flagPriority));
+  }
+
+  static Color colorForPriority(Priority priority) {
+    switch (priority) {
+      case Priority.routine:
+        return Colors.blue[50];
+      case Priority.urgent:
+        return Colors.yellow[50];
+      case Priority.asap:
+        return Colors.orange[50];
+      case Priority.stat:
+        return Colors.red[50];
+      default:
+        return Colors.grey[50];
+    }
+  }
+
+  static Priority priorityForFlagPriority(Coding flagPriority) {
+    if (flagPriority == FlagPriority.noAlarm) return Priority.routine;
+    if (flagPriority == FlagPriority.lowPriority) return Priority.urgent;
+    if (flagPriority == FlagPriority.mediumPriority) return Priority.asap;
+    if (flagPriority == FlagPriority.highPriority) return Priority.stat;
+    return null;
+  }
 }

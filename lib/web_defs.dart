@@ -9,6 +9,7 @@ import 'package:map_app_flutter/fhir/FhirPath2.dart';
 
 import 'package:flutter/material.dart';
 import 'package:map_app_flutter/config/AppConfig.dart';
+import 'package:map_app_flutter/fhir/FhirResources.dart';
 import 'package:map_app_flutter/main.dart';
 import 'package:map_app_flutter/platform_stub.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -74,7 +75,29 @@ class WebDefs implements PlatformDefs {
   }
 
   dynamic evaluateFhirPathExpression(resource, expression) {
-    return evaluate(resource, expression);
+    // "answers" is not implemented yet in fhirpath.js Once it
+    try {
+      return evaluate(resource, expression);
+    } catch (e) {
+      print("FhirPath.js threw exception: $e. Attempting to evaluate expression manually.");
+      
+      if (expression != "answers().sum(value.ordinal())") {
+        throw UnsupportedError("FhirPath expression cannot be evaluated: $expression");
+      }
+      if (resource.resourceType != "QuestionnaireResponse") {
+        throw ArgumentError(
+            "Resource type not supported for FhirPath expression evaluation: ${resource.resourceType}");
+      }
+      QuestionnaireResponse r = resource;
+      int sum = 0;
+      r.item.forEach((QuestionnaireResponseItem r) {
+        r.answer.forEach((Answer a) {
+          int ordinalValue = a.ordinalValue();
+          if (a.ordinalValue() != -1) sum += ordinalValue;
+        });
+      });
+      return sum;
+    }
   }
 }
 

@@ -1279,6 +1279,9 @@ class QuestionnaireItem {
       this.enableWhen,
       this.repeats});
 
+  @JsonKey(ignore: true)
+  Coding get priority => this.extension != null ? this.extension.firstWhere((element) => element.url == "http://hl7.org/fhir/StructureDefinition/flag-priority")?.valueCodeableConcept?.coding?.first : null;
+
   bool isSupported() {
     return type == QuestionType.choice ||
         type == QuestionType.decimal ||

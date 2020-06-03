@@ -40,6 +40,15 @@ class CommunicationLanguage extends Coding {
   CommunicationLanguage(String code): super(system: _system, code: code);
 }
 
+class FlagPriority extends Coding {
+  static const _system = "http://hl7.org/fhir/flag-priority-code";
+  FlagPriority._(String code): super(system: _system, code: code);
+  static FlagPriority noAlarm = FlagPriority._("PN"); // "priority none"
+  static FlagPriority lowPriority = FlagPriority._("PL"); // "priority low"
+  static FlagPriority mediumPriority = FlagPriority._("PM"); // "priority medium"
+  static FlagPriority highPriority = FlagPriority._("PH"); // "priority high"
+}
+
 class OrganizationReference extends Reference {
   static const _resourceType = "Organization";
 

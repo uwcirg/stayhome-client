@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
+import 'package:map_app_flutter/color_palette.dart';
 import 'package:map_app_flutter/const.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
@@ -103,7 +104,7 @@ class NotificationsWidget extends StatelessWidget {
       children: communications.map((Communication c) {
         String text = c.payload[0]?.contentString ?? S.of(context).no_content;
         return Card(
-          color: _colorForPriority(c.priority),
+          color: MapAppColors.colorForPriority(c.priority),
           child: Padding(
             padding: const EdgeInsets.all(Dimensions.halfMargin),
             child: Column(
@@ -131,20 +132,5 @@ class NotificationsWidget extends StatelessWidget {
         );
       }).toList(),
     );
-  }
-
-  _colorForPriority(Priority priority) {
-    switch (priority) {
-      case Priority.routine:
-        return Colors.blue[50];
-      case Priority.urgent:
-        return Colors.yellow[50];
-      case Priority.asap:
-        return Colors.orange[50];
-      case Priority.stat:
-        return Colors.red[50];
-      default:
-        return Colors.grey[50];
-    }
   }
 }

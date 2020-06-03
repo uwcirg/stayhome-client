@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:map_app_flutter/MapAppPageScaffold.dart';
+import 'package:map_app_flutter/color_palette.dart';
 import 'package:map_app_flutter/fhir/FhirResources.dart';
 import 'package:map_app_flutter/generated/l10n.dart';
 import 'package:map_app_flutter/main.dart';
@@ -173,8 +174,12 @@ class QuestionListWidgetState extends State<QuestionListWidget> {
               if (item.isCalculated()) {
                 print("Item is a calculated item: ${item.linkId}");
                 double calculatedValue = item.calculate(response);
-                response.setAnswer(item.linkId, Answer(valueDecimal: calculatedValue));
-                return Text("${item.text}: ${response.getResponseItem(item.linkId)?.answerDisplay}");
+                response.setAnswer(item.linkId, Answer(valueDecimal: calculatedValue),
+                    replace: !item.repeats);
+                return Text(
+                  "${item.text}: ${response.getResponseItem(item.linkId)?.answerDisplay}",
+                  textAlign: TextAlign.center,
+                );
               }
 
               if (item.isSupported()) {
@@ -283,22 +288,42 @@ class QuestionWidgetState extends State<QuestionWidget> {
 
   Widget _buildItem(BuildContext context, QuestionnaireItem questionnaireItem) {
     if (!questionnaireItem.isEnabled(_response)) {
-      return Card(
-          child: Padding(
-        padding: MapAppPadding.cardPageMargins,
-        child: Text("Hidden item. Name: ${questionnaireItem.text}"),
-      ));
+      return Container();
     }
+
+    String text = questionnaireItem.text;
+
     var questionTitleStyle = Theme.of(context).textTheme.title;
+    Widget questionTitle;
     Widget item;
+
     if (questionnaireItem.isTemperature()) {
       item = _buildTemperatureItem(questionnaireItem, context);
     } else if (questionnaireItem.type == QuestionType.choice) {
       item = _buildChoiceItem(questionnaireItem, context);
     } else if (questionnaireItem.type == QuestionType.display) {
       item = Container();
-      questionTitleStyle =
-          questionTitleStyle.apply(color: Theme.of(context).primaryColor, fontWeightDelta: 2);
+
+      Coding priority = questionnaireItem.priority;
+      if (priority != null) {
+        Color backgroundColor = MapAppColors.colorForFlagPriority(priority);
+        questionTitle = Container(
+            padding: MapAppPadding.cardPageMargins,
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.all(Radius.circular(8)),
+            ),
+            child: Text(
+              text ?? "",
+              style: questionTitleStyle,
+              textAlign: TextAlign.center,
+            ));
+      } else {
+        questionTitleStyle = questionTitleStyle.apply(
+          color: Theme.of(context).primaryColor,
+          fontWeightDelta: 2,
+        );
+      }
     } else if (questionnaireItem.type == QuestionType.string) {
       item = _buildStringItem(questionnaireItem, context);
     } else if (questionnaireItem.type == QuestionType.date) {
@@ -308,8 +333,25 @@ class QuestionWidgetState extends State<QuestionWidget> {
     }
 
     String helpText = questionnaireItem.helpText;
-    String text = questionnaireItem.text;
     SupportLink supportLink = questionnaireItem.supportLink;
+
+    if (questionTitle == null) {
+      questionTitle = Visibility(
+        visible: text != null && text.isNotEmpty,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
+          child: Text(text ?? "", style: questionTitleStyle),
+        ),
+      );
+    } else {
+      questionTitle = Visibility(
+        visible: text != null && text.isNotEmpty,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
+          child: questionTitle,
+        ),
+      );
+    }
 
     return Padding(
         padding: MapAppPadding.cardPageMargins,
@@ -317,13 +359,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Visibility(
-                visible: text != null && text.isNotEmpty,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: Dimensions.halfMargin),
-                  child: Text(text ?? "", style: questionTitleStyle),
-                ),
-              ),
+              questionTitle,
               Visibility(
                   visible: helpText != null && helpText.isNotEmpty,
                   child: Text(
@@ -496,7 +532,8 @@ class QuestionWidgetState extends State<QuestionWidget> {
       return _buildChoicesFromAnswerOptions(questionnaireItem, currentResponses, context, vertical);
     }
     if (questionnaireItem.answerValueSet != null) {
-      return _buildChoicesFromAnswerValueSet(questionnaireItem, currentResponses, context, vertical);
+      return _buildChoicesFromAnswerValueSet(
+          questionnaireItem, currentResponses, context, vertical);
     }
     throw UnimplementedError("Only answerOption and answerValueSet are supported");
   }
@@ -515,8 +552,8 @@ class QuestionWidgetState extends State<QuestionWidget> {
     }).toList();
   }
 
-  List<Widget> _buildChoicesFromAnswerValueSet(
-      QuestionnaireItem questionnaireItem, List<Answer> currentResponses, BuildContext context, vertical) {
+  List<Widget> _buildChoicesFromAnswerValueSet(QuestionnaireItem questionnaireItem,
+      List<Answer> currentResponses, BuildContext context, vertical) {
     return questionnaireItem.answerValueSetExpansion.map((Coding option) {
       String display = option.display;
       bool isSelected = (questionnaireItem.repeats
@@ -525,13 +562,14 @@ class QuestionWidgetState extends State<QuestionWidget> {
           false;
 
       return _buildChip(
-          display, isSelected, context, questionnaireItem, new Answer(valueCoding: option), containedInVerticalList: vertical);
+          display, isSelected, context, questionnaireItem, new Answer(valueCoding: option),
+          containedInVerticalList: vertical);
     }).toList();
   }
 
   Widget _buildChip(String chipLabel, bool isSelected, BuildContext context,
       QuestionnaireItem questionnaireItem, Answer ifChosen,
-      {bool containedInVerticalList=false}) {
+      {bool containedInVerticalList = false}) {
     Widget chip = ChoiceChip(
         label: Text("  "),
         selectedColor: Theme.of(context).primaryColor,
