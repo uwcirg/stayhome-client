@@ -1128,11 +1128,11 @@ QuestionnaireItem _$QuestionnaireItemFromJson(Map<String, dynamic> json) {
             ? null
             : QuestionnaireItem.fromJson(e as Map<String, dynamic>))
         ?.toList(),
-    repeats: json['repeats'] as bool ?? false,
     enableWhen: (json['enableWhen'] as List)
         ?.map((e) =>
             e == null ? null : EnableWhen.fromJson(e as Map<String, dynamic>))
         ?.toList(),
+    repeats: json['repeats'] as bool ?? false,
   )..textExt = json['_text'] == null
       ? null
       : PrimitiveTypeExtension.fromJson(json['_text'] as Map<String, dynamic>);

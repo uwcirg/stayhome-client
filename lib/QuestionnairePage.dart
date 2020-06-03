@@ -508,8 +508,8 @@ class QuestionWidgetState extends State<QuestionWidget> {
   }
 
   List<Widget> _buildChoicesFromAnswerValueSet(
-      QuestionnaireItem questionnaireItem, List<Answer> currentResponses, BuildContext context) {
-    return questionnaireItem.answerValueSet.map((Coding option) {
+      QuestionnaireItem questionnaireItem, List<Answer> currentResponses, BuildContext context, vertical) {
+    return questionnaireItem.answerValueSetExpansion.map((Coding option) {
       String display = option.display;
       bool isSelected = (questionnaireItem.repeats
               ? currentResponses?.contains(option)
