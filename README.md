@@ -14,8 +14,10 @@ StayHome App Client: https://github.com/uwcirg/stayhome-client (View at https://
 
 StayHome Dashboard Client - Population Health view of StayHome patient users agreeing to share data: https://github.com/uwcirg/stayhome-dashboard (View at http://stayhome-dashboard.cirg.washington.edu/)
 
-### Auth proxy
-The app uses a reverse proxy for authorization: https://github.com/uwcirg/map-api/.
+### Server
+Auth proxy: https://github.com/uwcirg/map-api/.
+
+Seed FHIR bundle needed to initialize the app: https://github.com/uwcirg/stayhome-environments
 
 
 ### Websites
