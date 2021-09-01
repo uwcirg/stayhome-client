@@ -39,8 +39,8 @@ class IconSize {
 }
 
 class WhatInfo {
-  static const String link = "https://uwcirg.github.io/stayhomelanding/";
-  static String changelogLink = "https://uwcirg.github.io/stayhomelanding/?return_uri=" +
+  static const String link = "https://uwcirg.github.io/stayhome-project/";
+  static String changelogLink = "https://uwcirg.github.io/stayhome-project/?return_uri=" +
       Uri.encodeComponent(PlatformDefs().rootUrl()) +
       "#change-log";
   static const String cirgLink = "https://www.cirg.washington.edu/";
@@ -48,7 +48,7 @@ class WhatInfo {
   static const String _resourceLinkZipPrefix = "https://uwcirg.github.io/stayhomeresources?zip=";
   static const String contactLink = "mailto:help@stayhome-app.on.spiceworks.com";
   static const String cdcSymptomSelfCheckerLink =
-      "https://uwcirg.github.io/stayhomelanding/gotoCDCbot.html";
+      "https://uwcirg.github.io/stayhome-project/gotoCDCbot.html";
 
   static String resourceLinkWithZip(String zip) {
     if (_resourceLinkZipPrefix == null || zip == null) return resourceLink;
